@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.79.0",
+    "version": "0.80.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -41753,6 +41753,189 @@
           }
         }
       }
+    },
+    "/monitoring-onboarding/presets": {
+      "get": {
+        "x-mop-capabilities": [
+          "assets:read",
+          "configurations:read"
+        ],
+        "x-mop-read-only": true,
+        "x-mop-current-membership-recheck": true,
+        "x-mop-catalog-digest-scope": "SHA256 of shared preset file bytes, not collector authorization or runtime configuration revision",
+        "x-mop-network-io": false,
+        "x-mop-deployment-performed": false,
+        "x-mop-arbitrary-destination-accepted": false,
+        "operationId": "readMonitoringPresetCatalog",
+        "summary": "读取预设与当前租户可用采集器参数规则，不暴露其他租户地址或凭据引用",
+        "responses": {
+          "200": {
+            "description": "Catalog and form schemas, not verified device setup",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringPresetCatalogResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Rejected input or changed current scope; no preparation result released",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Rejected input or changed current scope; no preparation result released",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Rejected input or changed current scope; no preparation result released",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Rejected input or changed current scope; no preparation result released",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Rejected input or changed current scope; no preparation result released",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/monitoring-onboarding/plans": {
+      "post": {
+        "x-mop-capabilities": [
+          "assets:read",
+          "configurations:read",
+          "configurations:write"
+        ],
+        "x-mop-read-only": true,
+        "x-mop-current-membership-recheck": true,
+        "x-mop-catalog-digest-scope": "SHA256 of shared preset file bytes, not collector authorization or runtime configuration revision",
+        "x-mop-network-io": false,
+        "x-mop-deployment-performed": false,
+        "x-mop-arbitrary-destination-accepted": false,
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-csrf-required": true,
+        "x-mop-max-body-bytes": 65536,
+        "x-mop-idempotency-receipt": false,
+        "operationId": "prepareMonitoringOnboardingPlan",
+        "summary": "按当前资产与租户内采集器生成全禁用计划；不注册、不批准地址、不采集、不写业务数据",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonitoringPlanRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Valid disabled configuration or positioned invalid plan; never a partial configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringPlanResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Rejected input or changed current scope; no preparation result released",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Rejected input or changed current scope; no preparation result released",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Rejected input or changed current scope; no preparation result released",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Rejected input or changed current scope; no preparation result released",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Rejected input or changed current scope; no preparation result released",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -83340,6 +83523,547 @@
               "permission_version",
               "report",
               "source"
+            ]
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ]
+      },
+      "MonitoringPlanRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "const": 1
+          },
+          "assets": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "asset_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "profiles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 16,
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64
+                      },
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "preset_id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 64
+                          },
+                          "key": {
+                            "type": "string",
+                            "maxLength": 64
+                          },
+                          "port": {
+                            "type": "integer"
+                          },
+                          "scheme": {
+                            "type": "string",
+                            "maxLength": 64
+                          },
+                          "path": {
+                            "type": "string",
+                            "maxLength": 512
+                          },
+                          "collector": {
+                            "type": "string",
+                            "maxLength": 64
+                          }
+                        },
+                        "required": [
+                          "preset_id"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "asset_id",
+                "profiles"
+              ]
+            }
+          },
+          "defaults": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "interval_seconds": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "timeout_seconds": {
+                "type": "integer"
+              },
+              "exporter_scheme": {
+                "type": "string",
+                "maxLength": 64
+              }
+            },
+            "required": []
+          }
+        },
+        "required": [
+          "version",
+          "assets"
+        ],
+        "x-mop-cross-field-checks": [
+          "At most 64 profiles across the request; duplicate asset ids rejected",
+          "Tenant and addresses come only from the current session and authorized asset repository",
+          "Client collector definitions, credential references, enabled flags, endpoint URLs and tenant overrides are forbidden",
+          "Typed but incomplete/invalid profile settings return a positioned invalid plan; no partial configuration"
+        ]
+      },
+      "MonitoringPreparedConfiguration": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "const": 1
+          },
+          "targets": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 64,
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/MonitoringRegisteredTarget"
+                },
+                {
+                  "properties": {
+                    "enabled": {
+                      "const": false
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "version",
+          "targets"
+        ]
+      },
+      "MonitoringPreparedPlan": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "diagnostics": {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "pattern": "^[A-Z_]{1,100}$"
+                },
+                "asset_index": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 64
+                },
+                "profile_index": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 16
+                }
+              },
+              "required": [
+                "code"
+              ]
+            }
+          },
+          "configuration": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MonitoringPreparedConfiguration"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "configuration_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "catalog_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "target_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 64
+          },
+          "network_accessed": {
+            "const": false
+          },
+          "applied": {
+            "const": false
+          },
+          "continuous_collection_verified": {
+            "const": false
+          },
+          "device_identity_verified": {
+            "const": false
+          }
+        },
+        "required": [
+          "valid",
+          "diagnostics",
+          "configuration",
+          "configuration_sha256",
+          "catalog_sha256",
+          "target_count",
+          "network_accessed",
+          "applied",
+          "continuous_collection_verified",
+          "device_identity_verified"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "valid": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "diagnostics": {
+                  "maxItems": 0
+                },
+                "configuration": {
+                  "$ref": "#/components/schemas/MonitoringPreparedConfiguration"
+                },
+                "configuration_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "target_count": {
+                  "minimum": 1
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "diagnostics": {
+                  "minItems": 1
+                },
+                "configuration": {
+                  "type": "null"
+                },
+                "configuration_sha256": {
+                  "type": "null"
+                },
+                "target_count": {
+                  "const": 0
+                }
+              }
+            }
+          }
+        ]
+      },
+      "MonitoringPlanResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "actor_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "permission_version": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "plan": {
+                "$ref": "#/components/schemas/MonitoringPreparedPlan"
+              },
+              "asset_scope_checked": {
+                "type": "boolean"
+              },
+              "source": {
+                "const": "SERVER_AUTHORIZED_PREPARATION"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "actor_id",
+              "permission_version",
+              "plan",
+              "asset_scope_checked",
+              "source"
+            ],
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "plan": {
+                      "properties": {
+                        "valid": {
+                          "const": true
+                        }
+                      }
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "asset_scope_checked": {
+                      "const": true
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ]
+      },
+      "MonitoringPresetCatalog": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "const": 1
+          },
+          "catalog_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "presets": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                "title": {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                "scenario": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "engine": {
+                  "enum": [
+                    "prometheus",
+                    "zabbix"
+                  ]
+                },
+                "test_kind": {
+                  "enum": [
+                    "metrics",
+                    "blackbox",
+                    "snmp",
+                    "tcp",
+                    "configuration_only"
+                  ]
+                },
+                "suggested_port": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 65535
+                },
+                "path": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 64
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "required_any_metrics": {
+                  "type": "array",
+                  "maxItems": 2,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "source_url": {
+                  "type": "string",
+                  "format": "uri",
+                  "maxLength": 512
+                },
+                "module": {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                "success_metric": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "template": {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                "profile_schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "const": "object"
+                    },
+                    "additionalProperties": {
+                      "const": false
+                    },
+                    "properties": {
+                      "type": "object"
+                    },
+                    "required": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "additionalProperties",
+                    "properties",
+                    "required"
+                  ]
+                },
+                "server_collector_required": {
+                  "type": "boolean"
+                },
+                "server_collector_configured": {
+                  "type": "boolean"
+                },
+                "device_setup_verified": {
+                  "const": false
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "scenario",
+                "engine",
+                "test_kind",
+                "suggested_port",
+                "path",
+                "required_any_metrics",
+                "source_url",
+                "profile_schema",
+                "server_collector_required",
+                "server_collector_configured",
+                "device_setup_verified"
+              ]
+            }
+          }
+        },
+        "required": [
+          "version",
+          "catalog_sha256",
+          "presets"
+        ]
+      },
+      "MonitoringPresetCatalogResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "actor_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "permission_version": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "catalog": {
+                "$ref": "#/components/schemas/MonitoringPresetCatalog"
+              },
+              "source": {
+                "const": "SERVER_PRESET_CATALOG"
+              },
+              "network_accessed": {
+                "const": false
+              }
+            },
+            "required": [
+              "tenant_id",
+              "actor_id",
+              "permission_version",
+              "catalog",
+              "source",
+              "network_accessed"
             ]
           },
           "trace_id": {

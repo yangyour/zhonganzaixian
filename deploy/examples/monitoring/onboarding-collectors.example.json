@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "collectors": [
+    {"name": "blackbox", "tenant_id": "79000000-0000-4000-8000-000000000001", "kind": "blackbox", "endpoint": "http://198.51.100.10:9115/probe", "auth_profile": null},
+    {"name": "snmp", "tenant_id": "79000000-0000-4000-8000-000000000001", "kind": "snmp", "endpoint": "http://198.51.100.20:9116/snmp", "auth_profile": "replace_with_configured_snmp_profile"}
+  ]
+}

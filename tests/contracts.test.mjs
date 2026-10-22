@@ -133,7 +133,7 @@ test('所有业务写接口明确要求幂等及CSRF，remote_test不存在fixtu
   for (const [path, methods] of Object.entries(contract.paths)) {
     for (const [method, operation] of Object.entries(methods)) {
       if (!['post', 'put', 'patch', 'delete'].includes(method)) continue;
-      const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates', '/operations/explicit-comparisons', '/contacts/import-preview', '/monitoring/threshold-diagnostics', '/monitoring/observation-window-diagnostics', '/runtime-configurations/{key}/validate', '/monitoring-onboarding/registered-targets/{id}/test'].includes(path);
+      const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates', '/operations/explicit-comparisons', '/contacts/import-preview', '/monitoring/threshold-diagnostics', '/monitoring/observation-window-diagnostics', '/runtime-configurations/{key}/validate', '/monitoring-onboarding/registered-targets/{id}/test', '/monitoring-onboarding/plans'].includes(path);
       if (readonlyPreview) assert.equal(operation['x-mop-read-only'], true);
       for (const name of readonlyPreview || ['/auth/local/login','/auth/wecom/start'].includes(path) ? ['X-CSRF-Token'] : ['Idempotency-Key', 'X-CSRF-Token']) {
         assert.ok(operation.parameters.some((p) => p.in === 'header' && p.name === name && p.required), `${method} ${path} ${name}`);
@@ -248,8 +248,8 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.79.0');
-  assert.equal(contract.info.version, '0.79.0');
+  assert.equal(contract.info.version, '0.80.0');
+  assert.equal(contract.info.version, '0.80.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -944,7 +944,7 @@ test('补充SLA口径只能绑定明确发布版本，不接收策略或身份�
 
 test('SLA提醒记录不等于路由或送达，读取无业务写入',()=>{const p=contract.paths['/tickets/{ticketId}/sla/reminders'];assert.equal(p.get['x-mop-read-only'],true);assert.equal(p.post,undefined);const s=contract.components.schemas.TicketSlaReminder;assert.equal(s.properties.notification_status.const,'NOT_ROUTED');assert.equal(s.properties.delivered.const,false);assert.deepEqual(s.properties.progress.enum,[0.5,0.8,1]);});
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.79.0');
+  assert.equal(contract.info.version, '0.80.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/workflow/sla'].get;
@@ -1008,7 +1008,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.79.0');
+  assert.equal(contract.info.version, '0.80.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1413,4 +1413,72 @@ test('expanded monitoring view is explicit and does not add arbitrary destinatio
   assert.ok(operation.responses['409']);
   assert.equal(operation['x-mop-arbitrary-destination-accepted'], false);
   assert.equal(operation['x-mop-read-only'], true);
+});
+
+test('monitoring plan request accepts bounded drafts but rejects identity and credential overrides', () => {
+  const inventory = read('../deploy/examples/monitoring/inventory.disabled.json');
+  const body = { version: 1, defaults: inventory.defaults, assets: inventory.assets.map(({ address, ...asset }) => asset) };
+  assert.equal(validates('MonitoringPlanRequest', body), true);
+  for (const key of ['tenant_id', 'collectors', 'endpoint', 'password', 'enabled']) assert.equal(validates('MonitoringPlanRequest', { ...body, [key]: 'forbidden' }), false);
+  const overridden = structuredClone(body);
+  overridden.assets[0].address = '192.0.2.99';
+  assert.equal(validates('MonitoringPlanRequest', overridden), false);
+  overridden.assets[0] = { asset_id: body.assets[0].asset_id, profiles: [{ preset_id: 'network-snmp', auth_profile: 'unapproved' }] };
+  assert.equal(validates('MonitoringPlanRequest', overridden), false);
+});
+
+test('prepared monitoring configuration can never enable collection', () => {
+  const golden = read('../fixtures/monitoring-inventory-golden.json');
+  assert.equal(validates('MonitoringPreparedConfiguration', golden.configuration), true);
+  const active = structuredClone(golden.configuration);
+  active.targets[0].enabled = true;
+  assert.equal(validates('MonitoringPreparedConfiguration', active), false);
+});
+
+const preparedPlanFixture = () => {
+  const golden = read('../fixtures/monitoring-inventory-golden.json');
+  return { valid: true, diagnostics: [], configuration: golden.configuration, configuration_sha256: golden.configuration_sha256,
+    catalog_sha256: 'a'.repeat(64), target_count: 15, network_accessed: false, applied: false,
+    continuous_collection_verified: false, device_identity_verified: false };
+};
+
+test('monitoring plan distinguishes valid preparation from invalid drafts and partial output', () => {
+  const valid = preparedPlanFixture();
+  assert.equal(validates('MonitoringPreparedPlan', valid), true);
+  const invalid = { ...valid, valid: false, diagnostics: [{ asset_index: 1, profile_index: 2, code: 'COLLECTOR_REQUIRED' }], configuration: null, configuration_sha256: null, target_count: 0 };
+  assert.equal(validates('MonitoringPreparedPlan', invalid), true);
+  assert.equal(validates('MonitoringPreparedPlan', { ...invalid, configuration: valid.configuration }), false);
+  assert.equal(validates('MonitoringPreparedPlan', { ...invalid, diagnostics: [] }), false);
+  assert.equal(validates('MonitoringPreparedPlan', { ...valid, diagnostics: invalid.diagnostics }), false);
+  for (const field of ['network_accessed', 'applied', 'continuous_collection_verified', 'device_identity_verified']) assert.equal(validates('MonitoringPreparedPlan', { ...valid, [field]: true }), false);
+});
+
+test('valid monitoring plan requires current asset scope to have been checked', () => {
+  const data = { tenant_id: '79000000-0000-4000-8000-000000000001', actor_id: '79000000-0000-4000-8000-000000000002',
+    permission_version: 7, plan: preparedPlanFixture(), asset_scope_checked: true, source: 'SERVER_AUTHORIZED_PREPARATION' };
+  assert.equal(validates('MonitoringPlanResult', { data, trace_id: 'test' }), true);
+  assert.equal(validates('MonitoringPlanResult', { data: { ...data, asset_scope_checked: false }, trace_id: 'test' }), false);
+});
+
+test('monitoring catalog carries parameter schemas without claiming verified device setup', () => {
+  const catalog = read('../config/monitoring/presets.v1.json');
+  const result = { version: 1, catalog_sha256: 'a'.repeat(64), presets: catalog.presets.map(preset => ({ ...preset,
+    profile_schema: { type: 'object', additionalProperties: false, properties: { preset_id: { const: preset.id } }, required: ['preset_id'] },
+    server_collector_required: ['snmp', 'blackbox'].includes(preset.test_kind), server_collector_configured: false, device_setup_verified: false })) };
+  assert.equal(validates('MonitoringPresetCatalog', result), true);
+  result.presets[0].device_setup_verified = true;
+  assert.equal(validates('MonitoringPresetCatalog', result), false);
+});
+
+test('monitoring preparation endpoint is privileged CSRF-protected and has no network or write receipt', () => {
+  const operation = contract.paths['/monitoring-onboarding/plans'].post;
+  assert.equal(operation['x-mop-read-only'], true);
+  assert.equal(operation['x-mop-csrf-required'], true);
+  assert.equal(operation['x-mop-network-io'], false);
+  assert.equal(operation['x-mop-idempotency-receipt'], false);
+  assert.equal(operation['x-mop-max-body-bytes'], 65536);
+  assert.deepEqual(operation['x-mop-roles'], ['padmin']);
+  assert.deepEqual(operation['x-mop-capabilities'], ['assets:read', 'configurations:read', 'configurations:write']);
+  assert.ok(operation.parameters.some(parameter => parameter.name === 'X-CSRF-Token' && parameter.required));
+  assert.equal(contract.paths['/monitoring-onboarding/presets'].get['x-mop-network-io'], false);
 });

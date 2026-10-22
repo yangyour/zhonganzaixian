@@ -3,6 +3,9 @@ import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 @Configuration @Profile("remote_test")
 public class MonitoringPresetConfiguration {
+    @Bean MonitoringOnboardingPlanner monitoringOnboardingPlanner(Environment env){
+        return new MonitoringOnboardingPlanner(env.getProperty("MOP_MONITORING_ONBOARDING_COLLECTORS","{\"version\":1,\"collectors\":[]}"));
+    }
     @Bean MonitoringPresetProbeService monitoringPresetProbeService(Environment env){
         String enabled=env.getProperty("MOP_MONITORING_PRESET_TEST_ENABLED","false");
         if(!enabled.equals("true")&&!enabled.equals("false"))throw MonitoringPresetRegistry.invalid();

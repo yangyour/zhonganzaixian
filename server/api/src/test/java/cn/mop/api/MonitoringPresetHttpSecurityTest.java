@@ -35,6 +35,8 @@ class MonitoringPresetHttpSecurityTest {
   @Bean AtomicInteger probes(){return new AtomicInteger();}
   @Bean MonitoringPresetRegistry registry(){return MonitoringPresetTest.registry(MonitoringPresetTest.config("linux-node"));}
   @Bean MonitoringPresetProbeService service(MonitoringPresetRegistry r,AtomicInteger probes){return new MonitoringPresetProbeService(r,t->{probes.incrementAndGet();return MonitoringPresetProbeService.outcome(t,"FAILED","CONNECTION_FAILED");});}
+  @Bean MonitoringOnboardingPlanner onboardingPlanner(){return MonitoringOnboardingPlannerTest.empty();}
+  @Bean MonitoringOnboardingController onboardingController(PlatformRepository p,MonitoringOnboardingPlanner planner){return new MonitoringOnboardingController(p,planner);}
   @Bean MonitoringPresetController controller(PlatformRepository p,MonitoringPresetProbeService s){return new MonitoringPresetController(p,s);}
  }
  @Autowired WebApplicationContext context;@Autowired PlatformRepository repository;@Autowired MonitoringPresetRegistry registry;@Autowired AtomicInteger probes;
@@ -51,5 +53,22 @@ class MonitoringPresetHttpSecurityTest {
   mvc.perform(get(BASE).param("view","expanded").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isOk()).andExpect(jsonPath("$.data.items[0].target_id").value(target.id()));
   mvc.perform(get(BASE).param("view","expanded")).andExpect(status().isUnauthorized());
   mvc.perform(get(BASE).param("view","expanded","expanded").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isBadRequest());assertEquals(0,probes.get());
+ }
+
+ String planBody(){return "{\"version\":1,\"assets\":[{\"asset_id\":\""+target.assetId()+"\",\"profiles\":[\"linux-node\"]}]}";}
+ @Test void catalogHasScopedSchemasButAnonymousCannotRead()throws Exception{
+  mvc.perform(get("/api/v1/monitoring-onboarding/presets")).andExpect(status().isUnauthorized());
+  mvc.perform(get("/api/v1/monitoring-onboarding/presets").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store")).andExpect(jsonPath("$.data.catalog.presets.length()").value(13));assertEquals(0,probes.get());
+ }
+ @Test void planRequiresCsrfEvenThoughItIsPreparationOnly()throws Exception{
+  mvc.perform(post("/api/v1/monitoring-onboarding/plans").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT).contentType("application/json").content(planBody())).andExpect(status().isForbidden()).andExpect(jsonPath("$.error.code").value("CSRF_INVALID"));assertEquals(0,probes.get());
+ }
+ @Test void validPlanUsesCurrentAssetAndNeverCallsProbe()throws Exception{
+  mvc.perform(post("/api/v1/monitoring-onboarding/plans").with(user(ACTOR)).with(csrf().asHeader()).sessionAttr("mop.tenant_id",TENANT).contentType("application/json").content(planBody())).andExpect(status().isOk()).andExpect(jsonPath("$.data.plan.valid").value(true)).andExpect(jsonPath("$.data.plan.configuration.targets[0].endpoint").value("http://192.0.2.10:9100/metrics")).andExpect(jsonPath("$.data.plan.configuration.targets[0].enabled").value(false)).andExpect(jsonPath("$.data.asset_scope_checked").value(true));assertEquals(0,probes.get());
+ }
+ @Test void planRejectsCredentialOverridesAndReadOnlyRole()throws Exception{
+  mvc.perform(post("/api/v1/monitoring-onboarding/plans").with(user(ACTOR)).with(csrf().asHeader()).sessionAttr("mop.tenant_id",TENANT).contentType("application/json").content(planBody().replace("\"version\":1","\"version\":1,\"endpoint\":\"http://127.0.0.1:1/\""))).andExpect(status().isBadRequest());
+  when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"padmin",7,true,List.of("assets:read","configurations:read"))));
+  mvc.perform(post("/api/v1/monitoring-onboarding/plans").with(user(ACTOR)).with(csrf().asHeader()).sessionAttr("mop.tenant_id",TENANT).contentType("application/json").content(planBody())).andExpect(status().isForbidden());assertEquals(0,probes.get());
  }
 }

@@ -1,0 +1,45 @@
+{
+  "status": "PASS_BACKEND_UNIT_SECURITY_CHAIN_CONTRACT_AND_PACKAGE",
+  "base_main": "9d3fed4db4038132293ef4e95c5b9ca71ba33cf4",
+  "tested_backend_base_main": "0639c0ad260338633ef7b1832c76359528127044",
+  "preserved_upstream_frontend_and_doc_files": 7,
+  "api_version": "0.80.0",
+  "backend": {
+    "tests": 4276,
+    "executed": 3234,
+    "skipped": 1042,
+    "failures": 0,
+    "errors": 0,
+    "new_tests": 33,
+    "new_security_chain_cases": 4
+  },
+  "node_contracts": {
+    "tests": 192,
+    "new_tests": 6,
+    "failures": 0
+  },
+  "cross_language_golden": {
+    "preset_kinds": 13,
+    "targets": 15,
+    "configuration_and_sha256_match": true
+  },
+  "package": {
+    "jar_sha256": "e3743b53e79283475c2353e30c6d60ceb399282cd4055e485895f6e60d505eff",
+    "controllers_present": true,
+    "shared_catalog_matches": true,
+    "test_classes_absent": true
+  },
+  "frontend_sources_changed": false,
+  "network_probes_performed_by_plan": false,
+  "business_writes_performed": false,
+  "credentials_created": false,
+  "default_server_collectors": [],
+  "device_identity_verified": false,
+  "configuration_applied": false,
+  "full_application_external_identity_database_integration": "NOT_RUN",
+  "real_device_integration": "NOT_RUN",
+  "deployment": false,
+  "sql_migrations": false,
+  "formal_contract_cases": 128,
+  "formal_contract_status": "NOT_RUN"
+}

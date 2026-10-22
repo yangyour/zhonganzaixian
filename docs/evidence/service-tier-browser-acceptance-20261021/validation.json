@@ -1,0 +1,44 @@
+{
+  "result": "PASS_BROWSER_SPEC_DISCOVERY_AND_FIXTURE_ISOLATION_ONLY",
+  "new_browser_specs": 11,
+  "new_unit_tests": 2,
+  "focused_tests_passed": 31,
+  "vitest": {
+    "files_passed": 268,
+    "tests_passed": 4420
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180730,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "6e12a9f881a584563cf6237a77a4bc53178513a4af9e178e71851a510b46fa5f",
+    "scope": "static-artifacts-only"
+  },
+  "browser_specs": {
+    "tests": 97,
+    "files": 11,
+    "status": "DISCOVERED_NOT_EXECUTED"
+  },
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "screenshots": "NOT_RUN",
+  "axe": "NOT_RUN",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "initial_discovery": "FAILED_EXTRA_CLOSING_PARENTHESIS_IN_TEST; corrected and rediscovered",
+  "backend_or_ddl_changed": false,
+  "real_fee_tier_account_or_ticket_changes": 0,
+  "source_sha256": {
+    "apps/web/qa/service-tiers.fixture.html": "0f85b04b1543a3d0894b2b359fdf3fcba947c507faa567b8b39eeb022e526566",
+    "apps/web/qa/service-tiers.fixture.ts": "d755fd382fe887a2903c56d85d00d69957dea0b0eab70469756b89bcc94ced54",
+    "apps/web/qa/service-tiers.data.ts": "01839b383d7c2c5fa39113919442245670b4e533c365f867813d7a49f55e8c9f",
+    "apps/web/qa/browser/service-tiers.pw.ts": "ee69af0eed180968c042261f7d72c6777e9fff7b817fb3bc43f71b9f46d7dfc7",
+    "apps/web/tests/serviceTierBrowserFixture.test.ts": "6695be64807cdbe96210b272ed8703e1afd8ea84587942a70940d781168e472f"
+  }
+}

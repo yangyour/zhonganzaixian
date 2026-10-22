@@ -1,0 +1,12 @@
+{
+  "result": "PASS",
+  "text_files_checked": 140,
+  "markers": [
+    "/qa/service-tiers.fixture",
+    "Synthetic service tier browser entry",
+    "SYNTHETIC_BROWSER_ONLY",
+    "68000000-0000-4000-8000-"
+  ],
+  "hits": [],
+  "scope": "PRODUCTION_STATIC_ARTIFACT_SCAN_NOT_BROWSER_EXECUTION"
+}

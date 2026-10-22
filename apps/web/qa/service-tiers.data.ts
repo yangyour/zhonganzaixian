@@ -1,0 +1,14 @@
+// Synthetic browser/unit data only. No production credentials or real customer changes.
+import type {ServiceTierSnapshot,ServiceTierPage,TicketSlaInspection} from '../src/utils/serviceTiers'
+export const id=(n:number)=>'68000000-0000-4000-8000-'+n.toString(16).padStart(12,'0')
+export const tenant=id(1),actor=id(2),ticket=id(3),at='2026-10-21T00:00:00Z',observed='2026-10-21T12:00:00Z'
+export const tier=(version=1):ServiceTierSnapshot=>({tenant_id:tenant,version,tier:'STANDARD',availability_target:null,contract_device_count:10,billing_cycle:'MONTHLY',monthly_fee_fen:100,effective_mode:'IMMEDIATE',effective_from:at,updated_by:actor,updated_at:at,customer_approval_status:'UNVERIFIED'})
+export const tierPage=(current=tier()):ServiceTierPage=>({tenant_id:tenant,current,items:[{id:id(8),tenant_id:tenant,version:current.version,previous_version:current.version===1?null:current.version-1,from_tier:current.version===1?null:'STANDARD',to_tier:current.tier,availability_target:current.availability_target,contract_device_count:current.contract_device_count,billing_cycle:current.billing_cycle,monthly_fee_fen:current.monthly_fee_fen,effective_mode:current.effective_mode,effective_from:current.effective_from,reason:'SYNTHETIC_BROWSER_ONLY',approved_by:actor,changed_at:at,customer_approval_status:'UNVERIFIED'}],has_more:false,next_before_version:null,observed_at:observed,customer_approval_status:'UNVERIFIED',in_flight_ticket_retroactive:false,source:'postgresql'})
+export function inspection(count=60):TicketSlaInspection{return{
+ ticket_id:ticket,tenant_id:tenant,receipt_no:'SYNTHETIC-SLA-ONLY',registration_created_at:at,workflow_version:2,state:'RESOLVED',priority:'P1',frozen_service_tier:'STANDARD',current_tenant_service_tier:'ADVANCED',tier_changed_since_open:true,
+ response_clock:{name:'RESPONSE',due_at:null,completed_at:'2026-10-21T00:01:00Z',paused:false,breached:null,status:'PENDING_CONFIG',missing_reason:'CONFIGURATION_UNAVAILABLE',thresholds:{p50_at:null,p80_at:null,p100_at:null},working_windows_count:0},
+ recovery_clock:{name:'RECOVERY',due_at:null,completed_at:'2026-10-21T01:00:00Z',paused:true,breached:null,status:'PENDING_CONFIG',missing_reason:'CONFIGURATION_UNAVAILABLE',thresholds:{p50_at:null,p80_at:null,p100_at:null},working_windows_count:0},
+ clock_tasks:Array.from({length:count},(_,i)=>({clock_key:`confirmation:${i+1}`,kind:'CONFIRMATION_REMINDER',due_at:new Date(Date.UTC(2026,9,22,0,i)).toISOString(),outcome:null,completed_at:null})),
+ sla_missing:{response:'CONFIGURATION_UNAVAILABLE',recovery:'CONFIGURATION_UNAVAILABLE'},sla_references:Array.from({length:count},(_,i)=>({key:`synthetic.policy.${i+1}`,release_id:null,version:0,definition_hash:(i+1).toString(16).padStart(64,'0'),source:'CONTRACT_DEFAULT'})),
+ reopen_count:0,reopen_policy_status:'NOT_REOPENED',metric_version:'SLA_CLOCK_V2',observed_at:observed,source:'postgresql'
+}}

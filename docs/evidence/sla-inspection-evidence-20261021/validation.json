@@ -1,0 +1,51 @@
+{
+  "result": "PASS_SLA_INSPECTION_EVIDENCE_TABLES",
+  "new_tests": 19,
+  "new_test_layers": {
+    "component_dom": 17,
+    "full_page_dom": 2
+  },
+  "focused_tests_passed": 151,
+  "vitest": {
+    "files_passed": 267,
+    "tests_passed": 4418
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180730,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "6e12a9f881a584563cf6237a77a4bc53178513a4af9e178e71851a510b46fa5f",
+    "scope": "static-artifacts-only"
+  },
+  "browser_specs": {
+    "tests": 86,
+    "files": 10,
+    "status": "DISCOVERED_NOT_EXECUTED"
+  },
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "initial_dom_run": {
+    "passed": 28,
+    "failed": 1,
+    "reason": "ID test incorrectly compared independent Vue applications using default useId namespaces; changed to two instances in one application and verified 12 distinct IDs"
+  },
+  "paging": "25 rows per section; all 60 synthetic rows reachable independently; local only",
+  "backend_or_ddl_changed": false,
+  "real_fee_tier_account_or_ticket_changes": 0,
+  "source_sha256": {
+    "apps/web/src/components/SlaInspectionEvidence.vue": "95c305eb732a768d7179e98befed5e6736749362b45fce453347496845cf57e9",
+    "apps/web/src/pages/ServiceTiersPage.vue": "a9baed20c3f80d841e5d2769df987adf0c6bf2a0228cb101d0d334f291c73f47",
+    "apps/web/src/utils/serviceTiers.ts": "97248bd971d2c9b7f0606e87e5ea9fbcf0396f3c67645a2aeed36f4c23574845",
+    "apps/web/tests/slaInspectionEvidence.test.ts": "c7979a3159de613ad3bf7b89a62748ec1ee13718beb18f6d1d9f87196333c615",
+    "apps/web/tests/serviceTierReadRecoveryDom.test.ts": "e093d8f5c6075860b12c77f0aceeb61292b6f709474131effd08122c4627a5be"
+  }
+}

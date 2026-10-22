@@ -1,0 +1,34 @@
+{
+  "result": "PASS",
+  "scope": "LOOPBACK_VITE_HTTP_SMOKE_NOT_BROWSER_OR_API_ACCEPTANCE",
+  "checks": [
+    {
+      "path": "/service-tiers",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/pages/ServiceTiersPage.vue",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/utils/serviceTiers.ts",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/components/ReadRecoveryActions.vue",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/components/SlaInspectionEvidence.vue",
+      "status": 200,
+      "expected_marker_present": true
+    }
+  ],
+  "vite_stopped": true,
+  "browser_js_executed": false,
+  "api_or_database_executed": false
+}

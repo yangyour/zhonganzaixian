@@ -37,6 +37,7 @@ export interface TicketSlaClockStatus {
  thresholds:{p50_at:string|null;p80_at:string|null;p100_at:string|null};
  working_windows_count:number
 }
+export interface SlaPolicyReference {key:string;release_id:string|null;version:number;definition_hash:string;source:'CONTRACT_DEFAULT'|'RUNTIME_RELEASE'}
 export interface TicketSlaInspection {
  ticket_id:string;tenant_id:string;receipt_no:string;registration_created_at:string;
  workflow_version:number;state:string|null;priority:'P1'|'P2'|'P3'|null;
@@ -44,7 +45,7 @@ export interface TicketSlaInspection {
  tier_changed_since_open:boolean;
  response_clock:TicketSlaClockStatus|null;recovery_clock:TicketSlaClockStatus|null;
  clock_tasks:{clock_key:string;kind:string;due_at:string;outcome:string|null;completed_at:string|null}[];
- sla_missing:Record<string,string>;sla_references:unknown[];
+ sla_missing:Record<string,string>;sla_references:SlaPolicyReference[];
  reopen_count:number;reopen_policy_status:'NOT_REOPENED'|'PENDING_Q27';
  metric_version:'SLA_CLOCK_V2';observed_at:string;source:'postgresql'
 }

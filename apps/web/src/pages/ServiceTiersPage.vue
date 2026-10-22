@@ -12,6 +12,7 @@ import {
 import {displayTime} from '../utils/display'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import ReadRecoveryActions from '../components/ReadRecoveryActions.vue'
+import SlaInspectionEvidence from '../components/SlaInspectionEvidence.vue'
 import {exportUuid} from '../utils/assetExportJobs'
 
 const state=shallowRef<ServiceTierState>(emptyServiceTierState())
@@ -259,6 +260,7 @@ defineExpose({state,workspace,mayLeave,prepareChange,submitChange,recover,readLe
         </tbody>
        </table>
       </div>
+      <SlaInspectionEvidence :inspection="state.slaInspection" />
       <p class="metric-footer">
        重开次数：{{ state.slaInspection.reopen_count }} · 重开计时策略：{{ state.slaInspection.reopen_policy_status === 'PENDING_Q27' ? '待客户确认（Q27）' : '未触发重开' }} · 口径版本：<code>{{ state.slaInspection.metric_version }}</code>
       </p>

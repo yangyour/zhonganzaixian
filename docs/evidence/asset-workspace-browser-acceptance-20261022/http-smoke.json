@@ -1,0 +1,29 @@
+{
+  "result": "PASS",
+  "scope": "LOOPBACK_VITE_HTTP_SMOKE_NOT_BROWSER_OR_API_ACCEPTANCE",
+  "checks": [
+    {
+      "path": "/qa/asset-workspaces.fixture.html",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/qa/asset-workspaces.fixture.ts",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/qa/asset-workspaces.data.ts",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/components/AssetDateQuery.vue",
+      "status": 200,
+      "expected_marker_present": true
+    }
+  ],
+  "vite_stopped": true,
+  "browser_js_executed": false,
+  "api_or_database_executed": false
+}

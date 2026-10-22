@@ -1,0 +1,40 @@
+{
+  "status": "PASS_FIXTURE_AND_DISCOVERY_ONLY",
+  "new_fixture_tests": 6,
+  "new_browser_specifications": 30,
+  "vitest": {
+    "files": 289,
+    "tests": 4766,
+    "failures": 0
+  },
+  "node_contract_tests": 179,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180737,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "ac36b1d590b3253d964df4a327ec65059ca60ab3597e9c8d3aba3299c851a9e6",
+    "scope": "static-artifacts-only"
+  },
+  "qa_markers_absent_from_production": [
+    "asset-workspaces.fixture",
+    "synthetic-asset-account-version",
+    "Synthetic asset workspace browser entry",
+    "SYNTHETIC_UNKNOWN_SAVE"
+  ],
+  "http_smoke": "4_DISTINCT_LOOPBACK_VITE_RESOURCES_PASS_AND_STOPPED",
+  "browser": "135_SPECIFICATIONS_13_FILES_DISCOVERED_ACTUAL_NOT_RUN",
+  "actual_screenshots": "NOT_RUN",
+  "actual_axe": "NOT_RUN",
+  "formal_contract_tc": "128_NOT_RUN",
+  "test_boundary": "Five real workspace components in synthetic shell, Playwright API interception; not full production login or AssetsPage browser E2E",
+  "backend_sql_or_real_account_changed": false,
+  "source_sha256": {
+    "apps/web/qa/asset-workspaces.data.ts": "41c89cc5a35b132f17f90744beee7a4c68744a14ab0e1e592ba8b0e8b156ef7c",
+    "apps/web/qa/asset-workspaces.fixture.html": "9c0d1ca463402788af36618871fa98c10809aca981becf3e8ef8ac04d89f2560",
+    "apps/web/qa/asset-workspaces.fixture.ts": "02a5048a6ec57406f9f52afc855495e70282894099e097da48d67f1262235617",
+    "apps/web/qa/browser/asset-workspaces.pw.ts": "348f579cb6800e2d86602269d3144948b9539a4ea5c68f218fc571b096ffb1dc",
+    "apps/web/tests/assetWorkspaceBrowserFixtures.test.ts": "1f881fedf4d1a78d7a97c4f000bc069e488a8e39b8c6abf0ea25f1f691035b2e"
+  }
+}

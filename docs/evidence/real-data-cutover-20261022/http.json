@@ -1,0 +1,184 @@
+{
+  "status": "PASSED",
+  "account": "JiangFaMing",
+  "checks": [
+    {
+      "path": "auth/csrf",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "session",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "assets?page_size=100",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "identity/users?include_inactive=true",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "tickets",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "events",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "contacts",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "inspection-templates",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "inspection-worksheets",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "inspection-source-collections",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "inspection-quarterly-reports",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "backup-plan-drafts",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "change-notice-drafts",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "working-calendars",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "assets/import-sources",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "service-tiers",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "email/deliveries",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "my/notifications",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "events/noise-funnel",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "oncall/board",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "escalation-policies",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "network-monitoring/refresh-policy",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "identity/roles",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "email/status",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "auth/wecom/options",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "configurations",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "dashboard?window=HOURS_24",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "network-monitoring",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=latency&window=HOUR_1",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=latency&window=HOUR_1",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=latency&window=HOUR_1",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=latency&window=HOUR_1",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "path": "assets/028a8298-0893-f976-3da5-80fc618926c0",
+      "status": 404,
+      "expected": 404
+    }
+  ],
+  "asset_count": 4,
+  "visible_user_count": 1,
+  "audit_chain_rows_verified": 1252,
+  "all_user_triggers_enabled": true,
+  "business_writes": 0,
+  "messages_sent": 0,
+  "schema_version": 50,
+  "verified_at": "2026-10-22T13:03:22.307502+00:00"
+}

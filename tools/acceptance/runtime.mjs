@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process'
 import assert from 'node:assert/strict'
 import Ajv from 'ajv/dist/2020.js'
 import addFormats from 'ajv-formats'
+import { assertAcceptanceWriteScope } from './data-scope.mjs'
 
 class Blocked extends Error {}
 export function createHarness({ output, runId = randomUUID() } = {}) {
@@ -37,7 +38,11 @@ export function createHarness({ output, runId = randomUUID() } = {}) {
     constructor(role = 'anonymous') { this.role = role; this.cookies = new Map(); this.csrf = null; this.session = null }
     async call(path, method = 'GET', body, expected = 200, options = {}) {
       assert.ok(path.startsWith('/') && !path.startsWith('//') && !path.includes('://'), 'Relative API path required')
+      assertAcceptanceWriteScope(path, method, this.session)
       const url = new URL('/api/v1' + path, base)
+      const changesSession = method.toUpperCase() === 'POST' && ['/auth/local/login', '/auth/logout', '/session/tenant'].includes(url.pathname.slice('/api/v1'.length))
+      // A switch/login with an uncertain response must not leave an old tenant grant cached.
+      if (changesSession) this.session = null
       const headers = { Accept: 'application/json', Cookie: [...this.cookies].map(([k, v]) => k + '=' + v).join('; ') }
       if (body !== undefined && !options.formData) headers['Content-Type'] = 'application/json'
       if (!['GET', 'HEAD'].includes(method)) {
@@ -54,6 +59,7 @@ export function createHarness({ output, runId = randomUUID() } = {}) {
       for (const raw of response.headers.getSetCookie()) { const pair = raw.split(';')[0], index = pair.indexOf('='); this.cookies.set(pair.slice(0, index), pair.slice(index + 1)) }
       let payload
       try { payload = await response.json() } catch { throw new Error('NON_JSON_RESPONSE') }
+      if (changesSession && response.ok && payload.data?.tenant?.id) this.session = payload.data
       const record = { case: currentCase, role: this.role, method, path: route, status: response.status, trace_id: payload.trace_id, code: payload.error?.code, expected_status: expected }
       if (!['GET', 'HEAD'].includes(method) && response.ok) {
         for (const key of ['id', 'operation_id']) if (/^[0-9a-f-]{36}$/.test(payload.data?.[key] || '')) record['returned_' + key] = payload.data[key]

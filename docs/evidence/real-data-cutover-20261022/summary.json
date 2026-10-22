@@ -1,0 +1,40 @@
+{
+  "status": "PASSED",
+  "account": "JiangFaMing",
+  "environment": "lan-test-20261008",
+  "deleted_records": 1758,
+  "affected_delete_tables": 68,
+  "updates": 12,
+  "foreign_keys_verified": 257,
+  "rollback_rehearsal": true,
+  "all_14_container_lifecycles_unchanged": true,
+  "schema_version": 50,
+  "migrations": 0,
+  "http_checks": 34,
+  "browser_checks": 36,
+  "audit_chain_rows_verified": 1252,
+  "pure_cleanup_tests": 8,
+  "contract_and_scope_tests": 175,
+  "acceptance_write_guard_tests": 5,
+  "postcheck_remaining_synthetic_candidates": 0,
+  "postcheck_remaining_updates": 0,
+  "failed_attempts": [
+    {
+      "stage": "rollback_rehearsal",
+      "result": "ROLLED_BACK",
+      "reason": "Deferred FK events must be checked before re-enabling user triggers; fixed statement order."
+    },
+    {
+      "stage": "HTTP_verifier",
+      "result": "VERIFIER_ERROR",
+      "reason": "Events endpoint uses events, not items; corrected assertion, all actual HTTP responses were 200."
+    }
+  ],
+  "notes": [
+    "Original immutable audit retained; one truthful maintenance record appended.",
+    "Real JiangFaMing WeCom test message receipt retained; synthetic receipts removed.",
+    "No stored object deletion; removed records are no longer addressable via authorized business APIs.",
+    "No new metrics, device configuration writes, notifications or fixture business writes."
+  ],
+  "verified_at": "2026-10-22T13:05:32.101Z"
+}

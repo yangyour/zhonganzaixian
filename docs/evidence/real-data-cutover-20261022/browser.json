@@ -1,0 +1,335 @@
+{
+  "status": "PASSED",
+  "account": "JiangFaMing",
+  "origin": "http://mop.all-online.com.cn",
+  "cases": [
+    {
+      "route": "/dashboard",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/assets",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/network-monitoring",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/tickets",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/my-tasks",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/identity/users",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/identity/roles",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/customer-contacts",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/inspection-templates",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/inspection-worksheets",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/inspection-source-collections",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/inspection-quarterly-reports",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/backup-plan-drafts",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/change-notice-drafts",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/runtime-configurations",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/tenant-inventory",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/my-export-messages",
+      "width": 1440,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/dashboard",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/assets",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/network-monitoring",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/tickets",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/my-tasks",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/identity/users",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/identity/roles",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/customer-contacts",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/inspection-templates",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/inspection-worksheets",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/inspection-source-collections",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/inspection-quarterly-reports",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/backup-plan-drafts",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/change-notice-drafts",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/runtime-configurations",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/tenant-inventory",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    },
+    {
+      "route": "/my-export-messages",
+      "width": 390,
+      "http_status": 200,
+      "synthetic_data_visible": false,
+      "page_errors": 0,
+      "horizontal_overflow": false,
+      "api_failures": []
+    }
+  ],
+  "business_writes": 0,
+  "messages_sent": 0,
+  "browser": "155.0.4283.62",
+  "verified_at": "2026-10-22T13:05:32.101Z"
+}

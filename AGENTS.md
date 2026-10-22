@@ -1,5 +1,7 @@
 # V50 当前冻结边界（2026-10-21，自有临时库证据）
 
+2026-10-22 指定 LAN 测试库已从 V39 独立逐项应用冻结 V40–V50，各 apply/repeat/check=1/0/0，原 V1–V39 历史保持一致。备份只存 Git 忽略目录；临时迁移身份配置已移除，API/Worker不自动迁移。当前 API/Web main 055048b / API0.77 / V50、14服务就绪；最初迁移前 API 与 V50 权限目录不兼容，不能盲目按旧应用事务回退，详见 docs/test-environment-update-20261022.md。下文自有临时库证据仍保留为各自独立历史。
+
 当前集成谱系V1–V50 SQL均已应用并字节冻结；任何后续SQL变更新增V51或更高，禁止改写已执行资源。V50首次应用证据为docs/evidence/delivery-receipt-postgres-20261021/catalog-attempt-1/v50-application.json，固定摘要及guard摘要见tools/niko-test/frozen-delivery-receipt-journal-migration.json；V46–V49各自冻结清单保留。下文V45及更早边界为历史阶段记录，不代表当前可改写V46–V50。工具链恢复后的普通Maven/HTTP合成测试不构成新的实际PostgreSQL迁移或生产验收；API/Worker仍不得自动迁移。
 
 # 前端功能与交互验收（2026-10-21）

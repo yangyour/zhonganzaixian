@@ -90,11 +90,11 @@ defineExpose({assetBusy,prepareCreate,prepareFrom,loadAssets,cancelAssets,retryA
 </script>
 <template>
  <section class="change-notice-page">
-  <div class="page-heading"><div><h1>变更报备草稿</h1><p>登记配置变更报备草稿、变更摘要与计划窗口 · 保留原申请人与修订历史</p></div><button v-if="writable" type="button" :disabled="Boolean(state.busy)||assetBusy||workspace.unresolved()" @click="prepareCreate">准备新报备草稿</button></div>
-  <el-alert type="warning" :closable="false" show-icon title="待提交审批，审批流与窗口匹配规则待生效；草稿暂不触发远程执行或告警抑制" />
+  <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">变更报备草稿</h1></div><button v-if="writable" type="button" :disabled="Boolean(state.busy)||assetBusy||workspace.unresolved()" @click="prepareCreate">准备新报备草稿</button></div>
+  <p class="inline-boundary">待提交审批，审批流与窗口匹配规则待生效；草稿暂不触发远程执行或告警抑制</p>
   <p v-if="!permitted" class="panel">当前无权读取变更报备草稿，或租户正在切换；未展示旧数据</p>
   <template v-else>
-<div class="feature-summary"><article><span>本页变更报备</span><strong>{{ state.page?.items.length ?? '—' }}</strong><small>当前已读取记录，非总体数量</small></article><article><span>本页未归档</span><strong>{{ state.page ? state.page.items.filter(row => !row.archived).length : '—' }}</strong><small>仅记录状态，不表示批准或生效</small></article><article><span>当前所选版本</span><strong>{{ state.selected ? 'v'+state.selected.version : '—' }}</strong><small>按明确版本读取</small></article><article><span>未填结束时间</span><strong>{{ state.page ? state.page.items.filter(row => row.planned_end_at === null).length : '—' }}</strong><small>本页报备；未知时间不自动补齐</small></article></div>
+
    <details class="boundary-details"><summary>草稿准备与原请求确认说明</summary><ol class="plan-steps" aria-label="变更报备草稿步骤"><li :aria-current="currentStep===1?'step':undefined"><strong>① 明确目标</strong><span>手动勾选当前租户设备</span></li><li :aria-current="currentStep===2?'step':undefined"><strong>② 填写提案</strong><span>明确开始，结束可未知</span></li><li :aria-current="currentStep===3?'step':undefined"><strong>③ 确认原收据</strong><span>结果未知只重试原请求</span></li></ol></details>
    <ApiErrorNotice :error="state.error" /><ReadRecoveryActions :busy="state.busy" :can-retry="workspace.canRetryRead()" :scope-key="contextKey" :cancel="workspace.cancelRead" :retry="workspace.retryRead" />
    <section v-if="state.attempt" class="panel original-request" aria-live="polite"><h2>原请求 · {{actions[state.attempt.action]}}</h2><p v-if="state.attempt.state==='uncertain'">结果未知：可能已经提交。输入与原key/body已锁定，刷新列表不会重复提交请求</p><p v-else-if="state.attempt.state==='accepted'">已确认原请求收据；这不是当前最新状态，也不表示报备已获批准</p><p v-else>本次请求已明确拒绝。原输入保留，版本不自动合并</p><div class="actions"><button v-if="state.attempt.state==='uncertain'" type="button" :disabled="Boolean(state.busy)||!writable" @click="retry">重试提交</button><button v-if="state.attempt.state==='rejected'&&writable" type="button" :disabled="Boolean(state.busy)" @click="unlockRejected">保留输入并解锁修正</button><button v-if="state.attempt.baseline" type="button" :disabled="Boolean(state.busy)" @click="select(state.attempt.baseline.id)">查看原记录</button></div></section>

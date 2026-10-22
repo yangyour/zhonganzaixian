@@ -53,11 +53,11 @@ const errorText=(s:string)=>({AUTHORIZATION_CHANGED:'原受理授权已变化',S
 defineExpose({form,state,acknowledge,locked,autoRefresh,pollPreparation,filters,change,changeAck,submit,retry,browse,select,beginNew,unlockRejected,discard,cancelRead,retryRead,hasUnresolved:workspace.unresolved})
 </script>
 <template>
- <section class="export-page"><div class="page-heading proto-page-head"><div><h1>资产台账导出 <span class="proto-badge">{{ session?.tenant.name }}</span></h1><p>创建资产台账导出任务、跟踪后台文件生成进度并管理下载发布</p></div><button v-if="permitted" class="export-create" type="button" @click="formOpen=true">新建导出请求</button></div>
- <el-alert type="info" :closable="false" show-icon title="导出请求提交后由后台异步生成文件；文件准备完成后支持独立发布与下载，发布后可查看我的导出消息" />
+ <section class="export-page"><div class="compact-page-toolbar page-heading proto-page-head"><div><h1 class="page-title-sr">资产台账导出 </h1></div><button v-if="permitted" class="export-create" type="button" @click="formOpen=true">新建导出请求</button></div>
+ 
  <p v-if="!permitted" class="panel">当前身份没有内部导出准备权限，或租户正在切换；未展示旧数据</p>
  <template v-else>
-  <div class="proto-kpis"><div><span>本页作业</span><b>{{ state.page ? state.page.items.length : '—' }}</b><small>当前账号已提交任务</small></div><div><span>文件格式</span><b>XLSX</b><small>标准资产台账表格</small></div><div><span>处理模式</span><b>异步生成</b><small>受理后支持实时查询进度</small></div><div><span>文件发布</span><b>受控签发</b><small>生成后按需发布下载链接</small></div></div>
+  
   <section class="panel export-list"><div class="actions"><h2>我的导出作业</h2><button type="button" :disabled="busy" @click="browse()">刷新任务列表</button></div><p v-if="!state.page">{{state.busy==='read'?'正在加载任务列表…':state.error?'任务列表加载未完成':'暂未加载任务列表'}}</p>
    <template v-else><p>本页已加载 {{state.page.items.length}} 条任务（{{state.paged?'续页':'第一页'}} · 仅展示当前账号创建的导出作业）</p><p v-if="!state.page.items.length">当前筛选范围内暂无导出作业记录</p><div class="proto-table-wrap"><table class="job-cards proto-table"><thead><tr><th>导出作业</th><th>准备状态</th><th>筛选文本</th><th>创建时间</th><th>操作</th></tr></thead><tbody><tr v-for="job in state.page.items" :key="job.id"><td><span class="export-file-icon">X</span><span>设备台账 XLSX</span><small>{{job.id}} · v{{job.version}}</small></td><td><span class="proto-badge">{{statusText(job.status)}}</span></td><td>{{valueText(job.filters.query)}}</td><td>{{displayTime(job.created_at)}}<span class="proto-sub">Asia/Shanghai</span></td><td><button class="proto-link" type="button" :disabled="busy" @click="select(job.id)">读取当前进度</button></td></tr></tbody></table></div><button type="button" :disabled="busy||!state.page.has_more" @click="browse(true)">下一页本人作业</button></template>
   </section>

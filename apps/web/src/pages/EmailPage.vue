@@ -72,7 +72,7 @@ async function disableSelected(){
 async function disable(row:EmailBinding){if(!bindings.value.some(item=>item===row)||!row.active)return;if(!locked.value&&!editor.dirty.value)await editor.save(`/email/bindings/${row.user_id}`,'PUT',{expected_version:row.version,email:row.email,active:false})}
 </script>
 <template><section :aria-busy="loading" class="identity-page admin-prototype email-page">
- <div class="page-heading"><div><h1>邮件通知</h1><p>检查发件连接，配置收件地址，查看邮件发送记录。</p></div><el-button :disabled="editor.busy()||loading||switchingTenant" @click="refresh">刷新</el-button></div>
+ <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">邮件通知</h1></div><el-button :disabled="editor.busy()||loading||switchingTenant" @click="refresh">刷新</el-button></div>
  <ApiErrorNotice v-if="error" :error="error"/><IdentityCommandNotice v-if="command.state!=='idle'||message" :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry"/>
  <p v-if="loading" role="status">正在读取邮件配置…</p><p v-if="error instanceof ApiError&&error.status===404" class="admin-card">当前租户尚未启用邮件通知，请联系管理员配置。</p>
  <p v-if="!readable()" role="status">当前没有读取邮件配置的权限。</p>

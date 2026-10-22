@@ -35,11 +35,11 @@ defineExpose({state,workspace,mayLeave,openLedger,markRead,recover,tab,list,refr
 </script>
 <template>
  <section class="notifications">
-  <div class="page-heading proto-page-head"><div><h1>工单通知 <span class="proto-badge">{{ session?.tenant.name }}</span></h1><p>工单受理、处理、确认与 SLA 节点的站内通知记录；仅显示发给本人账号的通知。</p></div><RouterLink to="/ticket-workflows" class="back">工单处理</RouterLink></div>
+  <div class="compact-page-toolbar page-heading proto-page-head"><div><h1 class="page-title-sr">工单通知 </h1></div><RouterLink to="/ticket-workflows" class="back">工单处理</RouterLink></div>
   <p class="panel" v-if="!permitted">当前身份没有工单通知权限，或正在切换租户。</p>
   <template v-else>
-   <p class="proto-scope-note external">邮件或企业微信接入启用且账号完成绑定后，可将本站通知发送给本人。自动业务通知尚未启用；服务器受理与实际收到分别记录。</p>
-   <div class="proto-kpis"><div><span>未读通知</span><b>{{ state.page ? state.page.unread_count : '—' }}</b><small>当前租户本人</small></div><div><span>本页通知</span><b>{{ state.page ? state.page.items.length : '—' }}</b><small>按时间倒序</small></div><div><span>通知渠道</span><b>站内</b><small>自动派发未启用</small></div></div>
+   
+   
    <div class="proto-panel workspace">
     <div class="proto-toolbar">
      <div class="proto-tabs" aria-label="通知视图">
@@ -74,7 +74,7 @@ defineExpose({state,workspace,mayLeave,openLedger,markRead,recover,tab,list,refr
      </template>
     </template>
     <template v-else-if="ledgerAllowed">
-     <p class="proto-scope-note">每条工单处理事件生成一条通知派发记录。“待确认规则”表示接收对象依赖尚未配置的值班、升级或角色规则，系统不会自动指定默认接收人。</p>
+     
      <ApiErrorNotice :error="state.intentError" />
      <button v-if="state.intentError&&!state.intents&&!state.intentBusy" type="button" @click="workspace.retryIntents()">重试原台账页</button>
      <p v-if="state.intentBusy" role="status">正在读取通知派发记录…</p>

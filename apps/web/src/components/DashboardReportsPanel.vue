@@ -31,7 +31,7 @@ onUnmounted(()=>{alive=false;reset()})
 </script>
 <template>
  <section v-if="permitted" class="dashboard-reports" :aria-busy="busy" aria-label="实际报障登记">
-  <header><div><h2>{{ own ? '我的报障登记' : '报障登记' }}</h2><p>{{ own ? '仅本人记录' : '当前租户授权记录' }} · 按登记时间正序，每页 10 条</p></div><div class="report-actions"><button type="button" :disabled="busy" @click="load()">{{ busy ? '刷新中…' : '刷新登记' }}</button><router-link to="/tickets">进入报障工作区</router-link></div></header>
+  <header><div><h2>{{ own ? '我的报障登记' : '报障登记' }}</h2></div><div class="report-actions"><button type="button" :disabled="busy" @click="load()">{{ busy ? '刷新中…' : '刷新登记' }}</button><router-link to="/tickets">进入报障工作区</router-link></div></header>
   <ApiErrorNotice :error="error" :retrying="busy" @retry="retry" />
   <p v-if="!page" role="status">{{ busy ? '正在加载报障登记…' : error ? '登记读取失败，未显示旧列表。' : '暂未加载报障登记。' }}</p>
   <template v-else>

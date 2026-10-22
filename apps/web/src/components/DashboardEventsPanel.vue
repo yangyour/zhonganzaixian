@@ -31,7 +31,7 @@ const suppression={NONE:'无抑制',FLAP_SILENCED:'抖动静默',DEPENDENCY_SUPP
 </script>
 <template>
 <section v-if="permitted" class="dashboard-events" aria-labelledby="dashboard-events-title" :aria-busy="busy">
- <header><div><h2 id="dashboard-events-title">近期监控事件</h2><p>当前租户 · 按最近发生时间倒序，最多 7 条；包含恢复和关闭事件，不限最近 24 小时。</p></div><div class="actions"><button :disabled="busy" @click="load">{{busy?'读取中…':'刷新近期事件'}}</button><router-link to="/monitoring-events">进入事件中心</router-link></div></header>
+ <header><div><h2 id="dashboard-events-title">近期监控事件</h2></div><div class="actions"><button :disabled="busy" @click="load">{{busy?'读取中…':'刷新近期事件'}}</button><router-link to="/monitoring-events">进入事件中心</router-link></div></header>
  <ApiErrorNotice :error="error" :retrying="busy" @retry="load" />
  <p v-if="!events" role="status">{{busy?'正在读取近期事件…':error?'事件读取失败，未沿用旧列表。':'尚未读取事件。'}}</p>
  <template v-else><p role="status">已读取 {{events.length}} 条近期记录 · 数据库观察时间：{{displayTime(observed)}}。此处手动刷新，不代表实时推送。</p><p v-if="!events.length">当前查询没有事件记录，不代表全量设备健康或采集完整。</p>

@@ -60,11 +60,11 @@ defineExpose({state,workspace,draft,pageSize,from,to,search,refresh,nextPage,ver
 </script>
 <template>
   <section class="audit-page admin-prototype">
-    <div class="page-heading"><div><h1>审计检索与区间校验</h1><p>按当前租户检索操作审计记录（支持精确条件匹配），并提供基于哈希链的区间连续性校验。</p></div><el-button :loading="state.loading" :disabled="!permitted" @click="refresh">刷新列表</el-button></div>
+    <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">审计检索与区间校验</h1></div><el-button :loading="state.loading" :disabled="!permitted" @click="refresh">刷新列表</el-button></div>
     <details class="admin-explainer"><summary>审计日志存证说明 · 链式哈希摘要校验范围</summary><p>审计日志以只读追加方式持久化存储，不支持修改、删除或重签名。区间校验用于核对数据库快照内相邻记录的哈希链连续性（长期归档与外部可信时间戳锚点按平台合规策略配置）。</p></details>
     <el-empty v-if="!permitted" description="当前身份没有本租户审计权限" />
     <template v-else>
-      <div class="admin-stats"><div class="admin-stat"><span>本页审计记录</span><strong>{{ state.page?.items.length ?? '—' }}</strong><small>当前页已加载记录</small></div><div class="admin-stat"><span>查询快照序号上界</span><strong>{{ state.page?.snapshot_sequence ?? '—' }}</strong><small>后续翻页沿用同一快照上界</small></div><div class="admin-stat"><span>区间校验</span><strong>{{ state.proof ? state.proof.status : '未校验' }}</strong><small>独立于列表筛选条件</small></div><div class="admin-stat"><span>本次已校验记录</span><strong>{{ state.proof?.verified_records ?? '—' }}</strong><small>当前校验批次记录数</small></div></div>
+      
       <div class="panel">
         <el-form label-position="top" class="audit-filter-grid" @submit.prevent="search">
           <el-form-item v-for="field in fields.slice(0, 3)" :key="field.key" :label="field.label"><el-input v-model="draft[field.key]" clearable :aria-label="field.label" :placeholder="field.placeholder" /></el-form-item>

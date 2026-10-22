@@ -59,10 +59,10 @@ const bufferMissing: Record<string, string> = Object.fromEntries([...bufferField
 <template>
   <CapacityScenarioPanel ref="scenarios" :calculation="input()" />
   <section ref="capacityRoot" class="capacity-page">
-    <div class="page-heading"><div><h1>容量与 Proxy 缓冲评估</h1><p>按有效监控项、采样频率和保留周期测算存储与吞吐规模 · 模型估算供容量规划参考</p></div><div class="capacity-actions"><el-button v-if="can('capacity_scenarios:read')" @click="scenarios?.browse()">已保存方案</el-button><el-button v-if="can('capacity_scenarios:write')" type="primary" @click="scenarios?.prepare()">保存为容量方案</el-button></div></div>
+    <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">容量与 Proxy 缓冲评估</h1></div><div class="capacity-actions"><el-button v-if="can('capacity_scenarios:read')" @click="scenarios?.browse()">已保存方案</el-button><el-button v-if="can('capacity_scenarios:write')" type="primary" @click="scenarios?.prepare()">保存为容量方案</el-button></div></div>
     <el-empty v-if="!permitted" description="当前身份没有平台容量估算权限" />
     <template v-else>
-      <div class="feature-summary"><article><span>平均 NVPS</span><strong>{{ state.result?.outputs?.nvps ?? '—' }}</strong><small>值 / 秒 · 模型估算值</small></article><article><span>单节点容量</span><strong>{{ state.result?.outputs?.single_node_bytes ?? '—' }}</strong><small>bytes · 历史 + 趋势 + 余量</small></article><article><span>有效监控项</span><strong>{{ state.result?.outputs?.total_items ?? '—' }}</strong><small>数量未知时不按零处理</small></article><article><span>模型状态</span><strong class="summary-status">{{ state.result?.status === 'ESTIMATED' ? '已估算' : '待明确' }}</strong><small>供容量规划参考</small></article></div>
+      
       <ApiErrorNotice :error="state.error" :retrying="state.busy" retry-label="以当前输入重新估算" @retry="calculate" />
       <p role="status">{{ state.busy ? '正在核对当前输入…' : state.error ? '估算未完成，输入已保留，可修改后重试。' : state.result ? '本次只读估算已完成，未自动保存方案。' : '尚无估算结果，输入不会自动提交。' }}</p>
       <CapacityRuntimeInputsPanel :current="{inputs:draft.inputs,buffer:draft.proxy_buffer}" @apply="importRuntime" />

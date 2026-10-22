@@ -99,18 +99,16 @@ defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyE
 </script>
 <template>
  <section class="sla-reports">
-  <div class="page-heading proto-page-head">
+  <div class="compact-page-toolbar page-heading proto-page-head">
    <div>
-    <h1>SLA 月度报表与赔付试算 <span class="proto-badge">{{ session?.tenant.name }}</span></h1>
-    <p>按资产核对监控故障区间与批准维护排除。未知区间同时从可用率分子和分母扣除，有效覆盖不足90%显示样本不足；客户报障和手工登记不充作可用性观测。</p>
+    <h1 class="page-title-sr">SLA 月度报表与赔付试算 </h1>
+    
    </div>
    <RouterLink to="/oncall-board" class="back">值班看板</RouterLink>
   </div>
   <p class="panel" v-if="!permitted">当前身份无权访问内部 SLA 月报与赔付台账，或正在切换租户。</p>
   <template v-else>
-   <p class="proto-scope-note">
-    按资产计算监控故障并集与批准维护排除；未知时段同时从分子分母剔除，覆盖不足90%不判定达标。月度补偿采用固定档位比例（基础10% / 标准20% / 高级30%）并四舍五入到元，不采用未达标占比连乘。正式金额待试运行期、费用月份档位和对账审批齐备，仍为null；已冻结月度快照保留原公式，不覆盖历史。
-   </p>
+   
 
    <div class="proto-toolbar">
     <form class="period-bar" @submit.prevent="queryReport">
@@ -133,7 +131,7 @@ defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyE
 
    <template v-if="state.report">
     <div class="review-export"><button type="button" :disabled="locked||periodInput!==state.report.period" aria-describedby="sla-review-export-note" @click="exportServices">{{exporting?'正在生成服务核对 CSV…':'导出当前服务核对 CSV'}}</button><p id="sla-review-export-note">仅导出当前已加载的 {{state.report.services.length}} 条服务可用性及观察时间；不包含赔付金额、工单明细或冻结快照，不是正式报告或账单。下载不会保存或冻结月报。</p><ApiErrorNotice :error="exportError" /><p v-if="exportStatus" role="status">{{exportStatus}}</p></div>
-    <div class="proto-kpis">
+    <div class="compact-result-summary">
      <div>
       <span>已核验可用性均值</span>
       <b>{{ state.report.kpis.mean_verified_availability_pct!==null?`${state.report.kpis.mean_verified_availability_pct}%`:'待配置' }}</b>

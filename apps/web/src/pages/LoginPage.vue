@@ -103,7 +103,7 @@ function updateCapsLock(event: KeyboardEvent | Event) {
     </header>
     <main class="login-main">
     <section class="login-card" aria-labelledby="login-title">
-      <div class="login-card-heading"><h1 id="login-title">{{ options?.local_enabled ? '账号登录' : '登录' }}</h1><span v-if="options?.mode === 'remote_test'" class="login-environment">测试环境</span></div>
+      <div class="login-card-heading"><h1 id="login-title">{{ options?.local_enabled ? '账号登录' : '登录' }}</h1></div>
       <p class="login-progress" role="status">{{ loading ? '正在连接登录服务…' : submitting ? loginMethod === 'unified' ? '正在跳转至统一身份认证，请稍候…' : '正在验证登录信息，请稍候…' : '' }}</p>
       <el-alert v-if="sessionExpired" class="page-note" role="status" title="登录状态已过期，请重新登录。若此前有正在提交的操作，登录后请先核对结果。" type="warning" :closable="false" show-icon />
       <el-alert v-if="oidcFailure" :title="oidcFailure" type="error" :closable="false" show-icon class="page-note" />

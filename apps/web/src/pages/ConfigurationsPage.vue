@@ -158,12 +158,12 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
 </script>
 <template>
   <section class="configuration-page">
-    <div class="page-heading"><div><h1>配置项登记</h1><p>集中管理平台合同基线参数、客户待确认项与配置修订提案 · 待确认参数在完成审批发布前暂不参与生产计算</p></div><el-button :loading="loading" @click="load">刷新列表</el-button></div>
+    <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">配置项登记</h1></div><el-button :loading="loading" @click="load">刷新列表</el-button></div>
 
     <WorkingCalendarReader v-model="calendarOpen" />
     <el-alert v-if="draftState.receipt" type="success" :closable="false" :title="'配置建议草稿已保存：' + draftState.receipt.key + ' · v' + draftState.receipt.version + '（草稿状态，暂未发布生效）'" />
-    <div class="scope-card feature-summary configuration-summary"><div><span class="small-label">登记项</span><strong>{{ countsUnknown ? '—' : rows.length }} <small>项</small></strong></div><div><span class="small-label">待客户确认</span><strong>{{ countsUnknown ? '—' : pendingCount }} <small>项</small></strong></div><div><span class="small-label">草稿版本</span><strong>{{ countsUnknown ? '—' : draftCount }} <small>项</small></strong></div><div><span class="small-label">运行发布</span><router-link to="/runtime-configurations">查看当前租户配置</router-link><small>与设计基线登记独立管理</small></div></div>
-    <el-alert class="page-note" type="warning" :closable="false" show-icon title="本页用于维护配置基线登记与内部修订提案；运行参数发布、版本回滚及当前生效值请前往“运行配置与发布”模块管理。" />
+    <div class="compact-actions"><router-link to="/runtime-configurations">运行配置与发布</router-link></div>
+    <p class="inline-boundary">本页用于维护配置基线登记与内部修订提案；运行参数发布、版本回滚及当前生效值请前往“运行配置与发布”模块管理。</p>
     <div class="panel configuration-register"><nav class="feature-tabs" aria-label="配置工作区"><button type="button" :class="{active:!filters.pending_only}" @click="filters.pending_only=false">全部登记</button><button type="button" :class="{active:filters.pending_only}" @click="filters.pending_only=true">待客户确认 <span>{{ countsUnknown ? '—' : pendingCount }}</span></button><router-link to="/threshold-diagnostics">告警阈值诊断</router-link><button type="button" :disabled="!can('configurations:read') || switchingTenant" @click="calendarOpen=true">工作日历查询与试算</button></nav><div class="panel-heading configuration-register-heading"><h2>配置登记与修订</h2><span>登记基线 / 建议草稿 / 运行生效值对照</span></div><ApiErrorNotice :error="error"><el-button size="small" @click="load">重试</el-button></ApiErrorNotice>
       <el-form class="configuration-filters" label-position="top" @submit.prevent>
         <el-form-item label="配置键（config_key）"><el-input v-model="filters.config_key" clearable placeholder="按配置键查找" aria-label="筛选配置键" /></el-form-item>
@@ -188,7 +188,7 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
     <ConfigurationDiagnosticPanel v-model="diagnosticOpen" :configuration-key="diagnosticKey" />
     <el-drawer v-model="comparisonOpen" title="登记值与建议值差异" size="820px" class="configuration-comparison-drawer" destroy-on-close>
       <p class="mono configuration-comparison-key">{{ comparisonKey }}</p>
-      <el-alert type="info" :closable="false" show-icon title="对比当前配置项的登记基线值与已保存建议值（仅作差异核对，实际生效状态以运行配置中心为准）。" />
+      <p class="inline-boundary">对比当前配置项的登记基线值与已保存建议值（仅作差异核对，实际生效状态以运行配置中心为准）。</p>
       <ApiErrorNotice :error="comparisonError"><el-button size="small" @click="loadComparison">重试读取</el-button></ApiErrorNotice>
       <el-skeleton v-if="comparisonLoading" :rows="7" animated class="configuration-comparison-loading" />
       <template v-else-if="comparisonSnapshot && comparison">
@@ -212,7 +212,7 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
     </el-drawer>
     <el-dialog v-model="editingOpen" title="编辑配置建议草稿（未发布生效）" width="560px" class="responsive-dialog" :close-on-click-modal="!draftUnresolved" :close-on-press-escape="!draftUnresolved" :show-close="!draftUnresolved" destroy-on-close>
       <template v-if="editing"><div class="config-dialog-context"><strong>{{ configurationMetadataLabel(editing.description, '配置描述') }}</strong><span class="mono">{{ editing.key }}</span><p>当前版本 v{{ editing.version }} · 登记值：{{ displayValue(editing.registered_value) }}</p><p>运行生效：{{ editing.effective_value === null ? '尚未启用' : displayValue(editing.effective_value) }}</p><p>关联确认：{{ configurationQuestionsLabel(editing.question_ids) }}</p></div>
-        <el-alert type="info" :closable="false" title="在此维护配置建议草稿（与租户修订提案及运行生效配置独立存储，不影响当前生产运行状态）。" show-icon />
+        <p class="inline-boundary">在此维护配置建议草稿（与租户修订提案及运行生效配置独立存储，不影响当前生产运行状态）。</p>
         <ApiErrorNotice :error="editError" />
         <el-alert v-if="draftUnresolved" type="warning" :closable="false" title="提交结果待确认：系统已锁定当前草稿内容与基准版本，请先核对最新状态或点击“重试提交”继续处理。" />
         <div class="calendar-actions"><el-button :disabled="saving" @click="draftWriter.refresh()">刷新最新登记</el-button><el-button v-if="draftUnresolved" type="warning" :disabled="Boolean(draftState.busy)" @click="retryDraft">重试提交</el-button><el-button v-if="!draftUnresolved" :disabled="Boolean(draftState.busy)" @click="rebaseDraft">采用最新基准并保留填写值</el-button></div>

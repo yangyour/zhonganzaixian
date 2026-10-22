@@ -106,11 +106,11 @@ defineExpose({cancelSources,retrySources,canRetrySources,sourceReadStatus,source
 </script>
 <template>
  <section class="worksheet-page">
-  <div class="page-heading"><div><h1>人工巡检执行单</h1><p>当前租户：{{ session?.tenant.name }} · 按冻结模板填写 · 修订历史保留</p></div></div>
-  <details class="boundary-details maintenance-notice"><summary>人工自述未核验，不能当作设备健康结论 · 查看功能范围说明</summary><el-alert type="warning" :closable="false" title="功能范围与未完成事项">本页不执行扫描，不自动填写正常，不绑定证据文件，不发布季度报告。模板批准与资产类型适用性仍未核验。</el-alert></details>
-  <p v-if="!permitted" class="empty-panel">当前身份没有真实测试环境人工执行单读取权限</p>
+  <h1 class="page-title-sr">人工巡检执行单</h1>
+  <p class="inline-boundary">人工自述未核验，不能当作设备健康结论</p>
+  <p v-if="!permitted" class="empty-panel">当前身份没有人工执行单读取权限</p>
   <template v-else>
-<div class="feature-summary"><article><span>本页巡检执行单</span><strong>{{ state.page?.items.length ?? '—' }}</strong><small>当前已读取记录，非总体数量</small></article><article><span>本页未归档</span><strong>{{ state.page ? state.page.items.filter(row => !row.archived).length : '—' }}</strong><small>仅记录状态，不表示批准或生效</small></article><article><span>当前所选版本</span><strong>{{ state.selected ? 'v'+state.selected.version : '—' }}</strong><small>按明确版本读取</small></article><article><span>本页未答检查项</span><strong>{{ state.page ? state.page.items.reduce((sum,row) => sum + row.summary.unanswered,0) : '—' }}</strong><small>逐执行单累加，未填写不算正常</small></article></div>
+
    <section v-if="state.attempt" class="panel request-status" aria-live="polite"><h2>固定原请求：{{ actions[state.attempt.action] }}</h2><p v-if="state.attempt.state==='uncertain'">结果尚未确认。后续拒绝也不能证明之前没写入；普通刷新不能代替原收据确认。</p><p v-else-if="state.attempt.state==='accepted'">原请求收据已确认。它可能早于当前版本，请另行回读当前执行单。</p><p v-else>本次请求明确拒绝或派发前校验失败；输入和版本保持，不自动覆盖。</p><div class="actions"><button v-if="state.attempt.state==='uncertain'" type="button" :disabled="Boolean(state.busy)" @click="retry">重试提交</button><button v-if="state.attempt.state==='rejected'" type="button" :disabled="Boolean(state.busy)" @click="unlockRejected">保留输入并解锁</button><button v-if="state.receipt" type="button" :disabled="Boolean(state.busy)" @click="select(state.receipt.id)">回读当前执行单</button></div></section>
    <ApiErrorNotice :error="state.error" /><ReadRecoveryActions :busy="state.busy" :can-retry="workspace.canRetryRead()" :scope-key="contextKey" :cancel="workspace.cancelRead" :retry="workspace.retryRead" /><ApiErrorNotice :error="sourceError" /><div class="actions" role="group" aria-label="巡检来源读取恢复"><button v-if="sourcesBusy" type="button" @click="cancelSources">取消来源读取</button><button v-if="canRetrySources" type="button" @click="retrySources">重试原来源读取</button><p v-if="sourceReadStatus" ref="sourceReadNotice" tabindex="-1" role="status">{{sourceReadStatus}}</p></div><p v-if="state.busy||sourcesBusy" class="hint" role="status">{{ state.busy==='write'?'正在提交请求…':'正在加载数据…' }}</p>
 

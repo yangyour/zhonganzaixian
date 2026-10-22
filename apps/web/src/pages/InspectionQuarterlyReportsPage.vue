@@ -97,9 +97,9 @@ defineExpose({browseSourceCandidates,chooseSourceCandidate,retrySourceRead,retry
 </script>
 <template>
 <section class="quarterly-report-page">
- <div class="page-heading"><div><h1>季度巡检报告草稿</h1><p>当前租户：{{ session?.tenant.name }} · 冻结输入与输出 · 历史不重算</p></div></div>
- <el-alert type="warning" :closable="false" title="仅保存 DRAFT，不代表客户批准、正式执行或发布">配置来源 REQUEST_DRAFT_NOT_APPROVED。空配置仍为 null，不借用平台时区或默认选取规则。来源完整性仅指明确集合，租户资产总量未知，不计算覆盖率，不授予附件访问。</el-alert>
- <p v-if="!permitted" class="empty-panel">当前身份没有真实测试环境季度报告读取权限</p>
+ <h1 class="page-title-sr">季度巡检报告草稿</h1>
+ <p class="inline-boundary">仅保存 DRAFT，不代表客户批准、正式执行或发布</p>
+ <p v-if="!permitted" class="empty-panel">当前身份没有季度报告读取权限</p>
  <template v-else>
  <nav class="feature-tabs" aria-label="巡检工作区"><router-link to="/inspection-templates">模板候选</router-link><router-link to="/inspection-worksheets">执行单</router-link><router-link to="/inspection-source-collections">来源集合</router-link><span class="active">季度草稿</span></nav>
  <ApiErrorNotice :error="state.error" /><ReadRecoveryActions :busy="state.busy" :can-retry="workspace.canRetryRead()" :scope-key="contextKey" :cancel="workspace.cancelRead" :retry="workspace.retryRead" />

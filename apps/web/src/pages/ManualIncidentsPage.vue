@@ -31,11 +31,11 @@ onUnmounted(()=>{disposed=true;reader.dispose()})
   <ManualRecoveryPanel ref="recovery" v-model="recoveryOpen" />
   <ManualIncidentEditor ref="editor" v-model="editorOpen" @saved="afterSaved" />
   <section class="manual-incidents-page">
-    <header class="proto-page-head"><div><h1>手工故障与事件登记 <span class="proto-badge">{{ session?.tenant.name }}</span></h1><p>登记电话报障、现场反馈及人工巡检发现的异常事件 · 当前租户内部归档</p></div><el-button v-if="permitted && can('manual_incidents:write')" :disabled="state.busy" type="primary" @click="editor?.prepare()">新建手工登记</el-button></header>
-    <el-alert type="warning" :closable="false" show-icon title="人工登记事件独立记录现场反馈；监控正常不会让手工记录自动恢复，正式工单关联与 SLA 考核待流程启用后联动。" />
+    <header class="compact-page-toolbar proto-page-head"><div><h1 class="page-title-sr">手工故障与事件登记 </h1></div><el-button v-if="permitted && can('manual_incidents:write')" :disabled="state.busy" type="primary" @click="editor?.prepare()">新建手工登记</el-button></header>
+    <p class="inline-boundary">人工登记事件独立记录现场反馈；监控正常不会让手工记录自动恢复，正式工单关联与 SLA 考核待流程启用后联动。</p>
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前读取权限不可用，原范围数据已清除" />
     <template v-else>
-      <div class="proto-kpis"><div><span>本页手工登记</span><b>{{ state.page ? state.page.items.length : '—' }}</b><small>仅统计当前加载页</small></div><div><span>本页涉及资产</span><b>{{ state.page ? new Set(state.page.items.map(row => row.asset_id)).size : '—' }}</b><small>当前页按资产去重</small></div><div><span>本页严重 / 灾难</span><b>{{ state.page ? state.page.items.filter(row => ['high','disaster'].includes(row.severity)).length : '—' }}</b><small>人工上报严重等级</small></div><div><span>当前登记详情</span><b>{{ state.selected ? '已选择' : '未选择' }}</b><small>支持独立确认恢复状态</small></div></div>
+      
       <div class="manual-workspace" :class="{ 'has-selection': state.selected }"><div class="proto-panel manual-registers">
       <div class="proto-section-head"><h2 ref="listHeading" tabindex="-1">手工登记列表</h2><el-button :loading="state.busy" :disabled="state.busy" @click="list()">刷新列表</el-button></div>
       <ReadRecoveryActions :busy="state.busy?'read':null" :can-retry="reader.canRetryRead()" :scope-key="contextKey" label="手工登记列表详情" :cancel="reader.cancelRead" :retry="retryRead" />

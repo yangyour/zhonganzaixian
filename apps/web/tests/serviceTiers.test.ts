@@ -138,7 +138,7 @@ describe('service tiers and ticket SLA clock inspection',()=>{
   expect(nav).toContain("['service-tiers','服务档位与SLA台账']")
   expect(pageSource).toContain('M2-10')
   expect(pageSource).toContain('Q27')
-  expect(pageSource).toContain('UNVERIFIED')
+  expect(pageSource).toContain('商务审批仍待核验')
  })
 })
 

@@ -1,0 +1,9 @@
+import {it,expect} from 'vitest'
+import {readFileSync,readdirSync} from 'node:fs'
+import {parse,compileTemplate} from '@vue/compiler-sfc'
+import {displayTenantName} from '../src/utils/displayTenantName'
+it.each([['星湾 A（测试环境）','星湾 A'],['星湾 B (测试环境)','星湾 B'],['测试环境研究中心','测试环境研究中心'],['（测试环境）','当前租户'],['常规租户','常规租户']])('normalizes only display suffix: %s',(name,want)=>expect(displayTenantName(name)).toBe(want))
+for(const name of readdirSync('src/pages').filter(x=>x.endsWith('.vue'))){it(`compiles cleaned page ${name} without duplicate attributes`,()=>{const t=parse(readFileSync('src/pages/'+name,'utf8')).descriptor.template!;expect(compileTemplate({source:t.content,filename:name,id:name}).errors).toEqual([]);expect(t.content).not.toMatch(/class="[^"]*(?:feature-summary|proto-kpis|network-summary|scope-card|admin-stats)/)})}
+it('isolates event layout and provides bounded accessible table scrolling',()=>{const s=readFileSync('src/pages/MonitoringEventsPage.vue','utf8');expect(s).not.toContain('class="workspace-grid"');expect(s).toContain('grid-template-columns:minmax(0,1fr)');expect(s).toContain('overflow-x:auto');expect(s).toContain('min-width:0');expect(s).toContain('aria-label="监控事件列表，可横向滚动" tabindex="0"');expect(s).toContain('<th scope="col">')})
+it('removes shell environment slogans without removing tenant selection',()=>{const shell=readFileSync('src/App.vue','utf8');expect(shell).not.toContain('class="environment-label"');expect(shell).toContain('aria-label="切换租户"');expect(shell).toContain(':value="tenant.id"');expect(readFileSync('src/components/HorizontalModuleNavigation.vue','utf8')).not.toContain('项目测试环境')})
+it('keeps hidden heading available to assistive technology and visible on focus',()=>{const css=readFileSync('src/styles/compact-workspaces.css','utf8');expect(css).toContain('.page-title-sr:not(:focus)');expect(css).toContain('.page-title-sr:focus');expect(css.split('/* Empty results')[0]).not.toContain('display:none')})

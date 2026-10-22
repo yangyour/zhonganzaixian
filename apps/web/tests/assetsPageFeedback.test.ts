@@ -55,8 +55,7 @@ function button(text: string): HTMLButtonElement {
   return result!
 }
 function expectCount(value: '—' | '0' | '1') {
-  const count = [...host.querySelectorAll('.scope-card > div')].find(item => item.textContent?.includes('本页资产'))
-  expect(count?.querySelector('strong')?.textContent?.trim()).toBe(value)
+  expect(host.querySelector('.scope-card')).toBeNull()
   expect(host.querySelector('.table-footer > span')?.textContent).toContain(`本页 ${value} 条`)
 }
 beforeEach(() => {

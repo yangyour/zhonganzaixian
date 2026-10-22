@@ -108,19 +108,29 @@ defineExpose({state,workspace,mayLeave,prepareChange,submitChange,recover,readLe
 </script>
 <template>
  <section class="service-tiers">
-  <div class="page-heading proto-page-head">
+  <div class="compact-page-toolbar page-heading proto-page-head">
    <div>
-    <h1 ref="ledgerHeading" tabindex="-1">服务档位与 SLA 时钟台账 <span class="proto-badge">{{ session?.tenant.name }}</span></h1>
-    <p>管理当前租户服务档位配置与变更台账，并核验在途工单的开单冻结 SLA 时钟（M2-10 / M5-8 / M5-18 / M5-20）。</p>
+    <h1 class="page-title-sr" ref="ledgerHeading" tabindex="-1">服务档位与 SLA 时钟台账 </h1>
+    
    </div>
    <RouterLink to="/sla-scenarios" class="back">SLA 场景测算</RouterLink>
   </div>
   <p class="panel" v-if="!permitted">当前身份无权访问内部服务档位与 SLA 时钟台账，或正在切换租户。</p>
   <template v-else>
-   <p class="proto-scope-note">
-    在途工单的 SLA 目标在开单时自动冻结，后续调整租户服务档位不会追溯变更既有工单的响应与恢复截止时间（M2-10 / M5-20）。线下商务审批状态为待核验（UNVERIFIED）；工单重开计时策略（Q27）及基础/标准档 P3 次日口径（Q08）按当前已发布运行配置执行。
-   </p>
-   <div class="proto-kpis">
+   
+   
+
+   <div class="proto-panel workspace">
+    <div class="proto-toolbar">
+     <div class="proto-tabs" aria-label="服务档位视图">
+      <button type="button" :class="{active:tab==='ledger'}" :aria-pressed="tab==='ledger'" :disabled="locked" @click="tab='ledger'">档位快照与变更历史</button>
+      <button type="button" :class="{active:tab==='sla'}" :aria-pressed="tab==='sla'" :disabled="locked" @click="tab='sla'">工单 SLA 冻结时钟核验</button>
+     </div>
+     <button v-if="tab==='ledger'" type="button" :disabled="locked" @click="readLedger()">刷新</button>
+    </div>
+
+    <template v-if="tab==='ledger'">
+<div class="compact-result-summary">
     <div>
      <span>最新登记档位</span>
      <b>{{ state.page?.current ? tierLabels[state.page.current.tier] : state.page?'未登记':'尚未读取或读取失败' }}</b>
@@ -142,17 +152,6 @@ defineExpose({state,workspace,mayLeave,prepareChange,submitChange,recover,readLe
      <small>开单冻结快照（M2-10）</small>
     </div>
    </div>
-
-   <div class="proto-panel workspace">
-    <div class="proto-toolbar">
-     <div class="proto-tabs" aria-label="服务档位视图">
-      <button type="button" :class="{active:tab==='ledger'}" :aria-pressed="tab==='ledger'" :disabled="locked" @click="tab='ledger'">档位快照与变更历史</button>
-      <button type="button" :class="{active:tab==='sla'}" :aria-pressed="tab==='sla'" :disabled="locked" @click="tab='sla'">工单 SLA 冻结时钟核验</button>
-     </div>
-     <button v-if="tab==='ledger'" type="button" :disabled="locked" @click="readLedger()">刷新</button>
-    </div>
-
-    <template v-if="tab==='ledger'">
      <ReadRecoveryActions :busy="state.busy" :can-retry="!confirming&&workspace.canRetryRead()" :scope-key="context" label="服务档位台账" :cancel="cancelLedger" :retry="()=>readLedger(false,true)" /><div ref="ledgerFeedback" tabindex="-1" role="group" aria-label="服务档位读取结果"><ApiErrorNotice :error="state.error" /></div>
      <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">服务档位变更提交结果尚未确认，请点击下方按钮重试。</p>
      <button v-if="state.attempt&&!state.busy" type="button" @click="recover">重试提交变更</button>

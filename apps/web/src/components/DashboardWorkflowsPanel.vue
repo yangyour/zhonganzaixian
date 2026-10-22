@@ -20,7 +20,7 @@ onUnmounted(()=>{disposed=true;workspace.dispose()})
 </script>
 <template>
 <section v-if="permitted" class="dashboard-workflows" aria-labelledby="dashboard-workflows-title" :aria-busy="state.busy">
- <header><div><h2 id="dashboard-workflows-title">工单处理状态</h2><p>{{customer?'仅本人报障关联的处理流程':'当前租户授权处理流程'}} · 按登记时间倒序，每页5条</p></div><div class="actions"><button ref="refreshButton" type="button" :disabled="state.busy" @click="read('refresh')">刷新工单</button><button v-if="state.busy" type="button" @click="cancel">取消读取工单</button><router-link to="/ticket-workflows">进入工单处理工作区</router-link></div></header>
+ <header><div><h2 id="dashboard-workflows-title">{{customer?'我的工单处理状态':'工单处理状态'}}</h2></div><div class="actions"><button ref="refreshButton" type="button" :disabled="state.busy" @click="read('refresh')">刷新工单</button><button v-if="state.busy" type="button" @click="cancel">取消读取工单</button><router-link to="/ticket-workflows">进入工单处理工作区</router-link></div></header>
  <label class="state-filter">筛选工作流状态<select :value="state.filter" :disabled="state.busy" aria-label="筛选工作流状态" @change="select"><option v-for="(label,key) in workflowLabels" :key="key" :value="key">{{label}}</option></select></label>
  <ApiErrorNotice :error="state.error" />
  <p ref="status" tabindex="-1" role="status">{{state.busy?'正在读取工单工作流…':state.cancelled?'读取已取消，未显示旧列表。':state.error?'读取失败，未显示旧列表。':state.page?`${workflowLabels[state.filter]} · 第 ${state.pageNumber} 页，本页 ${state.page.items.length} 条${state.page.has_more?'，还有更多记录':''}`:'尚未读取。'}}</p>

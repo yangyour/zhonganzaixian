@@ -53,10 +53,10 @@ defineExpose({ prepareCreate, prepareFrom, browse, hasUnresolved: workspace.unre
 </script>
 <template>
  <section class="contacts-page admin-prototype">
-  <div class="page-heading"><div><h1>客户联系人</h1><p>维护当前租户的客户联系人档案与职责分工 · 修订历史全程可追溯</p></div><el-button v-if="writable" type="primary" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="prepareCreate">新建联系人</el-button></div>
-  <el-alert type="warning" :closable="false" title="联系角色仅标识业务职责，不关联系统登录权限">维护客户联系人档案不会自动创建平台账号或授予权限；通知路由策略待确认，本页不发送通知。每个租户须至少保留一名启用状态的决策人。</el-alert>
+  <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">客户联系人</h1></div><el-button v-if="writable" type="primary" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="prepareCreate">新建联系人</el-button></div>
+  <p class="inline-boundary">联系角色仅标识业务职责，不关联系统登录权限</p>
   <nav class="admin-tabs" aria-label="联系人工作区"><span class="active">联系人列表</span><router-link v-if="writable" to="/contact-imports">批量新建与作业</router-link><router-link v-if="writable" to="/contact-import-preview">导入格式预览</router-link></nav>
-  <div v-if="state.page" class="admin-stats"><div class="admin-stat"><span>本页联系人</span><strong>{{ state.page.items.length }}</strong><small>当前筛选结果 · 每页 15 条</small></div><div class="admin-stat"><span>启用状态</span><strong>{{ state.page.items.filter(row => row.enabled && !row.archived).length }}</strong><small>当前页已启用档案</small></div><div class="admin-stat"><span>决策人</span><strong>{{ state.page.items.filter(row => row.roles.includes('DECISION_MAKER')).length }}</strong><small>业务联系职责标识</small></div><div class="admin-stat"><span>已归档</span><strong>{{ state.page.items.filter(row => row.archived).length }}</strong><small>保留历史 · 支持恢复</small></div></div>
+  
   <el-empty v-if="!permitted" description="当前身份没有联系人读取权限" />
   <template v-else>
    <section v-if="state.attempt" class="request-status" aria-live="polite">

@@ -40,10 +40,10 @@ const missing: Record<string, string> = { input: '尚未提供人力组', active
 </script>
 <template>
  <section class="operational-page">
-  <div class="page-heading"><div><h1>经营样本与人力测算</h1><p>基于录入样本与月度人力配置执行算术对照测算 · 正式经营统计看板待数据源接入后启用</p></div><el-button v-if="permitted" :disabled="discarding" @click="resetDraft">重置条件</el-button></div>
+  <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">经营样本与人力测算</h1></div><el-button v-if="permitted" :disabled="discarding" @click="resetDraft">重置条件</el-button></div>
   <el-empty v-if="!permitted" description="当前身份无显式经营对照权限" />
   <template v-else>
-   <div class="feature-summary"><article><span>录入耗时样本</span><strong>{{ state.result?.sample_median.sample_count ?? '—' }}</strong><small>仅统计本次录入样本</small></article><article><span>样本中位数</span><strong>{{ state.result?.sample_median.median_millis ?? '—' }}</strong><small>毫秒 · 样本算术中位数</small></article><article><span>月度折算 FTE</span><strong>{{ state.result?.staffing.explicit_total_fte ?? '—' }}</strong><small>值守 + 二线折算</small></article><article><span>租户数 / FTE</span><strong>{{ state.result?.staffing.tenants_per_fte ?? '—' }}</strong><small>算术对照，供资源评估参考</small></article></div>
+   
    <ApiErrorNotice :error="state.error" :retrying="state.busy" retry-label="以当前输入重新测算" @retry="calculate" /><p role="status">{{state.busy?'正在核对显式样本与人力参数…':state.error?'测算未完成，输入已保留；请核对后重试。':state.result?'本次只读测算完成，未保存或形成经营指标。':'尚无测算结果，不自动提交输入。'}}</p>
    <div class="operations-layout">
     <div class="operations-main">

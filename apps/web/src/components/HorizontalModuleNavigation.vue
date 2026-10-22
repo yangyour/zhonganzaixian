@@ -65,7 +65,6 @@ function selectModule(module: NavigationModule) {
   <aside id="workspace-sidebar" class="workspace-sidebar" :class="{ collapsed }" aria-label="功能菜单">
     <SidebarNavigation v-if="activeModule" :key="scopeKey" :module="activeModule" :collapsed="collapsed" @navigate="navigate" />
     <p v-else class="sidebar-no-access">{{ switchingTenant ? '正在切换租户…' : '暂无可用业务权限' }}</p>
-    <div class="workspace-sidebar-foot"><span class="environment-indicator" /><span>项目测试环境<small>租户隔离与实时鉴权已启用</small></span></div>
   </aside>
   <el-drawer v-model="mobileOpen" class="mobile-navigation-drawer" title="功能菜单" direction="ltr" size="280px" append-to-body @closed="restoreAfterResize">
     <div id="mobile-navigation-panel">

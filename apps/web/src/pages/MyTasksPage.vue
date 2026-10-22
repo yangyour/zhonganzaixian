@@ -19,7 +19,7 @@ onUnmounted(()=>{disposed=true;workspace.dispose()})
 </script>
 <template>
 <section class="my-tasks-page" :aria-busy="state.busy">
- <header><div><h1>我的待办</h1><p>当前先提供“我负责的工单”入口，与运营总览分开。</p></div><router-link to="/dashboard" v-if="can('dashboard:read')">查看运营总览</router-link></header>
+ <header class="compact-page-toolbar"><div><h1 class="page-title-sr">我的待办</h1></div><router-link to="/dashboard" v-if="can('dashboard:read')">查看运营总览</router-link></header>
  <p v-if="!permitted" role="status">当前身份缺少内部工单读取或负责人筛选权限；未读取任务数据。</p>
  <template v-else>
   <section class="scope-note" aria-label="我的待办当前覆盖范围"><h2>我负责的工单</h2><p>仅当前租户中明确分派给当前账号的六态工作流。审批任务、未分派报障、协办关系和七态生命周期尚未合并，不显示虚假的“全部待办”总数。</p><p>“等待客户确认”是跟进状态，不表示你可代客户确认；操作权限由工单详情重新核验。</p></section>

@@ -240,9 +240,9 @@ onUnmounted(() => { unregisterContextGuard(); unregisterRouteResolve?.(); unregi
 
 <template>
   <section class="tickets-page">
-    <div class="page-heading proto-page-head"><div><h1>报障与受理 <span class="proto-badge">{{ session?.tenant.name }}</span></h1><p>集中管理客户故障申报、受理进度跟踪与协同处理记录</p></div><el-button v-if="mayReport" type="primary" @click="createOpen = true">故障申报登记</el-button></div>
-    <div class="proto-kpis"><div><span>本页申报工单</span><b>{{ loading || error || !loaded ? '—' : rows.length }}</b><small>当前页已加载工单数</small></div><div><span>本页紧急申报</span><b>{{ loading || error || !loaded ? '—' : rows.filter(row => row.urgency === 'urgent').length }}</b><small>申报时标记为很急</small></div><div><span>本页关联资产</span><b>{{ loading || error || !loaded ? '—' : rows.filter(row => row.asset_id !== null).length }}</b><small>已关联目标设备</small></div><div><span>本页含照片工单</span><b>{{ loading || error || !loaded ? '—' : rows.filter(row => row.attachments.length > 0).length }}</b><small>已上传现场照片附件</small></div></div>
-    <el-alert class="page-note" type="info" :closable="false" show-icon title="当前已完成故障受理入库；工单分派流转与 SLA 考核计时将在 ITSM 流程启用后自动关联。" />
+    <div class="compact-page-toolbar page-heading proto-page-head"><div><h1 class="page-title-sr">报障与受理 </h1></div><el-button v-if="mayReport" type="primary" @click="createOpen = true">故障申报登记</el-button></div>
+    
+    
     <el-alert v-if="acceptedOperationId" class="page-note" type="success" :closable="false" show-icon title="故障申报已受理，系统正在生成正式工单，可点击下方按钮刷新处理进度。" />
     <RetainedPhotoNotice v-if="retainedPhotos" :target-id="photoTargetId" :ticket="appendTicket" :count="detailPhotos.rows.value.length" :can-discard="photoWorkspace.canDiscard.value" @resume="openDetail(photoTargetId)" @discard="discardRetainedPhotos" />
     <div class="panel ticket-register-panel">

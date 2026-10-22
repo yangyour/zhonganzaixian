@@ -40,7 +40,7 @@ describe('D15 event page uses controller states and explicit human inputs', () =
     expect(host.textContent).not.toContain('已定位根因并处理')
     expect(host.textContent).not.toContain('已确认生效')
     expect(host.textContent).toContain('已记录管理员确认')
-    expect(host.textContent).toContain('静默5m')
+    expect(host.textContent).toContain('抖动静默：5分钟')
     expect(buttons('确认解决').length).toBeGreaterThan(0)
     expect(buttons('确认解决').every(b => b.disabled)).toBe(true)
     expect(buttons('开始处理').length).toBeGreaterThan(0)
@@ -136,7 +136,7 @@ describe('D15 page permissions and interrupted flows', () => {
     mount(); await settle(); await input(`root-cause-${e.id}`, '明确人工复核设备故障根因并完成修复，持续观察确认网络恢复稳定')
     button('确认解决').click(); await settle()
     expect(request.mock.calls.filter(([, o]) => o?.method === 'POST')).toHaveLength(1)
-    expect(button('24h 漏斗').disabled).toBe(true); expect((document.getElementById(`root-cause-${e.id}`) as HTMLTextAreaElement).disabled).toBe(true)
+    expect(button('刷新事件').disabled).toBe(true); expect((document.getElementById(`root-cause-${e.id}`) as HTMLTextAreaElement).disabled).toBe(true)
     expect(routeGuard.leave?.()).toBe(false); expect(routeGuard.update?.()).toBe(false); expect(await contextTransitionGuards.approve()).toBe(false)
     const unload = new Event('beforeunload', { cancelable: true }); window.dispatchEvent(unload); expect(unload.defaultPrevented).toBe(true)
     const original = request.mock.calls.find(([, o]) => o?.method === 'POST')!
@@ -152,7 +152,7 @@ describe('D15 page permissions and interrupted flows', () => {
     if (change === 'permissionVersion') session.value = { ...auth, permission_version: 4 }
     if (change === 'contextGeneration') contextGeneration.value++
     await settle(); expect(signal.aborted).toBe(true); first(data); await settle()
-    expect(host.querySelector('.workspace-grid')).toBeNull()
+    expect(host.querySelector('.event-workspace')).toBeNull()
   })
   it('clears entered root cause when permission scope changes', async () => {
     const { data } = ready(), e = data.events.find(e => e.handling_state === 'PENDING_REVIEW')!
@@ -185,3 +185,5 @@ it('shows stored retry deadlines as plans rather than promising execution or del
  expect(host.textContent).toContain('是否执行取决于 Worker 配置')
  expect(host.textContent).toContain('登记已保存，不等于正式工单流程已启动或外部通知已送达')
 })
+it('puts events first in a full-width workspace and removes funnel statistics',async()=>{ready();mount();await settle();expect(host.querySelector('.workspace-grid,.kpi-list')).toBeNull();expect(host.querySelector('.event-workspace>section')?.getAttribute('aria-label')).toBe('监控事件主列表');const scroll=host.querySelector<HTMLElement>('.event-table-scroll')!;expect(scroll.tabIndex).toBe(0);scroll.focus();expect(document.activeElement).toBe(scroll);expect(scroll.querySelectorAll('th[scope="col"]')).toHaveLength(7);expect(button('刷新事件').disabled).toBe(false)})
+it('refresh remains read-only after removing funnel controls',async()=>{const {request}=ready();mount();await settle();button('刷新事件').click();await settle();expect(request).toHaveBeenCalledTimes(2);expect(request.mock.calls.every(([,o])=>o?.method!=='POST')).toBe(true)})

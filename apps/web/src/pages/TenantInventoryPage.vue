@@ -24,14 +24,14 @@ const total = (key: 'registered_asset_count' | 'registered_site_count' | 'active
 </script>
 <template>
  <section ref="root" class="tenant-inventory-page admin-prototype" :aria-busy="state.busy">
-  <div class="page-heading"><div><h1>租户资源台账</h1><p>展示当前账号具备平台管理员授权的租户基础档案与已登记资源规模</p></div><el-button :disabled="!permitted" :loading="state.busy" @click="read('refresh')">重新读取第一页</el-button></div>
-  <el-alert type="info" title="台账统计范围说明" :closable="false">本页汇总各租户已登记的资产、站点与有效成员数量（含台账草稿）；资源池隔离参数、监控项配额（Item / NVPS）、数据保留期、ITSM 对接及网络拓扑状态待采集源与策略确认后接入展示。</el-alert>
+  <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">租户资源台账</h1></div><el-button :disabled="!permitted" :loading="state.busy" @click="read('refresh')">重新读取第一页</el-button></div>
+  
   <ApiErrorNotice :error="state.error"/>
   <el-button v-if="state.canRetry&&permitted" :disabled="state.busy" @click="read('retry')">重试原分页请求</el-button>
   <p v-if="!permitted" role="status">当前成员无租户登记资源读取权限</p>
   <el-skeleton v-else-if="state.busy" :rows="6" animated/>
   <template v-else-if="state.page">
-   <div class="admin-stats"><div class="admin-stat"><span>本页授权租户</span><strong>{{ state.page.items.length }}</strong><small>当前账号可管理的租户范围</small></div><div class="admin-stat"><span>本页登记资产</span><strong>{{ total('registered_asset_count') }}</strong><small>含台账草稿记录</small></div><div class="admin-stat"><span>本页登记站点</span><strong>{{ total('registered_site_count') }}</strong><small>已登记站点总数</small></div><div class="admin-stat"><span>本页有效成员关系</span><strong>{{ total('active_member_count') }}</strong><small>跨租户授权成员分别计入</small></div></div>
+   
    <p class="scope-note">当前页已加载 {{state.page.items.length}} 个授权租户记录；创建时间按北京时间显示，详情面板同时保留 UTC 标准时间。</p>
    <div class="inventory-scroll admin-table-scroll" tabindex="0" role="region" aria-label="租户登记资源12列表格，可横向滚动">
     <table class="admin-table"><caption>已授权租户资源台账快照</caption><thead><tr><th v-for="column in tenantInventoryColumns" :key="column.key" scope="col">{{column.label}}</th></tr></thead><tbody><tr v-for="row in state.page.items" :key="row.id"><td v-for="column in tenantInventoryColumns" :key="column.key"><button v-if="column.key==='name'" class="tenant-name" :data-tenant-id="row.id" @click="openDetail(row.id)">{{row.name}}</button><span v-else>{{tenantInventoryCell(row,column.key).text}}</span><small v-if="['name','created'].includes(column.key)">{{tenantInventoryCell(row,column.key).detail}}</small><span v-else class="inventory-cell-hint" :title="tenantInventoryCell(row,column.key).detail">{{ column.key === 'assets' ? '含草稿登记' : column.key === 'members' ? '有效成员关系' : column.key === 'sites' ? '登记站点' : '待接入配置' }}</span></td></tr><tr v-if="!state.page.items.length"><td :colspan="tenantInventoryColumns.length">本页无授权登记记录；不表示平台没有租户</td></tr></tbody></table>

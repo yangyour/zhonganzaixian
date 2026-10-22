@@ -50,11 +50,11 @@ window.addEventListener('beforeunload',beforeUnload);onUnmounted(()=>{disposed=t
 defineExpose({form,state,baseline,editing,dirty,acknowledge,locked,change,toggleChannel,changeAck,definition,refresh,startEditing,submit,retry,unlockRejected,loadHistory,expand,discard,cancelRead:workspace.cancelRead,retryRead,hasUnresolved:workspace.unresolved})
 </script>
 <template>
- <section class="own-preference-page"><div class="page-heading proto-page-head"><div><h1>个人通知偏好设置 <span class="proto-badge">{{ session?.tenant.name }}</span></h1><p>配置个人告警接收等级、通知渠道与免打扰时段偏好 · 修订记录可追溯</p></div></div>
- <el-alert type="warning" :closable="false" show-icon title="此处保存您的个人通知偏好请求草稿，在平台通知派发策略（Q14）正式启用前尚未生效或发送通知。" />
+ <section class="own-preference-page"><h1 class="page-title-sr">个人通知偏好设置 </h1>
+ <p class="inline-boundary">此处保存您的个人通知偏好请求草稿，在平台通知派发策略（Q14）正式启用前尚未生效或发送通知。</p>
  <p class="panel" v-if="!permitted">当前身份没有本人偏好读取权限，或正在切换租户；未展示旧数据</p>
  <template v-else>
-  <div class="proto-kpis"><div><span>偏好配置状态</span><b>{{ state.current ? state.current.exists ? '已保存' : '尚未创建' : '未知' }}</b><small>当前租户本人草稿</small></div><div><span>已保存版本</span><b>{{ currentPreference ? 'v'+currentPreference.version : '—' }}</b><small>当前服务端最新回读</small></div><div><span>请求渠道数</span><b>{{ currentPreference ? currentPreference.requested_channels?.length ?? '未指定' : '—' }}</b><small>空集合计为 0 · 待策略联动</small></div><div><span>免打扰时段</span><b class="preference-quiet-summary">{{ currentPreference ? quietSummary : '—' }}</b><small>Asia/Shanghai · 未生效</small></div></div>
+  
   <div class="notification-channels"><article v-for="channel in ownPreferenceChannels" :key="channel" class="proto-panel notification-channel"><div class="proto-section-head"><h2>{{channelLabels[channel]}}</h2><span class="proto-badge">{{ !state.current ? '未读取' : !state.current.exists ? '无草稿' : currentPreference?.requested_channels === null ? '未指定' : currentPreference?.requested_channels.includes(channel) ? '已请求' : '未请求' }}</span></div><div class="channel-content"><span>当前渠道偏好</span><strong>{{ !state.current ? '尚未读取' : !state.current.exists ? '尚无请求草稿' : state.current.current?.requested_channels === null ? '未指定' : state.current.current?.requested_channels.includes(channel) ? '已请求此渠道' : '未请求此渠道' }}</strong><small>待通知策略启用后生效</small></div></article></div>
   <div class="preference-workspace">
 

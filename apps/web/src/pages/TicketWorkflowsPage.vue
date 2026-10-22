@@ -129,7 +129,7 @@ onUnmounted(()=>{disposed=true;unregister();workspace.dispose();listGeneration++
   <section class="workflow-page">
     <p v-if="!readable()" role="status">当前没有工单读取权限，或正在切换租户；原范围数据已清除。</p>
     <p v-if="dirty" role="status">尚有未提交输入。刷新状态会保留输入；接单和开始处理不会提交说明，请核对当前状态后继续操作。</p><el-button v-if="dirty" :disabled="state.busy||workspace.unresolved()||confirming" @click="discardInputs">清空未提交输入</el-button>
-    <div class="page-heading proto-page-head"><div><h1>工单处理 <span class="proto-badge">{{ session?.tenant.name }}</span></h1><p>接单、协同处理、客户确认与历史追溯</p></div><el-button @click="router.push('/tickets')">查看报障台账</el-button></div>
+    <div class="compact-page-toolbar page-heading proto-page-head"><div><h1 class="page-title-sr">工单处理 </h1></div><el-button @click="router.push('/tickets')">查看报障台账</el-button></div>
     <section v-if="ticketId&&readable()" class="panel workflow-detail" aria-label="工单处理详情">
       <div class="workflow-toolbar"><h2>{{ state.current?.title || '当前工单' }}</h2><el-button :disabled="state.busy||workspace.unresolved()" @click="refreshDetail">刷新状态</el-button></div>
       <ApiErrorNotice :error="state.error" />

@@ -59,11 +59,11 @@ defineExpose({ prepareCreate, prepareFrom, browse, select, history, save, retry,
 </script>
 <template>
  <section class="inspection-template-page">
-  <div class="page-heading"><div><h1>巡检模板候选</h1><p>当前租户：{{ session?.tenant.name }} · 有序检查项 · 冻结修订历史</p></div><button v-if="writable" class="primary-button" type="button" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="prepareCreate">新建未发布模板</button></div>
-  <details class="boundary-details maintenance-notice"><summary>模板内容和发布规则尚待确认 · 查看功能范围说明</summary><el-alert type="warning" :closable="false" title="功能范围与未完成事项">本页只维护未发布候选，不执行设备扫描，不生成巡检结果，不批准模板或发布季度报告。新设备类型可以直接填写标识，无需改代码。</el-alert></details>
+  <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">巡检模板候选</h1></div><button v-if="writable" class="primary-button" type="button" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="prepareCreate">新建未发布模板</button></div>
+  <p class="inline-boundary">模板内容和发布规则尚待确认</p>
   <p v-if="!permitted" class="empty-panel">当前身份没有未发布巡检模板读取权限</p>
   <template v-else>
-<div class="feature-summary"><article><span>本页巡检模板</span><strong>{{ state.page?.items.length ?? '—' }}</strong><small>当前已读取记录，非总体数量</small></article><article><span>本页未归档</span><strong>{{ state.page ? state.page.items.filter(row => !row.archived).length : '—' }}</strong><small>仅记录状态，不表示批准或生效</small></article><article><span>当前所选版本</span><strong>{{ state.selected ? 'v'+state.selected.version : '—' }}</strong><small>按明确版本读取</small></article><article><span>本页检查项合计</span><strong>{{ state.page ? state.page.items.reduce((sum,row) => sum + row.item_count,0) : '—' }}</strong><small>逐模板累加，非已执行检查数</small></article></div>
+
    <section v-if="state.attempt" class="panel request-status" aria-live="polite"><h2>固定原请求：{{ actions[state.attempt.action] }}</h2><p v-if="state.attempt.state === 'uncertain'">结果尚未确认。即使重试被拒绝，也不能证明之前没写入；普通刷新不能代替原收据确认。</p><p v-else-if="state.attempt.state === 'accepted'">原请求收据已确认。它可能早于当前版本，请另行回读当前模板。</p><p v-else>本次请求已明确拒绝或发送前校验未通过。保留输入，不自动改版本或覆盖。</p><div class="actions"><button v-if="state.attempt.state === 'uncertain'" type="button" :disabled="Boolean(state.busy)" @click="retry">重试提交</button><button v-if="state.attempt.state === 'rejected'" type="button" :disabled="Boolean(state.busy)" @click="unlockRejected">保留输入并解锁</button><button v-if="state.receipt" type="button" :disabled="Boolean(state.busy)" @click="select(state.receipt.id)">回读当前模板</button></div></section>
    <ApiErrorNotice :error="state.error" /><ReadRecoveryActions :busy="state.busy" :can-retry="workspace.canRetryRead()" :scope-key="contextKey" :cancel="workspace.cancelRead" :retry="workspace.retryRead" />
    <p v-if="state.busy" class="loading-note" role="status">{{ state.busy === 'write' ? '正在核对并提交固定请求…' : '正在读取并核对范围与内容摘要…' }}</p>

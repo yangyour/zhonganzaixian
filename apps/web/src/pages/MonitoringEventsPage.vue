@@ -77,18 +77,14 @@ function switchWindow(w: FunnelWindow) {
 </script>
 
 <template>
-  <section class="page-section" aria-labelledby="monitoring-events-title">
-    <header class="section-header">
+  <section class="page-section monitoring-events-page" aria-labelledby="monitoring-events-title">
+    <header class="compact-page-toolbar section-header">
       <div>
-        <h1 id="monitoring-events-title">监控事件中心与降噪漏斗</h1>
-        <p class="muted">
-          5分钟同指纹去重合并（×N）、闪断10m≥3次静默5m、拓扑上游故障抑制、维护窗口SLA排除双确认、隔离区人工处置与自动建单补偿（Q14/Q29按服务端返回状态展示）。
-        </p>
+        <h1 class="page-title-sr" id="monitoring-events-title">监控事件中心与降噪漏斗</h1>
+        
       </div>
       <div class="actions">
-        <button type="button" :disabled="!canRead || locked" @click="switchWindow('24h')">24h 漏斗</button>
-        <button type="button" :disabled="!canRead || locked" @click="switchWindow('7d')">7d 漏斗</button>
-        <button type="button" :disabled="!canRead || locked" @click="switchWindow('30d')">30d 漏斗</button>
+        <button type="button" :disabled="!canRead || locked" @click="switchWindow('24h')">刷新事件</button>
       </div>
     </header>
 
@@ -117,33 +113,22 @@ function switchWindow(w: FunnelWindow) {
         <ul><li v-for="m in state.detail.members" :key="m.id">#{{ m.sequence_no }} · {{ m.source_event_id }} · {{ m.source_phase }} · {{ m.occurred_at }}</li></ul>
       </aside>
     </section>
-    <p v-if="state.workspaceBusy" role="status">正在读取最新事件流与降噪漏斗…</p>
-    <div v-if="state.workspace" class="workspace-grid">
-      <section class="card" aria-label="告警降噪漏斗">
-        <h2>告警降噪漏斗（{{ state.workspace.noise_funnel.window }}）</h2>
-        <ul class="kpi-list">
-          <li>原始到达：<strong>{{ state.workspace.noise_funnel.raw_intake_count }}</strong></li>
-          <li>去重合并（5m窗口）：<strong>{{ state.workspace.noise_funnel.merged_deduplicated_count }}</strong></li>
-          <li>闪断静默（10m≥3次→5m）：<strong>{{ state.workspace.noise_funnel.flap_silenced_count }}</strong></li>
-          <li>拓扑依赖抑制：<strong>{{ state.workspace.noise_funnel.dependency_suppressed_count }}</strong></li>
-          <li>维护期静默：<strong>{{ state.workspace.noise_funnel.maintenance_silenced_count }}</strong></li>
-          <li>有效告警：<strong>{{ state.workspace.noise_funnel.effective_alert_count }}</strong></li>
-        </ul>
-      </section>
-
+    <p v-if="state.workspaceBusy" role="status">正在读取最新事件…</p>
+    <div v-if="state.workspace" class="event-workspace">
       <section class="card" aria-label="监控事件主列表">
-        <h2>监控事件流（监控状态与处理状态正交独立）</h2>
+        <h2>监控事件流</h2>
         <p>此列表最多显示最新25条；搜索命中的事件可独立读取详情。</p>
+        <div class="event-table-scroll" role="region" aria-label="监控事件列表，可横向滚动" tabindex="0">
         <table>
           <thead>
             <tr>
-              <th>规则 / 去重角标</th>
-              <th>级别</th>
-              <th>监控状态</th>
-              <th>人工处理状态</th>
-              <th>抑制状态</th>
-              <th>通知空状态原因</th>
-              <th>操作</th>
+              <th scope="col">规则 / 去重角标</th>
+              <th scope="col">级别</th>
+              <th scope="col">监控状态</th>
+              <th scope="col">人工处理状态</th>
+              <th scope="col">抑制状态</th>
+              <th scope="col">通知空状态原因</th>
+              <th scope="col">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -183,6 +168,8 @@ function switchWindow(w: FunnelWindow) {
             </tr>
           </tbody>
         </table>
+        </div>
+        <p v-if="!state.workspace.events.length" role="status">暂无监控事件</p>
       </section>
 
       <section class="card" aria-label="计划维护窗口">
@@ -247,3 +234,8 @@ function switchWindow(w: FunnelWindow) {
     </div>
   </section>
 </template>
+
+<style scoped>
+.monitoring-events-page,.event-workspace{min-width:0;max-width:100%}.event-workspace{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}.event-workspace>.card,.event-detail{min-width:0;padding:16px;overflow-wrap:anywhere}.event-workspace h2{margin:0 0 12px;font-size:16px}.event-table-scroll{max-width:100%;overflow-x:auto;border:1px solid #e2e8f0;border-radius:6px}.event-table-scroll table{width:100%;min-width:960px;border-collapse:collapse;text-align:left;table-layout:fixed}.event-table-scroll th,.event-table-scroll td{padding:12px;border-bottom:1px solid #e2e8f0;vertical-align:top;overflow-wrap:anywhere}.event-table-scroll th{background:#f8fafc}.event-table-scroll th:first-child{width:18%}.event-table-scroll th:last-child{width:26%}.monitoring-events-page button{min-height:44px;padding:6px 12px;margin:2px;max-width:100%;white-space:normal}.monitoring-events-page input,.monitoring-events-page textarea{box-sizing:border-box;max-width:100%;min-height:44px}.monitoring-events-page textarea{width:100%}.monitoring-events-page :focus-visible{outline:2px solid #2563eb;outline-offset:2px}.monitoring-events-page li{margin-bottom:12px}.monitoring-events-page .actions{display:flex;flex-wrap:wrap;gap:8px}
+@media(max-width:760px){.event-workspace>.card,.event-detail{padding:12px}}
+</style>

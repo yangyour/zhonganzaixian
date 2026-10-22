@@ -21,6 +21,8 @@ import SessionResumeNotice from './components/SessionResumeNotice.vue'
 import { Fold, Expand, Menu } from '@element-plus/icons-vue'
 import './styles/prototype.css'
 import './styles/functional-prototype.css'
+import './styles/compact-workspaces.css'
+import { displayTenantName } from './utils/displayTenantName'
 const route = useRoute()
 const router = useRouter()
 const homeRoute = computed(() => landingRoute(session.value, router.getRoutes()))
@@ -97,10 +99,9 @@ async function endSession() {
           <GlobalSearch v-if="can('search:read')" />
           <div class="context-controls">
           <el-select v-if="maySwitchTenant" :model-value="session.tenant.id" :disabled="switchingTenant || tenantTransition" class="tenant-select" aria-label="切换租户" @change="changeTenant">
-            <el-option v-for="tenant in session.allowed_tenants" :key="tenant.id" :label="tenant.name" :value="tenant.id" />
+            <el-option v-for="tenant in session.allowed_tenants" :key="tenant.id" :label="displayTenantName(tenant.name)" :value="tenant.id" />
           </el-select>
-          <span v-else class="tenant-name">{{ session.tenant.name }}</span>
-          <span class="environment-label"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '测试环境' : '本地演示模式' }}</span>
+          <span v-else class="tenant-name">{{ displayTenantName(session.tenant.name) }}</span>
           </div>
         </div>
       </div>

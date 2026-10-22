@@ -71,8 +71,8 @@ defineExpose({ cancelJobRead, retryJobRead, retryFormatRead, change, changeAck, 
 </script>
 <template>
  <section class="contact-import-page admin-prototype">
-  <div class="page-heading"><div><h1>联系人批量新建与作业</h1><p>按标准 JSON 结构整批导入客户联系人档案 · 独立跟踪异步导入进度</p></div><router-link to="/customer-contacts">返回联系人管理</router-link></div>
-  <el-alert type="warning" :closable="false" title="批量导入仅新增客户联系人档案，不合并既有记录、不开通系统登录权限">本页接收标准 JSON 格式数据（单批上限 1–100 行）。格式校验通过后需显式确认提交导入作业，本页没有批量写入按钮之外的自动覆盖动作。</el-alert>
+  <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">联系人批量新建与作业</h1></div><router-link to="/customer-contacts">返回联系人管理</router-link></div>
+  <p class="inline-boundary">批量导入仅新增客户联系人档案，不合并既有记录、不开通系统登录权限</p>
   <nav class="admin-tabs" aria-label="联系人工作区"><router-link to="/customer-contacts">联系人列表</router-link><span class="active">批量新建与作业</span><router-link to="/contact-import-preview">导入格式预览</router-link></nav>
   <ol class="admin-stepbar"><li :class="{active: !previewState.result}"><strong>01 填写导入数据</strong><small>标准 8 字段 JSON</small></li><li :class="{active: previewState.result && !state.receipt}"><strong>02 格式校验与受理</strong><small>核对后提交导入作业</small></li><li :class="{active: !!state.receipt}"><strong>03 跟踪作业结果</strong><small>查询后台执行状态</small></li></ol>
   <el-empty v-if="!permitted" description="当前身份没有联系人批量新建权限" />

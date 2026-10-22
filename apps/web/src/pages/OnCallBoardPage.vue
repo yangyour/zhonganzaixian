@@ -172,52 +172,19 @@ defineExpose({state,workspace,members,loadMembers,cancelMembers,openWorkflow,ref
 </script>
 <template>
  <section class="oncall-board" :aria-busy="!!state.busy">
-  <div class="page-heading proto-page-head">
+  <div class="compact-page-toolbar page-heading proto-page-head">
    <div>
-    <h1>值班看板与升级链管理 <span class="proto-badge">{{ session?.tenant.name }}</span></h1>
-    <p>30s 自动刷新值班队列、18:00 交接班只追加台账及四套可配置升级链（M5-12 / M5-13）。</p>
+    <h1 class="page-title-sr">值班看板与升级链管理 </h1>
+    
    </div>
    <RouterLink to="/sla-reports" class="back">SLA 月报与赔付</RouterLink>
   </div>
   <p class="panel" v-if="!permitted">当前身份无权访问内部值班看板，或正在切换租户。</p>
   <template v-else>
-   <p class="proto-scope-note">
-    本看板默认每30秒刷新工单SLA快照，可暂停；交接台账标注18:00口径，只有显式登记后才保存对应计数，本页不会自动执行交接（M5-12）。电话未接听升级以实际策略和显式执行记录为准，短信仅登记待网关意图，不代表已经发送或送达（M5-13）；详细排班轮换细则与重呼叫间隔保持待客户确认（CONFIG_PENDING_Q15）。
-   </p>
+   
    <p v-if="dirty" role="status">存在未保存输入，自动刷新已暂停；离开前会提醒。</p>
    <p v-if="state.receipt" role="status">原操作回执已核对：{{state.receipt.identity}} · {{displayTime(state.receipt.recordedAt)}}。后续回读失败不表示原操作未保存。</p>
-   <div class="proto-kpis" v-if="state.board">
-    <div>
-     <span>待确认告警/工单</span>
-     <b>{{ state.board.kpis.unacknowledged_count }}</b>
-     <small>OPEN 状态</small>
-    </div>
-    <div>
-     <span>紧急告警/工单</span>
-     <b>{{ state.board.kpis.critical_count }}</b>
-     <small>P1 / P2 在途</small>
-    </div>
-    <div>
-     <span>进行中工单</span>
-     <b>{{ state.board.kpis.in_progress_count }}</b>
-     <small>ACCEPTED / IN_PROGRESS</small>
-    </div>
-    <div>
-     <span>待复核工单</span>
-     <b>{{ state.board.kpis.pending_review_count }}</b>
-     <small>RESOLVED 待确认</small>
-    </div>
-    <div>
-     <span>今日已恢复</span>
-     <b>{{ state.board.kpis.recovered_today_count }}</b>
-     <small>Asia/Shanghai 今日</small>
-    </div>
-    <div>
-     <span>当班 MTTA (P50)</span>
-     <b>{{ formatDurationSec(state.board.kpis.mtta_p50_sec) }}</b>
-     <small>目标 ≤ {{ formatDurationSec(state.board.kpis.mtta_target_sec) }}</small>
-    </div>
-   </div>
+   
 
    <div class="proto-panel workspace">
     <div class="proto-toolbar">
@@ -234,13 +201,13 @@ defineExpose({state,workspace,members,loadMembers,cancelMembers,openWorkflow,ref
     <ApiErrorNotice :error="state.error" />
     <p v-if="readStatus" role="status" aria-live="polite">{{readStatus}}</p>
     <p v-if="state.readFailed" role="status">看板读取尚未成功，自动刷新已暂停；请重试读取。不能据此判断队列为空。</p>
-    <p v-if="state.board" class="proto-scope-note">快照时间：{{displayTime(state.board.observed_at)}}。倒计时为该次快照值，并非连续计时；当前队列最多显示25条，不代表全部在途工单。</p>
+    
     <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">值班或升级操作提交结果尚未确认，请点击重试。</p>
     <button v-if="state.attempt&&!state.busy" type="button" @click="recover">重试上次提交</button>
     <p v-if="state.busy" role="status" aria-live="polite">{{ state.busy==='write'?'正在提交值班/升级记录…':'正在同步值班看板…' }}</p>
 
     <template v-if="tab==='queue'">
-     <p class="proto-scope-note">点击工单入口可查看六态工作流并按当前权限办理；历史升级记录不代表当前工单状态。打开详情不会自动接单、升级或发送短信。</p>
+     
      <div class="table-wrap" tabindex="0" role="region" aria-label="倒计时队列，可横向滚动" v-if="state.board?.queue.length">
       <table class="proto-table"><caption>倒计时队列</caption>
        <thead>

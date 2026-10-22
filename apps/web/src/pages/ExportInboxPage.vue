@@ -27,12 +27,12 @@ onUnmounted(()=>{clearInterval(timer);unregister();window.removeEventListener('b
 defineExpose({state,workspace,mayLeave})
 </script>
 <template>
- <section class="export-inbox"><div class="page-heading proto-page-head"><div><h1>我的导出消息 <span class="proto-badge">{{ session?.tenant.name }}</span></h1><p>查看并下载当前租户下已发布的资产台账导出文件（消息已读状态仅对本人账号生效）。</p></div><RouterLink to="/asset-export-jobs" class="export-back">台账导出</RouterLink></div>
+ <section class="export-inbox"><div class="compact-page-toolbar page-heading proto-page-head"><div><h1 class="page-title-sr">我的导出消息 </h1></div><RouterLink to="/asset-export-jobs" class="export-back">台账导出</RouterLink></div>
   <p class="panel" v-if="!permitted">当前身份没有导出消息权限，或正在切换租户。</p>
   <template v-else>
-   <div class="proto-kpis"><div><span>本次读取未读</span><b>{{ state.page ? state.page.unread_count : '—' }}</b><small>当前租户本人消息</small></div><div><span>本页消息</span><b>{{ state.page ? state.page.items.length : '—' }}</b><small>本页已加载消息数</small></div><div><span>原链接有效期</span><b>15 <small>分钟</small></b><small>自文件发布起计算</small></div><div><span>下载方式</span><b>受控下载</b><small>链接过期可重新申请</small></div></div>
+   
    <div class="proto-panel inbox-workspace"><div class="proto-toolbar"><div class="proto-tabs" aria-label="导出消息筛选"><button type="button" :class="{ active: !state.unreadOnly }" :aria-pressed="!state.unreadOnly" :disabled="locked" @click="workspace.list(false)">全部消息</button><button type="button" :class="{ active: state.unreadOnly }" :aria-pressed="state.unreadOnly" :disabled="locked" @click="workspace.list(true)">未读消息</button></div><button type="button" :disabled="locked" @click="workspace.list()">刷新消息</button></div>
-   <p class="proto-scope-note">下载链接有效期为 15 分钟；若链接已过期，可点击“重新申请下载链接”获取新链接。</p>
+   
    <ApiErrorNotice :error="state.error" :on-retry="state.page===null&&state.readRequest&&!state.attempt?workspace.retryRead:undefined" :retrying="state.busy==='read'" retry-label="重新加载" />
    <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">{{state.attempt?.kind==='grant'?'下载授权':'标记已读'}}的结果尚未确认，请点击下方按钮重试。</p><button v-if="state.attempt&&!state.busy" type="button" @click="recover">{{state.attempt.kind==='grant'?'重试获取链接':'重试标记已读'}}</button>
    <p v-if="lastRenewed" role="status">{{download(lastRenewed)?'新的下载链接已取得，原消息的期限未修改。':'原下载请求已恢复，但链接已经过期，可以重新申请。'}}</p>

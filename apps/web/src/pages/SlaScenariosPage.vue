@@ -25,9 +25,9 @@ const labels: Record<string, string> = { CALCULATED: '场景已测算', UNRESOLV
 </script>
 <template>
   <section class="sla-scenarios">
-    <div class="page-heading proto-page-head"><div><h1>SLA 场景测算 <span class="proto-badge">{{ session?.tenant.name }}</span></h1><p>基于模拟场景样本测算 SLA 响应与恢复达标情况 · 当前租户授权 · 单次最多 200 条</p></div></div>
-    <el-alert title="模拟场景测算说明（非实际生产达成率）" type="warning" :closable="false">本工具基于当前页面录入的模拟场景执行对照测算，不读取实际工单全集，亦不变更真实审批或生效快照（正式达成率与违约金核算规则待确认）。</el-alert>
-    <div class="proto-kpis"><div><span>样本集完整性声明</span><b>{{ draft.population_complete === null ? '未声明' : draft.population_complete ? '声明完整' : '非完整样本' }}</b><small>仅限当前模拟输入</small></div><div><span>模拟场景条数</span><b>{{ draft.tickets.length }}</b><small>仅当前页面输入</small></div><div><span>场景内达标 / 未达标</span><b>{{ state.result ? state.result.counts.met + ' / ' + state.result.counts.not_met : '—' }}</b><small>执行测算后显示</small></div><div><span>本次测算状态</span><b class="sla-result-status">{{ state.busy ? '计算中' : state.result ? labels[state.result.status] : '未计算' }}</b><small>以服务端本次返回为准</small></div></div>
+    <h1 class="page-title-sr">SLA 场景测算 </h1>
+    <p class="inline-boundary">模拟场景测算说明（非实际生产达成率）</p>
+    
     <details class="boundary-details"><summary>输入与计算口径</summary><p>输入仅保留在当前页面，离开或切换租户后自动清空，不自动保存。修改输入立即清除旧结果；未填写的字段保持未指定状态，不自动填充默认时限。</p></details>
     <ApiErrorNotice :error="state.error" />
     <div class="scenario-workspace"><section class="proto-panel scenario-inputs"><div class="proto-section-head"><h2>模拟场景样本</h2><span class="proto-sub">录入场景参数后执行测算</span></div>

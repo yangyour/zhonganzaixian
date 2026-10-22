@@ -30,9 +30,9 @@ const reasonLabels:Record<string,string>={CONDITION_INCOMPLETE:'比较符、阈�
 </script>
 <template>
 <section class="observation-page">
- <header><div><h1>采样观察窗诊断</h1><p>仅分析你明确提供的候选与采样，不读取真实监控，不确认事件恢复。</p></div><router-link to="/threshold-diagnostics">返回阈值条件诊断</router-link></header>
+ <header class="compact-page-toolbar"><div><h1 class="page-title-sr">采样观察窗诊断</h1></div><router-link to="/threshold-diagnostics">返回阈值条件诊断</router-link></header>
  <p class="boundary">已观察采样点的跨度不证明点与点之间连续正常。不会保存或发布规则，不修改事件状态；物理范围、实际设备和客户确认仍未验证。</p>
- <p v-if="!permitted">仅当前测试环境的授权平台配置管理员可使用此诊断。</p>
+ <p v-if="!permitted">当前账号没有此诊断的使用权限。</p>
  <template v-else>
   <details><summary>输入格式与缺失值说明</summary><p>condition 使用 GT / GE / LT / LE、精确小数字符串 threshold 和 unit；hold_seconds 与 max_gap_seconds 为秒的小数字符串，未确定用 null。observed_at 必须填写明确 UTC 时刻，最多毫秒，不自动填当前时间。</p><p>samples 最多1000条，时间严格递增且不晚于 observed_at。每条包含 recorded_at、state、value、unit；state 为 KNOWN / UNKNOWN / COLLECTOR_ERROR。KNOWN 必须有数值字符串和单位；未知/错误的 value 必须 null，不能补0。</p><p>空结构仅供填写，不发送请求，observed_at 的 null 必须补全后才能诊断。</p><button type="button" :disabled="discarding" @click="insertSkeleton">填入空结构（不发送）</button></details>
   <form @submit.prevent="analyze" :aria-busy="state.busy"><label for="observation-input">显式观察窗 JSON 输入</label><textarea id="observation-input" ref="editor" :value="state.text" :disabled="discarding" aria-describedby="observation-help observation-errors" spellcheck="false" rows="14" @input="edit"/><p id="observation-help">UTF-8 {{bytes}} / 524288 字节技术上限。不会截断；编辑会取消旧请求并清除旧结果。数据仅在当前页面内存保留。</p><div class="actions"><button type="submit" :disabled="!state.text||state.busy||discarding">{{state.busy?'诊断中…':'诊断明确输入'}}</button><button v-if="state.busy" type="button" @click="cancel">取消诊断</button><button type="button" :disabled="!state.text||discarding" @click="clear">清空输入与结果</button></div></form>

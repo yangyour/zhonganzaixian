@@ -74,7 +74,7 @@ async function disableSelected(){
 async function disable(row:WeComBinding){if(!bindings.value.some(item=>item===row)||!row.active)return;if(locked.value||editor.dirty.value)return;await editor.save(`/wecom/bindings/${row.user_id}`,'PUT',{expected_version:row.version,wecom_user_id:row.wecom_user_id,active:false})}
 </script>
 <template><section :aria-busy="loading" class="identity-page admin-prototype wecom-page">
- <div class="page-heading"><div><h1>企业微信</h1><p>检查应用连接，管理成员与平台账号的绑定，查看消息发送记录。</p></div><el-button :disabled="editor.busy()||loading||switchingTenant" @click="refresh">刷新</el-button></div>
+ <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">企业微信</h1></div><el-button :disabled="editor.busy()||loading||switchingTenant" @click="refresh">刷新</el-button></div>
  <ApiErrorNotice v-if="error" :error="error"/><IdentityCommandNotice v-if="command.state!=='idle'||message" :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry"/>
  <p v-if="loading" role="status">正在读取企业微信配置…</p>
  <p v-if="error instanceof ApiError&&error.status===404" class="admin-card">当前租户尚未启用企业微信接入。请联系管理员配置应用。</p>

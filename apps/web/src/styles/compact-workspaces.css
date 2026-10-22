@@ -1,0 +1,18 @@
+.page-title-sr:not(:focus){position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
+.prototype-shell #main-content .compact-page-toolbar{background:transparent;border:0;box-shadow:none;padding:0;min-height:0;margin:0 0 12px;display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px}
+.prototype-shell #main-content .compact-result-summary{display:flex;flex-wrap:wrap;gap:8px 24px;padding:8px 0;margin:0 0 12px;background:transparent;border:0}
+.prototype-shell #main-content .compact-result-summary>article,.prototype-shell #main-content .compact-result-summary>div{min-height:0;padding:4px 0;border:0;box-shadow:none;background:transparent}
+.prototype-shell #main-content .compact-result-summary :is(strong,b){font-size:16px;margin:0 8px;display:inline}
+.compact-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.compact-actions a{display:inline-flex;align-items:center;min-height:44px}
+
+.page-title-sr:focus{font-size:18px;line-height:1.5;margin:0 0 8px;outline:2px solid #2563eb;outline-offset:2px}
+
+.prototype-shell #main-content .compact-result-summary small{font-size:12px;color:#526176;display:block}
+/* Empty results and static boundaries must not displace functional controls. */
+.prototype-shell #main-content .inline-boundary{margin:4px 0 8px;padding:0;font-size:12px;line-height:1.5;color:#526176;background:none;border:0;overflow-wrap:anywhere}
+.prototype-shell #main-content :is(.proto-empty,.query-empty,.no-matches,.empty-chart-body,.live-empty){min-height:0;padding:12px;}
+.prototype-shell #main-content .el-empty{padding:16px 12px;}
+.prototype-shell #main-content .el-empty__image{display:none;}
+.prototype-shell #main-content .el-empty__description{margin-top:0;}
+.prototype-shell #main-content :is(.dashboard-events,.dashboard-reports,.dashboard-workflows){padding:12px;margin:8px 0;min-width:0;}
+.prototype-shell #main-content .panel:has(+.message-list){min-height:0;}

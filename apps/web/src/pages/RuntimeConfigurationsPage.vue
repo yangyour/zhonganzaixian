@@ -77,8 +77,8 @@ onUnmounted(()=>{disposed=true;++epoch;cancelValidation();abort?.abort();workspa
 </script>
 <template>
  <section class="runtime-config-page">
-  <div class="page-heading"><div><h1>运行配置与发布</h1><p>{{expectedKeys.size}} 项本版本平台运行参数 · 关联确认 Q01—Q31 · 按当前租户独立管理发布版本与回滚记录</p></div><router-link to="/configurations">配置登记与历史提案</router-link></div>
-  <el-alert type="warning" :closable="false" title="租户运行配置发布与生产确认基线说明">管理当前租户的运行配置参数发布、定时生效与历史版本回滚 · 待确认业务参数保持未配置状态，各业务模块按已生效参数与实际组件状态运行。</el-alert>
+  <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">运行配置与发布</h1></div><router-link to="/configurations">配置登记与历史提案</router-link></div>
+  <p class="inline-boundary">租户运行配置发布与生产确认基线说明</p>
   <p v-if="!permitted">当前没有配置读取权限。</p>
   <template v-else>
    <ApiErrorNotice :error="catalogError" :retrying="catalogBusy" @retry="catalog" />

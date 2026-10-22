@@ -1,0 +1,74 @@
+{
+  "status": "PASS_DOM_UNIT_AND_STATIC_BUILD_ONLY",
+  "base_main": "e8f20900ddae179a06ab2948de87a61decdd5328",
+  "frontend": {
+    "files": 290,
+    "tests": 4815,
+    "failed": 0
+  },
+  "node_contracts": {
+    "tests": 179,
+    "failed": 0
+  },
+  "api_contract": "PASS",
+  "formal_contract": {
+    "requirements": 128,
+    "progress_notes": 65,
+    "acceptance_status": "NOT_RUN",
+    "completion_verified": false
+  },
+  "build": {
+    "status": "PASSED",
+    "files": 143,
+    "bootstrap_gzip_bytes": 180632,
+    "bootstrap_css_gzip_bytes": 62920,
+    "build_id": "9a5a63381adc26b5790e9696a8c9e41f5f1ce66e49b10e5e07a7a4db89b6e423",
+    "scope": "static-artifacts-only"
+  },
+  "static_preview": {
+    "scope": "LOCAL_STATIC_PREVIEW_ONLY_NOT_BROWSER_OR_BACKEND",
+    "routes": [
+      {
+        "path": "/",
+        "status": 200,
+        "matches_app_shell": true
+      },
+      {
+        "path": "/dashboard",
+        "status": 200,
+        "matches_app_shell": true
+      },
+      {
+        "path": "/monitoring-events",
+        "status": 200,
+        "matches_app_shell": true
+      },
+      {
+        "path": "/assets",
+        "status": 200,
+        "matches_app_shell": true
+      },
+      {
+        "path": "/identity/users",
+        "status": 200,
+        "matches_app_shell": true
+      }
+    ],
+    "files_checked": 144,
+    "all_hashes_match": true,
+    "preview_stopped": true
+  },
+  "browser": {
+    "discovered": 139,
+    "files": 14,
+    "new_cases": 4,
+    "executed": false,
+    "status": "NOT_RUN",
+    "reason": "Existing Chromium Unix socket/startup restrictions; no bypass attempted",
+    "axe": "NOT_RUN",
+    "screenshots": "NOT_RUN"
+  },
+  "migration": "NONE",
+  "server_deployment": "NOT_PERFORMED",
+  "initial_regressions": "Legacy assertions required removed banners/cards/subtitles. Updated to retained controls, actual scoped results and equivalent boundaries; original behavior/security tests retained. Final full suite rerun."
+}

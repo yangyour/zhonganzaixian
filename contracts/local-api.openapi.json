@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.77.0",
+    "version": "0.78.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -41501,6 +41501,243 @@
         "x-mop-success-writes-audit-or-receipts": false,
         "description": "仅remote_test服务边界。BackupVersionInventoryQuery必须由显式应用绑定提供，两类授权不能用草稿读取或管理员角色默认代替；缺失返回503 BACKUP_VERSION_INVENTORY_NOT_CONFIGURED，例子中的null引用不是可自动发布配置。POST/PUT/PATCH/DELETE不支持，不返回KMS引用、对象位置、内部证明、租约owner或下载URL。"
       }
+    },
+    "/monitoring-onboarding/registered-targets": {
+      "get": {
+        "x-mop-capabilities": [
+          "assets:read",
+          "configurations:read"
+        ],
+        "x-mop-read-only": true,
+        "x-mop-current-membership-recheck": true,
+        "x-mop-arbitrary-destination-accepted": false,
+        "x-mop-deployment-performed": false,
+        "operationId": "listRegisteredMonitoringTargets",
+        "summary": "当前租户已登记目标，校验授权资产与明确管理地址，不发起采集",
+        "responses": {
+          "200": {
+            "description": "Server-managed configuration only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringRegisteredTargetListResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Rejected scope, configuration, concurrency or disabled service; no fallback network probe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Rejected scope, configuration, concurrency or disabled service; no fallback network probe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Rejected scope, configuration, concurrency or disabled service; no fallback network probe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Rejected scope, configuration, concurrency or disabled service; no fallback network probe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Rejected scope, configuration, concurrency or disabled service; no fallback network probe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rejected scope, configuration, concurrency or disabled service; no fallback network probe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Rejected scope, configuration, concurrency or disabled service; no fallback network probe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/monitoring-onboarding/registered-targets/{id}/test": {
+      "post": {
+        "x-mop-capabilities": [
+          "assets:read",
+          "configurations:read",
+          "configurations:write"
+        ],
+        "x-mop-read-only": true,
+        "x-mop-current-membership-recheck": true,
+        "x-mop-arbitrary-destination-accepted": false,
+        "x-mop-deployment-performed": false,
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-csrf-required": true,
+        "x-mop-network-io": "One explicitly allowlisted destination; Blackbox/SNMP require independent downstream authorization; one concurrent probe per process",
+        "operationId": "testRegisteredMonitoringTarget",
+        "summary": "按已登记ID及配置摘要执行一次有界只读探测，不接受URL/凭据/租户覆盖",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "configuration_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "configuration_sha256"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Single probe outcome; FAILED is not success or collection health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringRegisteredProbeResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Rejected scope, configuration, concurrency or disabled service; no fallback network probe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Rejected scope, configuration, concurrency or disabled service; no fallback network probe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Rejected scope, configuration, concurrency or disabled service; no fallback network probe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Rejected scope, configuration, concurrency or disabled service; no fallback network probe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Rejected scope, configuration, concurrency or disabled service; no fallback network probe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rejected scope, configuration, concurrency or disabled service; no fallback network probe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Rejected scope, configuration, concurrency or disabled service; no fallback network probe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -82419,6 +82656,685 @@
           "trace_id"
         ],
         "additionalProperties": false
+      },
+      "MonitoringRegisteredTarget": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "asset_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "preset_id": {
+            "enum": [
+              "linux-node",
+              "windows-exporter",
+              "network-snmp",
+              "http-service",
+              "tcp-service",
+              "icmp-device",
+              "postgresql",
+              "mysql",
+              "redis",
+              "containers",
+              "zabbix-linux",
+              "zabbix-windows",
+              "zabbix-snmp"
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "endpoint": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 512
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "auth_profile": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-zA-Z_][a-zA-Z0-9_-]{0,63}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "interval_seconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 5,
+                "maximum": 3600
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timeout_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "asset_id",
+          "preset_id",
+          "enabled",
+          "endpoint",
+          "target",
+          "auth_profile",
+          "interval_seconds",
+          "timeout_seconds"
+        ]
+      },
+      "MonitoringRegisteredTargetConfig": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "const": 1
+          },
+          "targets": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "tenant_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "asset_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "preset_id": {
+                  "enum": [
+                    "linux-node",
+                    "windows-exporter",
+                    "network-snmp",
+                    "http-service",
+                    "tcp-service",
+                    "icmp-device",
+                    "postgresql",
+                    "mysql",
+                    "redis",
+                    "containers",
+                    "zabbix-linux",
+                    "zabbix-windows",
+                    "zabbix-snmp"
+                  ]
+                },
+                "enabled": {
+                  "type": "boolean"
+                },
+                "endpoint": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "target": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 512
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "auth_profile": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z_][a-zA-Z0-9_-]{0,63}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "interval_seconds": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 5,
+                      "maximum": 3600
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "timeout_seconds": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 10
+                }
+              },
+              "required": [
+                "id",
+                "tenant_id",
+                "asset_id",
+                "preset_id",
+                "enabled",
+                "endpoint",
+                "target",
+                "auth_profile",
+                "interval_seconds",
+                "timeout_seconds"
+              ]
+            }
+          }
+        },
+        "required": [
+          "version",
+          "targets"
+        ]
+      },
+      "MonitoringRegisteredTargetList": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "permission_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "target_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "asset_name": {
+                  "type": "string"
+                },
+                "configuration": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "version": {
+                      "const": 1
+                    },
+                    "targets": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "tenant_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "asset_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "preset_id": {
+                            "enum": [
+                              "linux-node",
+                              "windows-exporter",
+                              "network-snmp",
+                              "http-service",
+                              "tcp-service",
+                              "icmp-device",
+                              "postgresql",
+                              "mysql",
+                              "redis",
+                              "containers",
+                              "zabbix-linux",
+                              "zabbix-windows",
+                              "zabbix-snmp"
+                            ]
+                          },
+                          "enabled": {
+                            "type": "boolean"
+                          },
+                          "endpoint": {
+                            "type": "string",
+                            "maxLength": 512
+                          },
+                          "target": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "maxLength": 512
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "auth_profile": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^[a-zA-Z_][a-zA-Z0-9_-]{0,63}$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "interval_seconds": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 5,
+                                "maximum": 3600
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "timeout_seconds": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 10
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "tenant_id",
+                          "asset_id",
+                          "preset_id",
+                          "enabled",
+                          "endpoint",
+                          "target",
+                          "auth_profile",
+                          "interval_seconds",
+                          "timeout_seconds"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "version",
+                    "targets"
+                  ]
+                },
+                "configuration_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "test_authorized": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "target_id",
+                "asset_name",
+                "configuration",
+                "configuration_sha256",
+                "test_authorized"
+              ]
+            }
+          },
+          "source": {
+            "const": "SERVER_EXPLICIT_CONFIGURATION"
+          },
+          "continuous_collection_verified": {
+            "const": false
+          }
+        },
+        "required": [
+          "tenant_id",
+          "actor_id",
+          "permission_version",
+          "items",
+          "source",
+          "continuous_collection_verified"
+        ]
+      },
+      "MonitoringRegisteredTargetListResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MonitoringRegisteredTargetList"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ]
+      },
+      "MonitoringRegisteredProbeReport": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "configuration_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "probe_status": {
+            "enum": [
+              "NOT_RUN",
+              "FAILED",
+              "TCP_REACHABLE_PROTOCOL_UNVERIFIED",
+              "SAMPLE_VERIFIED_ONCE"
+            ]
+          },
+          "continuous_collection_verified": {
+            "const": false
+          },
+          "device_identity_verified": {
+            "const": false
+          },
+          "health_verified": {
+            "const": false
+          },
+          "sample_count": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "matched_metrics": {
+            "type": "array",
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-zA-Z_:][a-zA-Z0-9_:]*$"
+            }
+          },
+          "reason": {
+            "type": "string",
+            "pattern": "^[A-Z_]{1,100}$"
+          },
+          "metric_values_stored": {
+            "const": false
+          }
+        },
+        "required": [
+          "target_id",
+          "configuration_sha256",
+          "probe_status",
+          "continuous_collection_verified",
+          "device_identity_verified",
+          "health_verified",
+          "sample_count",
+          "matched_metrics"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "probe_status": {
+                  "const": "SAMPLE_VERIFIED_ONCE"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "metric_values_stored"
+              ],
+              "properties": {
+                "sample_count": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100000
+                },
+                "matched_metrics": {
+                  "minItems": 1
+                }
+              },
+              "not": {
+                "required": [
+                  "reason"
+                ]
+              }
+            },
+            "else": {
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "sample_count": {
+                  "type": "null"
+                },
+                "matched_metrics": {
+                  "maxItems": 0
+                }
+              },
+              "not": {
+                "required": [
+                  "metric_values_stored"
+                ]
+              }
+            }
+          }
+        ],
+        "x-mop-cross-field-checks": [
+          "SAMPLE_VERIFIED_ONCE requires positive count, matching preset metrics and metric_values_stored=false; other states require null count, empty metrics, reason and no metric_values_stored",
+          "All reports remain one-shot, not identity, health, continuous collection, registration writes or deployment evidence"
+        ]
+      },
+      "MonitoringRegisteredProbeResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "actor_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "permission_version": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "report": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "target_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "configuration_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "probe_status": {
+                    "enum": [
+                      "NOT_RUN",
+                      "FAILED",
+                      "TCP_REACHABLE_PROTOCOL_UNVERIFIED",
+                      "SAMPLE_VERIFIED_ONCE"
+                    ]
+                  },
+                  "continuous_collection_verified": {
+                    "const": false
+                  },
+                  "device_identity_verified": {
+                    "const": false
+                  },
+                  "health_verified": {
+                    "const": false
+                  },
+                  "sample_count": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100000
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "matched_metrics": {
+                    "type": "array",
+                    "maxItems": 2,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z_:][a-zA-Z0-9_:]*$"
+                    }
+                  },
+                  "reason": {
+                    "type": "string",
+                    "pattern": "^[A-Z_]{1,100}$"
+                  },
+                  "metric_values_stored": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "target_id",
+                  "configuration_sha256",
+                  "probe_status",
+                  "continuous_collection_verified",
+                  "device_identity_verified",
+                  "health_verified",
+                  "sample_count",
+                  "matched_metrics"
+                ],
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "probe_status": {
+                          "const": "SAMPLE_VERIFIED_ONCE"
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "metric_values_stored"
+                      ],
+                      "properties": {
+                        "sample_count": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 100000
+                        },
+                        "matched_metrics": {
+                          "minItems": 1
+                        }
+                      },
+                      "not": {
+                        "required": [
+                          "reason"
+                        ]
+                      }
+                    },
+                    "else": {
+                      "required": [
+                        "reason"
+                      ],
+                      "properties": {
+                        "sample_count": {
+                          "type": "null"
+                        },
+                        "matched_metrics": {
+                          "maxItems": 0
+                        }
+                      },
+                      "not": {
+                        "required": [
+                          "metric_values_stored"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "x-mop-cross-field-checks": [
+                  "SAMPLE_VERIFIED_ONCE requires positive count, matching preset metrics and metric_values_stored=false; other states require null count, empty metrics, reason and no metric_values_stored",
+                  "All reports remain one-shot, not identity, health, continuous collection, registration writes or deployment evidence"
+                ]
+              },
+              "source": {
+                "const": "SERVER_ONE_SHOT_PROBE"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "actor_id",
+              "permission_version",
+              "report",
+              "source"
+            ]
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ]
       }
     }
   }

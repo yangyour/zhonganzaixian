@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
-import { onBeforeRouteLeave } from 'vue-router'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
 import { feedback as ElMessage } from '../utils/feedback'
 import { api } from '../api/client'
 import type { Asset } from '../api/types'
@@ -12,21 +13,27 @@ import ReadRecoveryActions from './ReadRecoveryActions.vue'
 const props = defineProps<{ modelValue: boolean; asset: Asset | null }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean]; saved: [] }>()
 const open = computed({ get: () => props.modelValue, set: value => emit('update:modelValue', value) })
-let disposed = false, focusEpoch = 0
+let disposed = false, focusEpoch = 0, confirmEpoch = 0
+const confirming = ref(false)
 const readNotice = ref<HTMLElement>(), readError = ref<HTMLElement>(), currentHeading = ref<HTMLElement>(), historyHeading = ref<HTMLElement>()
 const state = shallowRef<WarrantyState>(emptyWarrantyState())
 const workspace = createWarrantyWorkspace(api, value => { state.value = value })
 const permitted = computed(() => Boolean(session.value && props.asset?.tenant_id === session.value.tenant.id && ['msp', 'padmin'].includes(session.value.user.role) && can('assets:write') && !switchingTenant.value))
 const unresolved = computed(() => state.value.busy === 'write' || state.value.attempt?.state === 'uncertain')
-const locked = computed(() => !permitted.value || Boolean(state.value.busy) || unresolved.value)
+const locked = computed(() => !permitted.value || Boolean(state.value.busy) || unresolved.value || confirming.value)
+const initialForm = ref('')
 const baseline = ref<number | null>(null), validation = ref('')
 const form = reactive<Record<keyof WarrantyInput, string>>({ warranty_start: '', warranty_expiry: '', warranty_supplier: '', overdue_service_date: '', note: '' })
 const dates = [{ key: 'warranty_start', label: '维保起始日' }, { key: 'warranty_expiry', label: '维保到期日' }, { key: 'overdue_service_date', label: '超期服役日期' }] as const
 const blockers: Record<string, string> = { MANUAL_DRAFT_REQUIRED: '仅支持维护尚未接入监控的手工台账草稿', MONITORING_STATE_NOT_PRISTINE: '该资产已存在实时监控采样状态，不支持通过草稿模式覆盖', MANUAL_METADATA_CORE_DRIFT: '核心台账字段与资料快照不一致，请先核查数据来源' }
-function clearForm() { for (const key of Object.keys(form) as (keyof WarrantyInput)[]) form[key] = ''; baseline.value = null; validation.value = '' }
+const hasDraft = computed(() => baseline.value !== null && JSON.stringify(form) !== initialForm.value)
+const staleBaseline = computed(() => baseline.value !== null && (Boolean(state.value.current && state.value.current.asset.version !== baseline.value) || Boolean(props.asset && props.asset.version > baseline.value)))
+function formSnapshot() { return JSON.stringify([baseline.value,form,initialForm.value]) }
+function inputSnapshot() { return JSON.stringify([contextKey.value,formSnapshot(),state.value.current,state.value.attempt?.key,state.value.attempt?.state,workspace.unresolved()]) }
+function clearForm() { initialForm.value = ''; for (const key of Object.keys(form) as (keyof WarrantyInput)[]) form[key] = ''; baseline.value = null; validation.value = '' }
 function input(): WarrantyInput { return { warranty_start: form.warranty_start === '' ? null : form.warranty_start, warranty_expiry: form.warranty_expiry === '' ? null : form.warranty_expiry, warranty_supplier: form.warranty_supplier === '' ? null : form.warranty_supplier, overdue_service_date: form.overdue_service_date === '' ? null : form.overdue_service_date, note: form.note } }
 const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.account_version, session.value?.user.role, session.value?.mode, session.value?.capabilities, permitted.value, props.asset?.tenant_id, props.asset?.id]))
-watch(contextKey, () => { focusEpoch++; clearForm(); const s = session.value; workspace.reset(permitted.value && s && props.asset ? { tenantId: s.tenant.id, assetId: props.asset.id, actorId: s.user.id, permissionVersion: s.permission_version, canWrite: true } : null); workspace.setVisible(open.value); if (open.value && permitted.value) void load() }, { immediate: true, flush: 'sync' })
+watch(contextKey, () => { focusEpoch++; confirmEpoch++; confirming.value = false; clearForm(); const s = session.value; workspace.reset(permitted.value && s && props.asset ? { tenantId: s.tenant.id, assetId: props.asset.id, actorId: s.user.id, permissionVersion: s.permission_version, canWrite: true } : null); workspace.setVisible(open.value); if (open.value && permitted.value) void load() }, { immediate: true, flush: 'sync' })
 watch(open, value => { workspace.setVisible(value); if (value && permitted.value && !state.value.busy) void load() })
 async function withReadFocus(action: () => Promise<boolean>) {
   if (disposed || state.value.busy) return false
@@ -47,10 +54,49 @@ function clearSubmitted(payload: WarrantyInput & { expected_version: number }) {
   if (baseline.value === payload.expected_version && (Object.keys(form) as (keyof WarrantyInput)[]).every(key => form[key] === (payload[key] ?? ''))) clearForm()
   else validation.value = '原保存已确认，后来填写的内容已保留；请核对基准版本后再提交'
 }
-async function beginEdit() { if (locked.value || !await workspace.refresh() || !state.value.current?.can_edit) return; const current = state.value.current; clearForm(); form.warranty_start = current.warranty_details?.warranty_start ?? ''; form.warranty_supplier = current.warranty_details?.warranty_supplier ?? ''; form.warranty_expiry = current.metadata?.warranty_expiry ?? ''; form.overdue_service_date = current.metadata?.overdue_service_date ?? ''; form.note = current.metadata?.note ?? ''; baseline.value = current.asset.version }
+async function confirmDiscard() {
+  if (disposed || confirming.value) return false
+  if (workspace.unresolved()) { ElMessage.warning('维保档案保存状态待确认，不能放弃原请求'); return false }
+  if (!hasDraft.value) return true
+  const before = inputSnapshot(), owner = contextKey.value, turn = ++confirmEpoch; confirming.value = true
+  try {
+    await ElMessageBox.confirm('将放弃尚未保存的维保档案输入，是否继续？','保留维保档案草稿',{type:'warning',confirmButtonText:'放弃未保存输入',cancelButtonText:'继续编辑'})
+    return !disposed && turn === confirmEpoch && owner === contextKey.value && before === inputSnapshot() && !workspace.unresolved()
+  } catch { return false }
+  finally { if (!disposed && turn === confirmEpoch && owner === contextKey.value) confirming.value = false }
+}
+async function beginEdit() {
+  if (disposed || locked.value) return false
+  const owner = contextKey.value, before = inputSnapshot(), originalForm = formSnapshot()
+  if (!await confirmDiscard() || disposed || owner !== contextKey.value || before !== inputSnapshot() || locked.value) return false
+  if (!await workspace.refresh() || disposed || owner !== contextKey.value || originalForm !== formSnapshot() || !state.value.current?.can_edit) return false
+  const current = state.value.current
+  if (props.asset && current.asset.version < props.asset.version) { validation.value = '档案回读版本低于当前资产台账，请刷新核对后再编辑'; return false }
+  clearForm()
+  form.warranty_start = current.warranty_details?.warranty_start ?? ''; form.warranty_supplier = current.warranty_details?.warranty_supplier ?? ''; form.warranty_expiry = current.metadata?.warranty_expiry ?? ''; form.overdue_service_date = current.metadata?.overdue_service_date ?? ''; form.note = current.metadata?.note ?? ''
+  baseline.value = current.asset.version; initialForm.value = JSON.stringify(form)
+  return !disposed && owner === contextKey.value
+}
+async function cancelEdit() {
+  if (disposed || locked.value) return false
+  const before = inputSnapshot(), owner = contextKey.value
+  if (!await confirmDiscard() || disposed || owner !== contextKey.value || before !== inputSnapshot() || workspace.unresolved()) return false
+  clearForm(); return true
+}
+async function canLeave() {
+  if (disposed) return false
+  if (workspace.unresolved()) { ElMessage.warning('维保档案保存状态待确认，请先完成原请求重试，再离开、切换租户或退出'); return false }
+  return confirmDiscard()
+}
+async function canReplace(target: Asset) {
+  if (disposed || !session.value || switchingTenant.value || !can('assets:write') || !['msp','padmin'].includes(session.value.user.role) || target?.tenant_id !== session.value.tenant.id || typeof target.id !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(target.id)) return false
+  if (target.id === props.asset?.id) return true
+  const before = inputSnapshot(), owner = contextKey.value, selected = JSON.stringify(target)
+  return await canLeave() && !disposed && owner === contextKey.value && before === inputSnapshot() && selected === JSON.stringify(target) && !workspace.unresolved()
+}
 async function save() {
   if (locked.value || baseline.value === null) return
-  if (state.value.current?.asset.version !== baseline.value) { validation.value = '资产版本尚未核对或已更新，请重新点击“基于当前版本编辑”核对后再提交'; return }
+  if (!state.value.current || staleBaseline.value) { validation.value = '资产版本尚未核对或已更新，请重新点击“基于当前版本编辑”核对后再提交'; return }
   const owner = contextKey.value
   try { const facts = input(), expected = baseline.value; validateWarrantyInput(facts); validation.value = ''; if (await workspace.submit(facts, expected) && !disposed && owner === contextKey.value) { clearSubmitted({ ...facts, expected_version: expected }); emit('saved') } }
   catch (error) { if (!disposed && owner === contextKey.value) validation.value = error instanceof Error ? error.message : '请核对维保字段' }
@@ -61,12 +107,20 @@ async function retryOriginal() {
   const payload = JSON.parse(attempt.payload) as WarrantyInput & { expected_version: number }
   if (await workspace.retry() && !disposed && owner === contextKey.value) { clearSubmitted(payload); emit('saved') }
 }
-function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved()) { event.preventDefault(); event.returnValue = '' } }
+function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved() || hasDraft.value) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', beforeUnload)
-onBeforeRouteLeave(() => { if (!workspace.unresolved()) return true; ElMessage.warning('维保档案保存状态待确认，请先完成重试后再离开页面'); return false })
-const unregister = contextTransitionGuards.register(() => { if (!workspace.unresolved()) return true; ElMessage.warning('维保档案保存状态待确认，请先完成重试再切换租户或退出'); return false })
-onUnmounted(() => { disposed = true; focusEpoch++; unregister(); workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
-defineExpose({ hasUnresolved: workspace.unresolved, cancelRead: workspace.cancelRead, retryRead })
+const router = useRouter(); let routeEpoch = 0, removeResolve: (() => void) | undefined
+function clearRouteApproval() { removeResolve?.(); removeResolve = undefined; routeEpoch++ }
+async function canLeaveRoute() {
+  clearRouteApproval(); const turn = routeEpoch, before = inputSnapshot()
+  if (!await canLeave() || disposed || turn !== routeEpoch || before !== inputSnapshot()) return false
+  removeResolve = router.beforeResolve(() => !disposed && turn === routeEpoch && before === inputSnapshot() && !workspace.unresolved()); return true
+}
+onBeforeRouteLeave(canLeaveRoute)
+const removeAfterRoute = router.afterEach(clearRouteApproval), removeRouteError = router.onError(clearRouteApproval)
+const unregisterContextGuard = contextTransitionGuards.register(canLeave,inputSnapshot)
+onUnmounted(() => { disposed = true; focusEpoch++; confirmEpoch++; clearRouteApproval(); removeAfterRoute(); removeRouteError(); unregisterContextGuard(); workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
+defineExpose({ hasUnresolved: workspace.unresolved, hasDraft, canLeave, canReplace, inputSnapshot, cancelRead: workspace.cancelRead, retryRead })
 </script>
 <template>
   <el-drawer v-model="open" title="维保档案维护与修订历史" size="820px" class="warranty-drawer" :close-on-click-modal="false">
@@ -92,16 +146,16 @@ defineExpose({ hasUnresolved: workspace.unresolved, cancelRead: workspace.cancel
         <el-button type="primary" plain :disabled="locked || !state.current.can_edit" @click="beginEdit">基于当前版本编辑</el-button>
       </section>
       <section v-if="baseline !== null" class="warranty-section">
-        <h3 class="tabular-nums">编辑草稿（基准版本 v{{ baseline }}）</h3><el-alert v-if="state.current && state.current.asset.version !== baseline" type="warning" :closable="false" title="检测到档案版本已更新，当前表单已暂停提交；请点击“基于当前版本编辑”重新加载最新基准。" />
+        <h3 class="tabular-nums">编辑草稿（基准版本 v{{ baseline }}）</h3><el-alert v-if="staleBaseline" type="warning" :closable="false" title="检测到档案版本已更新，当前表单已暂停提交；请点击“基于当前版本编辑”重新加载最新基准。" />
         <el-form label-position="top" @submit.prevent="save"><div class="warranty-grid"><el-form-item v-for="date in dates" :key="date.key" :label="date.label"><el-input v-model="form[date.key]" :disabled="locked" :aria-label="date.label" placeholder="YYYY-MM-DD，选填" /></el-form-item><el-form-item label="维保供应商（选填，最多 200 字符）"><el-input v-model="form.warranty_supplier" :disabled="locked" aria-label="维保供应商" placeholder="输入维保服务供应商名称，选填" /></el-form-item></div>
           <p class="field-help">同时填写维保起始日与到期日时，起始日不得晚于到期日；选填项留空记为未填写，其余扩展资料保持不变。</p>
           <el-form-item label="资产资料备注（必填，最多 2000 字符）"><el-input v-model="form.note" type="textarea" :rows="3" :disabled="locked" placeholder="记录本次维保信息维护原因或核对依据" aria-label="维保维护的资产资料备注" /></el-form-item><p class="field-help">已带出当前资料备注；保存后将同步更新资产资料备注，历史版本自动留存。</p>
-          <p v-if="validation" role="alert" class="warranty-validation">{{ validation }}</p><div class="warranty-actions"><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !state.current?.can_edit || state.current.asset.version !== baseline">保存维保修订</el-button><el-button :disabled="locked" @click="clearForm">取消编辑</el-button></div>
+          <p v-if="validation" role="alert" class="warranty-validation">{{ validation }}</p><div class="warranty-actions"><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !state.current?.can_edit || staleBaseline">保存维保修订</el-button><el-button :disabled="locked" @click="cancelEdit">取消编辑</el-button></div>
         </el-form>
       </section>
       <section v-if="state.history" class="warranty-section"><h3 ref="historyHeading" tabindex="-1">共享资产资料修订历史</h3><p class="field-help">展示基础扩展资料与维保档案的合并修订记录（每页 15 条，按版本倒序排列）。</p><el-empty v-if="!state.history.items.length" description="暂无修订历史" /><details v-for="revision in state.history.items" :key="revision.asset_version" class="warranty-history"><summary class="tabular-nums">v{{ revision.asset_version }} · {{ revision.recorded_at }}</summary><p class="warranty-id">操作者 {{ revision.actor_id }}</p><p>补充资料：{{ revision.before.warranty_details === null ? '未登记' : '已登记' }} → {{ revision.warranty_details === null ? '未登记' : '已登记' }}</p><dl class="warranty-facts"><dt>起始日</dt><dd class="tabular-nums">{{ revision.before.warranty_details?.warranty_start ?? '未填写' }} → {{ revision.warranty_details?.warranty_start ?? '未填写' }}</dd><dt>到期日</dt><dd class="tabular-nums">{{ revision.before.metadata?.warranty_expiry ?? '未填写' }} → {{ revision.metadata.warranty_expiry ?? '未填写' }}</dd><dt>维保供应商</dt><dd>{{ revision.before.warranty_details?.warranty_supplier ?? '未填写' }} → {{ revision.warranty_details?.warranty_supplier ?? '未填写' }}</dd><dt>超期服役日</dt><dd class="tabular-nums">{{ revision.before.metadata?.overdue_service_date ?? '未填写' }} → {{ revision.metadata.overdue_service_date ?? '未填写' }}</dd><dt>资产资料备注</dt><dd>{{ revision.before.metadata?.note ?? '未填写' }} → {{ revision.metadata.note }}</dd></dl></details><el-button :disabled="Boolean(state.busy) || !state.history.has_more" @click="earlierHistory">加载更早修订记录</el-button></section>
     </template>
-    <template #footer><el-button @click="open = false">收起面板</el-button><span class="field-help">收起面板不会中断正在执行的保存请求；待确认状态将保留在当前会话中</span></template>
+    <template #footer><el-button @click="open = false">收起面板</el-button><span class="field-help">收起面板保留未保存草稿，也不会中断正在执行的保存请求；待确认状态将保留在当前会话中</span></template>
   </el-drawer>
 </template>
 <style>

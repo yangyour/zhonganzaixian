@@ -161,11 +161,16 @@ const metadataOpen = ref(false), metadataAsset = ref<Asset | null>(null)
 const metadataPanel = ref<InstanceType<typeof AssetMetadataWorkspace> | null>(null)
 const warrantyOpen = ref(false), warrantyAsset = ref<Asset | null>(null)
 const warrantyPanel = ref<InstanceType<typeof ManualWarrantyWorkspace> | null>(null)
-function openWarranty() {
-  if (!asset.value) return
-  if (metadataPanel.value?.hasUnresolved()) { ElMessage.warning('设备扩展资料保存状态待确认，请先处理当前提交'); return }
-  if (warrantyPanel.value?.hasUnresolved() && warrantyAsset.value?.id !== asset.value.id) { ElMessage.warning('另一台设备的维保档案保存状态待确认，请先返回原设备处理'); return }
-  warrantyAsset.value = asset.value; warrantyOpen.value = true
+let warrantySelectionEpoch = 0
+async function openWarranty() {
+  const turn = ++warrantySelectionEpoch, selected = asset.value
+  if (!selected || !readable() || !can('assets:write') || !metadataAllowed.value) return false
+  if (metadataPanel.value?.hasUnresolved()) { ElMessage.warning('设备扩展资料保存状态待确认，请先处理当前提交'); return false }
+  if (warrantyPanel.value?.hasUnresolved() && warrantyAsset.value?.id !== selected.id) { ElMessage.warning('另一台设备的维保档案保存状态待确认，请先返回原设备处理'); return false }
+  const owner = readScope.value, target = JSON.stringify(selected), editor = warrantyPanel.value, before = editor?.inputSnapshot()
+  if (editor && !await editor.canReplace(selected)) return false
+  if (turn !== warrantySelectionEpoch || owner !== readScope.value || !readable() || !can('assets:write') || !metadataAllowed.value || editor !== warrantyPanel.value || before !== editor?.inputSnapshot() || target !== JSON.stringify(selected) || target !== JSON.stringify(asset.value) || metadataPanel.value?.hasUnresolved()) return false
+  warrantyAsset.value = selected; warrantyOpen.value = true; return true
 }
 function warrantySaved() { void loadAssets(); if (queryString('asset_id') === warrantyAsset.value?.id) void loadDetail(queryString('asset_id')) }
 const metadataAllowed = computed(() => ['msp', 'padmin'].includes(session.value?.user.role || ''))

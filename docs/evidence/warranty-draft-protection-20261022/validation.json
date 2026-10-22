@@ -1,0 +1,37 @@
+{
+  "status": "PASS_WARRANTY_DRAFT_CONFIRMATION_AND_SELECTION_PROTECTION",
+  "new_tests": 25,
+  "new_editor_memory_router_tests": 16,
+  "new_parent_child_tests": 9,
+  "original_editor_run": {
+    "failed": 16,
+    "passed": 0
+  },
+  "vitest": {
+    "files": 279,
+    "tests": 4652,
+    "failures": 0
+  },
+  "node_contract_tests": 179,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180726,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "bbc88e8e46e5ddc5346bfa5f06795e92688681c86265eefb94de8643e40a07bb",
+    "scope": "static-artifacts-only"
+  },
+  "test_boundary": "Actual Vue parent-child and memory router; confirmation results, drawer shell and unrelated workspaces test-controlled",
+  "http_smoke": "4_DISTINCT_LOOPBACK_VITE_RESOURCES_PASS_AND_STOPPED",
+  "browser": "105_SPECIFICATIONS_12_FILES_ACTUAL_NOT_RUN",
+  "formal_contract_tc": "128_NOT_RUN",
+  "backend_sql_or_real_account_changed": false,
+  "remaining": "Dependency editor recovery and complete draft protection",
+  "source_sha256": {
+    "apps/web/src/components/ManualWarrantyWorkspace.vue": "66f722efcc38e4b89a40e87717c4f6b3c6e7b13736bbb7d3993bead4b1eb599d",
+    "apps/web/src/pages/AssetsPage.vue": "44b5f9cf839edfbb5935f125b31fe79b9bc56ac465c5e6add8c399fd44e4dbed",
+    "apps/web/tests/manualWarrantyConfirmation.test.ts": "d98b69a97dc20865bb1246b93f989c395247a1c2d591bf93092487f64015470c",
+    "apps/web/tests/manualWarrantyTargetProtection.test.ts": "28aa5482663f965a837f4f6fb1c3b7c7403d788d75d3887ea5d730ac2b08dfb8"
+  }
+}

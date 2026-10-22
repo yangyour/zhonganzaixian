@@ -1,0 +1,29 @@
+{
+  "result": "PASS",
+  "scope": "LOOPBACK_VITE_HTTP_SMOKE_NOT_BROWSER_OR_API_ACCEPTANCE",
+  "checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/pages/AssetsPage.vue",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/components/ManualWarrantyWorkspace.vue",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/utils/manualWarrantyWorkspace.ts",
+      "status": 200,
+      "expected_marker_present": true
+    }
+  ],
+  "vite_stopped": true,
+  "browser_js_executed": false,
+  "api_or_database_executed": false
+}

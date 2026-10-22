@@ -9,6 +9,6 @@ export function inspection(count=60):TicketSlaInspection{return{
  response_clock:{name:'RESPONSE',due_at:null,completed_at:'2026-10-21T00:01:00Z',paused:false,breached:null,status:'PENDING_CONFIG',missing_reason:'CONFIGURATION_UNAVAILABLE',thresholds:{p50_at:null,p80_at:null,p100_at:null},working_windows_count:0},
  recovery_clock:{name:'RECOVERY',due_at:null,completed_at:'2026-10-21T01:00:00Z',paused:true,breached:null,status:'PENDING_CONFIG',missing_reason:'CONFIGURATION_UNAVAILABLE',thresholds:{p50_at:null,p80_at:null,p100_at:null},working_windows_count:0},
  clock_tasks:Array.from({length:count},(_,i)=>({clock_key:`confirmation:${i+1}`,kind:'CONFIRMATION_REMINDER',due_at:new Date(Date.UTC(2026,9,22,0,i)).toISOString(),outcome:null,completed_at:null})),
- sla_missing:{response:'CONFIGURATION_UNAVAILABLE',recovery:'CONFIGURATION_UNAVAILABLE'},sla_references:Array.from({length:count},(_,i)=>({key:`synthetic.policy.${i+1}`,release_id:null,version:0,definition_hash:(i+1).toString(16).padStart(64,'0'),source:'CONTRACT_DEFAULT'})),
+ sla_missing:{response:'CONFIGURATION_UNAVAILABLE',recovery:'CONFIGURATION_UNAVAILABLE'},sla_references:Array.from({length:Math.min(count,20)},(_,i)=>({key:`synthetic.policy.${i+1}`,release_id:null,version:0,definition_hash:(i+1).toString(16).padStart(64,'0'),source:'CONTRACT_DEFAULT'})),
  reopen_count:0,reopen_policy_status:'NOT_REOPENED',metric_version:'SLA_CLOCK_V2',observed_at:observed,source:'postgresql'
 }}

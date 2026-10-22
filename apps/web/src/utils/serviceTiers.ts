@@ -37,6 +37,7 @@ export interface TicketSlaClockStatus {
  thresholds:{p50_at:string|null;p80_at:string|null;p100_at:string|null};
  working_windows_count:number
 }
+export const SLA_DIAGNOSTIC_LIMITS={clockTasks:64,policyReferences:20} as const
 export interface SlaPolicyReference {key:string;release_id:string|null;version:number;definition_hash:string;source:'CONTRACT_DEFAULT'|'RUNTIME_RELEASE'}
 export interface TicketSlaInspection {
  ticket_id:string;tenant_id:string;receipt_no:string;registration_created_at:string;
@@ -146,6 +147,7 @@ export function readTicketSlaInspection(value:unknown,scope:ServiceTierContext,e
  if(value.ticket_id!==expectedTicketId||value.tenant_id!==scope.tenantId||typeof value.receipt_no!=='string'||!value.receipt_no.trim()||!exportInteger(value.workflow_version,0)||typeof value.tier_changed_since_open!=='boolean'||!exportInteger(value.reopen_count,0)||!['NOT_REOPENED','PENDING_Q27'].includes(value.reopen_policy_status as string)||value.metric_version!=='SLA_CLOCK_V2'||value.source!=='postgresql')throw invalid()
  const registered=tierTime(value.registration_created_at),observed=tierTime(value.observed_at)
  if(observed<registered||value.current_tenant_service_tier!==null&&!isTier(value.current_tenant_service_tier)||!Array.isArray(value.clock_tasks)||!Array.isArray(value.sla_references)||!value.sla_missing||typeof value.sla_missing!=='object'||Array.isArray(value.sla_missing))throw invalid()
+ if(value.clock_tasks.length>SLA_DIAGNOSTIC_LIMITS.clockTasks||value.sla_references.length>SLA_DIAGNOSTIC_LIMITS.policyReferences)throw new ApiError(413,'SLA_INSPECTION_LIMIT','SLA 核验明细超过单次接口范围，未截断展示；请联系管理员核对历史规模','—')
  if(Object.entries(value.sla_missing).some(([k,v])=>!k.trim()||typeof v!=='string'||!v.trim()))throw invalid()
  const seenTasks=new Set<string>()
  let previousTask:{due:bigint;key:string}|null=null

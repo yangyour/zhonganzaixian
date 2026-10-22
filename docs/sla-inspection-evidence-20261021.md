@@ -23,3 +23,5 @@ table caption、列标题scope、命名可聚焦滚动区、状态范围与分�
 新增19项：17项真实Vue组件DOM、2项完整服务档位页面回归。包括60条记录跨页可达、三组独立分页、范围拒绝、源替换/卸载焦点、空值/版本0/完整摘要、纯文本和不发网络/存储写入。初次ID测试错误地比较两个独立Vue应用的默认useId命名空间，改为本产品同一应用内两个实例并验证12个ID互不重复；保留该测试驱动失败记录。
 
 [验证记录](evidence/sla-inspection-evidence-20261021/validation.json)、[本地HTTP记录](evidence/sla-inspection-evidence-20261021/http-smoke.json)。浏览器/axe与128正式TC仍NOT_RUN，DOM不当作视觉或真实供应商验收；未改变任何真实费用、工单、通知或审批状态。
+
+范围说明：组件独立压力测试可用60行验证分页，但实际SLA接口既有上限为64个任务、20个冻结来源；组件压力数据不构成放宽接口上限。后续[契约范围修正](sla-diagnostic-contract-limits-20261021.md)补齐了服务端与读取器的明确超限拒绝。

@@ -2,6 +2,7 @@ package cn.mop.persistence;
 
 import cn.mop.domain.*;
 import cn.mop.domain.sla.TicketSlaClockEvaluation;
+import cn.mop.domain.sla.TicketSlaDiagnosticLimits;
 import cn.mop.domain.ticket.*;
 import cn.mop.domain.ticket.WorkflowLifecycle.*;
 import cn.mop.domain.ticket.TicketWorkflowRepository.*;
@@ -50,10 +51,12 @@ public final class PostgresTicketWorkflowRepository implements TicketWorkflowRep
                 "reopen_count",0,"reopen_policy_status","NOT_REOPENED","metric_version",TicketSlaClockEvaluation.METRIC_VERSION,"observed_at",observed.toString(),"source","postgresql");
             var recovery=monitoringRecovery(c,a.tenantId(),ticket);
             var eval=TicketSlaClockEvaluation.evaluate(event.snapshot(),currentTenantTier,observed,recovery.linked(),recovery.recoveredAt());
+            if(!customer)TicketSlaDiagnosticLimits.requireWithinLimits(0,eval.slaReferences().size());
             var tasks=new ArrayList<Map<String,Object>>();
-            if(!customer)try(var s=statement(c,"SELECT j.clock_key,j.kind,j.due_at,r.outcome,r.completed_at FROM public.mop_ticket_workflow_clock j LEFT JOIN public.mop_ticket_workflow_clock_receipt r ON r.task_id=j.id AND r.tenant_id=j.tenant_id WHERE j.tenant_id=?::uuid AND j.ticket_id=?::uuid ORDER BY j.due_at,j.clock_key")){
+            if(!customer)try(var s=statement(c,"SELECT j.clock_key,j.kind,j.due_at,r.outcome,r.completed_at FROM public.mop_ticket_workflow_clock j LEFT JOIN public.mop_ticket_workflow_clock_receipt r ON r.task_id=j.id AND r.tenant_id=j.tenant_id WHERE j.tenant_id=?::uuid AND j.ticket_id=?::uuid ORDER BY j.due_at,j.clock_key LIMIT "+TicketSlaDiagnosticLimits.CLOCK_TASK_LOOKAHEAD)){
                 s.setString(1,a.tenantId());s.setString(2,ticket);try(var r=s.executeQuery()){while(r.next())tasks.add(map("clock_key",r.getString(1),"kind",r.getString(2),"due_at",time(r,"due_at").toString(),"outcome",r.getString(4),"completed_at",r.getObject(5)==null?null:time(r,"completed_at").toString()));}
             }
+            TicketSlaDiagnosticLimits.requireWithinLimits(tasks.size(),customer?0:eval.slaReferences().size());
             return map("ticket_id",p.id(),"tenant_id",a.tenantId(),"receipt_no",p.receipt(),"registration_created_at",p.created().toString(),
                 "workflow_version",event.snapshot().version(),"state",eval.workflowState().name(),"priority",eval.priority(),
                 "frozen_service_tier",eval.frozenServiceTier().name(),"current_tenant_service_tier",eval.currentTenantServiceTier()==null?null:eval.currentTenantServiceTier().name(),

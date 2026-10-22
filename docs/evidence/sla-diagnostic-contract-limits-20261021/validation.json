@@ -1,0 +1,98 @@
+{
+  "result": "PASS_EXISTING_SLA_DIAGNOSTIC_CONTRACT_LIMITS",
+  "new_java_tests": 6,
+  "java_focused_tests_passed": 14,
+  "maven_verify": {
+    "tests": 4085,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1031,
+    "executed": 3054,
+    "status": "PASS",
+    "test_java_versions": [
+      "17.0.20.1"
+    ],
+    "skip_reasons": {
+      "Environment variable [MOP_RUN_REMOTE_TESTS] does not exist": 891,
+      "Environment variable [MOP_DEVICE_LEASE_TEST_ENVIRONMENT] does not exist": 1,
+      "Environment variable [MOP_RUN_CHANGE_NOTICE_APPROVAL_TESTS] does not exist": 21,
+      "Environment variable [MOP_RUN_MONITORING_EVENT_CENTER_TESTS] does not exist": 4,
+      "Environment variable [MOP_RUN_WECOM_PG_TESTS] does not exist": 6,
+      "Environment variable [MOP_RUN_EVENT_GLOBAL_SEARCH_TESTS] does not exist": 23,
+      "Environment variable [MOP_RUN_WORKFLOW_AUTHORITY_TESTS] does not exist": 4,
+      "Environment variable [MOP_RUN_TICKET_NOTIFICATION_TESTS] does not exist": 2,
+      "Environment variable [MOP_BACKUP_RUN_TEST_ENVIRONMENT] does not exist": 2,
+      "Environment variable [MOP_RUN_CHANNEL_TARGET_PG_TESTS] does not exist": 9,
+      "Environment variable [MOP_RUN_ONCALL_ESCALATION_TESTS] does not exist": 3,
+      "Environment variable [MOP_RUN_AUTOTICKET_CAS_TESTS] does not exist": 3,
+      "Environment variable [MOP_RUN_AUTOTICKET_RETRY_TESTS] does not exist": 6,
+      "Environment variable [MOP_RUN_TICKET_WORKFLOW_TESTS] does not exist": 3,
+      "Environment variable [MOP_BACKUP_ARCHIVE_TEST_ENVIRONMENT] does not exist": 2,
+      "Environment variable [MOP_DELIVERY_JOURNAL_TEST_ENVIRONMENT] does not exist": 2,
+      "Environment variable [MOP_RUN_EMAIL_PG_TESTS] does not exist": 6,
+      "Environment variable [MOP_RUN_SERVICE_TIER_TESTS] does not exist": 2,
+      "Environment variable [MOP_RUN_RUNTIME_CONFIG_TESTS] does not exist": 8,
+      "Environment variable [MOP_BACKUP_VERSION_TEST_ENVIRONMENT] does not exist": 2,
+      "Environment variable [MOP_RUN_BASIC_NETWORK_TESTS] does not exist": 1,
+      "Environment variable [MOP_RUN_CONFIGURED_MINIO_TESTS] does not exist": 2,
+      "Environment variable [MOP_RUN_REPORT_PDF_TESTS] does not exist": 7,
+      "Environment variable [MOP_RUN_IMPORT_REMOTE_TESTS] does not exist": 3,
+      "Environment variable [MOP_RUN_EXPORT_MINIO_TESTS] does not exist": 3,
+      "Environment variable [MOP_BACKUP_VERSION_INVENTORY_TEST_ENVIRONMENT] does not exist": 1,
+      "System property [mop.fixture.unit-test] does not exist": 13,
+      "Environment variable [MOP_RUN_BACKUP_ARCHIVE_HTTP_TESTS] does not exist": 1
+    }
+  },
+  "new_frontend_tests": 5,
+  "vitest": {
+    "files_passed": 269,
+    "tests_passed": 4425
+  },
+  "node_contract_tests_passed": 173,
+  "python_tests_passed": 134,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_EXISTING_64_TASKS_20_REFERENCES_UNCHANGED",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180740,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "5eb1fdfbab78f7cb71097824b100d9c815e9cd6cca7159bb8aabb31443efe9fb",
+    "scope": "static-artifacts-only"
+  },
+  "api_jar_sha256": "5ef45dd04d9b34dfd506276a9117b1dbf465d4920fa58cc06687a825b9ed14fa",
+  "browser_specs": {
+    "tests": 97,
+    "files": 11,
+    "status": "DISCOVERED_NOT_EXECUTED"
+  },
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "preserved_failures": [
+    "System Java21 runtime lacked release17 compiler symbols",
+    "JUnit test initially placed in dependency-free domain module; moved to existing persistence test module",
+    "Stale per-exec proxy setting refused connection; regenerated from current environment",
+    "Standalone JDK17 dependency resolution failed certificate verification; no TLS bypass, existing system runtime resolves artifacts instead",
+    "Mockito dynamic attachment unavailable; startup agent used in isolated test JVM",
+    "First full API test attempt: 2680 total, 4 failures, 1135 errors, 47 skipped; primarily unavailable Mockito",
+    "Python initial import failed because pinned paramiko missing; installed tools/requirements.txt locally and reran 134 tests"
+  ],
+  "sql_migrations_changed": false,
+  "new_postgresql_or_external_integration_run": false,
+  "real_fee_tier_account_or_ticket_changes": 0,
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/sla/TicketSlaDiagnosticLimits.java": "7d273faf80d84299dc1b265587c535969ea5f3157b3cd8bb1c941771f248ecbd",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresTicketWorkflowRepository.java": "df2d4eec9ed7364943d3a3d76b19bf056df9ea050e47bb0a23fd5758e38f10e3",
+    "server/persistence/src/test/java/cn/mop/persistence/TicketSlaDiagnosticLimitsTest.java": "25ab506da9cb77c09df46ea81a6b9db0736a235d67b65326ab7079c9a575c59c",
+    "apps/web/src/utils/serviceTiers.ts": "4eb9781d7d39775b5fc996df736ca5243482c952ed72a88c972db08fe66cc5fd",
+    "apps/web/qa/service-tiers.data.ts": "4803943d1cffdbc7ffd2a77edfbacf07abafb034dcd0e119d6cf5b7261d42d87",
+    "apps/web/qa/browser/service-tiers.pw.ts": "6f25785552a49e64c3a705930e18f128b5c1aab6361ea033517d1a1f6b40b500",
+    "apps/web/tests/serviceTierBrowserFixture.test.ts": "974fc49fec5aeae96d54aaa1ce367c4bbb0f7584c909aa34e05ba22b718197f2",
+    "apps/web/tests/serviceTierDiagnosticLimits.test.ts": "de0d7a2a50e58175ce8f695d0be2ffc30f5897f1cd77063c39c7156f535d8930",
+    "apps/web/tests/serviceTierReadRecoveryDom.test.ts": "9abbd6db984ee10cff8bd7ccaddb06dcc4e0ffa956e834a1e88fe0d5642bb377"
+  }
+}

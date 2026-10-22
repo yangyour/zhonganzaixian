@@ -13,7 +13,7 @@
 
 ## 安全与数据边界
 
-qa/service-tiers.fixture.html和.fixture.ts仅DEV入口；全部API由测试拦截并限制方法及路径，身份与正文是合成值，无真实账号、客户费用或后台任务操作。QA数据的60个任务/来源用于分页覆盖，不声称是真实业务历史。新增2项unit校验保证这份合成载荷通过生产读取器。
+qa/service-tiers.fixture.html和.fixture.ts仅DEV入口；全部API由测试拦截并限制方法及路径，身份与正文是合成值，无真实账号、客户费用或后台任务操作。QA数据的60个任务及最多20个来源用于展示覆盖，不声称是真实业务历史。新增2项unit校验保证这份合成载荷通过生产读取器。
 
 生产构建仍从正式入口生成，检查产物不含QA入口/标记。测试发现曾因一个多余括号失败，修正后重新发现并通过类型检查；原失败保留，不把它改写成浏览器运行失败或通过。
 
@@ -25,3 +25,5 @@ qa/service-tiers.fixture.html和.fixture.ts仅DEV入口；全部API由测试拦�
 - [验证记录](evidence/service-tier-browser-acceptance-20261021/validation.json)、[本地HTTP记录](evidence/service-tier-browser-acceptance-20261021/http-smoke.json)、[生产隔离检查](evidence/service-tier-browser-acceptance-20261021/production-isolation.json)。
 
 环境允许后可在现有Playwright配置下执行service-tiers.pw.ts并保留真实截图/trace/axe输出。届时任何失败必须修正后重跑，不以当前规格数量宣称通过。
+
+后续契约复核发现原批次的60个来源超出既有20项上限；已修正样例、增加64任务/20来源的前后端超限拒绝，见[诊断范围一致性修正](sla-diagnostic-contract-limits-20261021.md)。原批次记录保留，不把此前读取器通过等同契约边界通过。

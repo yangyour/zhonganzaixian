@@ -120,6 +120,8 @@ public final class DeliveryReceiptJournal {
     public DeliveryReceiptSnapshotCodec.Document root(){return root;}
     public List<Entry> entries(){return entries;}
     public String headSha256(){return headSha256;}
+    public Optional<Command> command(UUID id){var known=seen.get(id);return known==null?Optional.empty():Optional.of(known.command());}
+    public OptionalLong commandVersion(UUID id){var known=seen.get(id);return known==null?OptionalLong.empty():OptionalLong.of(known.version());}
     public int encodedBytes(){return root.bytes().length+entries.stream().mapToInt(e->e.bytes().length).sum();}
     public boolean databasePersisted(){return false;}
     public boolean providerReceiptVerified(){return false;}

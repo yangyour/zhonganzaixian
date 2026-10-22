@@ -53,3 +53,5 @@
 [备份版本分页查询](backup-version-inventory-20261021.md)已有独立授权仓储核心及隔离验证，备份依赖引用现为29项null；新增列表授权不继承草稿权限，服务装配、下载/解密与真实权限适配仍待。
 
 [回执逐条追加日志格式](delivery-receipt-journal-20261021.md)可独立验证原命令和有序历史，尚非数据库仓库。已有receipt_history_repository_reference、receipt_journal_authorizer_reference、receipt_provider_correlation_reference、receipt_callback_authenticator_reference等引用继续null；操作者/权限版本仅记录，不作为授权或验签证明。
+
+[V50回执日志仓库](delivery-receipt-postgres-20261021.md)已有显式构造实现；生产receipt_history_repository_reference和receipt_journal_authorizer_reference仍未配置。仓库要求注入操作授权及可信原请求/回执前置核验，合成测试回调不得移作默认允许；签名回执入口、供应商映射、Worker和真实发送许可仍独立待完成。

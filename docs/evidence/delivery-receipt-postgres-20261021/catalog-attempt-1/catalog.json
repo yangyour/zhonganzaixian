@@ -1,0 +1,24 @@
+{
+  "constraints": {
+    "mop_delivery_receipt_journal_pkey": "b3bfc7826e8340ca6316d200a5601e869baf9e8b76876bc05164ce469e0ec5ed",
+    "mop_delivery_receipt_journal_check": "ec9ab44653afe0d1dbaf565b8c342e6d70a24b285fb12a322b56e5328fcffe29",
+    "mop_delivery_receipt_journal_check1": "eb13056eec97cd7db9adbecd0c3573d203cbe4200f48be25e5b8789627e0a77d",
+    "mop_delivery_receipt_journal_stage_check": "1d278f356c46bbce1d93e9abfe862022ddffcd54a389e386f43a6068c545f27d",
+    "mop_delivery_receipt_journal_channel_check": "e59223a83b7c3d0e003195692c17795f99928a332a418a4ddb22fd6a4a85bc27",
+    "mop_delivery_receipt_journal_version_check": "316ada8d9144fc352c18912637758187c49cff815b1a39496e9c40da453e1483",
+    "mop_delivery_receipt_journal_tenant_id_fkey": "3f462976bbd1a9c25f3b2648098beb48376ea3922f262bb1d2bf62c1a1c72c6e",
+    "mop_delivery_receipt_journal_trace_id_check": "f4b0fb98c5e3cc64ae24933ef1236fd9d362b4ade2c42a9f7139929a42917c45",
+    "mop_delivery_receipt_journal_recorded_at_check": "03e64fe781185389b309b9483affb45e644aa7a948a2bd2684f56445e24d92e4",
+    "mop_delivery_receipt_journal_root_version_check": "abc0718eb43656dbd229ad06bc3ec58095ce79414da49bb35313d8b3a10a9a39",
+    "mop_delivery_receipt_journal_record_sha256_check": "c1137910430bbe96c754eea767a5b7f171e5191ad3edfb5026a68a15764681ef",
+    "mop_delivery_receipt_journal_record_source_check": "cc5251e95dcc8299907d134cd12e176fbbeaad8ee6b6290567a9806c74d85402",
+    "mop_delivery_receipt_journal_command_sha256_check": "ba235625a1ad8d49af48b47a355c308c92dcaab6b61905a1e976630e384abdf5",
+    "mop_delivery_receipt_journal_encoded_record_check": "6d5244cd7fd4e19ed8bb8218c4aede0d0e76f06dcfa0ef76032704032476ff12",
+    "mop_delivery_receipt_journal_permission_version_check": "bca7ed00e14f8f4af333bec2a7ab6992072d737a8ccb3682c17c51d851c55050",
+    "mop_delivery_receipt_journal_tenant_id_command_id_key": "bf606fb60edbc83eafa9136366009a69ac18a74fb9c02fb17a41ebbaa024cb08",
+    "mop_delivery_receipt_journal_automatic_send_enabled_check": "c53829604b3bc3b56a5d227c4f82d40cea3ea228b351c4da48c4d7a8bb32d1da",
+    "mop_delivery_receipt_journal_provider_receipt_verified_check": "5b5544e6b672713a0a7b814cec0028ba7832fc8af6bcb862361713fc002c0b7d",
+    "mop_delivery_receipt_journal_tenant_id_delivery_id_root_ve_fkey": "c66dabb32643291d8ba97db22ef8b22fe7c09c2ce69231f5dda99287ac78b789"
+  },
+  "guard_sha256": "acfb638bd05e0870300a235d061e083df5bfc1b825c83b19196bb1f5bed7a01d"
+}

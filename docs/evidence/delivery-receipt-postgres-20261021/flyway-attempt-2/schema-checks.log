@@ -1,0 +1,12 @@
+SCHEMA_PASS original
+SCHEMA_PASS timezone_independence
+SCHEMA_PASS tamper_rollback_3
+SCHEMA_PASS tamper_rollback_4
+SCHEMA_PASS tamper_rollback_5
+SCHEMA_PASS tamper_rollback_6
+SCHEMA_PASS tamper_rollback_7
+SCHEMA_PASS tamper_rollback_8
+SCHEMA_PASS tamper_rollback_9
+SCHEMA_PASS tamper_rollback_10
+SCHEMA_PASS tamper_rollback_11
+TOTAL_SCHEMA_PASS=11

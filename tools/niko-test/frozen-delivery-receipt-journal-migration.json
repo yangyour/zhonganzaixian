@@ -1,0 +1,11 @@
+{
+  "status": "APPLIED_FROZEN",
+  "description": "V50 committed by explicit Flyway CLI on disposable PostgreSQL 17.11. SQL bytes immutable; repository verification tracked separately.",
+  "sha256": {
+    "V50__delivery_receipt_journal.sql": "93813aa97fcb4c19e00f664a91c1f732f51e5eb9e34ec8c35e5938b817cbff36"
+  },
+  "guard_body_sha256": {
+    "mop_delivery_receipt_journal_guard": "acfb638bd05e0870300a235d061e083df5bfc1b825c83b19196bb1f5bed7a01d"
+  },
+  "first_apply_evidence": "docs/evidence/delivery-receipt-postgres-20261021/catalog-attempt-1/v50-application.json"
+}

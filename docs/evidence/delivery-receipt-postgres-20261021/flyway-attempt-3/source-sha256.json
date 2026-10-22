@@ -1,0 +1,9 @@
+{
+  "server/persistence/src/main/java/cn/mop/persistence/DeliveryReceiptJournal.java": "3ff88d8ae38ec5e600592cef41af91cae08a5308befcbc56b01ed51b143b6917",
+  "server/persistence/src/main/java/cn/mop/persistence/PostgresDeliveryReceiptRepository.java": "2c1818d595487623343d6617ec70da07259133cdf8ccd6ede34b2153756c7e4a",
+  "server/persistence/src/main/java/cn/mop/persistence/DeliveryReceiptSchemaVerifier.java": "3e8b076a018ed7bd12e6796580b133133d5db2bb74a6ee11de22e643ae4e3ba8",
+  "server/persistence/src/main/java/cn/mop/persistence/TestSchemaMigration.java": "1abfbfed80f2154a5c7f65a5bf296361473562cd6d2475e26b0d734cd0b3cbc4",
+  "server/persistence/src/main/resources/db/migration/V50__delivery_receipt_journal.sql": "93813aa97fcb4c19e00f664a91c1f732f51e5eb9e34ec8c35e5938b817cbff36",
+  "server/api/src/test/java/cn/mop/persistence/DeliveryReceiptPostgresTest.java": "7ac3ab1d94c4a8030662d0e58dbb8b138bfefc1d8d8c7c2cd768173fcc10f575",
+  "server/persistence/src/test/java/cn/mop/persistence/DeliveryReceiptSchemaPostgresTest.java": "049edae4d4fe4d91db3dd0f076f45a045a3833feb643c015c6d265c3d39bebf8"
+}

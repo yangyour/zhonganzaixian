@@ -1,0 +1,16 @@
+{
+  "api_jar_sha256": "7fff9ef3ed6deaef2fb5d1d37330af6d75052f710f7789599f18419b27feb5a3",
+  "server_version": "17.11 (Debian 17.11-0+deb13u1)",
+  "icu_collation_version": "153.128",
+  "runtime_role": {
+    "rolname": "mop_test_runtime",
+    "rolsuper": false,
+    "rolcreatedb": false,
+    "rolcreaterole": false,
+    "rolreplication": false,
+    "rolbypassrls": false
+  },
+  "loopback_only": true,
+  "provider_sends": false,
+  "temporary_credentials_only": true
+}

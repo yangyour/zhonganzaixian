@@ -1,0 +1,6 @@
+{
+  "stage": "migration_V50",
+  "error_type": "AssertionError",
+  "detail": "migration_V50 verification failed",
+  "production_approved": false
+}

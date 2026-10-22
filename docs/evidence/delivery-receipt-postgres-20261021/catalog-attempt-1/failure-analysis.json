@@ -1,0 +1,7 @@
+{
+  "migration_committed": true,
+  "sql_frozen": true,
+  "failure": "Post-structure ACL verifier SELECT had one extra closing parenthesis, causing PSQLException; migration SQL itself applied successfully.",
+  "correction": "Fixed Java verifier SQL only and added all 19 exact constraint definitions from the captured catalog. No V50 SQL edit.",
+  "cleanup": "PostgreSQL stopped and disposable files removed; next validation uses a new database."
+}

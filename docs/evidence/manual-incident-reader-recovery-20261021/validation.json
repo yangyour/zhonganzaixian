@@ -1,0 +1,49 @@
+{
+  "result": "PASS_MANUAL_INCIDENT_READER_RECOVERY",
+  "new_tests": 23,
+  "new_test_layers": {
+    "reader": 15,
+    "real_vue_native_dom": 8
+  },
+  "focused_tests_passed": 58,
+  "vitest": {
+    "files_passed": 251,
+    "tests_passed": 4056
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "production_build": {
+    "status": "PASSED",
+    "files": 141,
+    "bootstrap_gzip_bytes": 180718,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "a6751da330659234411315a860c4e47317911e0df556a2b4ef296aca83f02cfa",
+    "scope": "static-artifacts-only"
+  },
+  "initial_failures": [
+    {
+      "duplicate_immutable_id": 1,
+      "passed_before_fix": 32,
+      "fixed": "Reject duplicate registration IDs independently of timestamp ordering."
+    }
+  ],
+  "modal_confirmation": "EXPLICITLY_STUBBED_NOT_BROWSER_QA",
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "real_manual_incident_writes": 0,
+  "formal_acceptance_passes_added": 0,
+  "source_sha256": {
+    "apps/web/src/utils/manualIncidentReader.ts": "8c1e59ba61694e86435fbbbaf089814636ea1b81dd80e7819ebba2a7107d27e1",
+    "apps/web/src/pages/ManualIncidentsPage.vue": "3a188d8ad25966b41920b5daaee119b0ad5ea2f763bd7fbf2e28d799d220fb64",
+    "apps/web/tests/manualIncidentReader.test.ts": "0f7c98b2af62cc3d1daaf7579f3bbd7921abe192112ecb4f4f65572ddb344ff0",
+    "apps/web/tests/manualIncidentsPageRecovery.test.ts": "726130fa75642c3743633473df02523dfecde8e4e8b2d167806bcd3d2601415f"
+  }
+}

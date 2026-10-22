@@ -1,0 +1,38 @@
+(node:6) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @mop/web@0.1.0 test
+> vitest run tests/manualIncidentReader.test.ts
+
+(node:19) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.11 /workspace/scratch/390b70bf66c8/zhonganzaixian-integrated/apps/web
+
+(node:37) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ tests/manualIncidentReader.test.ts (33 tests | 1 failed) 33ms
+   × rejects duplicate immutable registration IDs even when different timestamps appear sorted 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/manualIncidentReader.test.ts > rejects duplicate immutable registration IDs even when different timestamps appear sorted
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/manualIncidentReader.test.ts:47:221
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 32 passed (33)
+   Start at  17:52:21
+   Duration  313ms (transform 120ms, setup 0ms, import 148ms, tests 33ms, environment 0ms)
+

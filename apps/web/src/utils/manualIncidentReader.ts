@@ -20,32 +20,44 @@ export function readManualIncident(value: unknown, context: ManualIncidentContex
   date(value.registered_at); return copy(value) as unknown as ManualIncidentEntry
 }
 export const emptyManualIncidentReadState = (): ManualIncidentReadState => ({ page: null, selected: null, busy: false, error: null, paged: false })
+type ReadTarget={kind:'LIST';next:boolean;boundary:{time:string;id:string}|null;known:ManualIncidentEntry|null}|{kind:'DETAIL';id:string;known:ManualIncidentEntry[]}
+function sameEntry(a:ManualIncidentEntry,b:ManualIncidentEntry){return Object.keys(a).every(key=>key==='registered_at'?date(a.registered_at)===date(b.registered_at):a[key as keyof ManualIncidentEntry]===b[key as keyof ManualIncidentEntry])}
 export function createManualIncidentReader(client: Pick<ApiClient, 'request'>, changed: (value: ManualIncidentReadState) => void) {
-  let scope: ManualIncidentContext | null = null, state = emptyManualIncidentReadState(), epoch = 0, abort: AbortController | undefined
+  let scope: ManualIncidentContext | null = null, state = emptyManualIncidentReadState(), epoch = 0, disposed=false,lastRead:ReadTarget|null=null,knownDetail:ManualIncidentEntry|null=null, abort: AbortController | undefined
   const emit = () => changed(detachedWorkspaceState(state))
-  function reset(next: ManualIncidentContext | null) { abort?.abort(); ++epoch; const valid = next && uuid.test(next.tenantId) && uuid.test(next.actorId) && version(next.permissionVersion); scope = valid ? { ...next! } : null; state = emptyManualIncidentReadState(); if (next && !valid) state.error = bad(); emit() }
-  async function run(action: (signal: AbortSignal, context: ManualIncidentContext) => Promise<Partial<ManualIncidentReadState>>, clear: Partial<ManualIncidentReadState>) {
-    if (!scope) return false
-    abort?.abort(); const turn = ++epoch, controller = new AbortController(), context = { ...scope }; abort = controller; state = { ...state, ...clear, busy: true, error: null }; emit()
-    try { const result = await action(controller.signal, context); if (turn !== epoch || controller.signal.aborted) return false; state = { ...state, ...result }; return true }
+  function reset(next: ManualIncidentContext | null) { abort?.abort();abort=undefined;++epoch;lastRead=null;knownDetail=null; const valid = !disposed&&next && uuid.test(next.tenantId) && uuid.test(next.actorId) && version(next.permissionVersion); scope = valid ? { ...next! } : null; state = emptyManualIncidentReadState(); if (next && !valid && !disposed) state.error = bad(); emit() }
+  async function run(action: (signal: AbortSignal, context: ManualIncidentContext) => Promise<Partial<ManualIncidentReadState>>, clear: Partial<ManualIncidentReadState>,target:ReadTarget) {
+    if (!scope || disposed) return false
+    abort?.abort(); const turn = ++epoch, controller = new AbortController(), context = { ...scope }; abort = controller;lastRead=copy(target); state = { ...state, ...clear, busy: true, error: null }; emit()
+    try { if(turn!==epoch||disposed||controller.signal.aborted)return false;const result = await action(controller.signal, context); if (turn !== epoch || controller.signal.aborted) return false; state = { ...state, ...result };if(result.selected)knownDetail=copy(result.selected);lastRead=null; return true }
     catch (error) { if (turn === epoch && !isCancelled(error)) state = { ...state, ...clear, error }; return false }
     finally { if (turn === epoch) { state = { ...state, busy: false }; emit() } }
   }
-  function list(next = false) {
-    if (next && (!state.page?.has_more || state.busy)) return Promise.resolve(false)
-    const boundary = next ? { time: state.page!.next_before_registered_at!, id: state.page!.next_before_id! } : null
+  function list(next = false,recovery?:Extract<ReadTarget,{kind:'LIST'}>) {
+    if (next && !recovery && (!state.page?.has_more || state.busy)) return Promise.resolve(false)
+    const known=recovery?recovery.known:knownDetail, boundary = recovery?recovery.boundary:next ? { time: state.page!.next_before_registered_at!, id: state.page!.next_before_id! } : null
     return run(async (signal, context) => {
       const value = await client.request<unknown>('/manual-incidents?page_size=15' + (boundary ? '&before_registered_at=' + encodeURIComponent(boundary.time) + '&before_id=' + boundary.id : ''), { signal })
       if (!exact(value, ['items', 'has_more', 'next_before_registered_at', 'next_before_id', 'source', 'scope', 'page_size_limit', 'pagination_consistency']) || !Array.isArray(value.items) || value.items.length > 15 || typeof value.has_more !== 'boolean' || value.source !== 'postgresql' || value.scope !== 'CURRENT_TENANT_INTERNAL_MANUAL_REGISTRATIONS' || value.page_size_limit !== 100 || value.pagination_consistency !== 'CURRENT_REQUEST_SNAPSHOT_ONLY') throw bad()
-      const items = value.items.map(item => readManualIncident(item, context)); let previous = boundary
+      const items = value.items.map(item => readManualIncident(item, context)); if (new Set(items.map(item => item.id)).size !== items.length) throw bad(); let previous = boundary
       for (const item of items) { if (previous && (date(item.registered_at) > date(previous.time) || date(item.registered_at) === date(previous.time) && item.id >= previous.id)) throw bad(); previous = { time: item.registered_at, id: item.id } }
+      if(known){const matched=items.find(item=>item.id===known.id);if(matched&&!sameEntry(known,matched))throw bad()}
       const tail = items.at(-1); if (value.has_more ? items.length !== 15 || value.next_before_registered_at !== tail?.registered_at || value.next_before_id !== tail?.id : value.next_before_registered_at !== null || value.next_before_id !== null) throw bad()
       return { page: copy({ ...value, items }) as unknown as ManualIncidentPage }
-    }, { page: null, selected: null, paged: next })
+    }, { page: null, selected: null, paged: next },{kind:'LIST',next,boundary,known:known?copy(known):null})
   }
-  function select(id: string) {
-    if (!uuid.test(id)) return Promise.resolve(false)
-    return run(async (signal, context) => { const value = readManualIncident(await client.request<unknown>('/manual-incidents/' + id, { signal }), context); if (value.id !== id) throw bad(); return { selected: value } }, { selected: null })
+  function select(id:string,expected?:ManualIncidentEntry,recovery?:Extract<ReadTarget,{kind:'DETAIL'}>){
+    if(!uuid.test(id))return Promise.resolve(false)
+    const known=recovery?copy(recovery.known):[expected,state.selected?.id===id?state.selected:null,knownDetail?.id===id?knownDetail:null,state.page?.items.find(item=>item.id===id)].filter((item):item is ManualIncidentEntry=>Boolean(item)).map(copy)
+    return run(async(signal,context)=>{
+      for(const prior of known){if(readManualIncident(prior,context).id!==id)throw bad()}
+      const value=readManualIncident(await client.request<unknown>('/manual-incidents/'+id,{signal}),context)
+      if(value.id!==id||known.some(prior=>!sameEntry(prior,value)))throw bad();return{selected:value}
+    },{selected:null},{kind:'DETAIL',id,known})
   }
-  emit(); return { reset, list, select, state: () => detachedWorkspaceState(state), dispose: () => reset(null) }
+  function canRetryRead(){return !!scope&&!disposed&&!state.busy&&lastRead!==null}
+  function cancelRead(){if(disposed||!state.busy)return false;++epoch;abort?.abort();abort=undefined;state={...state,busy:false,error:null};emit();return true}
+  async function retryRead(){if(!canRetryRead()||!lastRead)return false;const target=copy(lastRead);return target.kind==='LIST'?list(target.next,target):select(target.id,undefined,target)}
+  function closeDetails(){if(disposed||state.busy)return false;if(lastRead?.kind==='DETAIL')lastRead=null;state={...state,selected:null,error:null};emit();return true}
+  emit(); return { reset, list:(next=false)=>list(next), select:(id:string,expected?:ManualIncidentEntry)=>select(id,expected), cancelRead,retryRead,canRetryRead,closeDetails,state: () => detachedWorkspaceState(state), dispose: () => {disposed=true;reset(null)} }
 }

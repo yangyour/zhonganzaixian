@@ -9,7 +9,8 @@ export interface WarrantyCurrent extends MetadataCurrent { warranty_details: War
 export interface WarrantyRevision extends Omit<MetadataRevision, 'before'> { before: WarrantySnapshot; warranty_details: WarrantyDetails | null; warranty_coverage_verified: false; warranty_supplier_verification: 'UNVERIFIED' }
 export interface WarrantyHistory extends Omit<MetadataHistory, 'items'> { items: WarrantyRevision[] }
 interface Attempt { key: string; payload: string; baseline: WarrantyCurrent; state: 'uncertain' | 'accepted' | 'rejected' }
-export interface WarrantyState { current: WarrantyCurrent | null; history: WarrantyHistory | null; receipt: WarrantyCurrent | null; attempt: Attempt | null; busy: 'read' | 'write' | null; error: unknown }
+export interface WarrantyReadTarget { beforeVersion: number | null }
+export interface WarrantyState { readTarget: WarrantyReadTarget | null; cancelledRead: boolean; current: WarrantyCurrent | null; history: WarrantyHistory | null; receipt: WarrantyCurrent | null; attempt: Attempt | null; busy: 'read' | 'write' | null; error: unknown }
 const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T
 const object = (v: unknown): v is Record<string, unknown> => Boolean(v && typeof v === 'object' && !Array.isArray(v))
 const exact = (v: unknown, keys: string[]): v is Record<string, unknown> => object(v) && Object.keys(v).length === keys.length && keys.every(k => Object.hasOwn(v, k))
@@ -54,43 +55,79 @@ function readWarrantyHistory(v: unknown, scope: MetadataContext, current: Warran
   } catch { throw invalid() }
 }
 const sameSnapshot = (a: WarrantyCurrent, b: WarrantyCurrent) => a.metadata_version === b.metadata_version && ['name', 'type', 'site_id', 'management_ip', 'source', 'status', 'lifecycle_status', 'sampled_at', 'availability', 'sync_state', 'created_at', 'updated_at'].every(k => a.asset[k as keyof typeof a.asset] === b.asset[k as keyof typeof b.asset]) && (a.metadata === null || b.metadata === null ? a.metadata === b.metadata : baseKeys.every(k => a.metadata![k] === b.metadata![k])) && sameDetails(a.warranty_details, b.warranty_details)
-export const emptyWarrantyState = (): WarrantyState => ({ current: null, history: null, receipt: null, attempt: null, busy: null, error: null })
+export const emptyWarrantyState = (): WarrantyState => ({ current: null, history: null, receipt: null, attempt: null, busy: null, error: null, readTarget: null, cancelledRead: false })
 export function createWarrantyWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: WarrantyState) => void, newKey: () => string = () => createRequestId()) {
-  let context: MetadataContext | null = null, state = emptyWarrantyState(), epoch = 0, controller: AbortController | undefined, known: WarrantyCurrent | null = null, visible = true
-  const emit = () => changed(detachedWorkspaceState(state)), path = () => `/assets/${context!.assetId}/manual-metadata/warranty`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
-  function reset(next: MetadataContext | null) { controller?.abort(); ++epoch; const valid = next && [next.tenantId, next.assetId, next.actorId].every(v => uuid.test(v)) && version(next.permissionVersion) && typeof next.canWrite === 'boolean'; context = valid ? { ...next! } : null; known = null; state = emptyWarrantyState(); if (next && !valid) state.error = invalid(); emit() }
-  function setVisible(value: boolean) { visible = value; if (!visible && state.busy !== 'write') { controller?.abort(); ++epoch; state = { ...state, current: null, history: null, busy: null }; emit() } }
-  function observe(current: WarrantyCurrent) { if (known && (current.asset.version < known.asset.version || current.asset.version === known.asset.version && !sameSnapshot(current, known))) throw invalid(); known = clone(current) }
-  async function refresh(more = false) {
-    if (!visible || !context || state.busy === 'write' || more && (state.busy || !state.history?.has_more)) return false
-    const scope = { ...context }, previous = state.current, before = more ? state.history!.next_before_version : null, turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort
-    state = { ...state, current: null, history: null, busy: 'read', error: null }; emit()
+  let context: MetadataContext | null = null, state = emptyWarrantyState(), epoch = 0, controller: AbortController | undefined, known: WarrantyCurrent | null = null, visible = true, disposed = false
+  const emit = () => changed(detachedWorkspaceState(state)), path = (scope: MetadataContext) => `/assets/${scope.assetId}/manual-metadata/warranty`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
+  function reset(next: MetadataContext | null) { controller?.abort(); controller = undefined; ++epoch; const valid = !disposed && next && [next.tenantId, next.assetId, next.actorId].every(v => uuid.test(v)) && version(next.permissionVersion) && typeof next.canWrite === 'boolean'; context = valid ? { ...next! } : null; known = null; state = emptyWarrantyState(); if (!disposed && next && !valid) state.error = invalid(); emit() }
+  function setVisible(value: boolean) {
+    if (disposed) return
+    visible = value
+    if (!visible && state.busy !== 'write') {
+      if (state.busy === 'read') cancelRead()
+      state = { ...state, current: null, history: null }; emit()
+    }
+  }
+  function observe(current: WarrantyCurrent) {
+    if (known && (current.asset.version < known.asset.version || current.asset.created_at !== known.asset.created_at || known.metadata_version !== null && (current.metadata_version === null || current.metadata_version < known.metadata_version) || known.warranty_details !== null && current.warranty_details === null || current.asset.version === known.asset.version && !sameSnapshot(current, known))) throw invalid()
+    known = clone(current)
+  }
+  async function read(target: WarrantyReadTarget) {
+    if (disposed || !visible || !context || state.busy) return false
+    const scope = context, original = clone(target), turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort
+    state = { ...state, current: null, history: null, readTarget: original, cancelledRead: false, busy: 'read', error: null }; emit()
+    if (disposed || turn !== epoch || abort.signal.aborted || context !== scope || !visible) return false
     try {
-      const current = readWarrantyCurrent(await client.request<unknown>(path(), { signal: abort.signal }), scope); if (turn !== epoch || abort.signal.aborted) return false; observe(current)
-      const boundary = more && previous?.asset.version === current.asset.version ? before : null
-      const history = readWarrantyHistory(await client.request<unknown>(path() + '/history?page_size=15' + (boundary ? '&before_version=' + boundary : ''), { signal: abort.signal }), scope, current, boundary)
-      if (turn !== epoch || abort.signal.aborted) return false; state = { ...state, current, history }; return true
-    } catch (error) { if (turn === epoch && !isCancelled(error)) state = { ...state, error }; return false }
-    finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
+      const raw = await client.request<unknown>(path(scope), { signal: abort.signal })
+      if (disposed || turn !== epoch || abort.signal.aborted || context !== scope || !visible) return false
+      const current = readWarrantyCurrent(raw, scope); observe(current)
+      const boundary = original.beforeVersion
+      const history = readWarrantyHistory(await client.request<unknown>(path(scope) + '/history?page_size=15' + (boundary !== null ? '&before_version=' + boundary : ''), { signal: abort.signal }), scope, current, boundary)
+      if (disposed || turn !== epoch || abort.signal.aborted || context !== scope || !visible) return false
+      state = { ...state, current, history }; return true
+    } catch (error) { if (!disposed && turn === epoch) state = { ...state, ...(isCancelled(error) ? { cancelledRead: true } : { error }) }; return false }
+    finally { if (!disposed && turn === epoch) { controller = undefined; state = { ...state, busy: null }; emit() } }
+  }
+  function refresh(more = false) {
+    if (disposed || !visible || !context || state.busy || more && !state.history?.has_more) return Promise.resolve(false)
+    return read({ beforeVersion: more ? state.history!.next_before_version : null })
+  }
+  const canRetryRead = () => !disposed && visible && !!context && !!state.readTarget && !state.busy && !!(state.error || state.cancelledRead)
+  function retryRead() { return canRetryRead() ? read(clone(state.readTarget!)) : Promise.resolve(false) }
+  function cancelRead() {
+    if (disposed || state.busy !== 'read') return false
+    ++epoch; controller?.abort(); controller = undefined
+    state = { ...state, current: null, history: null, busy: null, error: null, cancelledRead: true }; emit(); return true
   }
   async function send(attempt: Attempt, retry = false) {
-    if (!visible || !context?.canWrite || state.busy) return false
-    const scope = { ...context }, turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort; state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
+    if (disposed || !visible || !context?.canWrite || state.busy) return false
+    const scope = context, turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort; state = { ...state, busy: 'write', error: null, readTarget: null, cancelledRead: false, attempt: { ...attempt, state: 'uncertain' } }; emit()
+    if (disposed || turn !== epoch || abort.signal.aborted || context !== scope) return false
     try {
       const body = JSON.parse(attempt.payload) as WarrantyInput & { expected_version: number }
-      const receipt = readWarrantyCurrent(await client.request<unknown>(path(), { method: 'PATCH', body, idempotencyKey: attempt.key, signal: abort.signal }), scope)
-      if (turn !== epoch || abort.signal.aborted) return false
+      const raw = await client.request<unknown>(path(scope), { method: 'PATCH', body, idempotencyKey: attempt.key, signal: abort.signal })
+      if (disposed || turn !== epoch || abort.signal.aborted || context !== scope) return false
+      const receipt = readWarrantyCurrent(raw, scope)
       const baseline = attempt.baseline, m = receipt.metadata
       if (receipt.asset.version !== body.expected_version + 1 || receipt.metadata_version !== receipt.asset.version || !m || !sameDetails(receipt.warranty_details, { warranty_start: body.warranty_start, warranty_supplier: body.warranty_supplier }) || m.warranty_expiry !== body.warranty_expiry || m.overdue_service_date !== body.overdue_service_date || m.note !== body.note || receipt.recorded_by !== scope.actorId || receipt.asset.management_ip !== baseline.asset.management_ip || receipt.asset.created_at !== baseline.asset.created_at || !receipt.can_edit) throw invalid()
       for (const k of baseKeys.filter(k => !['warranty_expiry', 'overdue_service_date', 'note'].includes(k))) { const expected = baseline.metadata ? baseline.metadata[k] : ['name', 'type', 'site_id'].includes(k) ? baseline.asset[k as 'name' | 'type' | 'site_id'] : null; if (m[k] !== expected) throw invalid() }
       if (!known || receipt.asset.version >= known.asset.version) observe(receipt)
-      state = { ...state, receipt, current: null, history: null, busy: null, attempt: { ...attempt, state: 'accepted' } }; emit(); if (visible) await refresh(); return true
+      state = { ...state, receipt, current: null, history: null, busy: null, attempt: { ...attempt, state: 'accepted' } }; emit(); if (disposed || turn !== epoch || context !== scope) return false; if (visible) await refresh(); return !disposed && context === scope
     } catch (error) {
-      if (turn !== epoch) return false
+      if (disposed || turn !== epoch || context !== scope) return false
       const uncertain = retry || isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_')
       state = { ...state, current: null, history: null, error, attempt: { ...attempt, state: uncertain ? 'uncertain' : 'rejected' } }; return false
-    } finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
+    } finally { if (!disposed && turn === epoch) { controller = undefined; state = { ...state, busy: null }; emit() } }
   }
-  async function submit(input: WarrantyInput, expectedVersion: number) { if (!visible || !context?.canWrite || state.busy || unresolved() || !state.current?.can_edit || state.current.asset.version !== expectedVersion) return false; validateWarrantyInput(input); if (expectedVersion >= Number.MAX_SAFE_INTEGER) throw badInput(); return send({ key: newKey(), payload: JSON.stringify({ expected_version: expectedVersion, ...clone(input) }), baseline: clone(state.current), state: 'uncertain' }) }
-  emit(); return { reset, setVisible, refresh, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => detachedWorkspaceState(state) }
+  async function submit(input: WarrantyInput, expectedVersion: number) {
+    if (disposed || !visible || !context?.canWrite || state.busy || unresolved() || !state.current?.can_edit || state.current.asset.version !== expectedVersion) return false
+    validateWarrantyInput(input); if (expectedVersion >= Number.MAX_SAFE_INTEGER) throw badInput()
+    const scope = context, turn = epoch, payload = JSON.stringify({ expected_version: expectedVersion, ...clone(input) }), baseline = clone(state.current)
+    let key: string
+    try { key = newKey(); if (typeof key !== 'string' || !/^[A-Za-z0-9._:-]{1,128}$/.test(key)) throw new Error() }
+    catch { if (!disposed && turn === epoch && context === scope) { state = { ...state, readTarget: null, cancelledRead: false, error: new ApiError(0,'WARRANTY_PREPARATION_FAILED','保存请求尚未发送，请重试准备；原输入保留','—') }; emit() }; return false }
+    if (disposed || turn !== epoch || context !== scope || state.busy || unresolved() || !visible) return false
+    return send({ key, payload, baseline, state: 'uncertain' })
+  }
+  emit(); return { reset, setVisible, refresh, cancelRead, retryRead, canRetryRead, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => { disposed = true; reset(null) }, state: () => detachedWorkspaceState(state) }
 }

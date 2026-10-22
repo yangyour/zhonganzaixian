@@ -1,0 +1,49 @@
+{
+  "status": "PASS_WARRANTY_ORIGINAL_READ_RECOVERY",
+  "new_tests": 24,
+  "new_logic_tests": 16,
+  "new_dom_tests": 8,
+  "original_logic_run": {
+    "failed": 13,
+    "passed": 3
+  },
+  "subsequent_assertion_strengthening": "Three floor cases now also require invalid current to be rejected before history GET",
+  "focused": {
+    "files": 3,
+    "tests": 47,
+    "failures": 0
+  },
+  "vitest": {
+    "files": 277,
+    "tests": 4627,
+    "failures": 0
+  },
+  "node_contract_tests": 179,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180730,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "ccfe45b94f8722b9d858e9a00dd0f3cb826b735401288b5354eaca2cf2c7d1c5",
+    "scope": "static-artifacts-only"
+  },
+  "preserved_failures": [
+    "Fixture extraction incorrectly exported a function-local const; fixed before effective baseline",
+    "Immediate watch invoked const load before initialization; changed to function declaration"
+  ],
+  "test_boundary": "Actual Vue/Element Plus DOM with stubbed drawer shell; no browser or real modal acceptance",
+  "http_smoke": "4_DISTINCT_LOOPBACK_VITE_RESOURCES_PASS_AND_STOPPED",
+  "browser": "105_SPECIFICATIONS_12_FILES_ACTUAL_NOT_RUN",
+  "formal_contract_tc": "128_NOT_RUN",
+  "backend_sql_or_real_account_changed": false,
+  "remaining": "Warranty complete draft confirmation and dependency editor recovery/protection",
+  "source_sha256": {
+    "apps/web/src/utils/manualWarrantyWorkspace.ts": "9ac7da2d9bad21da78ca1f1e2c455b77f649b0beb155c1fd2ca3d94c2247658e",
+    "apps/web/src/components/ManualWarrantyWorkspace.vue": "28a5224036e40bad0222dbaa1e1b4ec5472896a54554f969c369cc87716d93db",
+    "apps/web/tests/manualWarrantyWorkspace.test.ts": "7fb84c67ffdd4c51e0f49378eb60bcd792146a79ac6f02c12a9fdf6962dc3fe7",
+    "apps/web/tests/fixtures/manualWarranty.ts": "f4de3fa7c798118eef2a7e4be5ade6f7a00368a4309f39987f99f023afd49363",
+    "apps/web/tests/manualWarrantyReadRecovery.test.ts": "5545ca6c651ccedeeef0fc3676b723c6aada4b9a30dffdda32068f3e43128f9a",
+    "apps/web/tests/manualWarrantyRecoveryPanel.test.ts": "0568c19e9900bd3f57a2a1d66c33e27624ccbf9f6ff4b442559007e4879baa7d"
+  }
+}

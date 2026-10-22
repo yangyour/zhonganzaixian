@@ -1,0 +1,60 @@
+{
+  "status": "PASS_FILE_SD_UNIT_AND_OFFICIAL_PROMETHEUS_LOOPBACK",
+  "base_main": "9cebcff67722fa89b67e65f56e9daa19754ba16f",
+  "api_version_unchanged": "0.79.0",
+  "python": {
+    "tests": 230,
+    "new_tests": 19,
+    "failures": 0,
+    "skipped_in_this_explicit_run": 0,
+    "default_without_collector_binary_skips": 1
+  },
+  "node_contracts": 186,
+  "prometheus": {
+    "version": "3.15.1",
+    "source": "https://github.com/prometheus/prometheus/releases/tag/v3.15.1",
+    "archive_sha256": "6a726885328ad9efebbf36e876ce2fb6225468a71fd1e7ce3ba666d5f4d97a84",
+    "checksum_verified": true
+  },
+  "loopback": {
+    "scope": "LOCAL_SYNTHETIC_PROMETHEUS_ONLY",
+    "completed": true,
+    "real_device_integration": false,
+    "business_database_accessed": false,
+    "production_applied": false,
+    "browser_executed": false,
+    "official_config_check": "PASSED",
+    "repeated_samples_observed": true,
+    "untrusted_label_override_prevented": true,
+    "second_target_discovered_without_restart_or_reload": true,
+    "scrape_failure_and_recovery_observed": true,
+    "exporter_scrape_counts": [
+      5,
+      2
+    ],
+    "collector_stopped": true,
+    "exporters_stopped": true,
+    "temporary_storage_removed": true
+  },
+  "java_sources_changed": false,
+  "frontend_sources_changed": false,
+  "business_database_accessed": false,
+  "real_device_integration": "NOT_RUN",
+  "mop_history_source_connected": false,
+  "production_configuration_applied": false,
+  "sql_migrations": false,
+  "formal_contract_cases": 128,
+  "formal_contract_status": "NOT_RUN",
+  "tested_backend_base_main": "6fdb377f825b3b7f867d4b4e773141c9db30e753",
+  "preserved_upstream_frontend_and_doc_files": 10,
+  "official_all_presets_file_sd_check": {
+    "configuration": "PASSED",
+    "file_sd_layout": "PASSED",
+    "official_config_check": "PASSED",
+    "job_count": 10,
+    "target_count": 12,
+    "target_network_tested": false,
+    "applied": false,
+    "continuous_collection_verified": false
+  }
+}

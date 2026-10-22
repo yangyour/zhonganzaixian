@@ -46,4 +46,10 @@ class MonitoringPresetHttpSecurityTest {
  @Test void validCsrfAndCurrentScopePermitExactlyOneProbe()throws Exception{mvc.perform(post(BASE+"/"+target.id()+"/test").with(user(ACTOR)).with(csrf().asHeader()).sessionAttr("mop.tenant_id",TENANT).contentType("application/json").content(body())).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store")).andExpect(jsonPath("$.data.source").value("SERVER_ONE_SHOT_PROBE")).andExpect(jsonPath("$.data.report.health_verified").value(false));assertEquals(1,probes.get());}
  @Test void listRequiresBothCapabilitiesAndReturnsNoProbe()throws Exception{mvc.perform(get(BASE).with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isOk()).andExpect(jsonPath("$.data.items[0].target_id").value(target.id()));assertEquals(0,probes.get());when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"padmin",7,true,List.of("assets:read"))));mvc.perform(get(BASE).with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isForbidden());}
  @Test void authenticatedScopeCannotSubmitDestinationOverride()throws Exception{mvc.perform(post(BASE+"/"+target.id()+"/test").with(user(ACTOR)).with(csrf().asHeader()).sessionAttr("mop.tenant_id",TENANT).contentType("application/json").content("{\"endpoint\":\"http://192.0.2.1:1/\"}")).andExpect(status().isBadRequest());assertEquals(0,probes.get());}
+
+ @Test void expandedQueryIsAcceptedOnlyForAuthorizedRead()throws Exception{
+  mvc.perform(get(BASE).param("view","expanded").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isOk()).andExpect(jsonPath("$.data.items[0].target_id").value(target.id()));
+  mvc.perform(get(BASE).param("view","expanded")).andExpect(status().isUnauthorized());
+  mvc.perform(get(BASE).param("view","expanded","expanded").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isBadRequest());assertEquals(0,probes.get());
+ }
 }

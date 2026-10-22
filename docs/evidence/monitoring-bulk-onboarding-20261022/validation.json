@@ -1,0 +1,53 @@
+{
+  "status": "PASS_BACKEND_UNIT_CONTRACT_OFFLINE_PLAN_AND_OFFICIAL_CONFIG_SYNTAX",
+  "base_main": "485166fe54a3216c7bfedef0671f80d8fbe17b2b",
+  "api_version": "0.79.0",
+  "backend": {
+    "tests": 4243,
+    "executed": 3201,
+    "skipped": 1042,
+    "failures": 0,
+    "errors": 0,
+    "new_tests": 10
+  },
+  "python": {
+    "tests": 211,
+    "new_tests": 28,
+    "failures": 0
+  },
+  "node_contracts": 186,
+  "frontend_unchanged_regression": {
+    "files": 294,
+    "tests": 4894,
+    "source_files_changed": false
+  },
+  "golden_inventory": {
+    "assets": 3,
+    "preset_kinds": 13,
+    "targets": 15,
+    "java_python_target_hashes_match": true
+  },
+  "promtool": {
+    "version": "3.15.1",
+    "source": "https://github.com/prometheus/prometheus/releases/tag/v3.15.1",
+    "archive_sha256": "6a726885328ad9efebbf36e876ce2fb6225468a71fd1e7ce3ba666d5f4d97a84",
+    "checksum_verified": true,
+    "synthetic_rendered_jobs": 12,
+    "check_config": "PASS",
+    "scrapes_executed": false
+  },
+  "network_discovery_executed": false,
+  "generated_targets_enabled": false,
+  "allowlists_automatically_approved": false,
+  "configuration_applied": false,
+  "asset_identity_verified": false,
+  "continuous_collection_verified": false,
+  "real_device_integration": "NOT_RUN",
+  "browser_execution": "NOT_RUN",
+  "deployment": false,
+  "sql_migrations": false,
+  "formal_contract_cases": 128,
+  "formal_contract_status": "NOT_RUN",
+  "preserved_upstream_files": 17,
+  "upstream_real_data_boundary_preserved": true
+}

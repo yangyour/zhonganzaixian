@@ -96,6 +96,18 @@ def downstream(value, preset):
         except ValueError: fail('INVALID_TCP_TARGET')
     else: ip_literal(value)
 
+def destination_key(target, preset):
+    if target is None: return ''
+    if preset['id'] == 'http-service':
+        u = urlsplit(target)
+        host = f'[{u.hostname}]' if ':' in u.hostname else u.hostname
+        return f"{u.scheme}://{host}:{u.port or (443 if u.scheme == 'https' else 80)}{u.path or '/'}"
+    if preset['id'] == 'tcp-service':
+        u = urlsplit('tcp://' + target)
+        host = f'[{u.hostname}]' if ':' in u.hostname else u.hostname
+        return f'{host}:{u.port}'
+    return target
+
 def validate(config):
     if not isinstance(config, dict) or set(config) != {'version', 'targets'} or type(config['version']) is not int or config['version'] != 1: fail('CONFIG_SHAPE')
     if not isinstance(config['targets'], list) or not 1 <= len(config['targets']) <= 64: fail('TARGET_COUNT')
@@ -106,10 +118,9 @@ def validate(config):
             if not isinstance(t[k], str) or not UUID.fullmatch(t[k]): fail('INVALID_ID')
         if not isinstance(t['preset_id'], str) or t['preset_id'] not in PRESETS: fail('UNKNOWN_PRESET')
         p = PRESETS[t['preset_id']]
+        if not isinstance(t['endpoint'], str) or t['target'] is not None and not isinstance(t['target'], str): fail('INVALID_DESTINATION_TYPE')
         if t['id'] in ids: fail('DUPLICATE_TARGET_ID')
-        ids.add(t['id']); binding = (t['tenant_id'], t['asset_id'], t['preset_id'])
-        if binding in bindings: fail('DUPLICATE_ASSET_PRESET')
-        bindings.add(binding)
+        ids.add(t['id'])
         if type(t['enabled']) is not bool: fail('INVALID_ENABLED')
         if t['interval_seconds'] is not None and (type(t['interval_seconds']) is not int or not 5 <= t['interval_seconds'] <= 3600): fail('INVALID_INTERVAL')
         if t['enabled'] and t['interval_seconds'] is None: fail('INTERVAL_REQUIRED')
@@ -119,6 +130,9 @@ def validate(config):
         if p['test_kind'] == 'snmp':
             if not isinstance(t['auth_profile'], str) or not SYMBOL.fullmatch(t['auth_profile']): fail('SNMP_AUTH_PROFILE_REQUIRED')
         elif t['auth_profile'] is not None: fail('UNEXPECTED_AUTH_PROFILE')
+        binding = (t['tenant_id'], t['asset_id'], t['preset_id'], t['endpoint'], destination_key(t['target'], p))
+        if binding in bindings: fail('DUPLICATE_MONITORING_DESTINATION')
+        bindings.add(binding)
     # Detach from caller mutations before a network request or export.
     return json.loads(json.dumps(config))
 

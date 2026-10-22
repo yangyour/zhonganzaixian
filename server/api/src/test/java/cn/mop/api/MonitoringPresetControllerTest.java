@@ -26,4 +26,22 @@ class MonitoringPresetControllerTest {
     @Test void defaultDisabledServiceMakesNoNetworkCall(){controller=new MonitoringPresetController(repository,new MonitoringPresetProbeService(null,t->{throw new AssertionError();}));assertEquals(503,assertThrows(DomainException.class,()->controller.list(request())).status);}
     @Test void noSessionOrInactiveIdentityCannotRead(){var r=request();r.setUserPrincipal(null);assertEquals(401,assertThrows(DomainException.class,()->controller.list(r)).status);when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"padmin",7,false)));assertEquals(401,assertThrows(DomainException.class,()->controller.list(request())).status);}
     @Test void cacheAndReferrerHeadersRemainPrivate(){var r=new MockHttpServletResponse();controller.privateHeaders(r);assertEquals("no-store",r.getHeader("Cache-Control"));assertEquals("no-referrer",r.getHeader("Referrer-Policy"));}
+
+    @Test void expandedViewPreservesAllServiceTargetsButLegacyViewFailsExplicitly(){
+        var c=MonitoringPresetTest.config("linux-node");var second=MonitoringPresetTest.row(c).deepCopy();
+        second.put("id","79000000-0000-4000-8000-000000000099").put("endpoint","http://192.0.2.10:19100/metrics");c.withArray("targets").add(second);
+        registry=new MonitoringPresetRegistry(c.toString(),"[]","[]");service(t->{throw new AssertionError("read performed probe");});
+        var error=assertThrows(DomainException.class,()->controller.list(request()));assertEquals(409,error.status);assertEquals("CONFIGURATION_VIEW_REQUIRED",error.code);
+        var r=request();r.addParameter("view","expanded");Map<?,?> data=(Map<?,?>)((Map<?,?>)controller.list(r)).get("data");assertEquals(2,((List<?>)data.get("items")).size());
+    }
+    @Test void expandedViewDoesNotPermitExtraDuplicateOrUnsupportedQueryParameters(){
+        for(String value:List.of("all","","EXPANDED")){var r=request();r.addParameter("view",value);assertEquals(400,assertThrows(DomainException.class,()->controller.list(r)).status);}
+        var duplicate=request();duplicate.addParameter("view","expanded","expanded");assertEquals(400,assertThrows(DomainException.class,()->controller.list(duplicate)).status);
+        var override=request();override.addParameter("view","expanded");override.addParameter("tenant_id","other");assertEquals(400,assertThrows(DomainException.class,()->controller.list(override)).status);
+        var post=request();post.addParameter("view","expanded");assertEquals(400,assertThrows(DomainException.class,()->controller.test(target.id(),post)).status);assertEquals(0,calls.get());
+    }
+    @Test void expandedViewStillRequiresCurrentMembershipAndAssetScope(){
+        var r=request();r.addParameter("view","expanded");when(repository.authorizedAsset(TENANT,ACTOR,7,target.assetId())).thenReturn(Optional.empty());
+        assertEquals(404,assertThrows(DomainException.class,()->controller.list(r)).status);assertEquals(0,calls.get());
+    }
 }

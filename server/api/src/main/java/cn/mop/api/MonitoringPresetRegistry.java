@@ -24,7 +24,7 @@ final class MonitoringPresetRegistry {
         try{
             var catalog=presets();JsonNode root=parse(raw);fields(root,Set.of("version","targets"));
             if(!root.get("version").isIntegralNumber()||!root.get("version").canConvertToInt()||root.get("version").intValue()!=1||!root.get("targets").isArray()||root.get("targets").isEmpty()||root.get("targets").size()>64)throw invalid();
-            Map<String,Target> found=new LinkedHashMap<>();Set<String> bindings=new HashSet<>();
+            Map<String,Target> found=new LinkedHashMap<>();Set<List<String>> bindings=new HashSet<>();
             for(JsonNode row:root.get("targets")){
                 fields(row,Set.of("id","tenant_id","asset_id","preset_id","enabled","endpoint","target","auth_profile","interval_seconds","timeout_seconds"));
                 String id=text(row,"id"),tenant=text(row,"tenant_id"),asset=text(row,"asset_id");if(!uuid(id)||!uuid(tenant)||!uuid(asset))throw invalid();
@@ -43,10 +43,16 @@ final class MonitoringPresetRegistry {
                 String single=JSON.writeValueAsString(Map.of("version",1,"targets",List.of(new TreeMap<>(values))));
                 String hash=HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(single.getBytes(StandardCharsets.UTF_8)));
                 Target t=new Target(id,tenant,asset,p,e,target,auth,timeout,single,hash);
-                if(found.put(id,t)!=null||!bindings.add(tenant+":"+asset+":"+p.id()))throw invalid();
+                if(found.put(id,t)!=null||!bindings.add(List.of(tenant,asset,p.id(),e.toString(),destinationKey(p,target))))throw invalid();
             }
             targets=Collections.unmodifiableMap(found);endpoints=allowlist(allowedEndpoints);downstreams=allowlist(allowedDownstreams);
         }catch(Exception ex){throw invalid();}
+    }
+    static String destinationKey(Preset p,String target){
+        if(target==null)return "";
+        if(p.id().equals("http-service")){URI u=URI.create(target);int port=u.getPort()<0?(u.getScheme().equals("https")?443:80):u.getPort();return u.getScheme()+"://"+u.getHost()+":"+port+(u.getRawPath().isEmpty()?"/":u.getRawPath());}
+        if(p.id().equals("tcp-service")){URI u=URI.create("tcp://"+target);return u.getHost()+":"+u.getPort();}
+        return target;
     }
     List<Target> forTenant(String tenant){return targets.values().stream().filter(t->t.tenantId().equals(tenant)).toList();}
     Optional<Target> find(String tenant,String id){return Optional.ofNullable(targets.get(id)).filter(t->t.tenantId().equals(tenant));}

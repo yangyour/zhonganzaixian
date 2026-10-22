@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "tenant_id": "79000000-0000-4000-8000-000000000001",
+  "defaults": {"interval_seconds": null, "timeout_seconds": 5, "exporter_scheme": "http"},
+  "collectors": {
+    "blackbox": {"kind": "blackbox", "endpoint": "http://198.51.100.10:9115/probe"},
+    "snmp": {"kind": "snmp", "endpoint": "http://198.51.100.20:9116/snmp", "auth_profile": "replace_with_configured_snmp_profile"}
+  },
+  "assets": [
+    {
+      "asset_id": "79000000-0000-4000-8000-000000000010", "address": "192.0.2.10",
+      "profiles": [
+        "linux-node", "postgresql", "mysql", "redis", "containers", "zabbix-linux", "icmp-device",
+        {"preset_id": "http-service", "key": "website", "scheme": "https", "path": "/"},
+        {"preset_id": "http-service", "key": "health", "scheme": "https", "path": "/health"},
+        {"preset_id": "tcp-service", "key": "ssh", "port": 22},
+        {"preset_id": "tcp-service", "key": "database", "port": 5432}
+      ]
+    },
+    {"asset_id": "79000000-0000-4000-8000-000000000020", "address": "192.0.2.20", "profiles": ["windows-exporter", "zabbix-windows"]},
+    {"asset_id": "79000000-0000-4000-8000-000000000030", "address": "192.0.2.30", "profiles": ["network-snmp", "zabbix-snmp"]}
+  ]
+}

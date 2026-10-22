@@ -248,8 +248,8 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.78.0');
-  assert.equal(contract.info.version, '0.78.0');
+  assert.equal(contract.info.version, '0.79.0');
+  assert.equal(contract.info.version, '0.79.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -944,7 +944,7 @@ test('补充SLA口径只能绑定明确发布版本，不接收策略或身份�
 
 test('SLA提醒记录不等于路由或送达，读取无业务写入',()=>{const p=contract.paths['/tickets/{ticketId}/sla/reminders'];assert.equal(p.get['x-mop-read-only'],true);assert.equal(p.post,undefined);const s=contract.components.schemas.TicketSlaReminder;assert.equal(s.properties.notification_status.const,'NOT_ROUTED');assert.equal(s.properties.delivered.const,false);assert.deepEqual(s.properties.progress.enum,[0.5,0.8,1]);});
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.78.0');
+  assert.equal(contract.info.version, '0.79.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/workflow/sla'].get;
@@ -1008,7 +1008,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.78.0');
+  assert.equal(contract.info.version, '0.79.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1400,4 +1400,17 @@ test('登记监控测试只接受配置摘要并保留CSRF、权限复核和单�
  const report={target_id:id('1'),configuration_sha256:'a'.repeat(64),probe_status:'FAILED',continuous_collection_verified:false,device_identity_verified:false,health_verified:false,sample_count:null,matched_metrics:[],reason:'CONNECTION_FAILED'};
  assert.equal(validates('MonitoringRegisteredProbeReport',report),true);for(const patch of [{health_verified:true},{continuous_collection_verified:true},{password:'secret'},{probe_status:'HEALTHY'}])assert.equal(validates('MonitoringRegisteredProbeReport',{...report,...patch}),false);
  for(const status of ['400','401','403','404','409','429','503'])assert.equal(op.responses[status].content['application/json'].schema.$ref,'#/components/schemas/Error');
+});
+
+test('expanded monitoring view is explicit and does not add arbitrary destination input', () => {
+  const operation = contract.paths['/monitoring-onboarding/registered-targets'].get;
+  assert.equal(operation.parameters.length, 1);
+  assert.equal(operation.parameters[0].name, 'view');
+  assert.equal(operation.parameters[0].in, 'query');
+  assert.equal(operation.parameters[0].required, false);
+  assert.deepEqual(operation.parameters[0].schema.enum, ['expanded']);
+  assert.match(operation.parameters[0].description, /CONFIGURATION_VIEW_REQUIRED/);
+  assert.ok(operation.responses['409']);
+  assert.equal(operation['x-mop-arbitrary-destination-accepted'], false);
+  assert.equal(operation['x-mop-read-only'], true);
 });

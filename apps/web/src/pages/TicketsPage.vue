@@ -240,13 +240,13 @@ onUnmounted(() => { unregisterContextGuard(); unregisterRouteResolve?.(); unregi
 
 <template>
   <section class="tickets-page">
-    <div class="compact-page-toolbar page-heading proto-page-head"><div><h1 class="page-title-sr">报障与受理 </h1></div><el-button v-if="mayReport" type="primary" @click="createOpen = true">故障申报登记</el-button></div>
+    <h1 class="page-title-sr">报障与受理 </h1>
     
     
     <el-alert v-if="acceptedOperationId" class="page-note" type="success" :closable="false" show-icon title="故障申报已受理，系统正在生成正式工单，可点击下方按钮刷新处理进度。" />
     <RetainedPhotoNotice v-if="retainedPhotos" :target-id="photoTargetId" :ticket="appendTicket" :count="detailPhotos.rows.value.length" :can-discard="photoWorkspace.canDiscard.value" @resume="openDetail(photoTargetId)" @discard="discardRetainedPhotos" />
     <div class="panel ticket-register-panel">
-      <div class="proto-section-head"><h2>{{ customerView ? '我的故障申报' : '全部故障申报' }}</h2><span class="proto-sub">{{ customerView ? '仅本人可见' : '当前租户范围' }} · 支持按关键词、分类与紧急程度筛选</span></div>
+      <div class="proto-section-head content-toolbar"><h2>{{ customerView ? '我的故障申报' : '全部故障申报' }}</h2><span class="proto-sub">{{ customerView ? '仅本人可见' : '当前租户范围' }} · 支持按关键词、分类与紧急程度筛选</span><div class="content-actions"><el-button v-if="mayReport" type="primary" @click="createOpen = true">故障申报登记</el-button></div></div>
       <el-form :inline="true" class="filter-form ticket-filter-form" @submit.prevent="applyFilters" @compositionstart="searchComposition.start" @compositionend="searchComposition.end" @keydown="searchComposition.keydown"><el-form-item label="搜索"><el-input v-model="filters.q" clearable placeholder="登记号 / 标题 / 描述" aria-label="搜索报障登记" enterkeyhint="search" /></el-form-item><el-form-item label="故障分类"><el-select v-model="filters.category" clearable placeholder="全部分类" aria-label="报障分类筛选"><el-option v-for="category in ticketCategories" :key="category" :label="category" :value="category" /></el-select></el-form-item><el-form-item label="紧急程度"><el-select v-model="filters.urgency" clearable placeholder="全部程度" aria-label="报障紧急程度筛选"><el-option label="一般" value="normal" /><el-option label="很急（参考）" value="urgent" /></el-select></el-form-item><el-form-item class="filter-actions"><el-button type="primary" native-type="submit" :disabled="loading">查询</el-button><el-button :disabled="loading" @click="resetFilters">重置</el-button><el-button :loading="loading" title="按当前已生效筛选条件刷新列表" @click="loadTickets">刷新</el-button></el-form-item></el-form>
       <AppliedFilters :items="filterItems" :pending="pendingFilters" :loading="loading" :failed="Boolean(error)" :loaded="loaded" :count="rows.length" @remove="removeFilter" @clear="resetFilters" />
       <ApiErrorNotice :error="error"><el-button size="small" @click="loadTickets">重试</el-button></ApiErrorNotice>

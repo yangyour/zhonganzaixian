@@ -35,20 +35,20 @@ defineExpose({state,workspace,mayLeave,openLedger,markRead,recover,tab,list,refr
 </script>
 <template>
  <section class="notifications">
-  <div class="compact-page-toolbar page-heading proto-page-head"><div><h1 class="page-title-sr">工单通知 </h1></div><RouterLink to="/ticket-workflows" class="back">工单处理</RouterLink></div>
+  <h1 class="page-title-sr">工单通知 </h1>
   <p class="panel" v-if="!permitted">当前身份没有工单通知权限，或正在切换租户。</p>
   <template v-else>
    
    
    <div class="proto-panel workspace">
-    <div class="proto-toolbar">
+    <div class="proto-toolbar content-toolbar">
      <div class="proto-tabs" aria-label="通知视图">
       <button type="button" :class="{active:tab==='mine'&&!state.unreadOnly}" :aria-pressed="tab==='mine'&&!state.unreadOnly" :disabled="locked" @click="list(false)">全部通知</button>
       <button type="button" :class="{active:tab==='mine'&&state.unreadOnly}" :aria-pressed="tab==='mine'&&state.unreadOnly" :disabled="locked" @click="list(true)">未读通知</button>
       <button v-if="ledgerAllowed" type="button" :class="{active:tab==='ledger'}" :aria-pressed="tab==='ledger'" :disabled="locked" @click="openLedger">通知派发台账</button>
      </div>
      <button type="button" :disabled="locked||state.intentBusy" @click="refresh">刷新</button>
-    </div>
+    <div class="content-actions"><RouterLink to="/ticket-workflows" class="back">工单处理</RouterLink></div></div>
     <p v-if="childPending.size" role="status">外部通道操作仍在确认、读取或等待原请求结果，请先处理该操作；刷新列表和切换视图暂不可用。</p>
     <template v-if="tab==='mine'">
      <ApiErrorNotice :error="state.error" />

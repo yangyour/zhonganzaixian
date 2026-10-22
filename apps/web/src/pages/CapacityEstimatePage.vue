@@ -59,7 +59,7 @@ const bufferMissing: Record<string, string> = Object.fromEntries([...bufferField
 <template>
   <CapacityScenarioPanel ref="scenarios" :calculation="input()" />
   <section ref="capacityRoot" class="capacity-page">
-    <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">容量与 Proxy 缓冲评估</h1></div><div class="capacity-actions"><el-button v-if="can('capacity_scenarios:read')" @click="scenarios?.browse()">已保存方案</el-button><el-button v-if="can('capacity_scenarios:write')" type="primary" @click="scenarios?.prepare()">保存为容量方案</el-button></div></div>
+    <h1 class="page-title-sr">容量与 Proxy 缓冲评估</h1>
     <el-empty v-if="!permitted" description="当前身份没有平台容量估算权限" />
     <template v-else>
       
@@ -70,7 +70,7 @@ const bufferMissing: Record<string, string> = Object.fromEntries([...bufferField
       <div class="capacity-layout">
         <div class="capacity-main">
           <el-form label-position="top" @submit.prevent="calculate">
-            <section class="capacity-input-section"><div class="panel-heading"><h2>容量模型</h2><span>未确认项留空</span></div><div class="capacity-fields"><el-form-item v-for="field in fields" :key="field.key" :label="field.label"><el-input v-model="draft.inputs[field.key]" :aria-label="field.label" inputmode="decimal" placeholder="未定请留空，0 请填 0" /><span class="field-help">{{ field.help }}</span></el-form-item></div>
+            <section class="capacity-input-section"><div class="panel-heading content-toolbar"><h2>容量模型</h2><span>未确认项留空</span><div class="content-actions"><div class="capacity-actions"><el-button v-if="can('capacity_scenarios:read')" @click="scenarios?.browse()">已保存方案</el-button><el-button v-if="can('capacity_scenarios:write')" type="primary" @click="scenarios?.prepare()">保存为容量方案</el-button></div></div></div><div class="capacity-fields"><el-form-item v-for="field in fields" :key="field.key" :label="field.label"><el-input v-model="draft.inputs[field.key]" :aria-label="field.label" inputmode="decimal" placeholder="未定请留空，0 请填 0" /><span class="field-help">{{ field.help }}</span></el-form-item></div>
               <div class="model-section"><h3>模型系数</h3><div class="model-fields"><el-form-item v-for="field in modelFields" :key="field.key" :label="field.label"><el-input v-model="draft.model[field.key]" :aria-label="field.label" placeholder="未定请留空" /><span class="field-help">{{ field.help }}</span></el-form-item></div></div>
               <div class="capacity-actions"><el-button type="primary" native-type="submit" :loading="state.busy" :disabled="state.busy">开始估算</el-button><el-button v-if="state.busy" @click="cancelCalculation">取消本次估算</el-button><el-button :disabled="discarding" @click="resetDraft">重置参数</el-button></div>
             </section>

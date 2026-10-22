@@ -45,15 +45,15 @@ describe('monitoring event links with real Vue Router navigation', () => {
     await mount(`/monitoring-events?event_id=${A}`)
     expect(sampleWorkspace().events.some(e => e.id === A)).toBe(false)
     expect(request.mock.calls.map(([path]) => path)).toEqual(['/events?window=24h&page_size=25', `/events/${A}`])
-    expect(host.querySelector('.event-workspace')).toBeNull(); expect(details()?.textContent).toContain('详情-A')
+    expect(host.querySelector('.event-table-scroll')).toBeNull(); expect(details()?.textContent).toContain('详情-A')
     list.resolve(sampleWorkspace()); await settle()
-    expect(host.querySelector('.event-workspace')).not.toBeNull(); expect(details()?.textContent).toContain('详情-A')
+    expect(host.querySelector('.event-table-scroll')).not.toBeNull(); expect(details()?.textContent).toContain('详情-A')
     expect(request.mock.calls.every(([, options]) => !options?.method && options?.signal instanceof AbortSignal)).toBe(true)
   })
   it('keeps an authorized detail visible when the independent list fails', async () => {
     setup(path => { if (path.startsWith('/events?')) throw new ApiError(503, 'UPSTREAM_UNAVAILABLE', '合成列表故障', 'test'); return detail(A) })
     await mount(`/monitoring-events?event_id=${A}`)
-    expect(host.querySelector('.event-workspace')).toBeNull(); expect(details()?.textContent).toContain('详情-A')
+    expect(host.querySelector('.event-table-scroll')).toBeNull(); expect(details()?.textContent).toContain('详情-A')
     expect(host.querySelector('[role="alert"]')).not.toBeNull()
   })
   it('reacts to same-page query changes, Back/Forward, closing, and reopening without remounting or writes', async () => {
@@ -70,7 +70,7 @@ describe('monitoring event links with real Vue Router navigation', () => {
   it('list detail buttons update the canonical URL and retain unrelated query fields', async () => {
     const data = sampleWorkspace(), id = data.events[0]!.id
     const request = setup(path => path.startsWith('/events?') ? data : detail(id))
-    await mount('/monitoring-events?view=all'); button('查看抽屉').click(); await settle()
+    await mount('/monitoring-events?view=all'); button('查看详情').click(); await settle()
     expect(router.currentRoute.value.query).toEqual({ view: 'all', event_id: id })
     expect(request.mock.calls.at(-1)?.[0]).toBe(`/events/${id}`)
     button('关闭事件详情').click(); await settle(); expect(router.currentRoute.value.query).toEqual({ view: 'all' })

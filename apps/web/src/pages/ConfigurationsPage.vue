@@ -158,11 +158,12 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
 </script>
 <template>
   <section class="configuration-page">
-    <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">配置项登记</h1></div><router-link to="/runtime-configurations">运行配置与发布</router-link><el-button :loading="loading" @click="load">刷新列表</el-button></div>
+    <h1 class="page-title-sr">配置项登记</h1>
 
     <WorkingCalendarReader v-model="calendarOpen" />
     <el-alert v-if="draftState.receipt" type="success" :closable="false" :title="'配置建议草稿已保存：' + draftState.receipt.key + ' · v' + draftState.receipt.version + '（草稿状态，暂未发布生效）'" />
-    <div class="panel configuration-register"><nav class="feature-tabs" aria-label="配置工作区"><button type="button" :class="{active:!filters.pending_only}" @click="filters.pending_only=false">全部登记</button><button type="button" :class="{active:filters.pending_only}" @click="filters.pending_only=true">待客户确认 <span>{{ countsUnknown ? '—' : pendingCount }}</span></button><router-link to="/threshold-diagnostics">告警阈值诊断</router-link><button type="button" :disabled="!can('configurations:read') || switchingTenant" @click="calendarOpen=true">工作日历查询与试算</button></nav><div class="panel-heading configuration-register-heading"><h2>配置登记与修订</h2><span>登记基线 / 建议草稿 / 运行生效值对照</span></div><ApiErrorNotice :error="error"><el-button size="small" @click="load">重试</el-button></ApiErrorNotice>
+    <div class="panel configuration-register"><nav class="feature-tabs" aria-label="配置工作区"><button type="button" :class="{active:!filters.pending_only}" @click="filters.pending_only=false">全部登记</button><button type="button" :class="{active:filters.pending_only}" @click="filters.pending_only=true">待客户确认 <span>{{ countsUnknown ? '—' : pendingCount }}</span></button><router-link to="/threshold-diagnostics">告警阈值诊断</router-link><button type="button" :disabled="!can('configurations:read') || switchingTenant" @click="calendarOpen=true">工作日历查询与试算</button></nav><div class="panel-heading configuration-register-heading content-toolbar"><h2>配置登记与修订</h2><span>登记基线 / 建议草稿 / 运行生效值对照</span><div class="content-actions"><router-link to="/runtime-configurations">运行配置与发布</router-link>
+<el-button :loading="loading" @click="load">刷新列表</el-button></div></div><ApiErrorNotice :error="error"><el-button size="small" @click="load">重试</el-button></ApiErrorNotice>
       <el-form class="configuration-filters" label-position="top" @submit.prevent>
         <el-form-item label="配置键（config_key）"><el-input v-model="filters.config_key" clearable placeholder="按配置键查找" aria-label="筛选配置键" /></el-form-item>
         <el-form-item label="关联确认 Q 编号"><el-select v-model="filters.question_id" clearable filterable placeholder="全部 Q 编号" aria-label="筛选关联确认 Q 编号"><el-option v-for="question in questions" :key="question" :value="question" :label="question" /></el-select></el-form-item>

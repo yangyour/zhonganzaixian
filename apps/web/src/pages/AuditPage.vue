@@ -60,7 +60,7 @@ defineExpose({state,workspace,draft,pageSize,from,to,search,refresh,nextPage,ver
 </script>
 <template>
   <section class="audit-page admin-prototype">
-    <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">审计检索与区间校验</h1></div><el-button :loading="state.loading" :disabled="!permitted" @click="refresh">刷新列表</el-button></div>
+    <h1 class="page-title-sr">审计检索与区间校验</h1>
         <el-empty v-if="!permitted" description="当前身份没有本租户审计权限" />
     <template v-else>
       
@@ -69,7 +69,7 @@ defineExpose({state,workspace,draft,pageSize,from,to,search,refresh,nextPage,ver
           <el-form-item v-for="field in fields.slice(0, 3)" :key="field.key" :label="field.label"><el-input v-model="draft[field.key]" clearable :aria-label="field.label" :placeholder="field.placeholder" /></el-form-item>
           <details class="audit-advanced"><summary>更多筛选</summary><div class="audit-advanced-grid"><el-form-item v-for="field in fields.slice(3)" :key="field.key" :label="field.label"><el-input v-model="draft[field.key]" clearable :aria-label="field.label" :placeholder="field.placeholder" /></el-form-item></div><p class="field-help">时间使用 UTC ISO-8601（如 2026-10-21T00:00:00Z），区间含开始、不含结束。</p></details>
           <el-form-item label="每页条数"><el-select v-model="pageSize" aria-label="审计每页条数"><el-option v-for="size in [10, 15, 25, 50, 100]" :key="size" :value="size" :label="`${size}条`" /></el-select></el-form-item>
-          <div class="audit-actions"><el-button type="primary" native-type="submit" :loading="state.loading">查询</el-button><el-button @click="resetFilters">重置</el-button></div>
+          <div class="audit-actions content-toolbar"><el-button type="primary" native-type="submit" :loading="state.loading">查询</el-button><el-button @click="resetFilters">重置</el-button><div class="content-actions"><el-button :loading="state.loading" :disabled="!permitted" @click="refresh">刷新列表</el-button></div></div>
         </el-form>
         <p v-if="unapplied" class="audit-warning">筛选条件已修改但尚未应用，请点击“查询”生效。</p>
         <ApiErrorNotice :error="state.error" /><p v-if="workspace.listRetryTarget()" class="audit-retry-target">重试目标：{{workspace.listRetryTarget()?.next?'续页':'第一页'}} · 页长 {{workspace.listRetryTarget()?.size}}<template v-if="workspace.listRetryTarget()?.bound?.snapshot"> · 快照上界 {{workspace.listRetryTarget()?.bound?.snapshot}}</template></p><el-button v-if="workspace.canRetryList()" @click="retryList">重试原审计页</el-button><el-button v-if="state.loading" @click="cancelList">取消审计列表读取</el-button><p v-if="listStatus" ref="listNotice" tabindex="-1" role="status">{{listStatus}}</p>

@@ -53,7 +53,7 @@ defineExpose({ prepareCreate, prepareFrom, browse, hasUnresolved: workspace.unre
 </script>
 <template>
  <section class="contacts-page admin-prototype">
-  <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">客户联系人</h1></div><el-button v-if="writable" type="primary" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="prepareCreate">新建联系人</el-button></div>
+  <h1 class="page-title-sr">客户联系人</h1>
   
   <nav class="admin-tabs" aria-label="联系人工作区"><span class="active">联系人列表</span><router-link v-if="writable" to="/contact-imports">批量新建与作业</router-link><router-link v-if="writable" to="/contact-import-preview">导入格式预览</router-link></nav>
   
@@ -70,11 +70,11 @@ defineExpose({ prepareCreate, prepareFrom, browse, hasUnresolved: workspace.unre
    <ApiErrorNotice :error="state.error" /><ReadRecoveryActions :busy="state.busy" :can-retry="workspace.canRetryRead()" :scope-key="contextKey+':'+readScope" :cancel="workspace.cancelRead" :retry="workspace.retryRead" label="联系人" />
    <el-alert v-if="validation" type="warning" :closable="false" :title="validation" />
    <section class="contact-section admin-contact-list">
-    <div class="contact-query admin-toolbar">
+    <div class="contact-query admin-toolbar content-toolbar">
      <el-input v-model="query" aria-label="联系人姓名查询" placeholder="输入联系人姓名检索（最多 200 字符）" :disabled="state.busy === 'write'" @keyup.enter="browse(false)" />
      <el-select v-model="view" aria-label="联系人记录视图" :disabled="state.busy === 'write'"><el-option value="CURRENT" label="未归档（含停用）" /><el-option value="ARCHIVED" label="已归档" /><el-option value="ALL" label="全部记录" /></el-select>
      <el-button :disabled="Boolean(state.busy)" @click="browse(false)">刷新列表</el-button><el-button :disabled="!nextList" @click="browse(true)">下一页</el-button>
-    </div>
+    <div class="content-actions"><el-button v-if="writable" type="primary" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="prepareCreate">新建联系人</el-button></div></div>
     <p v-if="query!==state.query||view!==state.view" role="status" class="contact-help">输入的筛选尚未应用；原读取重试仍使用已提交的查询条件。</p>
     <p v-if="!state.page&&state.busy!=='read'" class="contact-help">尚未取得联系人列表，数量未知</p>
     <p v-if="state.busy === 'read'" role="status">正在读取联系人记录，数量与结果待确认…</p>

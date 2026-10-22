@@ -31,13 +31,13 @@ onUnmounted(()=>{disposed=true;reader.dispose()})
   <ManualRecoveryPanel ref="recovery" v-model="recoveryOpen" />
   <ManualIncidentEditor ref="editor" v-model="editorOpen" @saved="afterSaved" />
   <section class="manual-incidents-page">
-    <header class="compact-page-toolbar proto-page-head"><div><h1 class="page-title-sr">手工故障与事件登记 </h1></div><el-button v-if="permitted && can('manual_incidents:write')" :disabled="state.busy" type="primary" @click="editor?.prepare()">新建手工登记</el-button></header>
+    <h1 class="page-title-sr">手工故障与事件登记 </h1>
     
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前读取权限不可用，原范围数据已清除" />
     <template v-else>
       
       <div class="manual-workspace" :class="{ 'has-selection': state.selected }"><div class="proto-panel manual-registers">
-      <div class="proto-section-head"><h2 ref="listHeading" tabindex="-1">手工登记列表</h2><el-button :loading="state.busy" :disabled="state.busy" @click="list()">刷新列表</el-button></div>
+      <div class="proto-section-head content-toolbar"><h2 ref="listHeading" tabindex="-1">手工登记列表</h2><el-button :loading="state.busy" :disabled="state.busy" @click="list()">刷新列表</el-button><div class="content-actions"><el-button v-if="permitted && can('manual_incidents:write')" :disabled="state.busy" type="primary" @click="editor?.prepare()">新建手工登记</el-button></div></div>
       <ReadRecoveryActions :busy="state.busy?'read':null" :can-retry="reader.canRetryRead()" :scope-key="contextKey" label="手工登记列表详情" :cancel="reader.cancelRead" :retry="retryRead" />
       <ApiErrorNotice :error="state.error" />
       <p v-if="!state.page" class="proto-empty field-help">列表尚未成功读取，不能据此认定没有事件</p>

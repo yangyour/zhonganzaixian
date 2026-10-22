@@ -172,13 +172,7 @@ defineExpose({state,workspace,members,loadMembers,cancelMembers,openWorkflow,ref
 </script>
 <template>
  <section class="oncall-board" :aria-busy="!!state.busy">
-  <div class="compact-page-toolbar page-heading proto-page-head">
-   <div>
-    <h1 class="page-title-sr">值班看板与升级链管理 </h1>
-    
-   </div>
-   <RouterLink to="/sla-reports" class="back">SLA 月报与赔付</RouterLink>
-  </div>
+  <h1 class="page-title-sr">值班看板与升级链管理 </h1>
   <p class="panel" v-if="!permitted">当前身份无权访问内部值班看板，或正在切换租户。</p>
   <template v-else>
    
@@ -187,7 +181,7 @@ defineExpose({state,workspace,members,loadMembers,cancelMembers,openWorkflow,ref
    
 
    <div class="proto-panel workspace">
-    <div class="proto-toolbar">
+    <div class="proto-toolbar content-toolbar">
      <div class="proto-tabs" aria-label="值班看板视图">
       <button type="button" :class="{active:tab==='queue'}" :aria-pressed="tab==='queue'" :disabled="locked" @click="tab='queue'">倒计时队列与升级执行</button>
       <button type="button" :class="{active:tab==='roster'}" :aria-pressed="tab==='roster'" :disabled="locked" @click="tab='roster'">当班排班与 18:00 交接班</button>
@@ -196,7 +190,7 @@ defineExpose({state,workspace,members,loadMembers,cancelMembers,openWorkflow,ref
      <button ref="refreshButton" type="button" :disabled="locked" @click="refreshBoard">{{state.readFailed?'重试读取看板':'立即刷新'}}</button>
      <button type="button" :aria-pressed="refreshPaused" @click="toggleRefresh">{{refreshPaused?'恢复自动刷新':'暂停自动刷新'}}</button>
      <button v-if="state.busy==='read'" type="button" @click="cancelRead">取消读取</button>
-    </div>
+    <div class="content-actions"><RouterLink to="/sla-reports" class="back">SLA 月报与赔付</RouterLink></div></div>
 
     <ApiErrorNotice :error="state.error" />
     <p v-if="readStatus" role="status" aria-live="polite">{{readStatus}}</p>

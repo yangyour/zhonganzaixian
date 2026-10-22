@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-22",
+  "source_base": "7a0ac88",
+  "scope": "page actions and monitoring event presentation",
+  "repository": "yangyour/zhonganzaixian",
+  "branch": "main",
+  "browser": "155.0.4283.62",
+  "unit": {
+    "files": 290,
+    "passed": 4815,
+    "failed": 0
+  },
+  "browser_synthetic": {
+    "passed": 6,
+    "failed": 0,
+    "widths": [
+      320,
+      390,
+      768,
+      1440
+    ],
+    "axe_violations": 0
+  },
+  "live_api_ui": {
+    "origin": "designated LAN test API",
+    "accessible_routes": 40,
+    "layout_checks_passed": 84,
+    "permission_redirects_excluded": 2,
+    "page_errors": 0,
+    "business_writes": 0,
+    "external_messages": 0,
+    "live_event_axe_violations": 0
+  },
+  "build": {
+    "status": "PASSED",
+    "files": 143,
+    "build_id": "cb2a740932069194cb291926e8c12ea327ae9bc48616078d2b327e69bb17e163"
+  },
+  "migration_count": 0,
+  "test_site_deployed": false,
+  "contract_acceptance_changed": false
+}

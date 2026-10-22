@@ -53,7 +53,7 @@ onUnmounted(() => { clearInterval(timer); document.removeEventListener('visibili
 </script>
 <template>
  <section class="live-monitoring" :aria-busy="state.busy" aria-label="实际设备监控">
-  <div class="live-heading"><div class="live-title"><h2>{{ mode === 'events' ? '当前采集检查' : mode === 'triggers' ? '告警接入状态' : '设备监控' }}</h2><span v-if="permitted && devices.length" class="live-summary"><span>{{ devices.length }} 台</span><span class="live-chip ok">可达 {{ reachable }}</span><span v-if="noResponse" class="live-chip bad">无回应 {{ noResponse }}</span></span></div><div class="live-tools"><span v-if="permitted" class="live-policy" aria-label="监控自动刷新设置">{{refreshPolicyLabel}}</span><button type="button" :disabled="state.busy || !permitted" @click="refresh">{{ state.busy ? '读取中…' : '刷新监控数据' }}</button></div></div>
+  <div class="live-heading"><div class="live-title"><h2>{{ mode === 'events' ? '当前采集检查' : mode === 'triggers' ? '告警接入状态' : '设备监控' }}</h2><span v-if="permitted && devices.length" class="live-summary"><span>{{ devices.length }} 台</span><span class="live-chip ok">可达 {{ reachable }}</span><span v-if="noResponse" class="live-chip bad">无回应 {{ noResponse }}</span></span></div><div class="live-tools"><slot name="tools" /><span v-if="permitted" class="live-policy" aria-label="监控自动刷新设置">{{refreshPolicyLabel}}</span><button type="button" :disabled="state.busy || !permitted" @click="refresh">{{ state.busy ? '读取中…' : '刷新监控数据' }}</button></div></div>
   <p v-if="!permitted" role="status">当前账号没有资产读取权限。</p>
   <template v-else>
    <ApiErrorNotice :error="refreshPolicyError" @retry="refreshPolicy"/>

@@ -36,7 +36,8 @@ afterEach(() => { app?.unmount(); app = undefined; host?.remove(); session.value
 describe('D15 event page uses controller states and explicit human inputs', () => {
   it('mounts real-shaped data with no writes, exposes legal transitions and keeps empty root causes disabled', async () => {
     const { request } = ready(); mount(); await settle()
-    expect(host.textContent).toContain('PENDING_REVIEW'); expect(host.textContent).toContain('INFO_DEFAULT_SILENT')
+    expect(host.querySelector('[title="PENDING_REVIEW"]')?.textContent).toBe('待复核')
+    expect(host.querySelector('[title="INFO_DEFAULT_SILENT"]')?.textContent).toBe('信息级静默')
     expect(host.textContent).not.toContain('已定位根因并处理')
     expect(host.textContent).not.toContain('已确认生效')
     expect(host.textContent).toContain('已记录管理员确认')
@@ -66,7 +67,7 @@ describe('D15 event page uses controller states and explicit human inputs', () =
     data.events.push(other); mount(); await settle()
     await input(`root-cause-${e.id}`, '仅确认第一个事件原因')
     const otherField = document.getElementById(`root-cause-${other.id}`) as HTMLTextAreaElement
-    expect(otherField.value).toBe(''); expect(otherField.closest('td')!.querySelector<HTMLButtonElement>('button:last-child')!.disabled).toBe(true)
+    expect(otherField.value).toBe(''); expect(otherField.closest('details')!.querySelector<HTMLButtonElement>('button')!.disabled).toBe(true)
     expect(request).toHaveBeenCalledTimes(1)
   })
   it.each(['START', 'MARK_PENDING_REVIEW', 'CLOSE'] as const)('sends actual %s transition token from an explicit click', async action => {
@@ -152,7 +153,8 @@ describe('D15 page permissions and interrupted flows', () => {
     if (change === 'permissionVersion') session.value = { ...auth, permission_version: 4 }
     if (change === 'contextGeneration') contextGeneration.value++
     await settle(); expect(signal.aborted).toBe(true); first(data); await settle()
-    expect(host.querySelector('.event-workspace')).toBeNull()
+    expect(host.querySelector('.event-table-scroll')).toBeNull()
+    expect(host.querySelector('textarea')).toBeNull()
   })
   it('clears entered root cause when permission scope changes', async () => {
     const { data } = ready(), e = data.events.find(e => e.handling_state === 'PENDING_REVIEW')!

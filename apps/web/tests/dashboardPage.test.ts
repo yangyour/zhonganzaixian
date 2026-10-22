@@ -2,7 +2,7 @@
 // Component regressions; does not constitute browser acceptance.
 import { beforeEach, afterEach, it, expect, vi } from 'vitest'
 import { createApp, nextTick, type App } from 'vue'
-vi.mock('../src/components/LiveMonitoringPanel.vue',()=>({default:{props:['autoRefresh'],template:'<div data-panel="live">{{autoRefresh}}</div>'}}))
+vi.mock('../src/components/LiveMonitoringPanel.vue',()=>({default:{props:['autoRefresh'],template:'<div data-panel="live"><span data-refresh>{{autoRefresh}}</span><slot name="tools" /></div>'}}))
 vi.mock('../src/components/DashboardEventsPanel.vue',()=>({default:{template:'<div data-panel="events" />'}}))
 vi.mock('../src/components/DashboardReportsPanel.vue',()=>({default:{template:'<div data-panel="reports" />'}}))
 vi.mock('../src/components/DashboardWorkflowsPanel.vue',()=>({default:{template:'<div data-panel="workflows" />'}}))
@@ -17,7 +17,7 @@ beforeEach(()=>{session.value=structuredClone(auth);switchingTenant.value=false;
 afterEach(()=>{app.unmount();host.remove();session.value=null;vi.restoreAllMocks()})
 it('retains functional panels without placeholder KPIs or explanatory scaffolding',()=>{expect(host.querySelectorAll('[data-panel]')).toHaveLength(4);expect(host.querySelector('.dashboard-kpis,.formal-dashboard-status,.dashboard-explanation,.tenant-badge')).toBeNull();expect(host.querySelector('h1')?.textContent).toBe('运营总览')})
 it('does not poll unused dashboard projection',async()=>{const spy=vi.spyOn(api,'request');vi.useFakeTimers();await vi.advanceTimersByTimeAsync(90000);expect(spy).not.toHaveBeenCalled();vi.useRealTimers()})
-it('checkbox changes actual monitoring child prop without persistence',async()=>{const spy=vi.spyOn(api,'request');const input=host.querySelector('input')!;input.checked=false;input.dispatchEvent(new Event('change',{bubbles:true}));await nextTick();expect(host.querySelector('[data-panel="live"]')?.textContent).toBe('false');expect(spy).not.toHaveBeenCalled()})
+it('checkbox changes actual monitoring child prop without persistence',async()=>{const spy=vi.spyOn(api,'request');const input=host.querySelector('input')!;input.checked=false;input.dispatchEvent(new Event('change',{bubbles:true}));await nextTick();expect(host.querySelector('[data-refresh]')?.textContent).toBe('false');expect(spy).not.toHaveBeenCalled()})
 it.each(['assets:read','tickets:read'])('honors child capability loss: %s',async(cap)=>{session.value={...auth,capabilities:auth.capabilities.filter(c=>c!==cap)};await nextTick();expect(host.querySelector(cap==='assets:read'?'[data-panel="live"]':'[data-panel="reports"]')).toBeNull();expect(host.querySelector('[data-panel="events"]')).not.toBeNull()})
 it('removes all children when tenant switch starts',async()=>{switchingTenant.value=true;await nextTick();expect(host.querySelector('[data-panel]')).toBeNull();expect(host.textContent).toContain('已清除原范围数据')})
 it('removes all children on dashboard permission loss',async()=>{session.value={...auth,capabilities:[]};await nextTick();expect(host.querySelector('[data-panel]')).toBeNull()})

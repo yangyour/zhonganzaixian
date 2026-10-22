@@ -108,26 +108,20 @@ defineExpose({state,workspace,mayLeave,prepareChange,submitChange,recover,readLe
 </script>
 <template>
  <section class="service-tiers">
-  <div class="compact-page-toolbar page-heading proto-page-head">
-   <div>
-    <h1 class="page-title-sr" ref="ledgerHeading" tabindex="-1">服务档位与 SLA 时钟台账 </h1>
-    
-   </div>
-   <RouterLink to="/sla-scenarios" class="back">SLA 场景测算</RouterLink>
-  </div>
+  <h1 class="page-title-sr" ref="ledgerHeading" tabindex="-1">服务档位与 SLA 时钟台账 </h1>
   <p class="panel" v-if="!permitted">当前身份无权访问内部服务档位与 SLA 时钟台账，或正在切换租户。</p>
   <template v-else>
    
    
 
    <div class="proto-panel workspace">
-    <div class="proto-toolbar">
+    <div class="proto-toolbar content-toolbar">
      <div class="proto-tabs" aria-label="服务档位视图">
       <button type="button" :class="{active:tab==='ledger'}" :aria-pressed="tab==='ledger'" :disabled="locked" @click="tab='ledger'">档位快照与变更历史</button>
       <button type="button" :class="{active:tab==='sla'}" :aria-pressed="tab==='sla'" :disabled="locked" @click="tab='sla'">工单 SLA 冻结时钟核验</button>
      </div>
      <button v-if="tab==='ledger'" type="button" :disabled="locked" @click="readLedger()">刷新</button>
-    </div>
+    <div class="content-actions"><RouterLink to="/sla-scenarios" class="back">SLA 场景测算</RouterLink></div></div>
 
     <template v-if="tab==='ledger'">
 <div class="compact-result-summary">

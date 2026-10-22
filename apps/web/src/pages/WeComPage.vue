@@ -74,7 +74,8 @@ async function disableSelected(){
 async function disable(row:WeComBinding){if(!bindings.value.some(item=>item===row)||!row.active)return;if(locked.value||editor.dirty.value)return;await editor.save(`/wecom/bindings/${row.user_id}`,'PUT',{expected_version:row.version,wecom_user_id:row.wecom_user_id,active:false})}
 </script>
 <template><section :aria-busy="loading" class="identity-page admin-prototype wecom-page">
- <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">企业微信</h1></div><el-button :disabled="editor.busy()||loading||switchingTenant" @click="refresh">刷新</el-button></div>
+ <h1 class="page-title-sr">企业微信</h1>
+<div v-if="!status" class="content-actions content-actions-recovery"><el-button :disabled="editor.busy()||loading||switchingTenant" @click="refresh">刷新</el-button></div>
  <ApiErrorNotice v-if="error" :error="error"/><IdentityCommandNotice v-if="command.state!=='idle'||message" :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry"/>
  <p v-if="loading" role="status">正在读取企业微信配置…</p>
  <p v-if="error instanceof ApiError&&error.status===404" class="admin-card">当前租户尚未启用企业微信接入。请联系管理员配置应用。</p>
@@ -82,7 +83,7 @@ async function disable(row:WeComBinding){if(!bindings.value.some(item=>item===ro
  <el-button v-if="error&&readable()" :disabled="loading||editor.busy()" @click="refresh">重新读取配置</el-button>
  <p v-if="editor.dirty.value" role="status">绑定内容尚未保存。请保存绑定，或刷新并确认放弃后再执行其他操作。</p>
  <template v-if="status">
-  <section class="admin-card"><div class="admin-card-head"><h2>应用连接</h2><span>{{status.last_check.ready?'连接正常':status.last_check.reason==='NOT_CHECKED'?'尚未检查':'需要检查'}}</span></div>
+  <section class="admin-card"><div class="admin-card-head content-toolbar"><h2>应用连接</h2><span>{{status.last_check.ready?'连接正常':status.last_check.reason==='NOT_CHECKED'?'尚未检查':'需要检查'}}</span><div class="content-actions"><el-button :disabled="editor.busy()||loading||switchingTenant" @click="refresh">刷新</el-button></div></div>
    <dl class="admin-facts"><dt>企业 ID</dt><dd>{{status.corp_id}}</dd><dt>应用 ID</dt><dd>{{status.agent_id}}</dd><dt>应用名称</dt><dd>{{status.last_check.application_name??'尚未读取'}}</dd><dt>应用密钥</dt><dd>{{status.secret_configured?'已在服务端配置':'未配置'}}</dd><dt>消息发送</dt><dd>{{status.dispatch_enabled?'已启用':'未启用'}}</dd><dt>企业微信登录</dt><dd>{{status.login_enabled?'已启用':'未启用'}}</dd><dt>最近检查</dt><dd>{{status.last_check.checked_at?displayTime(status.last_check.checked_at):'尚未检查'}}</dd></dl>
    <p v-if="status.last_check.reason">{{wecomErrorLabels[status.last_check.reason]??status.last_check.reason}}</p>
    <div class="wecom-actions"><el-button :disabled="locked||editor.dirty.value" @click="check">检查应用连接</el-button><el-button :disabled="locked||editor.dirty.value||!status.dispatch_enabled||!status.test_user_id" @click="test">发送测试消息</el-button></div>

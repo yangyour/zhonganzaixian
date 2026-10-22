@@ -71,7 +71,7 @@ defineExpose({ cancelJobRead, retryJobRead, retryFormatRead, change, changeAck, 
 </script>
 <template>
  <section class="contact-import-page admin-prototype">
-  <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">联系人批量新建与作业</h1></div></div>
+  <h1 class="page-title-sr">联系人批量新建与作业</h1>
   
   <nav class="admin-tabs" aria-label="联系人工作区"><router-link to="/customer-contacts">联系人列表</router-link><span class="active">批量新建与作业</span><router-link to="/contact-import-preview">导入格式预览</router-link></nav>
   <el-empty v-if="!permitted" description="当前身份没有联系人批量新建权限" />

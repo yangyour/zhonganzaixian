@@ -30,7 +30,7 @@ defineExpose({ change: workspace.change, preview: workspace.preview, clearInput,
 </script>
 <template>
  <section class="preview-page admin-prototype">
-  <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">联系人导入格式预览</h1></div></div>
+  <h1 class="page-title-sr">联系人导入格式预览</h1>
   
   <nav class="admin-tabs" aria-label="联系人工作区"><router-link to="/customer-contacts">联系人列表</router-link><router-link to="/contact-imports">批量新建与作业</router-link><span class="active">导入格式预览</span></nav>
   <el-empty v-if="!permitted" description="当前身份没有联系人预览权限" />

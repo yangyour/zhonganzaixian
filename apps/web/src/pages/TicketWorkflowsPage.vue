@@ -129,7 +129,7 @@ onUnmounted(()=>{disposed=true;unregister();workspace.dispose();listGeneration++
   <section class="workflow-page">
     <p v-if="!readable()" role="status">当前没有工单读取权限，或正在切换租户；原范围数据已清除。</p>
     <p v-if="dirty" role="status">尚有未提交输入。刷新状态会保留输入；接单和开始处理不会提交说明，请核对当前状态后继续操作。</p><el-button v-if="dirty" :disabled="state.busy||workspace.unresolved()||confirming" @click="discardInputs">清空未提交输入</el-button>
-    <div class="compact-page-toolbar page-heading proto-page-head"><div><h1 class="page-title-sr">工单处理 </h1></div><el-button @click="router.push('/tickets')">查看报障台账</el-button></div>
+    <h1 class="page-title-sr">工单处理 </h1>
     <section v-if="ticketId&&readable()" class="panel workflow-detail" aria-label="工单处理详情">
       <div class="workflow-toolbar"><h2>{{ state.current?.title || '当前工单' }}</h2><el-button :disabled="state.busy||workspace.unresolved()" @click="refreshDetail">刷新状态</el-button></div>
       <ApiErrorNotice :error="state.error" />
@@ -174,7 +174,7 @@ onUnmounted(()=>{disposed=true;unregister();workspace.dispose();listGeneration++
       <p v-if="stateFilter!==appliedFilters.state||priorityFilter!==appliedFilters.priority" class="field-help">筛选修改尚未应用；下一页仍沿用已应用的筛选，请点击查询后再核对。</p>
       <ApiErrorNotice :error="listError" @retry="loadList(false,true)" /><p v-if="listLoading" role="status">正在读取工单列表…</p>
       <el-table v-if="!listLoading&&!listError" :data="list" v-loading="listLoading" empty-text="当前查询没有可显示的处理记录"><el-table-column label="工单" min-width="220"><template #default="{row}"><el-button link type="primary" :disabled="workspace.unresolved()" @click="router.replace({query:{ticket_id:row.ticket_id}})">{{ row.title }}</el-button></template></el-table-column><el-table-column label="优先级" prop="priority" width="90"/><el-table-column label="状态" width="130"><template #default="{row}">{{ workflowLabels[row.state as keyof typeof workflowLabels] }}</template></el-table-column><el-table-column label="响应截止" min-width="180"><template #default="{row}">{{ displayTime(row.response_due_at) }}</template></el-table-column><el-table-column label="恢复截止" min-width="180"><template #default="{row}">{{ displayTime(row.recovery_due_at) }}</template></el-table-column></el-table>
-      <div class="workflow-toolbar"><el-button :disabled="listLoading || !listPaged" @click="firstList">第一页</el-button><el-button :disabled="listLoading || !nextCursor" @click="loadList(true)">下一页</el-button><span class="field-help">每页 25 条</span></div>
+      <div class="workflow-toolbar content-toolbar"><el-button :disabled="listLoading || !listPaged" @click="firstList">第一页</el-button><el-button :disabled="listLoading || !nextCursor" @click="loadList(true)">下一页</el-button><span class="field-help">每页 25 条</span><div class="content-actions"><el-button @click="router.push('/tickets')">查看报障台账</el-button></div></div>
     </section>
   </section>
 </template>

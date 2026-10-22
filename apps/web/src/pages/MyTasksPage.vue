@@ -19,10 +19,10 @@ onUnmounted(()=>{disposed=true;workspace.dispose()})
 </script>
 <template>
 <section class="my-tasks-page" :aria-busy="state.busy">
- <header class="compact-page-toolbar"><div><h1 class="page-title-sr">我的待办</h1></div><router-link to="/dashboard" v-if="can('dashboard:read')">查看运营总览</router-link></header>
+ <h1 class="page-title-sr">我的待办</h1>
  <p v-if="!permitted" role="status">当前身份缺少内部工单读取或负责人筛选权限；未读取任务数据。</p>
  <template v-else>
-  <div class="task-toolbar"><label for="own-workflow-state">我的工单状态<select id="own-workflow-state" :value="state.filter" :disabled="state.busy" @change="select"><option v-for="(label,key) in ownWorkflowLabels" :key="key" :value="key">{{label}}</option></select></label><button ref="refreshButton" type="button" :disabled="state.busy" @click="read('refresh')">刷新我的工单</button><button v-if="state.busy" type="button" @click="cancel">取消读取我的工单</button><p ref="status" tabindex="-1" role="status" class="task-status">{{state.busy?'正在读取分派给当前账号的工单…':state.cancelled?'读取已取消，旧列表已清除。':state.error?'读取失败，未显示旧列表，可重试原页。':state.page?`${workflowLabels[state.filter]} · 第 ${state.pageNumber} 页，本页 ${state.page.items.length} 条${state.page.has_more?'，还有后续页':''}`:'尚无读取结果。'}}</p></div>
+  <div class="task-toolbar content-toolbar"><label for="own-workflow-state">我的工单状态<select id="own-workflow-state" :value="state.filter" :disabled="state.busy" @change="select"><option v-for="(label,key) in ownWorkflowLabels" :key="key" :value="key">{{label}}</option></select></label><button ref="refreshButton" type="button" :disabled="state.busy" @click="read('refresh')">刷新我的工单</button><button v-if="state.busy" type="button" @click="cancel">取消读取我的工单</button><p ref="status" tabindex="-1" role="status" class="task-status">{{state.busy?'正在读取分派给当前账号的工单…':state.cancelled?'读取已取消，旧列表已清除。':state.error?'读取失败，未显示旧列表，可重试原页。':state.page?`${workflowLabels[state.filter]} · 第 ${state.pageNumber} 页，本页 ${state.page.items.length} 条${state.page.has_more?'，还有后续页':''}`:'尚无读取结果。'}}</p><div class="content-actions"><router-link to="/dashboard" v-if="can('dashboard:read')">查看运营总览</router-link></div></div>
   <ApiErrorNotice :error="state.error" />
   <button v-if="state.canRetry" type="button" :disabled="state.busy" @click="read('retry')">重试原页我的工单</button>
   <template v-if="state.page">

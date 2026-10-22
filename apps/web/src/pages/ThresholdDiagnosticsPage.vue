@@ -37,7 +37,7 @@ defineExpose({ change, analyze, clearInput, state })
 </script>
 <template>
  <section class="threshold-page">
-  <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">告警阈值规则诊断</h1></div><div class="toolbar-links"><router-link v-if="permitted" class="observation-entry" to="/observation-window-diagnostics">采样观察窗诊断</router-link><router-link to="/configurations">返回配置提案</router-link></div></div>
+  <h1 class="page-title-sr">告警阈值规则诊断</h1>
   <el-empty v-if="!permitted" description="仅当前平台配置管理员可以诊断共享阈值候选" />
   <template v-else>
    
@@ -49,7 +49,7 @@ defineExpose({ change, analyze, clearInput, state })
     <p>触发持续时长：{{ state.result.inputs.trigger_hold_seconds === null ? '未确认' : state.result.inputs.trigger_hold_seconds + ' 秒' }}；恢复持续时长：{{ state.result.inputs.recovery_hold_seconds === null ? '未确认' : state.result.inputs.recovery_hold_seconds + ' 秒' }}</p>
     <h3>精确关系检查</h3><dl class="relations"><dt>比较符方向一致</dt><dd>{{ booleanText(state.result.direction_consistent) }}</dd><dt>严重条件比警告更严格</dt><dd>{{ booleanText(state.result.critical_strict_subset_of_warning) }}</dd><dt>恢复与警告存在交集</dt><dd>{{ booleanText(state.result.recovery_overlaps_warning) }}</dd><dt>恢复与严重存在交集</dt><dd>{{ booleanText(state.result.recovery_overlaps_critical) }}</dd><dt>两个持续时长均非负</dt><dd>{{ booleanText(state.result.durations_nonnegative) }}</dd></dl>
     
-   </section></div><aside class="threshold-side"><section class="threshold-panel"><div class="panel-heading"><h2>候选阈值输入</h2><span>仅校验，不会直接下发至生产监控</span></div>
+   </section></div><aside class="threshold-side"><section class="threshold-panel"><div class="panel-heading content-toolbar"><h2>候选阈值输入</h2><span>仅校验，不会直接下发至生产监控</span><div class="content-actions"><div class="toolbar-links"><router-link v-if="permitted" class="observation-entry" to="/observation-window-diagnostics">采样观察窗诊断</router-link><router-link to="/configurations">返回配置提案</router-link></div></div></div>
     <details><summary>JSON 结构示例</summary><pre>{{ example }}</pre><p>direction 可选 HIGH_IS_BAD / LOW_IS_BAD / null；comparison 可选 GT（&gt;）、GE（≥）、LT（&lt;）、LE（≤）或 null。单位按字面一致性核对，不自动执行跨单位换算。</p></details>
     <el-input type="textarea" :rows="16" :model-value="state.text" :disabled="discarding" aria-label="阈值候选原始JSON" placeholder="请粘贴阈值候选 JSON（未确认项保持 null；请勿填写密码、Token 或密钥）" @update:model-value="change($event)" />
     <p class="help">≤16KiB · 3 层嵌套 · 256 个 Token · 小数最多 40 位整数 / 40 位小数</p>

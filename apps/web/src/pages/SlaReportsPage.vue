@@ -99,25 +99,19 @@ defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyE
 </script>
 <template>
  <section class="sla-reports">
-  <div class="compact-page-toolbar page-heading proto-page-head">
-   <div>
-    <h1 class="page-title-sr">SLA 月度报表与赔付试算 </h1>
-    
-   </div>
-   <RouterLink to="/oncall-board" class="back">值班看板</RouterLink>
-  </div>
+  <h1 class="page-title-sr">SLA 月度报表与赔付试算 </h1>
   <p class="panel" v-if="!permitted">当前身份无权访问内部 SLA 月报与赔付台账，或正在切换租户。</p>
   <template v-else>
    
 
-   <div class="proto-toolbar">
+   <div class="proto-toolbar content-toolbar">
     <form class="period-bar" @submit.prevent="queryReport">
      <label>统计月份
       <input type="month" v-model="periodInput" :disabled="locked" required />
      </label>
      <button ref="queryButton" type="submit" :disabled="locked">查询月报</button>
     </form>
-   </div>
+   <div class="content-actions"><RouterLink to="/oncall-board" class="back">值班看板</RouterLink></div></div>
 
    <p v-if="!periodInput">请明确选择统计月份；不会自动查询或保存预设月份。</p>
    <p v-if="state.report&&periodInput!==state.report.period" role="status">月份输入已改变。当前显示仍为 {{state.report.period}}，请先查询新月份；不能跨期保存或导出。</p>

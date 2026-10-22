@@ -27,11 +27,11 @@ onUnmounted(()=>{clearInterval(timer);unregister();window.removeEventListener('b
 defineExpose({state,workspace,mayLeave})
 </script>
 <template>
- <section class="export-inbox"><div class="compact-page-toolbar page-heading proto-page-head"><div><h1 class="page-title-sr">我的导出消息 </h1></div><RouterLink to="/asset-export-jobs" class="export-back">台账导出</RouterLink></div>
+ <section class="export-inbox"><h1 class="page-title-sr">我的导出消息 </h1>
   <p class="panel" v-if="!permitted">当前身份没有导出消息权限，或正在切换租户。</p>
   <template v-else>
    
-   <div class="proto-panel inbox-workspace"><div class="proto-toolbar"><div class="proto-tabs" aria-label="导出消息筛选"><button type="button" :class="{ active: !state.unreadOnly }" :aria-pressed="!state.unreadOnly" :disabled="locked" @click="workspace.list(false)">全部消息</button><button type="button" :class="{ active: state.unreadOnly }" :aria-pressed="state.unreadOnly" :disabled="locked" @click="workspace.list(true)">未读消息</button></div><button type="button" :disabled="locked" @click="workspace.list()">刷新消息</button></div>
+   <div class="proto-panel inbox-workspace"><div class="proto-toolbar content-toolbar"><div class="proto-tabs" aria-label="导出消息筛选"><button type="button" :class="{ active: !state.unreadOnly }" :aria-pressed="!state.unreadOnly" :disabled="locked" @click="workspace.list(false)">全部消息</button><button type="button" :class="{ active: state.unreadOnly }" :aria-pressed="state.unreadOnly" :disabled="locked" @click="workspace.list(true)">未读消息</button></div><button type="button" :disabled="locked" @click="workspace.list()">刷新消息</button><div class="content-actions"><RouterLink to="/asset-export-jobs" class="export-back">台账导出</RouterLink></div></div>
    
    <ApiErrorNotice :error="state.error" :on-retry="state.page===null&&state.readRequest&&!state.attempt?workspace.retryRead:undefined" :retrying="state.busy==='read'" retry-label="重新加载" />
    <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">{{state.attempt?.kind==='grant'?'下载授权':'标记已读'}}的结果尚未确认，请点击下方按钮重试。</p><button v-if="state.attempt&&!state.busy" type="button" @click="recover">{{state.attempt.kind==='grant'?'重试获取链接':'重试标记已读'}}</button>

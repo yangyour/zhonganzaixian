@@ -72,14 +72,15 @@ async function disableSelected(){
 async function disable(row:EmailBinding){if(!bindings.value.some(item=>item===row)||!row.active)return;if(!locked.value&&!editor.dirty.value)await editor.save(`/email/bindings/${row.user_id}`,'PUT',{expected_version:row.version,email:row.email,active:false})}
 </script>
 <template><section :aria-busy="loading" class="identity-page admin-prototype email-page">
- <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">邮件通知</h1></div><el-button :disabled="editor.busy()||loading||switchingTenant" @click="refresh">刷新</el-button></div>
+ <h1 class="page-title-sr">邮件通知</h1>
+<div v-if="!status" class="content-actions content-actions-recovery"><el-button :disabled="editor.busy()||loading||switchingTenant" @click="refresh">刷新</el-button></div>
  <ApiErrorNotice v-if="error" :error="error"/><IdentityCommandNotice v-if="command.state!=='idle'||message" :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry"/>
  <p v-if="loading" role="status">正在读取邮件配置…</p><p v-if="error instanceof ApiError&&error.status===404" class="admin-card">当前租户尚未启用邮件通知，请联系管理员配置。</p>
  <p v-if="!readable()" role="status">当前没有读取邮件配置的权限。</p>
  <el-button v-if="error&&readable()" :disabled="loading||editor.busy()" @click="refresh">重新读取配置</el-button>
  <p v-if="editor.dirty.value" role="status">绑定内容尚未保存。请保存绑定，或刷新并确认放弃后再执行其他操作。</p>
  <template v-if="status">
-  <section class="admin-card"><div class="admin-card-head"><h2>发件连接</h2><span>{{status.last_check.ready?'连接正常':status.last_check.reason==='NOT_CHECKED'?'尚未检查':'需要检查'}}</span></div>
+  <section class="admin-card"><div class="admin-card-head content-toolbar"><h2>发件连接</h2><span>{{status.last_check.ready?'连接正常':status.last_check.reason==='NOT_CHECKED'?'尚未检查':'需要检查'}}</span><div class="content-actions"><el-button :disabled="editor.busy()||loading||switchingTenant" @click="refresh">刷新</el-button></div></div>
    <dl class="admin-facts"><dt>发件邮箱</dt><dd>{{status.sender}}</dd><dt>发件名称</dt><dd>{{status.sender_name}}</dd><dt>邮件服务器</dt><dd>{{status.smtp_host}}:{{status.smtp_port}}</dd><dt>加密连接</dt><dd>SSL/TLS，校验证书</dd><dt>邮箱凭据</dt><dd>{{status.secret_configured?'已在服务端配置':'未配置'}}</dd><dt>人工发送</dt><dd>{{status.dispatch_enabled?'已启用':'未启用'}}</dd><dt>自动业务通知</dt><dd>{{status.automatic_notifications_enabled?'已启用':'未启用'}}</dd><dt>最近检查</dt><dd>{{status.last_check.checked_at?displayTime(status.last_check.checked_at):'尚未检查'}}</dd></dl>
    <p v-if="status.last_check.reason">{{emailErrorLabels[status.last_check.reason]??status.last_check.reason}}</p>
    <div class="email-actions"><el-button :disabled="locked||editor.dirty.value" @click="check">检查邮件连接</el-button><el-button :disabled="locked||editor.dirty.value||!status.dispatch_enabled" @click="test">发送测试邮件</el-button><span>测试收件人：{{status.test_recipient}}</span></div>

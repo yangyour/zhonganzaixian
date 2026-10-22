@@ -1,0 +1,782 @@
+{
+  "browser": "155.0.4283.62",
+  "cases": [
+    {
+      "path": "/account",
+      "width": 1440,
+      "actualPath": "/account",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/identity/users",
+      "width": 1440,
+      "actualPath": "/identity/users",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/identity/roles",
+      "width": 1440,
+      "actualPath": "/identity/roles",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 2
+    },
+    {
+      "path": "/wecom",
+      "width": 1440,
+      "actualPath": "/wecom",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/email",
+      "width": 1440,
+      "actualPath": "/email",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/identity/settings",
+      "width": 1440,
+      "actualPath": "/identity/settings",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/dashboard",
+      "width": 1440,
+      "actualPath": "/dashboard",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/assets",
+      "width": 1440,
+      "actualPath": "/assets",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 5
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 1440,
+      "actualPath": "/network-monitoring",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 2
+    },
+    {
+      "path": "/monitoring-events",
+      "width": 1440,
+      "actualPath": "/monitoring-events",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/manual-incidents",
+      "width": 1440,
+      "actualPath": "/manual-incidents",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/tickets",
+      "width": 1440,
+      "actualPath": "/tickets",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/my-tasks",
+      "width": 1440,
+      "actualPath": "/my-tasks",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/ticket-workflows",
+      "width": 1440,
+      "actualPath": "/ticket-workflows",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/ticket-notifications",
+      "width": 1440,
+      "actualPath": "/ticket-notifications",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/my-notification-preferences",
+      "width": 1440,
+      "actualPath": "/my-notification-preferences",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/my-export-messages",
+      "width": 1440,
+      "actualPath": "/my-export-messages",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/asset-export-jobs",
+      "width": 1440,
+      "actualPath": "/asset-export-jobs",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/my-worklogs",
+      "width": 1440,
+      "actualPath": "/assets",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 5
+    },
+    {
+      "path": "/sla-scenarios",
+      "width": 1440,
+      "actualPath": "/sla-scenarios",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/service-tiers",
+      "width": 1440,
+      "actualPath": "/service-tiers",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/oncall-board",
+      "width": 1440,
+      "actualPath": "/oncall-board",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/sla-reports",
+      "width": 1440,
+      "actualPath": "/sla-reports",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/runtime-configurations",
+      "width": 1440,
+      "actualPath": "/runtime-configurations",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/configurations",
+      "width": 1440,
+      "actualPath": "/configurations",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 2
+    },
+    {
+      "path": "/observation-window-diagnostics",
+      "width": 1440,
+      "actualPath": "/observation-window-diagnostics",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/threshold-diagnostics",
+      "width": 1440,
+      "actualPath": "/threshold-diagnostics",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 2
+    },
+    {
+      "path": "/contact-imports",
+      "width": 1440,
+      "actualPath": "/contact-imports",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/contact-import-preview",
+      "width": 1440,
+      "actualPath": "/contact-import-preview",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/inspection-templates",
+      "width": 1440,
+      "actualPath": "/inspection-templates",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/backup-plan-drafts",
+      "width": 1440,
+      "actualPath": "/backup-plan-drafts",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/change-notice-drafts",
+      "width": 1440,
+      "actualPath": "/change-notice-drafts",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/inspection-quarterly-reports",
+      "width": 1440,
+      "actualPath": "/inspection-quarterly-reports",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/inspection-source-collections",
+      "width": 1440,
+      "actualPath": "/inspection-source-collections",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/inspection-worksheets",
+      "width": 1440,
+      "actualPath": "/inspection-worksheets",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/customer-contacts",
+      "width": 1440,
+      "actualPath": "/customer-contacts",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/operational-comparison",
+      "width": 1440,
+      "actualPath": "/operational-comparison",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/capacity-estimates",
+      "width": 1440,
+      "actualPath": "/capacity-estimates",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 2
+    },
+    {
+      "path": "/capability-catalog",
+      "width": 1440,
+      "actualPath": "/capability-catalog",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 2
+    },
+    {
+      "path": "/tenant-inventory",
+      "width": 1440,
+      "actualPath": "/tenant-inventory",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/audit",
+      "width": 1440,
+      "actualPath": "/audit",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/account",
+      "width": 390,
+      "actualPath": "/account",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/identity/users",
+      "width": 390,
+      "actualPath": "/identity/users",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/identity/roles",
+      "width": 390,
+      "actualPath": "/identity/roles",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 2
+    },
+    {
+      "path": "/wecom",
+      "width": 390,
+      "actualPath": "/wecom",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/email",
+      "width": 390,
+      "actualPath": "/email",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/identity/settings",
+      "width": 390,
+      "actualPath": "/identity/settings",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/dashboard",
+      "width": 390,
+      "actualPath": "/dashboard",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/assets",
+      "width": 390,
+      "actualPath": "/assets",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 5
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 390,
+      "actualPath": "/network-monitoring",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 2
+    },
+    {
+      "path": "/monitoring-events",
+      "width": 390,
+      "actualPath": "/monitoring-events",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/manual-incidents",
+      "width": 390,
+      "actualPath": "/manual-incidents",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/tickets",
+      "width": 390,
+      "actualPath": "/tickets",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/my-tasks",
+      "width": 390,
+      "actualPath": "/my-tasks",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/ticket-workflows",
+      "width": 390,
+      "actualPath": "/ticket-workflows",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/ticket-notifications",
+      "width": 390,
+      "actualPath": "/ticket-notifications",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/my-notification-preferences",
+      "width": 390,
+      "actualPath": "/my-notification-preferences",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/my-export-messages",
+      "width": 390,
+      "actualPath": "/my-export-messages",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/asset-export-jobs",
+      "width": 390,
+      "actualPath": "/asset-export-jobs",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/my-worklogs",
+      "width": 390,
+      "actualPath": "/assets",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 5
+    },
+    {
+      "path": "/sla-scenarios",
+      "width": 390,
+      "actualPath": "/sla-scenarios",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/service-tiers",
+      "width": 390,
+      "actualPath": "/service-tiers",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/oncall-board",
+      "width": 390,
+      "actualPath": "/oncall-board",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/sla-reports",
+      "width": 390,
+      "actualPath": "/sla-reports",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/runtime-configurations",
+      "width": 390,
+      "actualPath": "/runtime-configurations",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/configurations",
+      "width": 390,
+      "actualPath": "/configurations",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 2
+    },
+    {
+      "path": "/observation-window-diagnostics",
+      "width": 390,
+      "actualPath": "/observation-window-diagnostics",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/threshold-diagnostics",
+      "width": 390,
+      "actualPath": "/threshold-diagnostics",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 2
+    },
+    {
+      "path": "/contact-imports",
+      "width": 390,
+      "actualPath": "/contact-imports",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/contact-import-preview",
+      "width": 390,
+      "actualPath": "/contact-import-preview",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/inspection-templates",
+      "width": 390,
+      "actualPath": "/inspection-templates",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/backup-plan-drafts",
+      "width": 390,
+      "actualPath": "/backup-plan-drafts",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/change-notice-drafts",
+      "width": 390,
+      "actualPath": "/change-notice-drafts",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/inspection-quarterly-reports",
+      "width": 390,
+      "actualPath": "/inspection-quarterly-reports",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/inspection-source-collections",
+      "width": 390,
+      "actualPath": "/inspection-source-collections",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/inspection-worksheets",
+      "width": 390,
+      "actualPath": "/inspection-worksheets",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/customer-contacts",
+      "width": 390,
+      "actualPath": "/customer-contacts",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/operational-comparison",
+      "width": 390,
+      "actualPath": "/operational-comparison",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/capacity-estimates",
+      "width": 390,
+      "actualPath": "/capacity-estimates",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 2
+    },
+    {
+      "path": "/capability-catalog",
+      "width": 390,
+      "actualPath": "/capability-catalog",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 2
+    },
+    {
+      "path": "/tenant-inventory",
+      "width": 390,
+      "actualPath": "/tenant-inventory",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/audit",
+      "width": 390,
+      "actualPath": "/audit",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 1
+    },
+    {
+      "path": "/assets",
+      "width": 320,
+      "actualPath": "/assets",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 5
+    },
+    {
+      "path": "/monitoring-events",
+      "width": 320,
+      "actualPath": "/monitoring-events",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    },
+    {
+      "path": "/assets",
+      "width": 768,
+      "actualPath": "/assets",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 5
+    },
+    {
+      "path": "/monitoring-events",
+      "width": 768,
+      "actualPath": "/monitoring-events",
+      "titleHidden": true,
+      "overflow": false,
+      "oldTitleBars": 0,
+      "actionCount": 0
+    }
+  ],
+  "pageErrors": [],
+  "blockedBusinessWrites": 0,
+  "liveEventAxeViolations": 0
+}

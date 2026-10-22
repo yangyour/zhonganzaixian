@@ -53,12 +53,12 @@ const errorText=(s:string)=>({AUTHORIZATION_CHANGED:'原受理授权已变化',S
 defineExpose({form,state,acknowledge,locked,autoRefresh,pollPreparation,filters,change,changeAck,submit,retry,browse,select,beginNew,unlockRejected,discard,cancelRead,retryRead,hasUnresolved:workspace.unresolved})
 </script>
 <template>
- <section class="export-page"><div class="compact-page-toolbar page-heading proto-page-head"><div><h1 class="page-title-sr">资产台账导出 </h1></div><button v-if="permitted" class="export-create" type="button" @click="formOpen=true">新建导出请求</button></div>
+ <section class="export-page"><h1 class="page-title-sr">资产台账导出 </h1>
  
  <p v-if="!permitted" class="panel">当前身份没有内部导出准备权限，或租户正在切换；未展示旧数据</p>
  <template v-else>
   
-  <section class="panel export-list"><div class="actions"><h2>我的导出作业</h2><button type="button" :disabled="busy" @click="browse()">刷新任务列表</button></div><p v-if="!state.page">{{state.busy==='read'?'正在加载任务列表…':state.error?'任务列表加载未完成':'暂未加载任务列表'}}</p>
+  <section class="panel export-list"><div class="actions content-toolbar"><h2>我的导出作业</h2><button type="button" :disabled="busy" @click="browse()">刷新任务列表</button><div class="content-actions"><button v-if="permitted" class="export-create" type="button" @click="formOpen=true">新建导出请求</button></div></div><p v-if="!state.page">{{state.busy==='read'?'正在加载任务列表…':state.error?'任务列表加载未完成':'暂未加载任务列表'}}</p>
    <template v-else><p class="export-count">{{state.paged?'续页':'第一页'}} · 本页 {{state.page.items.length}} 条</p><p v-if="!state.page.items.length">当前筛选范围内暂无导出作业记录</p><div class="proto-table-wrap"><table class="job-cards proto-table"><thead><tr><th>导出作业</th><th>准备状态</th><th>筛选文本</th><th>创建时间</th><th>操作</th></tr></thead><tbody><tr v-for="job in state.page.items" :key="job.id"><td><span class="export-file-icon">X</span><span>设备台账 XLSX</span><small>{{job.id}} · v{{job.version}}</small></td><td><span class="proto-badge">{{statusText(job.status)}}</span></td><td>{{valueText(job.filters.query)}}</td><td>{{displayTime(job.created_at)}}<span class="proto-sub">Asia/Shanghai</span></td><td><button class="proto-link" type="button" :disabled="busy" @click="select(job.id)">读取当前进度</button></td></tr></tbody></table></div><button type="button" :disabled="busy||!state.page.has_more" @click="browse(true)">下一页本人作业</button></template>
   </section>
   <details class="export-compose proto-panel" :open="formOpen || dirty || !!state.attempt" @toggle="formOpen=($event.target as HTMLDetailsElement).open"><summary>新建导出</summary>

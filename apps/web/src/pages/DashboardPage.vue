@@ -11,14 +11,13 @@ const contextKey = computed(() => JSON.stringify([contextGeneration.value, sessi
 </script>
 <template>
  <section class="dashboard-page" aria-labelledby="dashboard-title">
-  <div class="compact-page-toolbar dashboard-toolbar">
-   <h1 id="dashboard-title" class="page-title-sr">运营总览</h1>
-   <label v-if="permitted && can('assets:read')" class="auto-refresh"><input v-model="autoRefresh" type="checkbox" aria-label="启用监控自动刷新" />自动刷新监控</label>
-  </div>
+  <h1 id="dashboard-title" class="page-title-sr">运营总览</h1>
   <p v-if="!permitted" role="alert" class="dashboard-blocked">当前会话不可读取运营总览，或正在切换租户；已清除原范围数据</p>
   <div v-else :key="contextKey" class="dashboard-grid">
    <div class="dashboard-col dashboard-main">
-    <LiveMonitoringPanel v-if="can('assets:read')" :auto-refresh="autoRefresh" />
+    <LiveMonitoringPanel v-if="can('assets:read')" :auto-refresh="autoRefresh">
+     <template #tools><label class="auto-refresh"><input v-model="autoRefresh" type="checkbox" aria-label="启用监控自动刷新" />自动刷新监控</label></template>
+    </LiveMonitoringPanel>
     <DashboardWorkflowsPanel v-if="can('tickets:read')" />
    </div>
    <div class="dashboard-col dashboard-side">

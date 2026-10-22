@@ -16,11 +16,13 @@
   --ws-accent: #2165c5;
 }
 
-/* Page header: visible title on the left, page actions on the right. */
-.prototype-shell #main-content .page-title-sr {
-  position: static !important; width: auto !important; height: auto !important; margin: 0 !important; padding: 0 !important;
-  overflow: visible !important; clip-path: none !important; white-space: normal !important; border: 0 !important;
-  font-size: 18px; line-height: 28px; font-weight: 600; color: var(--ws-title); letter-spacing: 0; outline: none;
+/* The breadcrumb names the page. Keep h1 for screen readers and route focus
+   without bringing back a duplicate title row, including after navigation. */
+.prototype-shell #main-content .page-title-sr,
+.prototype-shell #main-content .page-title-sr:focus {
+  position: absolute !important; width: 1px !important; height: 1px !important;
+  margin: -1px !important; padding: 0 !important; overflow: hidden !important;
+  clip-path: inset(50%) !important; white-space: nowrap !important; border: 0 !important;
 }
 .prototype-shell #main-content h1[tabindex="-1"]:focus { outline: none; }
 .prototype-shell #main-content h1:focus-visible { outline: 2px solid var(--mop-focus); outline-offset: 3px; border-radius: 4px; }
@@ -32,8 +34,24 @@
 .prototype-shell #main-content .compact-page-toolbar > :first-child:is(.el-button, button, a, label, .actions, nav) { margin-right: 0; }
 .prototype-shell #main-content .compact-page-toolbar :is(.actions, .page-actions) { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; }
 .prototype-shell #main-content .compact-page-toolbar .el-button + .el-button { margin-left: 0; }
-.prototype-shell #main-content > section > h1.page-title-sr:first-child,
-.prototype-shell #main-content > div > h1.page-title-sr:first-child { margin: 4px 0 12px !important; }
+/* Page actions belong to the relevant content/filter toolbar. */
+.prototype-shell #main-content .content-toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-width: 0;
+}
+.prototype-shell #main-content .content-actions {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  min-width: 0; max-width: 100%; margin-left: auto;
+}
+.prototype-shell #main-content .content-actions > :is(div, nav) {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px; min-width: 0;
+}
+.prototype-shell #main-content .content-actions .el-button + .el-button { margin-left: 0; }
+.prototype-shell #main-content .content-actions a { display: inline-flex; align-items: center; min-height: var(--ctl-h, 32px); }
+.prototype-shell #main-content .content-actions-recovery { margin-bottom: 8px; }
+.prototype-shell #main-content .content-toolbar > h2 { margin: 0; }
+.prototype-shell #main-content .content-toolbar .network-refresh-actions { justify-content: flex-end; }
+.prototype-shell #main-content .content-toolbar .network-refresh-actions p { margin: 0; }
+.prototype-shell #main-content .content-toolbar .network-policy { font-size: 12px; }
 
 /* Cards */
 .prototype-shell #main-content :is(.panel, .proto-panel, .admin-card, .identity-card, .live-monitoring, .dashboard-events, .dashboard-reports, .dashboard-workflows, .ws-card) {
@@ -95,7 +113,8 @@
 /* Buttons, fields, dialogs and drawers: styles/controls.css */
 
 @media (max-width: 760px) {
-  .prototype-shell #main-content .page-title-sr { font-size: 17px; }
+  .prototype-shell #main-content .content-actions { margin-left: 0; }
+  .prototype-shell #main-content .content-actions > * { max-width: 100%; }
   .prototype-shell #main-content .compact-page-toolbar { align-items: flex-start; }
   .prototype-shell #main-content .compact-page-toolbar > :first-child { flex-basis: 100%; }
 }

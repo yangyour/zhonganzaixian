@@ -1,0 +1,51 @@
+(node:8) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @mop/web@0.1.0 test
+> vitest run tests/projectIdentity.test.ts
+
+(node:21) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.11 /workspace/scratch/390b70bf66c8/zhonganzaixian-integrated/apps/web
+
+(node:39) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ tests/projectIdentity.test.ts (16 tests | 2 failed) 27ms
+     × reports local key failure as not sent without throwing or disclosing the exception 4ms
+     × fixes the original payload before a key generator can change the caller object 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/projectIdentity.test.ts > local identity request preparation > reports local key failure as not sent without throwing or disclosing the exception
+Error: synthetic-secret-in-exception
+ ❯ tests/projectIdentity.test.ts:94:143
+
+ ❯ Object.submit src/utils/projectIdentity.ts:92:19
+ ❯ tests/projectIdentity.test.ts:94:204
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/projectIdentity.test.ts > local identity request preparation > fixes the original payload before a key generator can change the caller object
+AssertionError: expected { expected_version: 7, …(1) } to deeply equal { expected_version: 7, …(1) }
+
+- Expected
++ Received
+
+  {
+    "expected_version": 7,
+-   "new_password": "synthetic-memory-only",
++   "new_password": "changed by key factory",
+  }
+
+ ❯ tests/projectIdentity.test.ts:97:356
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 14 passed (16)
+   Start at  18:13:56
+   Duration  356ms (transform 131ms, setup 0ms, import 156ms, tests 27ms, environment 0ms)
+

@@ -85,11 +85,17 @@ export function createIdentityCommand(client: Pick<ApiClient, 'request'>, notify
   return {
     async submit(path: string, method: string, body: unknown) {
       if (disposed || ['sending', 'uncertain'].includes(value.state)) return false
+      // Snapshot before callbacks can alter the caller's original intent.
+      const originalGeneration=generation;let snapshot:unknown,prepared=true
+      try { snapshot=structuredClone(body) } catch { prepared=false }
+      if(disposed||originalGeneration!==generation)return false
       // clear() notifies synchronously; a callback may replace or dispose this intent.
       const turn = generation + 1
       clear()
       if (disposed || turn !== generation || value.state !== 'idle') return false
-      const key = keyFactory(), snapshot = structuredClone(body)
+      let key:string
+      try { if(!prepared)throw new Error('Invalid request payload');key=keyFactory();if(typeof key!=='string'||!key.trim()||key.length>128)throw new Error('Invalid request key') }
+      catch { if(!disposed&&turn===generation){value.state='rejected';value.error=new ApiError(0,'REQUEST_PREPARATION_FAILED','请求尚未发送，请核对输入并重新提交；原输入未清除','—');emit()}return false }
       if (disposed || turn !== generation) return false
       value.path = path; value.method = method; value.key = key; value.body = snapshot; return run()
     },

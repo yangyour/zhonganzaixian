@@ -30,7 +30,8 @@ async function load() {
   } catch (e) { if (current() && !isCancelled(e)) error.value = e; return false }
   finally { if (turn === generation) { controller = null; loading.value = false } }
 }
-const editor = useIdentityEditor(load), command = editor.command, message = editor.message
+const editor = useIdentityEditor(load,{snapshot:inputSnapshot,preserveUnknown:true}), command = editor.command, message = editor.message
+function inputSnapshot(){return JSON.stringify([scope.value,policy.value,provider.value])}
 function clearView() {
   generation++; controller?.abort(); controller = null
   policy.value = null; provider.value = null; error.value = null; loading.value = false; editor.clear()
@@ -38,8 +39,8 @@ function clearView() {
 watch(scope, clearView, { flush: 'sync' })
 onMounted(load); onUnmounted(() => { disposed = true; clearView() })
 async function refresh() {
-  const owner = scope.value
-  if (!readable() || editor.busy() || !await editor.leave() || owner !== scope.value) return
+  const owner = scope.value, before=inputSnapshot()
+  if (!readable() || editor.busy() || !await editor.leave() || owner !== scope.value || before!==inputSnapshot()) return
   editor.clear(); await load()
 }
 function number(key: typeof fields[number]['key'], event: Event) { const value = (event.target as HTMLInputElement).value; if (policy.value) policy.value[key] = value === '' ? null : Number(value); editor.dirty.value = true }

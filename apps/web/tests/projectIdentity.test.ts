@@ -89,3 +89,32 @@ describe('identity command notification reentrancy', () => {
     expect(request).not.toHaveBeenCalled(); expect(editor.unresolved()).toBe(false)
   })
 })
+describe('local identity request preparation',()=>{
+ it('reports local key failure as not sent without throwing or disclosing the exception',async()=>{
+  const request=vi.fn(),notify=vi.fn();const editor=createIdentityCommand({request} as unknown as Pick<ApiClient,'request'>,notify,()=>{throw Error('synthetic-secret-in-exception')});expect(await editor.submit(`/identity/users/${id}/password`,'POST',reset)).toBe(false);expect(request).not.toHaveBeenCalled();expect(editor.unresolved()).toBe(false);expect(notify.mock.calls.at(-1)![0].state).toBe('rejected');expect(notify.mock.calls.at(-1)![0].error.code).toBe('REQUEST_PREPARATION_FAILED');expect(JSON.stringify(notify.mock.calls)).not.toContain('synthetic-secret-in-exception');expect(JSON.stringify(notify.mock.calls)).not.toContain(reset.new_password)
+ })
+ it('fixes the original payload before a key generator can change the caller object',async()=>{
+  const request=vi.fn().mockResolvedValue(receipt),body={...reset};const editor=createIdentityCommand({request} as unknown as Pick<ApiClient,'request'>,()=>{},()=>{body.new_password='changed by key factory';return 'original-key'});expect(await editor.submit(`/identity/users/${id}/password`,'POST',body)).toBe(true);expect(request.mock.calls[0]![1].body).toEqual(reset)
+ })
+})
+it('a preparation failure can be corrected and submitted with a fresh local key',async()=>{
+ const request=vi.fn().mockResolvedValue(receipt),notify=vi.fn();let fail=true;const editor=createIdentityCommand({request} as unknown as Pick<ApiClient,'request'>,notify,()=>{if(fail)throw Error('local');return 'new-key'});expect(await editor.submit(`/identity/users/${id}/password`,'POST',reset)).toBe(false);expect(await editor.retry()).toBe(false);fail=false;expect(await editor.submit(`/identity/users/${id}/password`,'POST',reset)).toBe(true);expect(request).toHaveBeenCalledTimes(1);expect(request.mock.calls[0]![1].idempotencyKey).toBe('new-key')
+})
+it('uncloneable input is rejected locally without generating a key or retaining a body',async()=>{
+ const request=vi.fn(),notify=vi.fn(),key=vi.fn(()=> 'key');const editor=createIdentityCommand({request} as unknown as Pick<ApiClient,'request'>,notify,key);expect(await editor.submit('/identity/roles','POST',{bad:()=>{}})).toBe(false);expect(key).not.toHaveBeenCalled();expect(request).not.toHaveBeenCalled();expect(notify.mock.calls.at(-1)![0].body).toBeNull();expect(editor.unresolved()).toBe(false)
+})
+it('a key failure after disposal does not restore an error into the cleared command',async()=>{
+ const request=vi.fn(),notify=vi.fn();let editor:ReturnType<typeof createIdentityCommand>;editor=createIdentityCommand({request} as unknown as Pick<ApiClient,'request'>,notify,()=>{editor.dispose();throw Error('synthetic')});expect(await editor.submit('/identity/roles','POST',{})).toBe(false);expect(request).not.toHaveBeenCalled();expect(notify.mock.calls.at(-1)![0].state).toBe('idle');expect(notify.mock.calls.at(-1)![0].error).toBeNull()
+})
+it('an empty request key is a local preparation error, never an unresolved send',async()=>{
+ const request=vi.fn(),notify=vi.fn();const editor=createIdentityCommand({request} as unknown as Pick<ApiClient,'request'>,notify,()=> '');expect(await editor.submit('/identity/roles','POST',{})).toBe(false);expect(request).not.toHaveBeenCalled();expect(editor.unresolved()).toBe(false);expect(notify.mock.calls.at(-1)![0].error.code).toBe('REQUEST_PREPARATION_FAILED')
+})
+it('retains original input before the initial idle notification mutates the caller object',async()=>{
+ const request=vi.fn().mockResolvedValue(receipt),body={...reset};const editor=createIdentityCommand({request} as unknown as Pick<ApiClient,'request'>,v=>{if(v.state==='idle')body.new_password='changed during idle notify'},()=> 'key');expect(await editor.submit(`/identity/users/${id}/password`,'POST',body)).toBe(true);expect(request.mock.calls[0]![1].body).toEqual(reset)
+})
+it('a caller getter that clears the intent prevents cloning from resuming under a new generation',async()=>{
+ const request=vi.fn(),key=vi.fn(()=> 'key');let editor:ReturnType<typeof createIdentityCommand>;editor=createIdentityCommand({request} as unknown as Pick<ApiClient,'request'>,()=>{},key);const body={get expected_version(){editor.clear();return 0}};expect(await editor.submit('/identity/roles','POST',body)).toBe(false);expect(key).not.toHaveBeenCalled();expect(request).not.toHaveBeenCalled()
+})
+it('preparation errors never overwrite a nested request started by an idle notification',async()=>{
+ const request=vi.fn().mockResolvedValue(receipt);let nested:Promise<boolean>|undefined,react=true;let editor:ReturnType<typeof createIdentityCommand>;editor=createIdentityCommand({request} as unknown as Pick<ApiClient,'request'>,v=>{if(v.state==='idle'&&react){react=false;nested=editor.submit(`/identity/users/${id}/password`,'POST',reset)}},()=> 'key');expect(await editor.submit('/identity/roles','POST',{bad:()=>{}})).toBe(false);expect(await nested).toBe(true);expect(request).toHaveBeenCalledTimes(1)
+})

@@ -1,0 +1,59 @@
+{
+  "result": "PASS_IDENTITY_INPUT_AND_LOCAL_PREPARATION_PROTECTION",
+  "new_tests": 23,
+  "new_test_layers": {
+    "command": 9,
+    "member_dom": 8,
+    "own_account_dom": 3,
+    "policy_dom": 3
+  },
+  "focused_tests_passed": 73,
+  "vitest": {
+    "files_passed": 253,
+    "tests_passed": 4110
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "production_build": {
+    "status": "PASSED",
+    "files": 141,
+    "bootstrap_gzip_bytes": 180732,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "9d2b7d0e329b37a0250c15e50cd6e786473b9d7abd1afe01c7dcea551304d36a",
+    "scope": "static-artifacts-only"
+  },
+  "initial_failures": [
+    {
+      "preparation": 2,
+      "fixed": "Catch local preparation errors with safe not-sent message and capture payload before key callback."
+    },
+    {
+      "idle_notification_payload_mutation": 1,
+      "fixed": "Clone original payload before idle notification with generation guard."
+    }
+  ],
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "modal": "EXPLICIT_STUB_NOT_BROWSER_ACCEPTANCE",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "real_authorization_or_password_changes": 0,
+  "formal_acceptance_passes_added": 0,
+  "sensitive_inputs": "SYNTHETIC_TEST_ONLY_NO_REAL_CREDENTIALS",
+  "source_sha256": {
+    "apps/web/src/utils/projectIdentity.ts": "ff5100111a9904fb0e70944a54339a151899f5137fbda40b4a7c704d6f6b7869",
+    "apps/web/src/pages/IdentityUsersPage.vue": "4b6dbf4e6ed767677f45194d92c08499a1768aeb0a44a4b56867a7481ad63d35",
+    "apps/web/src/pages/IdentitySettingsPage.vue": "fbb2944fa16dcc7ca8e4b29aead4c6e41ec0e611f708479cce4123aa32304f7a",
+    "apps/web/src/pages/AccountPage.vue": "1c0731656156bfa55a2b0890ba09e7dea671d392511469bc6a003137e4676ad2",
+    "apps/web/tests/projectIdentity.test.ts": "a28086bc9ffd4fa024af43edfa85c89e9c5bd98917ed8bb17a2b3f1fa925d200",
+    "apps/web/tests/identityUserSelection.test.ts": "e625b37f9c2c18206b3bd58e056c93c1206c436179add14f971060ebf497d8b0",
+    "apps/web/tests/identitySettingsScope.test.ts": "c29741fde246365c98c14df6d25bcf595f2624640e8dab7d800dce1c34b4132c",
+    "apps/web/tests/accountScope.test.ts": "bbb5c279a93a1edd51cb01cdb7007d0508ead7bf85d11cf29b1931ffefe87cda"
+  }
+}

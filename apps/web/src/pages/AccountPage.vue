@@ -27,7 +27,9 @@ async function load() {
   } catch (e) { if (valid() && !isCancelled(e)) error.value = e; return false }
   finally { if (turn === generation) { controller = null; loading.value = false } }
 }
-const editor = useIdentityEditor(async () => { current.value = replacement.value = repeated.value = ''; window.location.assign('/login'); return 'redirected' as const }), command = editor.command, message = editor.message
+const editor = useIdentityEditor(async () => { current.value = replacement.value = repeated.value = ''; window.location.assign('/login'); return 'redirected' as const }, {snapshot:inputSnapshot,preserveUnknown:true}), command = editor.command, message = editor.message
+// Only transient in-memory comparison; never persist or log password snapshots.
+function inputSnapshot(){return JSON.stringify([scope.value,account.value?.id,account.value?.version,current.value,replacement.value,repeated.value])}
 function clearView() {
   generation++; controller?.abort(); controller = null; account.value = null; error.value = null; loading.value = false
   current.value = replacement.value = repeated.value = ''; editor.clear()
@@ -35,8 +37,8 @@ function clearView() {
 watch(scope, clearView, { flush: 'sync' })
 onMounted(load); onUnmounted(() => { disposed = true; clearView() })
 async function refresh() {
-  const owner = scope.value
-  if (!readable() || editor.busy() || !await editor.leave() || owner !== scope.value) return
+  const owner = scope.value, before=inputSnapshot()
+  if (!readable() || editor.busy() || !await editor.leave() || owner !== scope.value || before!==inputSnapshot()) return
   editor.clear(); await load()
 }
 async function save() { if (!readable() || loading.value || !account.value?.active || !account.value.username || account.value.id !== session.value?.user.id) return; error.value = null; if (replacement.value !== repeated.value) { error.value = new Error('两次新密码输入不一致'); return } await editor.save('/account/password', 'POST', { expected_version: account.value!.version, current_password: current.value, new_password: replacement.value }) }

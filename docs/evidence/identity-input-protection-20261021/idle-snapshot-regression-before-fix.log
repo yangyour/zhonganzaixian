@@ -1,0 +1,41 @@
+(node:6) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @mop/web@0.1.0 test
+> vitest run tests/projectIdentity.test.ts
+
+(node:19) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.11 /workspace/scratch/390b70bf66c8/zhonganzaixian-integrated/apps/web
+
+(node:37) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ tests/projectIdentity.test.ts (21 tests | 1 failed) 20ms
+   × retains original input before the initial idle notification mutates the caller object 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/projectIdentity.test.ts > retains original input before the initial idle notification mutates the caller object
+AssertionError: expected { expected_version: 7, …(1) } to deeply equal { expected_version: 7, …(1) }
+
+- Expected
++ Received
+
+  {
+    "expected_version": 7,
+-   "new_password": "synthetic-memory-only",
++   "new_password": "changed during idle notify",
+  }
+
+ ❯ tests/projectIdentity.test.ts:113:360
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 20 passed (21)
+   Start at  18:16:01
+   Duration  291ms (transform 102ms, setup 0ms, import 126ms, tests 20ms, environment 0ms)
+

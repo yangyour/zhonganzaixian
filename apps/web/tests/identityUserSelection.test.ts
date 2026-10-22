@@ -105,3 +105,27 @@ it('a changed allowed-tenant set also invalidates the open membership context', 
  session.value = { ...session.value!, allowed_tenants: [{ id: id(1), name: '当前' }] }; await settle()
  expect(host.querySelector('section.identity-form')).toBeNull(); expect(host.textContent).not.toContain('合成用户3')
 })
+it('new member text entered during discard cannot be cleared by a prior search',async()=>{
+ await mount();button('新建用户').click();await settle();const state=(app as any)._instance.setupState;state.form.display_name='original';state.editor.dirty.value=true;const wait=deferred();vi.spyOn(ElMessageBox,'confirm').mockImplementation(()=>wait.promise as never);const first=state.search();state.form.display_name='newer';wait.resolve('confirm');await first;expect(state.form.display_name).toBe('newer');expect(state.opened).toBe(true)
+})
+it('member replacement refuses a changed candidate and keeps original inputs',async()=>{
+ await mount();button('新建用户').click();await settle();const state=(app as any)._instance.setupState;state.form.display_name='original';state.editor.dirty.value=true;const wait=deferred();vi.spyOn(ElMessageBox,'confirm').mockImplementation(()=>wait.promise as never);const candidate=state.users.items[0],first=state.edit(candidate);candidate.display_name='changed after selection';wait.resolve('confirm');await first;expect(state.selected).toBeNull();expect(state.form.display_name).toBe('original');expect(pending.size).toBe(0)
+})
+it('a stale user row cannot launch memberships after the list was refreshed',async()=>{
+ await mount();const state=(app as any)._instance.setupState,old=state.users.items[0];await state.search();await state.edit(old);expect(state.opened).toBe(false);expect(pending.size).toBe(0)
+})
+it('unknown password reset preserves visible synthetic input and original replay identity',async()=>{
+ await mount();button('管理账号',0).click();await settle();complete(3);await settle();const state=(app as any)._instance.setupState;state.form.password='synthetic-reset-only';state.editor.dirty.value=true;vi.mocked(api.request).mockRejectedValueOnce(Error('synthetic lost'));await state.action('password');const key=state.command.key;expect(state.command.state).toBe('uncertain');expect(state.form.password).toBe('synthetic-reset-only');expect(await state.editor.leave()).toBe(false);expect(state.command.key).toBe(key)
+})
+it('declined command preparation cannot clear a newer password while confirmation is open',async()=>{
+ await mount();button('管理账号',0).click();await settle();complete(3);await settle();const state=(app as any)._instance.setupState;state.form.password='synthetic-preserved';state.editor.dirty.value=true;const wait=deferred();vi.spyOn(ElMessageBox,'confirm').mockImplementation(()=>wait.promise as never);const closing=state.closeEditor();await state.action('password');expect(state.form.password).toBe('synthetic-preserved');wait.reject('cancel');await closing;expect(state.opened).toBe(true)
+})
+it('new tenant grant inputs invalidate prior member close confirmation',async()=>{
+ await mount();button('新建用户').click();await settle();const state=(app as any)._instance.setupState;state.editor.dirty.value=true;const wait=deferred();vi.spyOn(ElMessageBox,'confirm').mockImplementation(()=>wait.promise as never);const first=state.closeEditor();state.extraTenant=id(9);state.extraRole=id(8);state.extraActive=false;wait.resolve('confirm');await first;expect(state.opened).toBe(true);expect(state.extraTenant).toBe(id(9));expect(state.extraActive).toBe(false)
+})
+it('clean member close cannot erase an input entered during the asynchronous clean check',async()=>{
+ await mount();button('新建用户').click();await settle();const state=(app as any)._instance.setupState;const first=state.closeEditor();state.form.display_name='late first keystroke';state.editor.dirty.value=true;await first;expect(state.opened).toBe(true);expect(state.form.display_name).toBe('late first keystroke')
+})
+it('pagination handlers reject invalid steps and unavailable pages before any read',async()=>{
+ await mount();const state=(app as any)._instance.setupState;vi.mocked(api.request).mockClear();await state.move(-1);await state.move(1);await state.move(3);expect(state.page).toBe(1);expect(api.request).not.toHaveBeenCalled()
+})

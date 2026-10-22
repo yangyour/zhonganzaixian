@@ -69,6 +69,29 @@ beforeEach(() => {
 afterEach(() => { app?.unmount(); app = undefined; host.remove(); session.value = null; vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 describe.each(cases)('$path explicit list search', config => {
+  it('discards only unsubmitted filters, keeps the original cursor and returns input focus without a request', async () => {
+    const request = vi.spyOn(api, 'request').mockResolvedValue(config.page())
+    await mount(config, '?q=before&page_size=25&cursor=synthetic-cursor')
+    await type(searchInput(config.label), '尚未查询的文字')
+    button('撤销修改').click(); await settle()
+    expect(searchInput(config.label).value).toBe('before')
+    expect(router.currentRoute.value.query.cursor).toBe('synthetic-cursor')
+    expect(request).toHaveBeenCalledTimes(1)
+    expect(document.activeElement).toBe(searchInput(config.label))
+    expect(host.querySelector('[aria-label="未应用筛选操作"]')).toBeNull()
+  })
+
+  it('applies the pending filter action to the first page and keeps keyboard focus reachable', async () => {
+    const request = vi.spyOn(api, 'request').mockResolvedValue(config.page())
+    await mount(config, '?q=before&cursor=synthetic-cursor')
+    await type(searchInput(config.label), '  新查询  ')
+    button('应用筛选').click()
+    await vi.waitFor(() => expect(router.currentRoute.value.query.q).toBe('新查询')); await settle()
+    expect(router.currentRoute.value.query.cursor).toBeUndefined()
+    expect(queryParams(request).get('q')).toBe('新查询')
+    expect(document.activeElement).toBe(searchInput(config.label))
+  })
+
   it('keeps typing separate, trims submitted input and returns to the first page', async () => {
     const request = vi.spyOn(api, 'request').mockResolvedValue(config.page())
     await mount(config, '?q=before&page_size=25&cursor=synthetic-cursor')
@@ -143,7 +166,7 @@ it('asset status shortcut and removing one applied filter leave other drafts and
   await vi.waitFor(() => expect(router.currentRoute.value.query.status).toBe('unknown')); await settle()
   expect(router.currentRoute.value.query.q).toBe('applied'); expect(router.currentRoute.value.query.type).toBe('switch')
   expect(router.currentRoute.value.query.cursor).toBeUndefined(); expect(searchInput('搜索资产').value).toBe('尚未提交')
-  host.querySelector<HTMLButtonElement>('button[aria-label="移除站点筛选：unit-site"]')!.click()
+  host.querySelector<HTMLButtonElement>('button[aria-label="站点：unit-site，移除此筛选"]')!.click()
   await vi.waitFor(() => expect(router.currentRoute.value.query.site_id).toBeUndefined()); await settle()
   expect(queryParams(request).get('q')).toBe('applied'); expect(queryParams(request).get('status')).toBe('unknown')
   expect(searchInput('搜索资产').value).toBe('尚未提交')
@@ -153,7 +176,7 @@ it('ticket single-filter removal preserves pending keywords and the other applie
   const request = vi.spyOn(api, 'request').mockResolvedValue(ticketPage())
   await mount(cases[1]!, '?q=applied&category=网络不通&urgency=normal&cursor=unit-old')
   await type(searchInput('搜索报障登记'), '尚未提交')
-  host.querySelector<HTMLButtonElement>('button[aria-label="移除分类筛选：网络不通"]')!.click()
+  host.querySelector<HTMLButtonElement>('button[aria-label="分类：网络不通，移除此筛选"]')!.click()
   await vi.waitFor(() => expect(router.currentRoute.value.query.category).toBeUndefined()); await settle()
   expect(queryParams(request).get('urgency')).toBe('normal'); expect(queryParams(request).get('q')).toBe('applied')
   expect(router.currentRoute.value.query.cursor).toBeUndefined(); expect(searchInput('搜索报障登记').value).toBe('尚未提交')

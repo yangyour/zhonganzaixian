@@ -117,6 +117,13 @@ function applyFilters() {
   else void router.replace({ query })
 }
 function resetFilters() { if (loading.value) return; Object.assign(filters, { q: '', status: '', type: '', site_id: '' }); applyFilters() }
+function focusFilterInput() { listRoot.value?.querySelector<HTMLInputElement>('input[aria-label="搜索资产"]')?.focus({ preventScroll: true }) }
+function applyPendingFilters() { applyFilters(); focusFilterInput() }
+function discardFilterEdits() {
+  if (loading.value) return
+  Object.assign(filters, appliedFilters.value)
+  focusFilterInput()
+}
 function updateAppliedFilter(key: string, value: string) {
   if (loading.value || !Object.hasOwn(filters, key)) return
   filters[key as keyof typeof filters] = value
@@ -252,7 +259,7 @@ onUnmounted(() => { disposed=true;listGeneration++;detailGeneration++;listContro
         <div class="asset-select-filters"><el-select v-model="filters.type" clearable placeholder="全部类型" aria-label="设备类型"><el-option v-for="type in assetTypes" :key="type.value" :label="type.label" :value="type.value" /></el-select><el-input v-model="filters.site_id" clearable placeholder="全部站点 / 站点 ID" aria-label="站点 ID" enterkeyhint="search" /><el-button type="primary" native-type="submit" :disabled="loading">查询</el-button><el-button :disabled="loading" @click="resetFilters">重置</el-button><el-button :icon="Refresh" :loading="loading" aria-label="刷新已应用的资产筛选" title="仅刷新已应用条件，保留未提交输入" @click="loadAssets">刷新</el-button></div>
       </el-form>
       <div class="asset-extended-filters content-toolbar"><span class="extended-filter-label">高级检索</span><template v-if="metadataAllowed"><el-button text bg size="small" @click="metadataQueryOpen = true">扩展资料检索</el-button><PermissionGate capability="asset_dates:read"><el-button text bg size="small" @click="dateQueryOpen = true">维保与超期筛查</el-button></PermissionGate></template><CmdbTypeCatalogPanel /><div class="content-actions"><div class="assets-heading-actions"><div class="asset-view-switch" aria-label="资产显示方式"><button type="button" :class="{ active: assetView === 'list' }" :aria-pressed="assetView === 'list'" @click="assetView = 'list'"><List />列表</button><button type="button" :class="{ active: assetView === 'grid' }" :aria-pressed="assetView === 'grid'" @click="assetView = 'grid'"><Grid />蜂巢</button></div><el-button v-if="exportAllowed" :icon="Download" @click="router.push('/asset-export-jobs')">导出</el-button><PermissionGate capability="assets:write"><el-button v-if="importAllowed" :icon="Upload" @click="importOpen = true">导入</el-button><el-button type="primary" :icon="Plus" @click="openCreate">创建资产草稿</el-button></PermissionGate></div></div></div>
-      <AppliedFilters :items="filterItems" :pending="pendingFilters" :loading="loading" :failed="Boolean(error)" :loaded="loaded" :count="rows.length" @remove="removeFilter" @clear="resetFilters" />
+      <AppliedFilters :items="filterItems" :pending="pendingFilters" :loading="loading" :failed="Boolean(error)" :loaded="loaded" :count="rows.length" @remove="removeFilter" @clear="resetFilters" @apply="applyPendingFilters" @discard="discardFilterEdits" />
       <ApiErrorNotice :error="error" guidance="请点击“重试”重新加载当前列表。"><el-button size="small" @click="loadAssets">重试</el-button></ApiErrorNotice>
       <AppTable v-if="assetView === 'list'" :error="error" :rows="rows" :loading="loading" :empty-text="error ? '列表加载失败，请点击重试' : !loaded ? '正在读取资产列表…' : filterItems.length ? '未找到匹配资产，可调整或清空筛选条件' : '当前授权范围内暂无资产'">
         <el-table-column v-for="column in assetLedgerColumns" :key="column.key" :label="column.label" :min-width="column.minWidth" :fixed="column.key === 'actions' ? 'right' : undefined">

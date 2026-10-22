@@ -95,6 +95,13 @@ function applyFilters() {
   else void router.replace({ query })
 }
 function resetFilters() { if (loading.value) return; Object.assign(filters, { q: '', category: '', urgency: '' }); applyFilters() }
+function focusFilterInput() { listRoot.value?.querySelector<HTMLInputElement>('input[aria-label="搜索报障登记"]')?.focus({ preventScroll: true }) }
+function applyPendingFilters() { applyFilters(); focusFilterInput() }
+function discardFilterEdits() {
+  if (loading.value) return
+  Object.assign(filters, appliedFilters.value)
+  focusFilterInput()
+}
 function removeFilter(key: string) {
   if (loading.value || !Object.hasOwn(filters, key)) return
   filters[key as keyof typeof filters] = ''
@@ -267,7 +274,7 @@ onUnmounted(() => { unregisterContextGuard(); unregisterRouteResolve?.(); unregi
     <div class="panel ticket-register-panel">
       <div class="proto-section-head content-toolbar"><h2>{{ customerView ? '我的故障申报' : '全部故障申报' }}</h2><span class="proto-sub">{{ customerView ? '仅本人可见' : '当前租户范围' }} · 支持按关键词、分类与紧急程度筛选</span><div class="content-actions"><el-button v-if="mayReport" type="primary" @click="createOpen = true">故障申报登记</el-button></div></div>
       <el-form :inline="true" class="filter-form ticket-filter-form" @submit.prevent="applyFilters" @compositionstart="searchComposition.start" @compositionend="searchComposition.end" @keydown="searchComposition.keydown"><el-form-item label="搜索"><el-input v-model="filters.q" clearable placeholder="登记号 / 标题 / 描述" aria-label="搜索报障登记" enterkeyhint="search" /></el-form-item><el-form-item label="故障分类"><el-select v-model="filters.category" clearable placeholder="全部分类" aria-label="报障分类筛选"><el-option v-for="category in ticketCategories" :key="category" :label="category" :value="category" /></el-select></el-form-item><el-form-item label="紧急程度"><el-select v-model="filters.urgency" clearable placeholder="全部程度" aria-label="报障紧急程度筛选"><el-option label="一般" value="normal" /><el-option label="很急（参考）" value="urgent" /></el-select></el-form-item><el-form-item class="filter-actions"><el-button type="primary" native-type="submit" :disabled="loading">查询</el-button><el-button :disabled="loading" @click="resetFilters">重置</el-button><el-button :loading="loading" title="按当前已生效筛选条件刷新列表" @click="loadTickets">刷新</el-button></el-form-item></el-form>
-      <AppliedFilters :items="filterItems" :pending="pendingFilters" :loading="loading" :failed="Boolean(error)" :loaded="loaded" :count="rows.length" @remove="removeFilter" @clear="resetFilters" />
+      <AppliedFilters :items="filterItems" :pending="pendingFilters" :loading="loading" :failed="Boolean(error)" :loaded="loaded" :count="rows.length" @remove="removeFilter" @clear="resetFilters" @apply="applyPendingFilters" @discard="discardFilterEdits" />
       <ApiErrorNotice :error="error"><el-button size="small" @click="loadTickets">重试</el-button></ApiErrorNotice>
       <AppTable :error="error" :rows="rows" :loading="loading" :empty-text="error ? '故障申报列表加载失败，请重试' : !loaded ? '正在加载故障申报列表…' : filterItems.length ? '当前筛选条件下暂无匹配工单，可调整或清空筛选条件' : customerView ? '暂无本人故障申报记录' : '当前租户暂无故障申报记录'">
         <el-table-column label="登记号 / 标题" min-width="250"><template #default="{ row }"><el-button type="primary" link class="asset-link ticket-detail-link" :data-list-record="row.id" @click="openDetail(row.id, $event)">{{ row.title }}</el-button><span class="cell-sub mono">{{ row.receipt_no }}</span></template></el-table-column>

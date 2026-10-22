@@ -7,7 +7,7 @@ defineProps<{
   loaded: boolean
   count: number
 }>()
-defineEmits<{ remove: [key: string]; clear: [] }>()
+defineEmits<{ remove: [key: string]; clear: []; apply: []; discard: [] }>()
 </script>
 
 <template>
@@ -22,10 +22,14 @@ defineEmits<{ remove: [key: string]; clear: [] }>()
     <div v-if="items.length || pending" class="filter-selection" aria-label="已应用筛选条件">
       <span class="filter-caption">已应用</span>
       <span v-if="!items.length" class="filter-unrestricted">全部记录</span>
-      <button v-for="item in items" :key="item.key" type="button" class="filter-chip" :disabled="loading" :aria-label="`移除${item.label}筛选：${item.value}`" @click="$emit('remove', item.key)">
+      <button v-for="item in items" :key="item.key" type="button" class="filter-chip" :disabled="loading" :aria-label="`${item.label}：${item.value}，移除此筛选`" @click="$emit('remove', item.key)">
         <span>{{ item.label }}：<strong>{{ item.value }}</strong></span><span class="filter-chip-close" aria-hidden="true">×</span>
       </button>
       <button type="button" class="filter-clear" :disabled="loading" @click="$emit('clear')">清空全部</button>
+    </div>
+    <div v-if="pending" class="filter-selection" aria-label="未应用筛选操作">
+      <button type="button" class="filter-clear" :disabled="loading" @click="$emit('apply')">应用筛选</button>
+      <button type="button" class="filter-clear" :disabled="loading" @click="$emit('discard')">撤销修改</button>
     </div>
   </div>
 </template>

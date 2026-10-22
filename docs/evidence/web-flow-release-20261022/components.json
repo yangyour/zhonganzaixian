@@ -1,0 +1,78 @@
+{
+  "ready": true,
+  "durable": true,
+  "production_ready": false,
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "services": [
+    {
+      "name": "mop-lan-api",
+      "running": true,
+      "source_commit": "9d3fed4db4038132293ef4e95c5b9ca71ba33cf4"
+    },
+    {
+      "name": "mop-lan-web",
+      "running": true,
+      "source_commit": "9d3fed4db4038132293ef4e95c5b9ca71ba33cf4"
+    },
+    {
+      "name": "mop-lan-photo-worker",
+      "running": true,
+      "source_commit": "603337b58db73165b3bd0a58094d68d5d4b387bb"
+    },
+    {
+      "name": "mop-lan-contact-worker",
+      "running": true,
+      "source_commit": "603337b58db73165b3bd0a58094d68d5d4b387bb"
+    },
+    {
+      "name": "mop-lan-export-preparation-worker",
+      "running": true,
+      "source_commit": "603337b58db73165b3bd0a58094d68d5d4b387bb"
+    },
+    {
+      "name": "mop-lan-af-collector",
+      "running": true,
+      "source_commit": "603337b58db73165b3bd0a58094d68d5d4b387bb"
+    },
+    {
+      "name": "mop-lan-import-worker",
+      "running": true,
+      "source_commit": "603337b58db73165b3bd0a58094d68d5d4b387bb"
+    },
+    {
+      "name": "mop-lan-zabbix-web",
+      "running": true,
+      "source_commit": null
+    },
+    {
+      "name": "mop-lan-zabbix-agent",
+      "running": true,
+      "source_commit": null
+    },
+    {
+      "name": "mop-lan-zabbix-server",
+      "running": true,
+      "source_commit": null
+    },
+    {
+      "name": "mop-lan-postgres",
+      "running": true,
+      "source_commit": null
+    },
+    {
+      "name": "mop-lan-rabbitmq",
+      "running": true,
+      "source_commit": null
+    },
+    {
+      "name": "mop-lan-minio",
+      "running": true,
+      "source_commit": null
+    },
+    {
+      "name": "mop-lan-redis",
+      "running": true,
+      "source_commit": null
+    }
+  ]
+}

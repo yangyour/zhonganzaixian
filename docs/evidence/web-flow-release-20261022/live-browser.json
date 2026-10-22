@@ -1,0 +1,57 @@
+{
+  "status": "PASSED",
+  "verified_at": "2026-10-22T14:23:11.839Z",
+  "source": "deployed business domain with real designated API",
+  "browser": "155.0.4283.62",
+  "build_id": "2ac49e25b90538a3c04162c402f50b4a4d160e5de9b76b53251a67e7b02b87a2",
+  "viewports": [
+    "1440x900",
+    "1440x560"
+  ],
+  "checks": [
+    {
+      "name": "filtered_detail_context",
+      "passed": true
+    },
+    {
+      "name": "return_preserves_query",
+      "passed": true
+    },
+    {
+      "name": "adjacent_then_browser_back",
+      "passed": true
+    },
+    {
+      "name": "return_focus",
+      "passed": true
+    },
+    {
+      "name": "return_scroll",
+      "passed": true,
+      "scroll_y": 21
+    },
+    {
+      "name": "discard_pending_without_request",
+      "passed": true
+    },
+    {
+      "name": "apply_pending_and_clear_empty",
+      "passed": true
+    },
+    {
+      "name": "export_requires_applied_filters",
+      "passed": true
+    },
+    {
+      "name": "export_prefill_without_submission",
+      "passed": true
+    },
+    {
+      "name": "export_return_preserves_query_and_page_size",
+      "passed": true
+    }
+  ],
+  "page_errors": 0,
+  "business_writes": 0,
+  "credentials_recorded": false
+}

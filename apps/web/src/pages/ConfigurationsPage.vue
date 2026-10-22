@@ -158,12 +158,10 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
 </script>
 <template>
   <section class="configuration-page">
-    <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">配置项登记</h1></div><el-button :loading="loading" @click="load">刷新列表</el-button></div>
+    <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">配置项登记</h1></div><router-link to="/runtime-configurations">运行配置与发布</router-link><el-button :loading="loading" @click="load">刷新列表</el-button></div>
 
     <WorkingCalendarReader v-model="calendarOpen" />
     <el-alert v-if="draftState.receipt" type="success" :closable="false" :title="'配置建议草稿已保存：' + draftState.receipt.key + ' · v' + draftState.receipt.version + '（草稿状态，暂未发布生效）'" />
-    <div class="compact-actions"><router-link to="/runtime-configurations">运行配置与发布</router-link></div>
-    <p class="inline-boundary">本页用于维护配置基线登记与内部修订提案；运行参数发布、版本回滚及当前生效值请前往“运行配置与发布”模块管理。</p>
     <div class="panel configuration-register"><nav class="feature-tabs" aria-label="配置工作区"><button type="button" :class="{active:!filters.pending_only}" @click="filters.pending_only=false">全部登记</button><button type="button" :class="{active:filters.pending_only}" @click="filters.pending_only=true">待客户确认 <span>{{ countsUnknown ? '—' : pendingCount }}</span></button><router-link to="/threshold-diagnostics">告警阈值诊断</router-link><button type="button" :disabled="!can('configurations:read') || switchingTenant" @click="calendarOpen=true">工作日历查询与试算</button></nav><div class="panel-heading configuration-register-heading"><h2>配置登记与修订</h2><span>登记基线 / 建议草稿 / 运行生效值对照</span></div><ApiErrorNotice :error="error"><el-button size="small" @click="load">重试</el-button></ApiErrorNotice>
       <el-form class="configuration-filters" label-position="top" @submit.prevent>
         <el-form-item label="配置键（config_key）"><el-input v-model="filters.config_key" clearable placeholder="按配置键查找" aria-label="筛选配置键" /></el-form-item>
@@ -188,7 +186,7 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
     <ConfigurationDiagnosticPanel v-model="diagnosticOpen" :configuration-key="diagnosticKey" />
     <el-drawer v-model="comparisonOpen" title="登记值与建议值差异" size="820px" class="configuration-comparison-drawer" destroy-on-close>
       <p class="mono configuration-comparison-key">{{ comparisonKey }}</p>
-      <p class="inline-boundary">对比当前配置项的登记基线值与已保存建议值（仅作差异核对，实际生效状态以运行配置中心为准）。</p>
+      
       <ApiErrorNotice :error="comparisonError"><el-button size="small" @click="loadComparison">重试读取</el-button></ApiErrorNotice>
       <el-skeleton v-if="comparisonLoading" :rows="7" animated class="configuration-comparison-loading" />
       <template v-else-if="comparisonSnapshot && comparison">
@@ -212,7 +210,7 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
     </el-drawer>
     <el-dialog v-model="editingOpen" title="编辑配置建议草稿（未发布生效）" width="560px" class="responsive-dialog" :close-on-click-modal="!draftUnresolved" :close-on-press-escape="!draftUnresolved" :show-close="!draftUnresolved" destroy-on-close>
       <template v-if="editing"><div class="config-dialog-context"><strong>{{ configurationMetadataLabel(editing.description, '配置描述') }}</strong><span class="mono">{{ editing.key }}</span><p>当前版本 v{{ editing.version }} · 登记值：{{ displayValue(editing.registered_value) }}</p><p>运行生效：{{ editing.effective_value === null ? '尚未启用' : displayValue(editing.effective_value) }}</p><p>关联确认：{{ configurationQuestionsLabel(editing.question_ids) }}</p></div>
-        <p class="inline-boundary">在此维护配置建议草稿（与租户修订提案及运行生效配置独立存储，不影响当前生产运行状态）。</p>
+        
         <ApiErrorNotice :error="editError" />
         <el-alert v-if="draftUnresolved" type="warning" :closable="false" title="提交结果待确认：系统已锁定当前草稿内容与基准版本，请先核对最新状态或点击“重试提交”继续处理。" />
         <div class="calendar-actions"><el-button :disabled="saving" @click="draftWriter.refresh()">刷新最新登记</el-button><el-button v-if="draftUnresolved" type="warning" :disabled="Boolean(draftState.busy)" @click="retryDraft">重试提交</el-button><el-button v-if="!draftUnresolved" :disabled="Boolean(draftState.busy)" @click="rebaseDraft">采用最新基准并保留填写值</el-button></div>
@@ -249,7 +247,7 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
 .configuration-comparison-drawer{max-width:100vw}
 .configuration-comparison-key{overflow-wrap:anywhere;font-size:12px;margin:0 0 16px}
 .configuration-diagnostic-link{min-height:36px}
-.configuration-row-actions{display:flex;flex-wrap:wrap;gap:2px 10px}
+.configuration-row-actions{display:flex;flex-wrap:wrap;align-items:center;gap:2px 12px;min-width:236px}.configuration-row-actions a{display:inline-flex;align-items:center;min-height:28px;font-size:12px;color:var(--el-color-primary);text-decoration:none}.configuration-row-actions a:hover{text-decoration:underline}.configuration-page .configuration-row-actions .configuration-diagnostic-link{margin:0;font-size:12px}
 .configuration-row-actions .el-button+.el-button{margin-left:0}
 .configuration-page .configuration-row-actions .el-button{font-size:12px;min-height:28px}
 .configuration-register .cell-sub{font-size:11px}

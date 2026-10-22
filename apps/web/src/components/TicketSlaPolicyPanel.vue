@@ -32,7 +32,7 @@ const policyLabel=(value:string|null)=>value==='EXCLUDE_CONFIRMED_PAUSES'?'排�
     <template v-if="state.view">
       <p v-if="state.view.status==='CONFIG_PENDING'">待补依赖：{{ state.view.missing }}</p>
       <p v-else>{{ policyLabel(state.view.clock_policy) }} · {{ state.view.status==='OPENING_FROZEN'?'已随开单冻结':state.view.status==='BOUND'?'已独立绑定，不可替换':'已发布，尚未绑定此工单' }}</p>
-      <template v-if="state.view.status==='AVAILABLE'&&scope.canWrite"><p>发布版本 {{ state.view.release_version }} · {{ state.view.release_id }}</p><p>只为缺失Q27的历史工单补充口径，不修改原始档位、预算或开单快照。绑定后不可替换，也不代表客户生产批准。</p><el-checkbox v-model="acknowledged" :disabled="locked">我已核对本工单及发布版本，确认固定使用此计时口径</el-checkbox><el-button type="primary" size="small" :disabled="locked||!acknowledged" @click="bind">绑定已发布口径</el-button></template>
+      <template v-if="state.view.status==='AVAILABLE'&&scope.canWrite"><p>发布版本 {{ state.view.release_version }} · {{ state.view.release_id }}</p><el-checkbox v-model="acknowledged" :disabled="locked">我已核对本工单及发布版本，确认固定使用此计时口径</el-checkbox><el-button type="primary" size="small" :disabled="locked||!acknowledged" @click="bind">绑定已发布口径</el-button></template>
     </template>
     <div v-if="state.attempt?.state==='uncertain'" role="alert"><p>结果尚不确定，不要新建请求。请使用相同请求号重试。</p><el-button :disabled="Boolean(state.busy)" @click="retry">原请求重试</el-button></div>
     <p v-if="state.attempt?.state==='accepted'" role="status">绑定已保存，SLA状态将重新读取。</p>

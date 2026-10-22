@@ -73,8 +73,7 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
 </script>
 <template>
   <section class="network-page">
-    <p v-if="permitted" class="network-policy" aria-label="监控自动刷新设置">{{refreshPolicyLabel}}</p><ApiErrorNotice v-if="permitted" :error="refreshPolicyError" @retry="refreshPolicy"/>
-    <header class="compact-page-toolbar network-heading"><div><div class="title-with-context"><h1 class="page-title-sr">基础网络监控</h1></div></div><div class="network-refresh-actions"><button v-if="permitted" type="button" @click="toggleAutomatic">{{autoPaused?'恢复自动刷新':'暂停自动刷新'}}</button><el-button :loading="loading" :disabled="!permitted" @click="refresh">刷新监控</el-button></div></header><p v-if="permitted" class="network-refresh-state" role="status">{{autoPaused?'已暂停本页自动刷新并取消在途数据读取；仍可手动刷新或选择历史。':refreshInterval===null?'自动刷新等待有效配置；可手动刷新。':'自动刷新：'+refreshInterval+' 秒。'}}</p>
+    <header class="compact-page-toolbar network-heading"><div><div class="title-with-context"><h1 class="page-title-sr">基础网络监控</h1></div></div><div class="network-refresh-actions"><p v-if="permitted" class="network-refresh-state" role="status">{{autoPaused?'已暂停本页自动刷新并取消在途数据读取；仍可手动刷新或选择历史。':refreshInterval===null?'自动刷新等待有效配置；可手动刷新。':'自动刷新：'+refreshInterval+' 秒。'}}</p><p v-if="permitted" class="network-policy" aria-label="监控自动刷新设置">{{refreshPolicyLabel}}</p><button v-if="permitted" type="button" @click="toggleAutomatic">{{autoPaused?'恢复自动刷新':'暂停自动刷新'}}</button><el-button :loading="loading" :disabled="!permitted" @click="refresh">刷新监控</el-button></div></header><ApiErrorNotice v-if="permitted" :error="refreshPolicyError" @retry="refreshPolicy"/>
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前没有资产读取权限" />
     <template v-else>
       
@@ -100,7 +99,7 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
       </div>
       <div class="network-table-footer"><span>当前展示 {{filteredDevices.length}} 台 / 共绑定 {{snapshot?.devices.length??'—'}} 台设备</span><span>数据范围：当前租户已绑定网络设备</span></div></section>
       <section class="network-history">
-        <div class="history-heading"><div><h2>采样历史</h2><p>选择设备与指标后展示历史趋势；采样间断处留空断开，不补零或沿用旧值。</p></div><div class="history-controls"><label>指标<select v-model="metric"><option value="latency">响应延迟</option><option value="loss">丢包率</option><option value="icmp">ICMP响应</option><option value="tcp_22">TCP 22</option><option value="tcp_80">TCP 80</option><option value="tcp_443">TCP 443</option><template v-if="selectedHasResources"><option value="cpu">CPU 使用率</option><option value="memory">内存使用率</option></template></select></label><label>时间<select v-model="window"><option value="HOUR_1">最近1小时</option><option value="HOURS_24">最近24小时</option></select></label></div></div>
+        <div class="history-heading"><div><h2>采样历史</h2><p>采样间断处留空，不补零。</p></div><div class="history-controls"><label>指标<select v-model="metric"><option value="latency">响应延迟</option><option value="loss">丢包率</option><option value="icmp">ICMP响应</option><option value="tcp_22">TCP 22</option><option value="tcp_80">TCP 80</option><option value="tcp_443">TCP 443</option><template v-if="selectedHasResources"><option value="cpu">CPU 使用率</option><option value="memory">内存使用率</option></template></select></label><label>时间<select v-model="window"><option value="HOUR_1">最近1小时</option><option value="HOURS_24">最近24小时</option></select></label></div></div>
         <p v-if="!selected" class="network-empty">请选择上方一台设备以查看历史采样趋势。</p>
         <p v-if="historyLoading" role="status">正在读取历史采样…</p><p v-else-if="selected&&!history&&!historyError">历史尚未取得；可重新选择指标或点击手动刷新，不表示没有采样。</p>
         <ApiErrorNotice v-if="historyError" :error="historyError" @retry="loadHistory" />
@@ -110,7 +109,7 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
           <p v-if="history.source==='SANGFOR_AF_API'" class="history-caption">注：防火墙资源指标采用采集端接收时刻记录。</p>
           <p v-if="!history.points.length" class="network-empty">该时间窗口尚无采样记录。</p>
           <svg v-else class="history-chart" viewBox="0 0 720 180" role="img" :aria-label="`${metric}历史采样，空窗不连线`"><path d="M16 20V154H704" stroke="#cedbe8" fill="none"/><g v-for="(segment,i) in segments" :key="i"><polyline :points="segment.line" fill="none" stroke="#1667b9" stroke-width="2"/><circle v-for="(p,j) in segment.dots" :key="j" :cx="p.x" :cy="p.y" r="2.5" fill="#1667b9"/></g></svg>
-          <p v-if="metric==='latency'" class="history-caption">注：延迟取响应包平均值；探测无响应时的零值不计为正常延迟，请结合 ICMP 连通性与丢包率综合判断。</p>
+          
           <div class="history-table" role="region" tabindex="0" aria-label="历史采样表，可横向滚动"><table><thead><tr><th scope="col">最近采样时间</th><th scope="col">原始值 {{history.unit}}</th></tr></thead><tbody><tr v-for="p in history.points.slice(-12).reverse()" :key="p.recorded_at"><td>{{time(p.recorded_at)}}</td><td>{{p.value}}</td></tr></tbody></table></div>
         </template>
       </section>
@@ -119,7 +118,7 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
 </template>
 <style scoped>
 .network-page{max-width:1440px;margin:auto;color:#20334c;min-width:0}
-.network-policy{font-size:12px;line-height:1.7;background:#edf5ff;color:#315b87;padding:9px 12px;border:1px solid #d9e7f7;border-radius:6px;margin:0 0 12px}
+.network-policy{margin:0;font-size:12px;line-height:20px;padding:2px 10px;background:#f1f5fb;color:#41618a;border:1px solid #e1e9f4;border-radius:999px;white-space:nowrap}
 .network-heading,.history-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:18px}
 .network-heading h1{font-size:22px;margin:0}
 .network-heading p,.history-heading p{color:#64748b;margin:4px 0 0;font-size:13px;line-height:1.6}
@@ -184,5 +183,5 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
 .history-table tbody tr:hover{background:#f8fbff}
 @media(max-width:1350px){.network-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.network-grid{grid-template-columns:1fr}.network-heading,.history-heading{align-items:flex-start;flex-direction:column}.device-card,.network-history,.network-device-workspace{padding:14px}.network-heading h1{font-size:20px}.history-controls{width:100%}.history-controls label{flex:1}.history-controls select,.network-list-toolbar input{width:100%}.network-view-tabs button,.network-list-toolbar input{min-height:44px}}
-.network-refresh-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.network-refresh-actions button{min-height:44px;padding:8px 12px;border:1px solid #8293a6;border-radius:4px;background:white;color:#24374a;font:inherit;cursor:pointer}.network-refresh-actions :focus-visible{outline:3px solid #176bb5;outline-offset:3px}.network-refresh-state{color:#46566c;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+.network-refresh-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.network-refresh-actions button{min-height:44px;padding:8px 12px;border:1px solid #dce4ee;border-radius:4px;background:white;color:#24374a;font:inherit;cursor:pointer}.network-refresh-actions :focus-visible{outline:3px solid #176bb5;outline-offset:3px}.network-refresh-state{margin:0;color:#5b6b80;font-size:12px;line-height:1.6;max-width:360px;overflow-wrap:anywhere}
 </style>

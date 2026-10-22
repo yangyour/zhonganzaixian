@@ -1,0 +1,109 @@
+/* Workspace content design layer.
+   Scope: page content inside #main-content only. Top module tabs, the left
+   sidebar and the app header keep their own styles (navigation.css). */
+.prototype-shell {
+  --ws-card: #fff;
+  --ws-border: #e3e9f2;
+  --ws-border-soft: #edf1f7;
+  --ws-radius: 10px;
+  --ws-radius-sm: 6px;
+  --ws-shadow: 0 1px 2px rgba(16, 42, 84, .05);
+  --ws-title: #1c2a3b;
+  --ws-text: #33465c;
+  --ws-muted: #6a7b90;
+  --ws-head-bg: #f6f8fb;
+  --ws-hover: #f4f8ff;
+  --ws-accent: #2165c5;
+}
+
+/* Page header: visible title on the left, page actions on the right. */
+.prototype-shell #main-content .page-title-sr {
+  position: static !important; width: auto !important; height: auto !important; margin: 0 !important; padding: 0 !important;
+  overflow: visible !important; clip-path: none !important; white-space: normal !important; border: 0 !important;
+  font-size: 18px; line-height: 28px; font-weight: 600; color: var(--ws-title); letter-spacing: 0; outline: none;
+}
+.prototype-shell #main-content h1[tabindex="-1"]:focus { outline: none; }
+.prototype-shell #main-content h1:focus-visible { outline: 2px solid var(--mop-focus); outline-offset: 3px; border-radius: 4px; }
+.prototype-shell #main-content .compact-page-toolbar {
+  display: flex; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 8px 10px;
+  min-height: 44px; margin: 4px 0 12px; padding: 0; background: transparent; border: 0; box-shadow: none;
+}
+.prototype-shell #main-content .compact-page-toolbar > :first-child { margin-right: auto; }
+.prototype-shell #main-content .compact-page-toolbar > :first-child:is(.el-button, button, a, label, .actions, nav) { margin-right: 0; }
+.prototype-shell #main-content .compact-page-toolbar :is(.actions, .page-actions) { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; }
+.prototype-shell #main-content .compact-page-toolbar .el-button + .el-button { margin-left: 0; }
+.prototype-shell #main-content > section > h1.page-title-sr:first-child,
+.prototype-shell #main-content > div > h1.page-title-sr:first-child { margin: 4px 0 12px !important; }
+
+/* Cards */
+.prototype-shell #main-content :is(.panel, .proto-panel, .admin-card, .identity-card, .live-monitoring, .dashboard-events, .dashboard-reports, .dashboard-workflows, .ws-card) {
+  background: var(--ws-card); border: 1px solid var(--ws-border); border-radius: var(--ws-radius); box-shadow: var(--ws-shadow);
+}
+.prototype-shell #main-content :is(.panel-heading, .proto-section-head, .admin-card-head) {
+  background: #fff; padding: 12px 16px; border-bottom: 1px solid var(--ws-border-soft); min-height: 48px;
+}
+.prototype-shell #main-content :is(.panel-heading, .proto-section-head, .admin-card-head):last-child { border-bottom: 0; }
+.prototype-shell #main-content :is(.panel-heading, .proto-section-head, .admin-card-head) :is(h2, h3) { font-size: 14px; font-weight: 600; color: var(--ws-title); line-height: 22px; }
+.prototype-shell #main-content :is(.panel, .proto-panel, .admin-card, .identity-card) :is(h2, h3) { color: var(--ws-title); }
+.prototype-shell #main-content :is(.panel, .proto-panel, .admin-card) > h2:first-child { font-size: 15px; font-weight: 600; }
+.prototype-shell #main-content h2 { font-size: 15px; font-weight: 600; line-height: 1.5; color: var(--ws-title); }
+.prototype-shell #main-content h3 { font-size: 14px; font-weight: 600; line-height: 1.5; color: var(--ws-title); }
+
+/* Tables */
+.prototype-shell #main-content table:not(.el-table__header):not(.el-table__body) { border-collapse: collapse; }
+.prototype-shell #main-content :is(.proto-table, .admin-table, .live-table, .ws-table) th {
+  background: var(--ws-head-bg); color: #5a6a7f; font-size: 12px; font-weight: 600; height: 40px; padding: 8px 14px;
+  border: 0; border-bottom: 1px solid var(--ws-border); text-align: left; white-space: nowrap;
+}
+.prototype-shell #main-content :is(.proto-table, .admin-table, .live-table, .ws-table) td {
+  padding: 10px 14px; border: 0; border-bottom: 1px solid var(--ws-border-soft); color: var(--ws-text); font-size: 13px; vertical-align: middle;
+}
+.prototype-shell #main-content :is(.proto-table, .admin-table, .live-table, .ws-table) tbody tr:hover { background: var(--ws-hover); }
+.prototype-shell #main-content :is(.proto-table, .admin-table, .live-table, .ws-table) tbody tr:last-child td { border-bottom: 0; }
+.prototype-shell #main-content .el-table {
+  --el-table-header-bg-color: var(--ws-head-bg); --el-table-row-hover-bg-color: var(--ws-hover); --el-table-border-color: var(--ws-border-soft);
+  --el-table-header-text-color: #5a6a7f; --el-table-text-color: var(--ws-text);
+}
+.prototype-shell #main-content .el-table th.el-table__cell { background: var(--ws-head-bg); font-weight: 600; border-right: 0; height: 40px; }
+.prototype-shell #main-content .el-table .cell { padding-inline: 14px; }
+.prototype-shell #main-content .el-table td.el-table__cell { padding-block: 9px; }
+.prototype-shell #main-content :is(.proto-table-wrap, .admin-table-scroll, .table-wrap, .live-table-wrap) { border-radius: 0 0 var(--ws-radius) var(--ws-radius); }
+
+/* Badges */
+.prototype-shell #main-content :is(.proto-badge, .ledger-state, .context-badge) { border-radius: 999px; padding-inline: 9px; }
+.prototype-shell #main-content .el-tag { border-radius: 999px; }
+
+/* Secondary text */
+.prototype-shell #main-content :is(.hint, .field-help, .help, .cell-sub, .muted) { color: var(--ws-muted); font-size: 12px; line-height: 1.6; }
+.prototype-shell #main-content .inline-boundary { color: var(--ws-muted); }
+
+/* Feedback */
+.prototype-shell #main-content .api-error { border-radius: 8px; padding: 10px 14px; margin: 0 0 12px; align-items: flex-start; }
+.prototype-shell #main-content .api-error .el-alert__title { font-weight: 600; line-height: 1.6; }
+.prototype-shell #main-content .api-error .el-alert__description { margin: 2px 0 0; font-size: 12px; }
+.prototype-shell #main-content .api-error p { margin: 2px 0 6px; }
+.prototype-shell #main-content .api-error .error-retry { min-height: 30px; margin: 4px 0 0; }
+.prototype-shell #main-content .api-error .error-details { margin-top: 6px; }
+.prototype-shell #main-content .panel > .api-error, .prototype-shell #main-content .proto-panel > .api-error { margin: 12px 16px; width: auto; }
+
+/* KPI tiles shared by redesigned pages */
+.prototype-shell #main-content .ws-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 0 0 12px; }
+.prototype-shell #main-content .ws-kpi { background: #fff; border: 1px solid var(--ws-border); border-radius: var(--ws-radius); box-shadow: var(--ws-shadow); padding: 12px 16px; min-width: 0; }
+.prototype-shell #main-content .ws-kpi span { display: block; font-size: 12px; color: var(--ws-muted); }
+.prototype-shell #main-content .ws-kpi strong { display: block; margin-top: 4px; font-size: 22px; line-height: 30px; font-weight: 600; color: var(--ws-title); font-variant-numeric: tabular-nums; }
+
+/* Buttons, fields, dialogs and drawers: styles/controls.css */
+
+@media (max-width: 760px) {
+  .prototype-shell #main-content .page-title-sr { font-size: 17px; }
+  .prototype-shell #main-content .compact-page-toolbar { align-items: flex-start; }
+  .prototype-shell #main-content .compact-page-toolbar > :first-child { flex-basis: 100%; }
+}
+
+/* Maintenance workspaces: list takes the full width until a record or editor opens */
+.prototype-shell #main-content .maintenance-workspace.no-side { grid-template-columns: minmax(0, 1fr); }
+.prototype-shell #main-content .maintenance-workspace.no-side > .workspace-side { display: none; }
+
+/* Card-level helpers: recovery actions and table footers align with card padding */
+.prototype-shell #main-content :is(.proto-panel, .panel) > .read-recovery { margin: 12px 16px; }
+.prototype-shell #main-content .proto-table-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; border-top: 1px solid #edf1f6; font-size: 12px; color: #64748b; }

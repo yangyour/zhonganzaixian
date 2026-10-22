@@ -53,7 +53,7 @@ defineExpose({ prepare, hasUnresolved: writer.unresolved, inputSnapshot, cancelR
 </script>
 <template>
   <el-drawer v-model="open" title="新建手工事件登记" size="820px" class="manual-incident-editor" :close-on-click-modal="false">
-    <el-alert type="warning" :closable="false" title="用于登记电话报障或现场巡检发现的异常事件；记录与自动监控告警独立存放，请勿输入账号密码或敏感凭据。" />
+    <p class="overlay-note">记录与自动监控告警独立存放；请勿输入账号密码或敏感凭据</p>
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前授权已失效，原范围输入已清除" />
     <template v-else>
       <ReadRecoveryActions :busy="state.busy" :can-retry="writer.canRetryRead()" :scope-key="contextKey" label="手工登记" :cancel="writer.cancelRead" :retry="writer.retryRead" />
@@ -69,7 +69,7 @@ defineExpose({ prepare, hasUnresolved: writer.unresolved, inputSnapshot, cancelR
       <el-form v-if="state.editing" label-position="top" @submit.prevent="save">
         <el-form-item label="事件标题（1–200 字符）"><el-input v-model="form.title" :disabled="locked" aria-label="手工事件原始标题" /></el-form-item>
         <el-form-item label="严重级别"><el-select v-model="form.severity" :disabled="locked" placeholder="请选择严重级别" aria-label="手工事件严重级别"><el-option v-for="(label, value) in manualSeverityLabels" :key="value" :value="value" :label="label" /></el-select></el-form-item>
-        <h3>关联资产（当前租户）</h3><p class="field-help">支持按资产名称或管理地址检索，选择后将锁定当前资产版本快照。</p>
+        <h3>关联资产（当前租户）</h3>
         <div class="manual-asset-search"><el-input ref="queryInput" v-model="query" :disabled="locked" aria-label="手工登记关联资产搜索" placeholder="输入资产名称或管理地址检索" /><el-button :disabled="locked || query.length > 100" @click="writer.search(query)">查询资产</el-button><el-button :disabled="locked || !state.nextAssetCursor || query !== state.assetSearch" @click="writer.search(query, true)">下一页</el-button></div>
         <p class="field-help">当前候选对应已应用查询：{{ state.assetSearch || '全部资产' }}{{ state.assetPaged ? '（后续页）' : '（首页）' }}。</p>
         <p v-if="queryDirty" role="status">搜索文字尚未应用；原读取恢复仍使用已应用条件，请先查询或<el-button :disabled="locked" @click="restoreAppliedQuery">恢复已应用查询</el-button>后再选择资产。</p>
@@ -78,7 +78,7 @@ defineExpose({ prepare, hasUnresolved: writer.unresolved, inputSnapshot, cancelR
         <p v-if="validation" role="alert" class="manual-validation">{{ validation }}</p><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !state.asset || !state.lastAssetRead || state.asset.version !== state.lastAssetRead.version">提交手工登记</el-button>
       </el-form>
     </template>
-    <template #footer><el-button @click="open = false">暂时收起</el-button><p class="field-help">收起窗口不会中断已发起的提交请求；切换租户或会话失效将清空未提交草稿。</p></template>
+    <template #footer><el-button @click="open = false">暂时收起</el-button></template>
   </el-drawer>
 </template>
 <style>

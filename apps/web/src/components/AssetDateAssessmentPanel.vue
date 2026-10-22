@@ -32,7 +32,7 @@ const fields = [{ key: 'warranty_expiry', label: '维保到期日期' }, { key: 
 </script>
 <template>
   <section v-if="permitted" class="date-assessment detail-section" :aria-labelledby="headingId" :aria-busy="state.busy">
-    <h3 :id="headingId" ref="heading" tabindex="-1">维保与超期日期核算</h3><p>按指定基准日期核算到期状态，仅核对已登记台账日期。未填写的日期保持“未登记”状态；如需维护维保起始日或服务商，请使用资产详情中的“维保档案”入口。</p>
+    <h3 :id="headingId" ref="heading" tabindex="-1">维保与超期日期核算</h3><p class="overlay-note">按指定基准日期核算到期状态，仅核对已登记台账日期</p>
     <div class="date-actions"><el-button :disabled="state.busy" @click="read(reader.refresh)">{{ state.attempted ? '重新核算日期' : '执行到期核算' }}</el-button>
       <el-button v-if="state.busy" @click="cancel">取消日期核算</el-button>
       <el-button v-if="state.attempted && !state.busy && (state.error || state.cancelled)" @click="read(reader.retry)">重试原资产核算</el-button>
@@ -43,12 +43,12 @@ const fields = [{ key: 'warranty_expiry', label: '维保到期日期' }, { key: 
     <section v-if="state.current" ref="result" tabindex="-1" :aria-labelledby="resultId">
       <h4 :id="resultId">原资产日期核算结果</h4>
       <p>核算基准日：{{ state.current.as_of_date }}（{{ state.current.timezone }}）<br />核算时间：{{ displayTime(state.current.observed_at) }}<br />资产版本 v{{ state.current.asset_version }} · 资料版本 {{ state.current.metadata_version ?? '未提供' }}</p>
-      <p>核算结果基于上述时刻的已登记台账日期；若后续修改了维保或服役日期，请重新执行核算。</p>
+      
       <article v-for="field in fields" :key="field.key" class="date-card" :class="{ 'past-date': state.current[field.key].position === 'PAST_DATE' }">
         <h4>{{ field.label }}</h4><strong>{{ state.current[field.key].recorded_date ?? '未登记' }}</strong><p>{{ labels[state.current[field.key].position] }}<span v-if="state.current[field.key].days_until !== null"> · 距基准日 {{ state.current[field.key].days_until }} 个日历日</span></p>
         <dl><template v-for="window in windows" :key="window.key"><dt>{{ window.label }}</dt><dd>{{ state.current[field.key][window.key] === null ? '待定' : state.current[field.key][window.key] ? '是' : '否' }}</dd></template></dl>
       </article>
-      <el-alert title="仅执行查询核算，不变更台账记录，不触发工单或通知" type="info" :closable="false">到期提醒通知与隐患工单需按独立流程触发。</el-alert>
+      <p class="overlay-note">仅执行查询核算，不变更台账记录，不触发工单或通知</p>
     </section>
     <p v-else-if="!state.busy && !state.error && !state.cancelled">点击“执行到期核算”获取服务端基准日对照结果。</p>
   </section>

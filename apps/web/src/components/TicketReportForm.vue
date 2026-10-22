@@ -158,7 +158,7 @@ async function submitReport() {
 
 <template>
   <el-dialog v-model="open" title="故障申报登记" width="650px" class="responsive-dialog ticket-report-dialog" :close-on-click-modal="!busy && !uncertain" :close-on-press-escape="!busy" :show-close="!busy" destroy-on-close>
-    <p class="ticket-form-intro">当前申报租户：<strong>{{ session?.tenant.name }}</strong>。提交后将立即生成故障受理记录，后续工单分派流转与 SLA 考核计时将在 ITSM 流程启用后自动关联。</p>
+    <p class="ticket-form-intro">申报租户：<strong>{{ session?.tenant.name }}</strong></p>
     <el-alert v-if="acceptedOperationId" type="info" :closable="false" show-icon title="故障申报已受理，系统正在生成正式工单，可点击下方按钮刷新处理进度。" />
     <el-alert v-else-if="uncertain" type="warning" :closable="false" show-icon title="提交结果待确认：系统已锁定当前填写内容，请先刷新列表核对是否已生效，或点击“重试提交”继续处理。" />
     <ApiErrorNotice :error="submitError" pending-message="系统已保留当前填写内容，请刷新或重试以确认受理结果。" />
@@ -174,7 +174,7 @@ async function submitReport() {
       <div class="ticket-contact-fields"><el-form-item label="联系人" :error="fieldErrors.contact_name"><el-input v-model="form.contact_name" placeholder="本次故障申报联系人" aria-label="报障联系人" /></el-form-item><el-form-item label="联系电话" :error="fieldErrors.contact_phone"><el-input v-model="form.contact_phone" type="tel" placeholder="例如：+86 138 0000 0000" aria-label="报障联系电话" /></el-form-item></div>
       <p class="field-help">请填写现场或业务联系人信息，以便工程师及时核实故障现象。</p>
       <el-form-item label="紧急程度（填报参考）" :error="fieldErrors.urgency"><el-radio-group v-model="form.urgency" class="ticket-choice-group" aria-label="紧急程度"><el-radio v-for="(label, value) in urgencyLabel" :key="value" :value="value">{{ label }}</el-radio></el-radio-group></el-form-item>
-      <p class="field-help">同一设备、同一分类在短时间内重复提报时将关联既有工单记录，不会覆盖已保存的故障描述与联系方式。</p>
+      
     </el-form>
     <el-alert v-if="registeredTicket" type="success" :closable="false" :title="`工单已生成（单号：${registeredTicket.receipt_no} · v${registeredTicket.version}），可查看工单详情或继续关联现场照片。`" />
     <ReportPhotoPanel :queue="photos" :existing="registeredTicket?.attachments || []" :disabled="submitting || uncertain" :appender="registeredTicket ? appender : undefined" />

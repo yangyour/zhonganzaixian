@@ -37,7 +37,7 @@ onUnmounted(reader.dispose)
 <template>
   <WorkingCalendarEditor ref="editor" v-model="editorOpen" @saved="afterSaved" />
   <el-drawer v-model="open" title="工作日历草稿 · 查询与试算" size="920px" class="calendar-reader" :close-on-click-modal="false">
-    <el-alert type="warning" :closable="false" show-icon title="当前工作日历记录均为待审批生效草稿；工作时段试算仅供排班与方案核对，不代表正式 SLA 承诺。" />
+    <p class="overlay-note">均为待审批草稿，试算不代表正式 SLA 承诺</p>
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前租户配置读取权限不可用，原范围数据已清除" />
     <template v-else>
       <div class="calendar-actions"><el-button :loading="state.busy" @click="reader.list()">刷新列表</el-button><el-button :disabled="state.busy || !state.page?.has_more" @click="reader.list(true)">下一页</el-button><el-button v-if="can('configurations:write')" :disabled="state.busy" @click="editor?.prepare(null)">新建日历草稿</el-button><span>{{ state.paged ? '后续页' : '第一页' }} · 每页15份</span></div>
@@ -52,7 +52,7 @@ onUnmounted(reader.dispose)
         <p>覆盖完整性：{{ state.selected.draft.coverage_complete ? '填报人声明完整（待客户核验）' : '未声明完整（暂不计算截止时间）' }}</p>
         <p class="calendar-text">说明：{{ state.selected.draft.note ?? '未提供' }}</p>
         <details><summary>原始工作窗口（{{ state.selected.draft.working_windows.length }}个，保留顺序与重复，试算按并集）</summary><p v-if="!state.selected.draft.working_windows.length">未配置工作窗口</p><ol class="calendar-windows"><li v-for="(window, index) in state.selected.draft.working_windows" :key="index">{{ displayTime(window.start) }} → {{ displayTime(window.end) }}<small>{{ window.start }} → {{ window.end }}</small></li></ol></details>
-        <h3>工作时长截止试算</h3><p class="field-help">基于上方所选日历版本执行只读试算（不修改或发布日历草稿；起点与所需时长请按实际测算场景填写）。</p>
+        <h3>工作时长截止试算</h3>
         <el-form label-position="top" @submit.prevent="preview">
           <el-form-item label="计时起点（含时区及秒，留空表示暂未指定）"><el-input v-model="start" :disabled="state.busy" aria-label="日历试算起点" placeholder="例如 2026-10-01T09:00:00+08:00" /></el-form-item>
           <el-form-item label="所需工作时长（整数秒，留空表示暂未指定）"><el-input v-model="seconds" :disabled="state.busy" inputmode="numeric" aria-label="日历试算所需秒数" placeholder="请输入所需工作秒数" /></el-form-item>
@@ -63,7 +63,7 @@ onUnmounted(reader.dispose)
         <article v-for="revision in state.history?.items || []" :key="revision.version" class="calendar-revision"><strong>v{{ revision.version }} · {{ displayTime(revision.recorded_at) }}</strong><p>名称：{{ revision.after.name }} · 窗口{{ revision.after.working_windows.length }}个 · {{ revision.after.coverage_complete ? '声明完整' : '不完整' }}</p><details><summary>{{ revision.before ? '查看该版本前后原始草稿' : '查看初版原始草稿' }}</summary><pre>{{ JSON.stringify({ before: revision.before, after: revision.after }, null, 2) }}</pre></details></article>
       </section>
     </template>
-    <template #footer><el-button @click="open = false">关闭查询</el-button><p class="field-help">查询和试算不修改日历草稿；创建/编辑需在独立面板明确保存，客户生效配置仍未启用</p></template>
+    <template #footer><el-button @click="open = false">关闭查询</el-button></template>
   </el-drawer>
 </template>
 <style>

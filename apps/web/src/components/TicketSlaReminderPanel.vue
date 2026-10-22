@@ -26,7 +26,7 @@ onUnmounted(()=>{++epoch;controller?.abort()})
 <template>
   <section v-if="permitted" class="sla-reminders" aria-label="SLA提醒记录">
     <header><h4>SLA 提醒记录</h4><el-button size="small" :disabled="busy" @click="refresh">刷新记录</el-button></header>
-    <p>这里只展示持久记录与通知意图。当前尚未路由到接收人或供应商，不代表已发送或送达。</p>
+    
     <ApiErrorNotice v-if="error" :error="error"/><p v-if="busy" role="status">正在读取提醒记录…</p>
     <template v-if="value">
       <p>队列：{{ states[value.scan_state] }}。此状态不证明 Worker 当前在线。</p>

@@ -28,7 +28,7 @@ watch(scope,clear,{flush:'sync'});onUnmounted(()=>{disposed=true;clear()})
 </script>
 <template>
  <section v-if="permitted" class="owned-import-sources" aria-label="我的暂存来源">
-  <h3>继续已有来源</h3><p>只列出当前账号在当前租户受理的源文件。重新打开仅读取状态，不重新上传、解析或导入。</p>
+  <h3>继续已有来源</h3>
   <div class="source-actions"><el-button ref="readButton" :disabled="busy" @click="read()">查看我的暂存来源</el-button><el-button v-if="visible&&!busy" @click="retry">重新读取本页来源</el-button><el-button v-if="busy" @click="cancel">取消读取来源列表</el-button></div>
   <p v-if="busy" role="status">正在读取来源记录…</p><ApiErrorNotice v-if="error" :error="error" :on-retry="retry"/>
   <template v-if="result"><p ref="summary" tabindex="-1" role="status">第 {{pageNumber}} 页，当前 {{result.items.length}} 条来源记录。不是资产入库记录。</p>
@@ -40,5 +40,5 @@ watch(scope,clear,{flush:'sync'});onUnmounted(()=>{disposed=true;clear()})
  </section>
 </template>
 <style scoped>
-.owned-import-sources{margin-top:16px;border-top:1px solid #b6c4d6;padding-top:12px;line-height:1.7}.source-actions,nav{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}.el-button{min-height:44px;height:auto;white-space:normal;margin:0}.sources-scroll{overflow:auto;max-height:480px}table{width:100%;border-collapse:collapse;text-align:left}caption{text-align:left}th,td{padding:8px;border-bottom:1px solid #dce5ef;vertical-align:top;min-width:110px;overflow-wrap:anywhere}tbody th{min-width:220px;font-weight:400}[tabindex]:focus-visible{outline:3px solid #175cd3;outline-offset:2px}
+.owned-import-sources{margin-top:16px;border-top:1px solid #dce4ee;padding-top:12px;line-height:1.7}.source-actions,nav{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}.el-button{min-height:44px;height:auto;white-space:normal;margin:0}.sources-scroll{overflow:auto;max-height:480px}table{width:100%;border-collapse:collapse;text-align:left}caption{text-align:left}th,td{padding:8px;border-bottom:1px solid #dce5ef;vertical-align:top;min-width:110px;overflow-wrap:anywhere}tbody th{min-width:220px;font-weight:400}[tabindex]:focus-visible{outline:3px solid #175cd3;outline-offset:2px}
 </style>

@@ -26,7 +26,7 @@ onUnmounted(()=>{disposed=true;epoch++})
 <template>
   <section class="dependency-edge-list" aria-label="当前资产关联边明细">
     <p ref="status" :id="statusId" role="status" tabindex="-1">关联边第 {{ range }} 条 / 共 {{ edges.length }} 条 · 第 {{ page }} / {{ totalPages }} 页 · 拓扑版本 v{{ graphVersion }}</p>
-    <p class="field-help">每页最多25条；只对本次已核对的完整图本地分页，不发出保存请求或截断原图。设备名称仅作辅助，完整标识用于核对。</p>
+    <p class="field-help">每页 25 条</p>
     <p v-if="!edges.length" role="status">当前设备暂无已登记的依赖关系草稿。</p>
     <div v-else class="dependency-edge-scroll" tabindex="0" role="region" aria-label="关联边明细，可横向滚动" :aria-describedby="statusId">
       <table><caption>{{ assetName }} 的依赖草稿关联边</caption><thead><tr><th scope="col">上游设备</th><th scope="col">下游设备</th><th scope="col">建议类型</th><th scope="col">建议抑制范围</th><th scope="col">建议启用状态</th></tr></thead>

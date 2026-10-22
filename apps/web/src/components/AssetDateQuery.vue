@@ -44,7 +44,6 @@ function inspect(row:DateQueryItem){if(disposed||!open.value||!permitted.value||
 <template>
  <el-drawer v-model="open" title="维保与超期日期筛选" size="min(100%, 1060px)" class="date-query-drawer">
   <template v-if="permitted">
-   <el-alert title="按指定基准日期核算到期状态，仅筛选已登记的台账日期" type="info" :closable="false">未填写日期的资产保持“未登记”状态；仅做到期核算，不触发通知、工单或 SLA。跨页浏览期间若资料更新，请重新查询。</el-alert>
    <el-form class="date-query-form" label-position="top" @submit.prevent="apply">
     <el-form-item label="日期字段（必选）"><el-select v-model="form.date_field" placeholder="请选择日期字段" aria-label="日期字段"><el-option label="维保到期日期" value="warranty_expiry"/><el-option label="超期服役日期" value="overdue_service_date"/></el-select></el-form-item>
     <el-form-item label="日期窗口（必选）"><el-select v-model="form.window" placeholder="请选择日期窗口" aria-label="日期窗口"><el-option v-for="w in windows" :key="w.value" :value="w.value" :label="w.label"/></el-select></el-form-item>
@@ -52,7 +51,7 @@ function inspect(row:DateQueryItem){if(disposed||!open.value||!permitted.value||
     <el-form-item label="站点 ID"><el-input v-model="form.site_id" clearable placeholder="输入完整站点 ID（精确匹配）" aria-label="日期筛选站点"/></el-form-item>
     <el-form-item class="date-query-actions"><el-button type="primary" native-type="submit" :loading="state.busy">查询到期记录</el-button><el-button :disabled="state.busy || !state.filters" @click="refresh">重置到第 1 页</el-button></el-form-item>
    </el-form>
-   <p class="date-query-hint">调整筛选条件后请点击“查询到期记录”重新加载。基准日按服务端 Asia/Shanghai 时区核算；若跨日翻页提示基准日变更（409），请重置到第 1 页重新查询。</p>
+   
    <p ref="resultHeading" tabindex="-1" role="status">{{readMessage}}</p>
    <ReadRecoveryActions :busy="state.busy?'read':null" :can-retry="workspace.canRetryRead()" :scope-key="contextKey" label="日期筛选" :cancel="workspace.cancelRead" :retry="retryRead" />
    <p v-if="state.readTarget?.cursor" class="date-query-hint">原页边界：{{state.readTarget.cursor.time}} / {{state.readTarget.cursor.id}}；原基准日 {{state.readTarget.cursor.day}}。原页重试不跨日改写基准日，409时请明确重置到第1页。</p>
@@ -71,7 +70,7 @@ function inspect(row:DateQueryItem){if(disposed||!open.value||!permitted.value||
    </template>
    <el-skeleton v-else-if="state.busy" :rows="5" animated/>
    <div v-else-if="!state.error" class="date-query-placeholder">请选择日期字段与日期窗口后点击“查询到期记录”。</div>
-   <div class="date-query-footer"><span class="tabular-nums">每页 15 条 · 当前租户授权资产</span><el-button :disabled="state.busy || !state.page?.has_more" @click="nextPage">下一页</el-button></div>
+   <div class="date-query-footer"><span class="tabular-nums">每页 15 条 · 跨页浏览期间若资料更新，请重新查询</span><el-button :disabled="state.busy || !state.page?.has_more" @click="nextPage">下一页</el-button></div>
   </template>
   <el-alert v-else title="当前账号无维保与超期日期筛选权限" type="warning" :closable="false"/>
  </el-drawer>

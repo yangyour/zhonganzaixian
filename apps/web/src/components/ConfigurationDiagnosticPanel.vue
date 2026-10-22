@@ -34,7 +34,7 @@ onUnmounted(() => reader.reset())
 <template>
   <el-drawer v-model="open" title="配置登记来源与提案诊断" size="760px" class="configuration-diagnostic-drawer" destroy-on-close>
     <p class="configuration-diagnostic-key mono">{{ configurationKey }}</p>
-    <p class="field-help">当前租户：{{ session?.tenant.name }}。展示当前配置项的设计登记目录属性与近期修订提案记录。</p>
+    <p class="field-help">当前租户：{{ session?.tenant.name }}</p>
     <router-link class="configuration-diagnostic-link" :to="{path:'/runtime-configurations',query:{key:configurationKey}}">查看此配置的运行值、发布与回滚 →</router-link>
     <ApiErrorNotice :error="error"><el-button size="small" :disabled="loading" @click="load">重新查询诊断</el-button></ApiErrorNotice>
     <el-skeleton v-if="loading" :rows="8" animated />
@@ -48,7 +48,7 @@ onUnmounted(() => reader.reset())
       </el-descriptions>
       <div class="detail-section">
         <h3>设计登记目录</h3>
-        <p class="field-help">登记版本与描述来自平台设计基线目录；运行定义与当前租户发布版本请在运行配置中心核对。</p>
+        
         <el-descriptions :column="1" border class="configuration-diagnostic-facts">
           <el-descriptions-item label="来源">平台设计登记目录（DESIGN_REGISTRY）</el-descriptions-item>
           <el-descriptions-item label="登记版本">v{{ diagnostic.registry.version }}</el-descriptions-item>
@@ -72,7 +72,7 @@ onUnmounted(() => reader.reset())
       </div>
       <div class="detail-section">
         <h3>当前租户近期提案</h3>
-        <p class="field-help">展示最近最多 5 条内部修订提案记录；实际发布状态请前往运行配置中心查询。</p>
+        
         <p v-if="diagnostic.recent_proposals.truncated" class="field-help">仅列出最近 5 条提案记录，更多记录请在“修订与审批”中查看。</p>
         <p v-if="!diagnostic.recent_proposals.items.length" class="muted">当前配置暂无近期修订提案。</p>
         <AppTable v-else :rows="diagnostic.recent_proposals.items" row-key="id">

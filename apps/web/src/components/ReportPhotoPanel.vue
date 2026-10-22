@@ -27,7 +27,7 @@ function select(event: Event) {
 <template>
   <section class="report-photo-panel" aria-label="报障照片">
     <h3>现场照片附件 <small>{{ existing.length + unboundCount }} / 3</small></h3>
-    <p class="field-help">支持 JPEG / PNG 格式，单张不超过 5 MB（5,000,000 字节），最多可上传 3 张现场照片。支持先提交工单再补充上传照片。</p>
+    <p class="field-help">JPEG / PNG，单张 ≤5 MB，最多 3 张；可先提交工单再补传。</p>
     <ApiErrorNotice :error="queue.policyError.value"><el-button size="small" :loading="queue.policyLoading.value" @click="queue.loadPolicy">重新加载上传配置</el-button></ApiErrorNotice>
     <p v-if="selectionMessage" class="photo-input-error" role="alert">{{ selectionMessage }}</p>
     <div v-if="selectable" class="photo-select-actions">

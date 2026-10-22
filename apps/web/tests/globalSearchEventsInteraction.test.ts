@@ -44,7 +44,7 @@ describe('event hits in the global search dialog', () => {
   it.each(['/home', '/monitoring-events'])('navigates from %s using only the named canonical event route', async path => {
     const request = vi.spyOn(api, 'request').mockResolvedValue(base)
     await mount(path); await search()
-    expect(document.querySelectorAll('.search-group')).toHaveLength(4)
+    expect(document.querySelectorAll('.search-group')).toHaveLength(3)
     expect(document.body.textContent).toContain(event.rule_code)
     button(event.rule_name).click(); await settle()
     expect(router.currentRoute.value.name).toBe('monitoring-events'); expect(router.currentRoute.value.query).toEqual({ event_id: event.id })

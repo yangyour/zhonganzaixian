@@ -63,7 +63,6 @@ defineExpose({ prepare, hasUnresolved: workspace.unresolved, inputSnapshot, canc
 </script>
 <template>
   <el-drawer v-model="open" title="人工恢复确认记录" size="800px" class="manual-recovery-panel" :close-on-click-modal="false">
-    <el-alert type="warning" :closable="false" title="独立维护手工事件的恢复确认记录；原登记快照保持不变，确认记录不直接变更自动监控状态或正式工单状态。" />
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前授权已失效，原范围内容已清除" />
     <template v-else>
       <h3 v-if="state.parent" class="recovery-original">{{ state.parent.title }}</h3><p v-if="state.parent" class="recovery-id">关联手工事件：{{ state.parent.id }}（原登记时恢复状态保持不变）</p>

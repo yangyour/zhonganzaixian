@@ -116,8 +116,7 @@ function switchWindow(w: FunnelWindow) {
     <p v-if="state.workspaceBusy" role="status">正在读取最新事件…</p>
     <div v-if="state.workspace" class="event-workspace">
       <section class="card" aria-label="监控事件主列表">
-        <h2>监控事件流</h2>
-        <p>此列表最多显示最新25条；搜索命中的事件可独立读取详情。</p>
+        <h2>监控事件流 <small class="event-count-note">最新 25 条</small></h2>
         <div class="event-table-scroll" role="region" aria-label="监控事件列表，可横向滚动" tabindex="0">
         <table>
           <thead>
@@ -238,4 +237,5 @@ function switchWindow(w: FunnelWindow) {
 <style scoped>
 .monitoring-events-page,.event-workspace{min-width:0;max-width:100%}.event-workspace{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}.event-workspace>.card,.event-detail{min-width:0;padding:16px;overflow-wrap:anywhere}.event-workspace h2{margin:0 0 12px;font-size:16px}.event-table-scroll{max-width:100%;overflow-x:auto;border:1px solid #e2e8f0;border-radius:6px}.event-table-scroll table{width:100%;min-width:960px;border-collapse:collapse;text-align:left;table-layout:fixed}.event-table-scroll th,.event-table-scroll td{padding:12px;border-bottom:1px solid #e2e8f0;vertical-align:top;overflow-wrap:anywhere}.event-table-scroll th{background:#f8fafc}.event-table-scroll th:first-child{width:18%}.event-table-scroll th:last-child{width:26%}.monitoring-events-page button{min-height:44px;padding:6px 12px;margin:2px;max-width:100%;white-space:normal}.monitoring-events-page input,.monitoring-events-page textarea{box-sizing:border-box;max-width:100%;min-height:44px}.monitoring-events-page textarea{width:100%}.monitoring-events-page :focus-visible{outline:2px solid #2563eb;outline-offset:2px}.monitoring-events-page li{margin-bottom:12px}.monitoring-events-page .actions{display:flex;flex-wrap:wrap;gap:8px}
 @media(max-width:760px){.event-workspace>.card,.event-detail{padding:12px}}
+.event-count-note{font-size:12px;font-weight:400;color:#6a7a8e;margin-left:6px}
 </style>

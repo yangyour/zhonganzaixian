@@ -134,7 +134,6 @@ defineExpose({ hasUnresolved: workspace.unresolved, hasDraft, canLeave, canRepla
 <template>
   <el-drawer v-model="open" title="资产扩展资料与修订历史" size="880px" class="metadata-drawer" :close-on-click-modal="false">
     <div v-if="asset" class="metadata-asset-banner"><strong>{{ asset.name }}</strong><span class="metadata-id mono">{{ asset.id }}</span></div>
-    <el-alert type="info" :closable="false" title="维护手工台账资产的硬件属性、所属业务与维保日期等扩展档案（管理 IP 与监控采集策略保持不变，选填项留空记为未填写）。" />
     <el-empty v-if="!permitted" description="当前账号无资产扩展资料维护权限，请重新打开资产详情" />
     <template v-else>
       <div class="metadata-actions"><el-button :disabled="Boolean(state.busy)" @click="load">刷新资料与历史</el-button><span>刷新仅同步最新档案状态，不会覆盖下方正在编辑的草稿</span></div>
@@ -156,7 +155,7 @@ defineExpose({ hasUnresolved: workspace.unresolved, hasDraft, canLeave, canRepla
       <section v-if="baseline !== null" class="metadata-section">
         <h3 class="tabular-nums">编辑草稿（基准版本 v{{ baseline }}）</h3><el-alert v-if="staleBaseline" type="warning" :closable="false" title="检测到资产档案已更新，当前表单已暂停提交；请点击“基于当前版本编辑”重新加载最新基准。" />
         <div class="metadata-actions"><el-input v-model="referenceQuery" :disabled="locked" aria-label="站点与负责人搜索" placeholder="搜索当前租户站点或活跃负责人" @keyup.enter="searchReferences" /><el-button :disabled="locked" @click="searchReferences">搜索可选项</el-button></div>
-        <p v-if="state.references" class="field-help">当前候选结果对应查询：{{ state.references.query || '空关键词' }}，不是尚未提交的新搜索文字。</p><p class="field-help">单次加载最多 100 项可选站点与负责人；提交保存时将自动校验所选站点及负责人的有效性。</p><el-alert v-if="state.references?.sites_truncated || state.references?.owners_truncated" type="warning" :closable="false" title="候选项超过 100 条，请输入关键词缩小检索范围。" />
+        <p v-if="state.references" class="field-help">当前候选结果对应查询：{{ state.references.query || '空关键词' }}，不是尚未提交的新搜索文字。</p><el-alert v-if="state.references?.sites_truncated || state.references?.owners_truncated" type="warning" :closable="false" title="候选项超过 100 条，请输入关键词缩小检索范围。" />
         <el-form label-position="top" @submit.prevent="save">
           <div class="metadata-grid">
             <el-form-item label="设备名称（必填）"><el-input v-model="form.name" :disabled="locked" aria-label="资料设备名称" /></el-form-item>
@@ -166,14 +165,14 @@ defineExpose({ hasUnresolved: workspace.unresolved, hasDraft, canLeave, canRepla
             <el-form-item v-for="field in optionalText" :key="field.key" :label="`${field.label}（选填，最多 ${field.max} 字符）`"><el-input v-model="form[field.key]" :disabled="locked" :aria-label="field.label" placeholder="选填，留空记为未填写" /></el-form-item>
             <el-form-item v-for="field in dateFields" :key="field.key" :label="`${field.label}（选填）`"><el-input v-model="form[field.key]" :disabled="locked" :aria-label="field.label" placeholder="YYYY-MM-DD，选填" /></el-form-item>
           </div>
-          <p class="field-help">日期请按 YYYY-MM-DD 格式填写；采集方式说明仅记录接入方式描述，请勿填入登录密码、SNMP 团体字或私钥等敏感凭据。</p>
+          <p class="field-help">日期格式 YYYY-MM-DD；请勿填写密码、团体字或私钥。</p>
           <el-form-item label="维护备注（必填，最多 2000 字符）"><el-input v-model="form.note" type="textarea" :rows="3" :disabled="locked" placeholder="记录本次资料维护原因或核查说明" aria-label="资料维护备注" /></el-form-item>
           <p v-if="validation" role="alert" class="metadata-validation">{{ validation }}</p><div class="metadata-actions"><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !state.current?.can_edit || staleBaseline">保存资料修订</el-button><el-button :disabled="locked" @click="cancelEdit">取消编辑</el-button></div>
         </el-form>
       </section>
-      <section v-if="state.history" class="metadata-section"><h3 ref="historyHeading" tabindex="-1">资料修订历史</h3><p class="field-help">展示当前已加载的扩展资料修订记录（每页 15 条，按修订版本倒序排列）。</p><el-empty v-if="!state.history.items.length" description="暂无资料修订历史" /><details v-for="revision in state.history.items" :key="revision.asset_version" class="metadata-history"><summary class="tabular-nums">资料修订 v{{ revision.asset_version }} · {{ revision.recorded_at }}</summary><p class="metadata-id">操作者 {{ revision.actor_id }}</p><p>{{ revision.before.asset.name }} → {{ revision.metadata.name }}；{{ typeLabel(revision.before.asset.type) }} → {{ typeLabel(revision.metadata.type) }}</p><p>站点 {{ revision.before.asset.site_id }} → {{ revision.metadata.site_id }}；管理 IP 保持 {{ revision.management_ip }}</p><dl class="metadata-facts"><template v-for="field in [...optionalText, ...dateFields, { key: 'owner_id' as const, label: '负责人ID' }, { key: 'note' as const, label: '维护备注' }]" :key="field.key"><dt>{{ field.label }}</dt><dd>{{ revision.before.metadata?.[field.key] ?? '未填写' }} → {{ revision.metadata[field.key] ?? '未填写' }}</dd></template></dl></details><el-button :disabled="Boolean(state.busy) || !state.history.has_more" @click="earlierHistory">加载更早修订记录</el-button></section>
+      <section v-if="state.history" class="metadata-section"><h3 ref="historyHeading" tabindex="-1">资料修订历史</h3><el-empty v-if="!state.history.items.length" description="暂无资料修订历史" /><details v-for="revision in state.history.items" :key="revision.asset_version" class="metadata-history"><summary class="tabular-nums">资料修订 v{{ revision.asset_version }} · {{ revision.recorded_at }}</summary><p class="metadata-id">操作者 {{ revision.actor_id }}</p><p>{{ revision.before.asset.name }} → {{ revision.metadata.name }}；{{ typeLabel(revision.before.asset.type) }} → {{ typeLabel(revision.metadata.type) }}</p><p>站点 {{ revision.before.asset.site_id }} → {{ revision.metadata.site_id }}；管理 IP 保持 {{ revision.management_ip }}</p><dl class="metadata-facts"><template v-for="field in [...optionalText, ...dateFields, { key: 'owner_id' as const, label: '负责人ID' }, { key: 'note' as const, label: '维护备注' }]" :key="field.key"><dt>{{ field.label }}</dt><dd>{{ revision.before.metadata?.[field.key] ?? '未填写' }} → {{ revision.metadata[field.key] ?? '未填写' }}</dd></template></dl></details><el-button :disabled="Boolean(state.busy) || !state.history.has_more" @click="earlierHistory">加载更早修订记录</el-button></section>
     </template>
-    <template #footer><el-button @click="open = false">收起面板</el-button><span class="field-help">收起仅隐藏面板，草稿与待确认请求仍保留；离开页面或更换资产时会核对未保存输入</span></template>
+    <template #footer><el-button @click="open = false">收起面板</el-button></template>
   </el-drawer>
 </template>
 

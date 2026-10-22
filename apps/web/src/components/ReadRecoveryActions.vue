@@ -9,7 +9,7 @@ async function retry(){if(!alive||props.busy||!props.canRetry||retryPending)retu
 
 onUnmounted(()=>{alive=false;epoch++})
 </script>
-<template><div v-if="busy==='read'||canRetry||status" class="read-recovery" role="group" :aria-label="label?label+'读取恢复':'读取恢复'"><button v-if="busy==='read'" type="button" @click="cancel">{{label?'取消'+label+'读取':'取消当前读取'}}</button><button v-if="canRetry&&!busy" type="button" @click="retry">{{label?'重试原'+label+'读取':'重试原读取'}}</button><p v-if="canRetry&&!busy">按原查询条件、页游标或历史版本边界重试，不采用尚未提交的新筛选；不会重发保存操作。</p><p v-if="status" ref="notice" tabindex="-1" role="status">{{status}}</p></div></template>
+<template><div v-if="busy==='read'||canRetry||status" class="read-recovery" role="group" :aria-label="label?label+'读取恢复':'读取恢复'"><button v-if="busy==='read'" type="button" @click="cancel">{{label?'取消'+label+'读取':'取消当前读取'}}</button><button v-if="canRetry&&!busy" type="button" @click="retry">{{label?'重试原'+label+'读取':'重试原读取'}}</button><p v-if="status" ref="notice" tabindex="-1" role="status">{{status}}</p></div></template>
 <style scoped>
-.read-recovery{margin:12px 0;min-width:0}.read-recovery button{min-height:44px;padding:8px 12px;border:1px solid #8194ac;border-radius:4px;background:#fff;color:#24384b;font:inherit;cursor:pointer}.read-recovery p{line-height:1.7;overflow-wrap:anywhere}.read-recovery :focus-visible{outline:3px solid #176bb5;outline-offset:3px}
+.read-recovery{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0;min-width:0}.read-recovery button{min-height:44px;padding:8px 12px;border:1px solid #8194ac;border-radius:4px;background:#fff;color:#24384b;font:inherit;cursor:pointer}.read-recovery p{margin:0;font-size:13px;color:#475569;line-height:1.6;overflow-wrap:anywhere}.read-recovery :focus-visible{outline:3px solid #176bb5;outline-offset:3px}
 </style>

@@ -26,13 +26,13 @@ const labels: Record<string, string> = { CALCULATED: '场景已测算', UNRESOLV
 <template>
   <section class="sla-scenarios">
     <h1 class="page-title-sr">SLA 场景测算 </h1>
-    <p class="inline-boundary">模拟场景测算说明（非实际生产达成率）</p>
     
-    <details class="boundary-details"><summary>输入与计算口径</summary><p>输入仅保留在当前页面，离开或切换租户后自动清空，不自动保存。修改输入立即清除旧结果；未填写的字段保持未指定状态，不自动填充默认时限。</p></details>
+    
+    
     <ApiErrorNotice :error="state.error" />
-    <div class="scenario-workspace"><section class="proto-panel scenario-inputs"><div class="proto-section-head"><h2>模拟场景样本</h2><span class="proto-sub">录入场景参数后执行测算</span></div>
+    <div class="scenario-workspace"><section class="proto-panel scenario-inputs"><div class="proto-section-head"><h2>模拟场景样本</h2><span class="proto-sub">{{ draft.tickets.length }} / 200 个场景</span></div>
     <div class="scenario-toolbar"><label>场景总体完整性 <select v-model="draft.population_complete" aria-label="场景总体完整性"><option :value="null">未指定</option><option :value="true">声明为完整样本集</option><option :value="false">部分样本（非全集）</option></select></label><el-button :disabled="draft.tickets.length >= 200" @click="add">新增场景</el-button><el-button type="primary" :loading="state.busy" @click="workspace.calculate()">开始测算</el-button></div>
-    <div v-if="!draft.tickets.length" class="proto-empty"><span class="scenario-empty-symbol" aria-hidden="true">▤</span><strong>尚未添加场景</strong><p>新增模拟场景后可逐项核对响应与恢复时间（空样本集不会折算为 100% 达标）。</p><el-button @click="add">添加第一个场景</el-button></div>
+    <div v-if="!draft.tickets.length" class="proto-empty"><span class="scenario-empty-symbol" aria-hidden="true">▤</span><strong>尚未添加场景</strong><el-button @click="add">添加第一个场景</el-button></div>
     <details v-for="(row, index) in draft.tickets" :key="index" class="scenario-card" open><summary>{{ row.scenario_ref || '场景 ' + (index + 1) }} <span class="proto-badge">{{ row.priority || '优先级未指定' }}</span></summary>
       <div class="scenario-toolbar"><h2>场景 {{ index + 1 }}</h2><el-button text type="danger" @click="draft.tickets.splice(index, 1)">删除场景</el-button></div>
       <div class="scenario-fields">
@@ -43,7 +43,7 @@ const labels: Record<string, string> = { CALCULATED: '场景已测算', UNRESOLV
       </div>
       <div v-for="field in refs" :key="field.key" class="reference-fields"><strong>{{ field.label }}（模拟引用，待核验）</strong><label>引用标识<input :value="row[field.key]?.id ?? ''" :aria-label="field.label + '标识'" @input="reference(row, field.key, 'id', ($event.target as HTMLInputElement).value)" /></label><label>版本号<input type="number" min="1" step="1" :value="row[field.key]?.version || ''" :aria-label="field.label + '版本'" @input="reference(row, field.key, 'version', ($event.target as HTMLInputElement).value)" /></label><el-button text @click="row[field.key] = null">清空引用</el-button></div>
     </details>
-    </section><aside class="proto-panel scenario-overview"><div class="proto-section-head"><h2>对照说明</h2></div><div class="scenario-guide"><h3>响应与恢复分别核对</h3><p>按录入的响应/恢复截止时间与实际完成时间逐项比对，不套用默认时限。</p><h3>未定项独立标识</h3><p>缺失时间戳、快照引用或适用性条件时保持“未定”，不计入达标样本。</p><h3>审批与正式报告</h3><p>模拟引用仅用于方案推演；正式服务可用率、月度报表与违约金核算以生效配置为准。</p></div></aside></div>
+    </section></div>
     <section v-if="state.result" class="scenario-results" aria-live="polite">
       <h2>{{ labels[state.result.status] }}</h2><p v-if="state.result.reason">{{ labels[state.result.reason] }}</p>
       <p v-if="state.result.scenario_achievement"><strong>模拟场景达标分数：{{ state.result.scenario_achievement.numerator }} / {{ state.result.scenario_achievement.denominator }}</strong>（精确分数表示，未套用财务舍入规则）</p>
@@ -56,7 +56,7 @@ const labels: Record<string, string> = { CALCULATED: '场景已测算', UNRESOLV
 </template>
 <style scoped>
 .sla-scenarios{max-width:none}
-.scenario-workspace{display:grid;grid-template-columns:minmax(0,2fr) minmax(270px,1fr);gap:12px;align-items:start;margin-top:12px}
+.scenario-workspace{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-items:start;margin-top:12px}
 .scenario-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 16px;margin:0;border-bottom:1px solid #edf1f7}
 .scenario-toolbar label{display:flex;gap:12px;align-items:center;font-size:12px;flex:1;min-width:220px}
 .scenario-toolbar label select{width:auto}

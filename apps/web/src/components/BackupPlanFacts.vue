@@ -9,7 +9,7 @@ watch(()=>('id' in props.value?props.value.id:props.value.plan_id)+'/'+props.val
 </script>
 <template>
  <div class="backup-plan-facts">
-  <dl><div><dt>版本 / 记录时间</dt><dd>v{{value.version}} · {{displayTime(value.recorded_at)}}</dd></div><div><dt>每日时间 / 业务时区</dt><dd>{{value.daily_local_time}} · Asia/Shanghai</dd></div><div><dt>启用意向</dt><dd>{{value.requested_enabled?'后续申请启用':'暂不申请启用'}}（当前未启用）</dd></div><div><dt>重试策略预设</dt><dd>2次 / 间隔10分钟（候选默认配置，待启用）</dd></div><div><dt>凭据引用</dt><dd>{{value.credential_ref??'未提供引用'}}<span>仅保存引用标识，未建立实际凭据连接</span></dd></div><div><dt>执行状态</dt><dd>草稿待审批启用 · 暂不执行自动调度 · 下次执行时间待定</dd></div></dl>
+  <dl><div><dt>版本 / 记录时间</dt><dd>v{{value.version}} · {{displayTime(value.recorded_at)}}</dd></div><div><dt>每日时间 / 业务时区</dt><dd>{{value.daily_local_time}} · Asia/Shanghai</dd></div><div><dt>启用意向</dt><dd>{{value.requested_enabled?'后续申请启用':'暂不申请启用'}}（当前未启用）</dd></div><div><dt>重试策略预设</dt><dd>2次 / 间隔10分钟（候选默认配置，待启用）</dd></div><div><dt>凭据引用</dt><dd>{{value.credential_ref??'未提供引用'}}</dd></div><div><dt>执行状态</dt><dd>草稿 · 待审批启用</dd></div></dl>
   <h3>关联目标设备 · {{value.target_count}} 台</h3><p>当前租户设备引用（设备在线状态与备份连通性待启用后校验）</p>
   <ol :start="targetPage*10+1" class="target-references"><li v-for="id in targets" :key="id">{{id}}</li></ol>
   <div v-if="pages>1" class="target-pages"><button type="button" :disabled="targetPage===0" @click="targetPage--">上一组目标</button><span>第{{targetPage+1}} / {{pages}}组 · 每组10个</span><button type="button" :disabled="targetPage+1>=pages" @click="targetPage++">下一组目标</button></div>

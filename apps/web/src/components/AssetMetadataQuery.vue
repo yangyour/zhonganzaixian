@@ -49,12 +49,11 @@ onUnmounted(()=>{disposed=true;focusEpoch++;workspace.dispose()})
 
 <template>
   <el-drawer v-model="open" title="资产扩展资料检索" size="1100px" class="metadata-query-drawer">
-    <el-alert type="info" :closable="false" title="支持按 14 项扩展维护字段组合检索当前租户手工台账资产（多条件同时满足，区分“未填写”与文本匹配）。" />
     <el-empty v-if="!permitted" description="当前账号无资产扩展资料检索权限" />
     <template v-else>
       <el-collapse v-model="expanded"><el-collapse-item name="filters" title="展开配置 14 项扩展字段筛选条件"><el-form label-position="top" @submit.prevent="apply"><div class="metadata-query-filters"><el-form-item v-for="key in metadataQueryFields" :key="key" :label="labels[key]"><el-select v-model="modes[key]" :aria-label="`${labels[key]}筛选方式`"><el-option value="any" label="不限" /><el-option value="value" :label="exactField(key) ? '精确匹配' : '包含匹配'" /><el-option v-if="!['name', 'type', 'site_id'].includes(key)" value="unknown" label="未填写（空值）" /></el-select><template v-if="modes[key] === 'value'"><el-select v-if="key === 'type'" v-model="values[key]" aria-label="设备类型筛选值" placeholder="请选择设备类型"><el-option v-for="type in assetTypes" :key="type.value" :label="type.label" :value="type.value" /></el-select><el-input v-else v-model="values[key]" :type="key === 'note' ? 'textarea' : 'text'" :aria-label="`${labels[key]}筛选值`" :placeholder="key.includes('date') || key === 'warranty_expiry' ? 'YYYY-MM-DD' : key === 'owner_id' ? '请输入完整负责人 UUID' : '输入包含的关键字'" /></template></el-form-item></div><div class="metadata-query-actions"><el-button type="primary" native-type="submit" :loading="state.busy">查询匹配资料</el-button><el-button :disabled="state.busy" @click="resetFilters">清空条件</el-button></div></el-form></el-collapse-item></el-collapse>
       <div class="metadata-query-actions"><el-button :disabled="state.busy" @click="refresh">刷新到第 1 页</el-button><el-button :disabled="state.busy || !state.page?.has_more" @click="nextPage">下一页</el-button><span class="tabular-nums">{{ state.paged ? '后续页' : '第 1 页' }} · 每页 15 条</span></div>
-      <p class="field-help">检索结果展示当前查询时刻的台账资料快照；若台账发生变更，点击“刷新到第 1 页”可从第 1 页重新加载。</p>
+      
       <p class="metadata-query-applied">已应用条件：<span v-if="!Object.keys(state.filters).length" class="applied-chip">不限（当前租户全部手工台账）</span><span v-for="(value, key) in state.filters" :key="key" class="applied-chip">{{ key === 'unknown_fields' ? '未填写字段' : labels[key as MetadataQueryField] }}＝{{ value }}</span></p>
       <p ref="resultHeading" tabindex="-1" role="status">{{readMessage}}</p>
       <ReadRecoveryActions :busy="state.busy?'read':null" :can-retry="workspace.canRetryRead()" :scope-key="contextKey" label="资料检索" :cancel="workspace.cancelRead" :retry="retryRead" />

@@ -65,15 +65,11 @@ body { line-height: 1.6; }
 .el-checkbox { min-height: 36px; height: auto; white-space: normal; }
 .el-checkbox__label { line-height: 1.6; white-space: normal; }
 .el-form-item__label, .filter-form .el-form-item__label { font-size: 13px; color: #425871; }
+/* Native control colors, sizes and states: styles/controls.css */
 .el-form-item__error { position: static; line-height: 1.6; padding-top: 6px; font-size: 12px; }
 .el-form-item__content { min-width: 0; }
 .filter-form { background: var(--mop-surface-muted); border-bottom-color: var(--mop-border); }
 .filter-form .el-form-item__label { font-weight: 500; }
-#main-content :is(button, select, input, textarea):not([class*="el-"]):not([type="checkbox"]):not([type="radio"]) { border: 1px solid #b7c6d5; color: var(--mop-text); background: var(--mop-surface); }
-#main-content button:not([class*="el-"]) { padding: 7px 14px; cursor: pointer; transition: background-color .15s ease-out, border-color .15s ease-out; }
-#main-content button:not([class*="el-"]):hover:not(:disabled) { border-color: var(--el-color-primary); background: #f1f6fd; }
-#main-content button:not([class*="el-"]):disabled { background: #f3f5f8; color: #687b90; cursor: not-allowed; }
-#main-content :is(select, input, textarea):not([class*="el-"]):not([type="checkbox"]):not([type="radio"]) { padding: 8px 10px; }
 #main-content :is(input[type="checkbox"], input[type="radio"]) { accent-color: var(--el-color-primary); }
 #main-content summary { cursor: pointer; }
 .el-alert { border-radius: 8px; padding: 14px 16px; }

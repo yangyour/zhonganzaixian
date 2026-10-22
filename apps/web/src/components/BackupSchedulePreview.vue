@@ -34,5 +34,5 @@ onUnmounted(()=>{alive=false;reset()})
 </section>
 </template>
 <style scoped>
-.schedule-preview{margin-top:18px;padding:12px;border:1px solid #8293a6;min-width:0;color:#24374a}.schedule-preview p{line-height:1.7;overflow-wrap:anywhere}.schedule-preview form{display:flex;gap:12px;flex-wrap:wrap;align-items:end}.schedule-preview label{display:flex;flex-direction:column;gap:6px;max-width:100%}.schedule-preview input,.schedule-preview button{box-sizing:border-box;min-height:44px;max-width:100%;padding:8px;font:inherit;border:1px solid #8293a6;border-radius:4px;background:white;color:#24374a}.schedule-preview button:disabled{opacity:.6}.schedule-preview :focus-visible{outline:3px solid #176bb5;outline-offset:3px}
+.schedule-preview{margin-top:18px;padding:12px;border:1px solid #dce4ee;min-width:0;color:#24374a}.schedule-preview p{line-height:1.7;overflow-wrap:anywhere}.schedule-preview form{display:flex;gap:12px;flex-wrap:wrap;align-items:end}.schedule-preview label{display:flex;flex-direction:column;gap:6px;max-width:100%}.schedule-preview input,.schedule-preview button{box-sizing:border-box;min-height:44px;max-width:100%;padding:8px;font:inherit;border:1px solid #dce4ee;border-radius:4px;background:white;color:#24374a}.schedule-preview button:disabled{opacity:.6}.schedule-preview :focus-visible{outline:3px solid #176bb5;outline-offset:3px}
 </style>

@@ -11,7 +11,7 @@ defineEmits<{ remove: [key: string]; clear: [] }>()
 </script>
 
 <template>
-  <div class="applied-filters">
+  <div class="applied-filters" :class="{ quiet: !items.length && !pending && !failed }">
     <div class="filter-result" role="status" aria-live="polite">
       <span v-if="loading">正在读取已应用条件…</span>
       <span v-else-if="failed" class="filter-failed">查询未完成，请重试</span>
@@ -31,6 +31,7 @@ defineEmits<{ remove: [key: string]; clear: [] }>()
 </template>
 
 <style scoped>
+.applied-filters.quiet{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
 .applied-filters{padding:12px 18px;border-bottom:1px solid #e8eef5;background:#fbfcfe;font-size:12px;color:#65758b}
 .filter-result{display:flex;align-items:center;flex-wrap:wrap;gap:7px 16px;line-height:1.6}
 .filter-result strong{font-variant-numeric:tabular-nums;font-weight:650;color:#30455f}

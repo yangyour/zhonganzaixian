@@ -1,0 +1,86 @@
+{
+  "status": "PASSED",
+  "verified_at": "2026-10-22T12:33:29.605Z",
+  "source_commit": "123b5f5cc447c47e573d4965ac64181bb9d942b1",
+  "web_build_id": "c5652ec31b1726e7816ce858fb6e2a572e086d9e980c5547fb811805f967bac9",
+  "origin": "http://mop.all-online.com.cn",
+  "browser": "155.0.4283.62",
+  "account": "JiangFaMing",
+  "login_http_status": 200,
+  "cases": [
+    {
+      "route": "/assets",
+      "width": 1440,
+      "http_status": 200,
+      "titleHidden": true,
+      "oldTitleBars": 0,
+      "overflow": false,
+      "searchTopRight": true,
+      "searchInBreadcrumb": false
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 1440,
+      "http_status": 200,
+      "titleHidden": true,
+      "oldTitleBars": 0,
+      "overflow": false,
+      "searchTopRight": true,
+      "searchInBreadcrumb": false
+    },
+    {
+      "route": "/identity/users",
+      "width": 1440,
+      "http_status": 200,
+      "titleHidden": true,
+      "oldTitleBars": 0,
+      "overflow": false,
+      "searchTopRight": true,
+      "searchInBreadcrumb": false
+    },
+    {
+      "route": "/assets",
+      "width": 390,
+      "http_status": 200,
+      "titleHidden": true,
+      "oldTitleBars": 0,
+      "overflow": false,
+      "searchTopRight": true,
+      "searchInBreadcrumb": false
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 390,
+      "http_status": 200,
+      "titleHidden": true,
+      "oldTitleBars": 0,
+      "overflow": false,
+      "searchTopRight": true,
+      "searchInBreadcrumb": false
+    },
+    {
+      "route": "/identity/users",
+      "width": 390,
+      "http_status": 200,
+      "titleHidden": true,
+      "oldTitleBars": 0,
+      "overflow": false,
+      "searchTopRight": true,
+      "searchInBreadcrumb": false
+    }
+  ],
+  "search_interactions": {
+    "widths": [
+      1440,
+      390
+    ],
+    "click_open": true,
+    "shortcut_open": true,
+    "escape_focus_return": true,
+    "real_search_get": true
+  },
+  "business_writes": 0,
+  "test_messages_sent": 0,
+  "page_errors": 0,
+  "credentials_recorded": false
+}

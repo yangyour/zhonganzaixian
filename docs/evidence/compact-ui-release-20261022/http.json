@@ -1,0 +1,1008 @@
+{
+  "environment": "lan-test-20261008",
+  "status": "PASSED",
+  "checks": [
+    {
+      "name": "real_readiness",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "liveness",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "anonymous_assets_denied",
+      "status": 401,
+      "expected": 401
+    },
+    {
+      "name": "anonymous_backup_inventory_denied",
+      "status": 401,
+      "expected": 401
+    },
+    {
+      "name": "web_manifest",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:.vite/manifest.json",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/AccessUnavailablePage-BUojm6NK.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/AccessUnavailablePage-CFERxh6Z.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/AccountPage-1Oo7q0Js.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/AccountPage-BZ4M1dik.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/adminPrototype-Sdtbn93B.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/AppTable-Cx2MYKpm.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/AppTable-ojhInS2F.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/assetExportJobs-D4lx5uIs.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/AssetExportJobsPage-XaV_9M7k.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/AssetExportJobsPage-Y2mXXhl7.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/assetExportPublication-DKOqGrKq.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/AssetsPage-BMy3WyJC.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/AssetsPage-PXzTlryD.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/AuditPage-B9pRSARI.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/AuditPage-F6pQsn95.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/BackupPlanDraftsPage-DFATwByA.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/BackupPlanDraftsPage-NlQHDHFe.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/CapabilityCatalogPage-BiwhuUW2.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/CapabilityCatalogPage-DUEAtqYC.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/CapacityEstimatePage-BnE9mGCd.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/CapacityEstimatePage-BP6Yk6qR.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/capacityEstimateWorkspace-B1cmDRfY.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/capacityRuntimeInputs-BtH5QkdF.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ChangeNoticeDraftsPage-Ci8scxq9.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ChangeNoticeDraftsPage-DS0EimF8.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/channelTargetBinding-Dj9SNNyQ.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ConfigurationRevisions-POEdY-y6.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ConfigurationRevisions.vue_vue_type_style_index_0_lang-klR4deim.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ConfigurationsPage-C3lSh9UN.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ConfigurationsPage-C7Uk8_6l.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ContactImportPreviewPage-_znRMyT1.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ContactImportPreviewPage-qbhLkCqV.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/contactImportPreviewWorkspace-ChP9uvk-.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ContactImportsPage-CjCCutON.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ContactImportsPage-Cq2O61Ge.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/CustomerContactFacts-BM6gOmwH.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/CustomerContactFacts-BXwuJY4m.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/CustomerContactsPage-DrrNIcxQ.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/CustomerContactsPage-DvP4nF7E.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/customerContactWorkspace-C7J0rCzs.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/DashboardPage-B2OLCIKe.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/DashboardPage-BNjQhjMB.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/dashboardWorkflows-CED_lHcj.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/email-C3LZtPKz.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/EmailPage-iHqH6AaN.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/EmailPage-T7I6xCXu.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ExportInboxPage-CBQrBRdg.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ExportInboxPage-jA-Scpni.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/IdentityCommandNotice.vue_vue_type_script_setup_true_lang-DmTOo9kW.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/IdentityRolesPage-Bu7Lc3ED.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/IdentityRolesPage-C0myHGyr.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/IdentitySettingsPage-BNjBptv8.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/IdentitySettingsPage-CNlAcczh.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/IdentityUsersPage-DakzzaAf.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/IdentityUsersPage-QHkx2ejO.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/index-b01w8j_I.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/index-BAmkNUi8.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/index-geJV81P8.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/index-ycXX2McG.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/InspectionQuarterlyReportsPage-C8TU__RW.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/InspectionQuarterlyReportsPage-CBw66rPI.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/InspectionSourceCollectionsPage-HxdfGv7K.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/InspectionSourceCollectionsPage-nsXQchXk.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/inspectionSourceCollectionWorkspace-DEIlLFft.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/inspectionTemplates-CJuS2zGD.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/InspectionTemplatesPage-BCuPbBQS.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/InspectionTemplatesPage-BvD7kArz.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/InspectionWorksheetFacts-DSeokAHe.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/InspectionWorksheetFacts-jNZLgqay.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/inspectionWorksheetForm-D1yi92MX.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/inspectionWorksheets-oIgFTvXP.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/InspectionWorksheetsPage-D3a28PqI.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/InspectionWorksheetsPage-rMmOj5o6.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/inspectionWorksheetWorkspace-Dq1G6dJF.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/internalNoteWorkspace-fY3pUngk.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/listSearch-D26qJy-5.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/listSearch-DT5o_a-p.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/LiveMonitoringPanel-BmqKBbaT.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/LiveMonitoringPanel-uqDeeAnh.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/login-infrastructure-20261015-C_aHNh-i.webp",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/LoginPage-AQZ7TZhx.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/LoginPage-wS_vo3PL.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/main-B7SZPMY2.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/main-Dmyusq9N.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ManualIncidentsPage-BKHVWpIt.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ManualIncidentsPage-CFZa2NLW.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/monitoringEvents-DiVImIz2.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/MonitoringEventsPage-aSTeJxq5.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/MonitoringEventsPage-DrYmkDfr.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/MonitoringOnboardingPage-CMv4GOIS.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/MonitoringOnboardingPage-CVaXUb6I.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/MyTasksPage-__BnQQMV.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/MyTasksPage-Bn3OEKvY.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/networkMonitoring-CG63Ptg7.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/NetworkMonitoringPage-CIoMqiw8.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/NetworkMonitoringPage-JM2hSG89.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/NotFoundPage-BfNdmXJc.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/NotFoundPage-PUrdXaU0.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ObservationWindowDiagnosticsPage-DgrfS03o.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ObservationWindowDiagnosticsPage-DiiFjRoC.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/onCallBoard-DUMp2pvK.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/OnCallBoardPage-BQoiL7jf.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/OnCallBoardPage-DD5IYhHl.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/OperationalComparisonPage-DDANOuKB.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/OperationalComparisonPage-OkBXNQTT.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/OwnNotificationPreferencesPage-CNDpeQil.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/OwnNotificationPreferencesPage-Cr6oW2kh.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/OwnWorklogsPage-DSDzRjuA.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/OwnWorklogsPage-xw9esNUm.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/PermissionGate.vue_vue_type_script_setup_true_lang-BtydmMy4.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ReadRecoveryActions-BIWZW_nJ.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ReadRecoveryActions-BjoYjlwF.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/RuntimeConfigurationsPage-Bez-GkVl.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/RuntimeConfigurationsPage-DuRnYue9.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/serviceTiers-CP-o7B38.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ServiceTiersPage-BfzzpEPF.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ServiceTiersPage-BQBIkhGq.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/SlaReportsPage-BDm1nWTV.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/SlaReportsPage-BRj5Ta-r.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/SlaScenariosPage-B89JRvyU.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/SlaScenariosPage-D1C9Va0Q.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/TenantInventoryPage-3_g0lX5J.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/TenantInventoryPage-XJk4ayFX.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ThresholdDiagnosticsPage-B-_1oG-M.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ThresholdDiagnosticsPage-CUVIDziz.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/thresholdDiagnosticWorkspace-C6wf1BXE.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ticket-Il3C1d3C.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/TicketNotificationsPage-_C9uSsyr.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/TicketNotificationsPage-ClAUloyy.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ticketReader-CWCKusPZ.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/TicketsPage-bBLmNR2o.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/TicketsPage-DqYT8r6D.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/ticketWorkflow-DQTT_dJb.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/TicketWorkflowsPage-BW1SWCcR.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/TicketWorkflowsPage-DdmHbxWO.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/wecom-DZoVie1n.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/WeComPage-D7zO8HiU.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/WeComPage-PkXoI1-0.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/worklogPageSummary-A1v4ysG0.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:assets/writeFailure-LQTWj_ol.js",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:index.html",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:startup.css",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:third-party-notices/noble-hashes-2.4.0-LICENSE.txt",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "static:WW_verify_iFfTEbx1uklTpULT.txt",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "login_page",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "missing_static_is_404",
+      "status": 404,
+      "expected": 404
+    },
+    {
+      "name": "padmin_csrf",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "padmin_login",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "padmin_session",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "padmin_assets",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "msp_csrf",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "msp_login",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "msp_session",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "msp_assets",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "tadmin_csrf",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "tadmin_login",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "tadmin_session",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "tadmin_assets",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "viewerA_csrf",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "viewerA_login",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "viewerA_session",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "viewerA_assets",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "viewerB_csrf",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "viewerB_login",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "viewerB_session",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "viewerB_assets",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "reviewer_csrf",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "reviewer_login",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "reviewer_session",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "reviewer_assets",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "admin:configurations",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "admin:events",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "admin:events/noise-funnel",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "admin:service-tiers",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "admin:oncall/board",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "admin:escalation-policies",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "admin:inspection-quarterly-reports",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "admin:change-notice-drafts",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "admin:my/notifications",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "admin:email/status",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "admin:email/deliveries",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "admin:auth/wecom/options",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "asset_inventory_for_detail",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "backup_inventory_fails_closed_without_authorizer",
+      "status": 503,
+      "expected": 503
+    },
+    {
+      "name": "padmin_csrf",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "padmin_login",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "padmin_session",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "independent_session_tenant_switch",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "cross_tenant_asset_is_404",
+      "status": 404,
+      "expected": 404
+    },
+    {
+      "name": "business_domain_login",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "business_domain_ready",
+      "status": 200,
+      "expected": 200
+    }
+  ],
+  "business_writes": 0,
+  "test_messages_sent": 0,
+  "credentials_recorded": false,
+  "source_commit": "123b5f5cc447c47e573d4965ac64181bb9d942b1",
+  "runtime_feature_gaps": [
+    "Backup version inventory independent authorizer has no production bean in current source; 503 BACKUP_VERSION_INVENTORY_NOT_CONFIGURED observed, no fallback or permission grant."
+  ],
+  "services_running": 14,
+  "applications_at_pinned_revision": 2,
+  "schema_version": 50,
+  "ready": true,
+  "production_ready": false,
+  "static_files_verified": 145,
+  "web_build_id": "c5652ec31b1726e7816ce858fb6e2a572e086d9e980c5547fb811805f967bac9",
+  "protected_containers_unchanged": true,
+  "temporary_candidate_removed": true,
+  "verified_at": "2026-10-22T12:32:34.722670+00:00"
+}

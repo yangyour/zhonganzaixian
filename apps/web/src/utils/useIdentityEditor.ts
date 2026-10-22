@@ -44,7 +44,7 @@ export function useIdentityEditor(reload: () => Promise<boolean | 'redirected'>,
     try { result = await reload() } catch { /* The accepted write remains accepted even if refresh fails. */ } finally { if (turn === epoch) reading.value = false }
     if (disposed || turn !== epoch) return false
     readbackFailed.value = result !== true && result !== 'redirected'
-    message.value = result === true ? '操作已保存，最新记录已回读。' : result === 'redirected' ? '操作已保存，请重新登录。' : '操作已保存，但最新记录尚未确认；请重新读取，不要重复提交。'
+    message.value = result === true ? (dirty.value?'本次操作已保存并回读，其他未提交内容已保留，请分别保存。':'操作已保存，最新记录已回读。') : result === 'redirected' ? '操作已保存，请重新登录。' : '操作已保存，但最新记录尚未确认；请重新读取，不要重复提交。'
     return ok
   }
   return { command, dirty, message, readbackFailed, leave, busy: () => confirming.value || ['sending','uncertain'].includes(command.value.state) || reading.value, async save(path: string, method: string, body: unknown) { if (disposed || confirming.value || reading.value) return false; const turn = epoch, before=options.snapshot?.(); message.value = ''; readbackFailed.value = false; return accepted(await writer.submit(path, method, body), turn, before) }, async retry() { if (disposed || confirming.value || reading.value) return false; const turn = epoch, before=options.snapshot?.(); return accepted(await writer.retry(), turn, before) }, clear() { epoch++; confirming.value=false; clearRouteApproval(); writer.clear(); dirty.value = false; reading.value = false; readbackFailed.value = false; message.value = '' } }

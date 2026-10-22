@@ -1,0 +1,45 @@
+{
+  "result": "PASS_MEMBER_CROSS_TAB_DRAFT_PROTECTION",
+  "new_dom_tests": 17,
+  "focused_tests_passed": 74,
+  "vitest": {
+    "files_passed": 261,
+    "tests_passed": 4302
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180744,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "75c2104eddf8bac12b2f6766ff0d9a246997a271254152f5090daf7e03c1831d",
+    "scope": "static-artifacts-only"
+  },
+  "browser_specs": {
+    "tests": 86,
+    "files": 10,
+    "status": "DISCOVERED_NOT_EXECUTED"
+  },
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "baseline_regression": {
+    "passed": 3,
+    "failed": 14,
+    "scope": "17 new tests against previous page and editor; retry invoked original editor handler before retry wrapper added"
+  },
+  "backend_or_ddl_changed": false,
+  "real_account_or_permission_changes": 0,
+  "sensitive_inputs": "synthetic only; never logged or persisted by application",
+  "source_sha256": {
+    "apps/web/src/pages/IdentityUsersPage.vue": "da67d60b9425fe9f9381f6fc5d19dc21e992fbb16da168e0ee5841cbc2585308",
+    "apps/web/src/utils/useIdentityEditor.ts": "7dbec6c619b1c3b5d89c153f9ad209c6844f85d617be7d34fc5c3b5deea95f4c",
+    "apps/web/tests/identityMemberDrafts.test.ts": "7700f3865e372a33a25074995f38e046141cc089f4e0674eb19ca16bfc5bf44d"
+  }
+}

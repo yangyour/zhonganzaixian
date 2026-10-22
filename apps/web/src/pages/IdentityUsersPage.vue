@@ -15,8 +15,12 @@ const extraTenant = ref(''), extraRole = ref(''), extraRoles = ref<RolePage | nu
 const extraBusy=ref(false),extraError=ref<unknown>(null),extraReadTarget=ref<{scope:string;userId:string;tenantId:string}|null>(null),extraRoleSelect=ref<HTMLSelectElement|null>(null),extraFeedback=ref<HTMLElement|null>(null)
 let extraController:AbortController|undefined
 const form = reactive({ username: '', display_name: '', password: '', active: true, role_id: '', member_active: true, issuer: '', subject: '' })
+type MemberForm=typeof form
+let formBaseline:MemberForm|null=null,extraBaseline={tenant:'',role:'',active:true}
+let savedFields:Partial<MemberForm>={},savedExtra:{tenant:string;role:string;active:boolean}|null=null
+const extraSnapshot=()=>({tenant:extraTenant.value,role:extraRole.value,active:extraActive.value})
 let controller = new AbortController(), readGeneration = 0, extraGeneration = 0, disposed = false
-const editor = useIdentityEditor(load,{snapshot:inputSnapshot,preserveUnknown:true}), command = editor.command, message = editor.message
+const editor = useIdentityEditor(reloadAfterSave,{snapshot:inputSnapshot,preserveUnknown:true}), command = editor.command, message = editor.message
 const scope = computed(() => JSON.stringify([session.value?.user.id, session.value?.user.role, session.value?.tenant.id, session.value?.permission_version, session.value?.account_version, [...(session.value?.capabilities ?? [])].sort(), (session.value?.allowed_tenants ?? []).map(t => t.id).sort(), contextGeneration.value, switchingTenant.value]))
 const canRead = () => !disposed && !switchingTenant.value && can('users:read')
 const canWrite = () => !extraBusy.value&&!loading.value&&canRead() && can('users:write') && opened.value && !detailLoading.value
@@ -24,6 +28,7 @@ const canWrite = () => !extraBusy.value&&!loading.value&&canRead() && can('users
 function inputSnapshot(){return JSON.stringify([scope.value,opened.value,selected.value,form,query.value,includeInactive.value,page.value,tab.value,extraTenant.value,extraRole.value,extraActive.value])}
 function clearView() {
   resetExtraRead(true)
+  formBaseline=null;savedFields={};savedExtra=null;extraBaseline={tenant:'',role:'',active:true}
   readGeneration++; extraGeneration++; controller.abort(); if (!disposed) controller = new AbortController()
   users.value = null; roles.value = null; selected.value = null; opened.value = false; error.value = null; loading.value = false; detailLoading.value = false
   memberships.value = []; bindings.value = []; extraTenant.value = ''; extraRole.value = ''; extraRoles.value = null; extraActive.value = true
@@ -51,7 +56,7 @@ async function relations(user:ProjectUser,turn:number,signal:AbortSignal,owner:s
  const values=readMemberRelations(members,ids,new Set([session.value!.tenant.id,...session.value!.allowed_tenants.map(t=>t.id)]))
  const newRoles=catalog?readMemberRoles(catalog,session.value!.tenant.id):null
  memberships.value=values.memberships;bindings.value=values.bindings;if(newRoles)roles.value=newRoles
- selected.value=user;Object.assign(form,{username:user.username||'',display_name:user.display_name,active:user.active,password:'',role_id:user.role_id,member_active:user.member_active,issuer:'',subject:''});return true
+ selected.value=user;Object.assign(form,{username:user.username||'',display_name:user.display_name,active:user.active,password:'',role_id:user.role_id,member_active:user.member_active,issuer:'',subject:''});formBaseline={...form};return true
 }
 async function runRead(target:MemberReadTarget){
  if(!canRead())return false
@@ -85,13 +90,41 @@ async function edit(user?:ProjectUser){
  if(user&&!users.value?.items.some(item=>item===user))return
  if(!canRead()||(!user&&(!can('users:write')||!can('roles:read')||!roles.value))||editor.busy()||!await editor.leave()||owner!==scope.value||before!==inputSnapshot()||user&&(!users.value?.items.some(item=>item===user)||JSON.stringify(user)!==target))return
  if(user){try{floor(user)}catch(e){error.value=e;return}}
- stopRead();editor.clear();selected.value=user??null;opened.value=true;tab.value='profile';memberships.value=[];bindings.value=[];extraTenant.value='';extraRoles.value=null;extraRole.value='';extraActive.value=true;editor.dirty.value=false;form.password='';error.value=null
+ stopRead();editor.clear();selected.value=user??null;opened.value=true;tab.value='profile';memberships.value=[];bindings.value=[];extraTenant.value='';extraRoles.value=null;extraRole.value='';extraActive.value=true;extraBaseline=extraSnapshot();formBaseline=null;savedFields={};savedExtra=null;editor.dirty.value=false;form.password='';error.value=null
  if(user){await readAndFocus({kind:'DETAIL',user:copy(user)},owner)}
  else{Object.assign(form,{username:'',display_name:'',password:'',active:true,role_id:roles.value?.items.find(r=>r.enabled&&r.base_role==='viewer')?.id||'',member_active:true,issuer:'',subject:''});await focusResult(owner,true)}
 }
-async function saveProfile() { const owner=scope.value;if (!canWrite() || (!selected.value && !can('roles:read'))) return; const user = selected.value;if(!user&&!roles.value?.items.some(r=>r.id===form.role_id&&r.enabled))return; if (await editor.save(user ? `/identity/users/${user.id}` : '/identity/users', user ? 'PATCH' : 'POST', user ? { expected_version: user.version, display_name: form.display_name, active: form.active } : { expected_version: 0, username: form.username, display_name: form.display_name, password: form.password, active: form.active, role_id: form.role_id })&&owner===scope.value&&!disposed) { form.password = ''; if (!user){opened.value = false;await focusResult(owner,true)} } }
-async function action(kind: 'password' | 'unlock' | 'revoke-sessions' | 'local-account') { if (!canWrite() || !selected.value) return; const owner = scope.value, user = selected.value!, originalPassword=form.password; const ok=await editor.save(`/identity/users/${user.id}/${kind}`, 'POST', { expected_version: user.version, ...(kind === 'password' ? { new_password: form.password } : kind === 'local-account' ? { username: form.username, password: form.password } : {}) }); if (ok&&owner === scope.value&&form.password===originalPassword) form.password = '' }
-async function assign() { if (!canWrite() || !can('roles:read') || !selected.value || !roles.value?.items.some(r=>r.id===form.role_id&&r.enabled)) return; const user = selected.value!; await editor.save(`/identity/users/${user.id}/memberships/${session.value!.tenant.id}`, 'PUT', { expected_version: user.permission_version, role_id: form.role_id, active: form.member_active }) }
+// Save only the submitted fields. Other tabs keep their in-memory drafts across accepted readback.
+async function saveMember(path:string,method:string,body:unknown,fields:Partial<MemberForm>={},extra=false){
+ if(editor.busy())return false
+ const attempt={...fields};savedFields=attempt;savedExtra=extra?extraSnapshot():null
+ try{return await editor.save(path,method,body)}finally{if(savedFields===attempt&&!['sending','uncertain'].includes(command.value.state)){savedFields={};savedExtra=null}}
+}
+async function retryMember(){
+ const attempt=savedFields
+ try{return await editor.retry()}finally{if(savedFields===attempt&&!['sending','uncertain'].includes(command.value.state)){savedFields={};savedExtra=null}}
+}
+async function reloadAfterSave(){
+ const owner=scope.value,userId=selected.value?.id,baseline=formBaseline
+ if(!userId||!baseline){savedFields={};savedExtra=null;return load()}
+ const drafts:Partial<MemberForm>={}
+ for(const key of Object.keys(form) as (keyof MemberForm)[]){
+  const value=form[key]
+  if(Object.prototype.hasOwnProperty.call(savedFields,key)?value!==savedFields[key]:value!==baseline[key])Object.assign(drafts,{[key]:value})
+ }
+ const extraBefore=extraSnapshot(),acceptedExtra=savedExtra?{...savedExtra}:null
+ const extraDirty=JSON.stringify(extraBefore)!==JSON.stringify(acceptedExtra??extraBaseline)
+ const result=await load()
+ if(disposed||owner!==scope.value||selected.value?.id!==userId)return false
+ if(result){Object.assign(form,drafts);if(acceptedExtra)extraBaseline=acceptedExtra}
+ // A failed read keeps raw input in memory, and retry must still ask before discarding drafts.
+ editor.dirty.value=Object.keys(drafts).length>0||extraDirty
+ savedFields={};savedExtra=null
+ return result
+}
+async function saveProfile() { const owner=scope.value;if (!canWrite() || (!selected.value && !can('roles:read'))) return; const user = selected.value;if(!user&&!roles.value?.items.some(r=>r.id===form.role_id&&r.enabled))return; if (await saveMember(user ? `/identity/users/${user.id}` : '/identity/users', user ? 'PATCH' : 'POST', user ? { expected_version: user.version, display_name: form.display_name, active: form.active } : { expected_version: 0, username: form.username, display_name: form.display_name, password: form.password, active: form.active, role_id: form.role_id },user?{display_name:form.display_name,active:form.active}:{...form})&&owner===scope.value&&!disposed) { if (!user){form.password='';opened.value = false;await focusResult(owner,true)} } }
+async function action(kind: 'password' | 'unlock' | 'revoke-sessions' | 'local-account') { if (!canWrite() || !selected.value) return; const owner = scope.value, user = selected.value!, originalPassword=form.password; const ok=await saveMember(`/identity/users/${user.id}/${kind}`, 'POST', { expected_version: user.version, ...(kind === 'password' ? { new_password: form.password } : kind === 'local-account' ? { username: form.username, password: form.password } : {}) },kind==='password'?{password:form.password}:kind==='local-account'?{username:form.username,password:form.password}:{}); if ((kind==='password'||kind==='local-account')&&ok&&owner === scope.value&&form.password===originalPassword) form.password = '' }
+async function assign() { if (!canWrite() || !can('roles:read') || !selected.value || !roles.value?.items.some(r=>r.id===form.role_id&&r.enabled)) return; const user = selected.value!; await saveMember(`/identity/users/${user.id}/memberships/${session.value!.tenant.id}`, 'PUT', { expected_version: user.permission_version, role_id: form.role_id, active: form.member_active },{role_id:form.role_id,member_active:form.member_active}) }
 function resetExtraRead(clearCatalog:boolean){extraGeneration++;extraController?.abort();extraController=undefined;extraBusy.value=false;extraError.value=null;extraReadTarget.value=null;if(clearCatalog){extraRoles.value=null;extraRole.value=''}}
 function extraAllowed(target:string,userId:string){return !disposed&&canRead()&&can('users:write')&&can('roles:read')&&opened.value&&!mainBusy.value&&!editor.busy()&&selected.value?.id===userId&&target===extraTenant.value&&target!==session.value?.tenant.id&&!!session.value?.allowed_tenants.some(t=>t.id===target)}
 function canRetryExtra(){const target=extraReadTarget.value;return !!target&&!extraBusy.value&&target.scope===scope.value&&extraAllowed(target.tenantId,target.userId)}
@@ -114,18 +147,18 @@ async function tenantRoles(recovery?:{scope:string;userId:string;tenantId:string
 }
 watch(extraTenant,()=>resetExtraRead(true),{flush:'sync'})
 watch(()=>selected.value?.id,()=>resetExtraRead(true),{flush:'sync'})
-async function grantTenant() { if (!canWrite() || !can('roles:read') || !selected.value || !extraTenant.value || extraRoles.value?.tenant_id !== extraTenant.value || !session.value?.allowed_tenants.some(t => t.id === extraTenant.value) || !extraRoles.value.items.some(r => r.id === extraRole.value && r.enabled)) return; const target = extraTenant.value, previous = memberships.value.find(x => x.tenant_id === target); await editor.save(`/identity/users/${selected.value!.id}/memberships/${target}`, 'PUT', { expected_version: previous?.permission_version ?? 0, role_id: extraRole.value, active: extraActive.value }) }
-async function bind() { if (!canWrite() || !selected.value) return; await editor.save(`/identity/users/${selected.value!.id}/external-identities`, 'POST', { expected_version: 0, issuer: form.issuer, subject: form.subject }) }
-async function disable(binding: IdentityBinding) { if (!canWrite() || !selected.value || !binding.active || !bindings.value.some(row=>row===binding)) return; await editor.save(`/identity/users/${selected.value!.id}/external-identities/${binding.id}/disable`, 'POST', { expected_version: binding.version }) }
+async function grantTenant() { if (!canWrite() || !can('roles:read') || !selected.value || !extraTenant.value || extraRoles.value?.tenant_id !== extraTenant.value || !session.value?.allowed_tenants.some(t => t.id === extraTenant.value) || !extraRoles.value.items.some(r => r.id === extraRole.value && r.enabled)) return; const target = extraTenant.value, previous = memberships.value.find(x => x.tenant_id === target); await saveMember(`/identity/users/${selected.value!.id}/memberships/${target}`, 'PUT', { expected_version: previous?.permission_version ?? 0, role_id: extraRole.value, active: extraActive.value },{},true) }
+async function bind() { if (!canWrite() || !selected.value) return; await saveMember(`/identity/users/${selected.value!.id}/external-identities`, 'POST', { expected_version: 0, issuer: form.issuer, subject: form.subject },{issuer:form.issuer,subject:form.subject}) }
+async function disable(binding: IdentityBinding) { if (!canWrite() || !selected.value || !binding.active || !bindings.value.some(row=>row===binding)) return; await saveMember(`/identity/users/${selected.value!.id}/external-identities/${binding.id}/disable`, 'POST', { expected_version: binding.version }) }
 async function search(){const owner=scope.value,before=inputSnapshot(),target:MemberListTarget={kind:'LIST',query:query.value,includeInactive:includeInactive.value,page:1,user:null};if(!canRead()||editor.busy()||!await editor.leave()||owner!==scope.value||before!==inputSnapshot())return false;editor.clear();selected.value=null;opened.value=false;editor.dirty.value=false;return await readAndFocus(target,owner)}
 async function move(delta:number){if(![-1,1].includes(delta)||unapplied.value||delta<0&&page.value<=1||delta>0&&!users.value?.has_more)return false;const owner=scope.value,before=inputSnapshot(),target:MemberListTarget={kind:'LIST',query:appliedQuery.value,includeInactive:appliedInactive.value,page:page.value+delta,user:null};if(!canRead()||editor.busy()||!await editor.leave()||owner!==scope.value||before!==inputSnapshot())return false;editor.clear();selected.value=null;opened.value=false;editor.dirty.value=false;return await readAndFocus(target,owner)}
-async function closeEditor(){const owner=scope.value,before=inputSnapshot();if(editor.busy()||!await editor.leave()||owner!==scope.value||before!==inputSnapshot())return;stopRead();editor.clear();opened.value=false;selected.value=null;form.password='';await focusResult(owner,true)}
+async function closeEditor(){const owner=scope.value,before=inputSnapshot();if(editor.busy()||!await editor.leave()||owner!==scope.value||before!==inputSnapshot())return;stopRead();editor.clear();savedFields={};savedExtra=null;formBaseline=null;opened.value=false;selected.value=null;form.password='';await focusResult(owner,true)}
 async function restoreQuery(){if(editor.busy()||disposed)return;const owner=scope.value;query.value=appliedQuery.value;includeInactive.value=appliedInactive.value;await nextTick();if(owner===scope.value&&!disposed)queryInput.value?.focus()}
 </script>
 <template><section class="identity-page admin-prototype" :aria-busy="mainBusy">
   <div class="page-heading"><div><h1 ref="pageHeading" tabindex="-1">用户与成员授权</h1><p>管理当前租户的账号、成员角色及统一身份绑定。</p></div><el-button v-if="can('users:write') && can('roles:read')" type="primary" :disabled="editor.busy()||!roles" @click="edit()">新建用户</el-button></div>
   <p v-if="!can('users:read')">当前会话无用户读取权限。</p><p v-if="canRead()&&can('roles:read')&&!roles&&!loading">角色目录尚未完整读取，请查询成员或恢复原读取后再新建账号。</p>
-  <ReadRecoveryActions :busy="mainBusy?'read':null" :can-retry="showReadRetry()" :scope-key="scope" label="成员列表详情" :cancel="cancelRead" :retry="retryRead" /><p v-if="loading" role="status">正在读取原成员列表与角色目录…</p><p v-if="!users&&!mainBusy&&!error&&canRead()">成员列表尚未读取成功，不能据此认定没有成员。</p><p v-if="mainTarget&&!mainBusy">原读取目标：{{mainTarget.kind==='LIST'?'成员列表第 '+mainTarget.page+' 页':'所选成员关联详情'}}。恢复不使用尚未查询的新筛选。</p><div ref="readFeedback" tabindex="-1" role="group" aria-label="成员读取结果"><ApiErrorNotice :error="error" /></div><IdentityCommandNotice :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" />
+  <ReadRecoveryActions :busy="mainBusy?'read':null" :can-retry="showReadRetry()" :scope-key="scope" label="成员列表详情" :cancel="cancelRead" :retry="retryRead" /><p v-if="loading" role="status">正在读取原成员列表与角色目录…</p><p v-if="!users&&!mainBusy&&!error&&canRead()">成员列表尚未读取成功，不能据此认定没有成员。</p><p v-if="mainTarget&&!mainBusy">原读取目标：{{mainTarget.kind==='LIST'?'成员列表第 '+mainTarget.page+' 页':'所选成员关联详情'}}。恢复不使用尚未查询的新筛选。</p><div ref="readFeedback" tabindex="-1" role="group" aria-label="成员读取结果"><ApiErrorNotice :error="error" /></div><IdentityCommandNotice :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="retryMember" />
   <div class="admin-stats" v-if="users">
     <div class="admin-stat"><span>本页成员</span><strong>{{ users.items.length }}</strong><small>当前租户 · 第 {{ page }} 页</small></div>
     <div class="admin-stat"><span>账号与成员均启用</span><strong>{{ users.items.filter(u => u.active && u.member_active).length }}</strong><small>有效账号及成员关系</small></div>
@@ -141,7 +174,7 @@ async function restoreQuery(){if(editor.busy()||disposed)return;const owner=scop
   </section>
   <p v-if="opened && detailLoading" role="status">正在读取所选账号详情…</p>
   <section v-if="opened && !detailLoading" class="identity-card identity-form admin-editor-panel" aria-label="用户账号编辑与授权"><div class="admin-editor-title"><h2 ref="editorHeading" tabindex="-1">{{ selected ? selected.display_name : '新建用户' }}</h2><el-button :disabled="editor.busy()" @click="closeEditor">关闭编辑</el-button></div>
-    <IdentityCommandNotice :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" />
+    <IdentityCommandNotice :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="retryMember" />
     <el-tabs v-model="tab"><el-tab-pane label="基本资料" name="profile" /><el-tab-pane v-if="selected" label="登录与会话" name="security" /><el-tab-pane v-if="selected" label="成员授权" name="membership" /><el-tab-pane v-if="selected" label="统一身份绑定" name="bindings" /></el-tabs>
     <form v-form-feedback v-if="tab === 'profile'" @submit.prevent="saveProfile" @input="editor.dirty.value = true" @change="editor.dirty.value = true"><fieldset :disabled="editor.busy() || extraBusy || !can('users:write')"><label v-if="!selected">登录账号<input v-model="form.username" required pattern="[A-Za-z0-9][A-Za-z0-9_.@-]{2,63}" maxlength="64" autocomplete="off" /></label><label>显示名称<input v-model="form.display_name" required maxlength="100" /></label><label v-if="!selected">初始密码<input v-model="form.password" type="password" required maxlength="1024" autocomplete="new-password" /></label><label v-if="!selected">所属角色<select v-model="form.role_id" required><option v-for="role in roles?.items.filter(r => r.enabled)" :key="role.id" :value="role.id">{{ role.name }}</option></select></label><label class="check"><input v-model="form.active" type="checkbox" />启用账号</label><p class="muted">账号基本资料与启用状态为平台全局属性；登录账号创建后不可修改。</p><el-button v-if="can('users:write')" native-type="submit" type="primary">保存账号</el-button></fieldset></form>
     <div v-if="tab === 'security' && selected"><p>重置密码或注销会话后，该账号已建立的登录会话将立即失效。忘记密码请由平台管理员核实身份后重置。</p><form v-form-feedback @submit.prevent="action(selected.local_login_enabled ? 'password' : 'local-account')" @input="editor.dirty.value = true"><fieldset :disabled="editor.busy() || extraBusy || !can('users:write') || selected.id === session?.user.id"><label v-if="!selected.local_login_enabled">开通登录账号<input v-model="form.username" required pattern="[A-Za-z0-9][A-Za-z0-9_.@-]{2,63}" maxlength="64" /></label><label>新密码<input v-model="form.password" type="password" required autocomplete="new-password" maxlength="1024" /></label><el-button v-if="can('users:write')" native-type="submit" type="primary">{{ selected.local_login_enabled ? '重置密码' : '开通本地登录' }}</el-button></fieldset></form><p v-if="selected.id === session?.user.id">当前登录账号的密码请前往“我的账号”修改。</p><p>锁定截至：{{ selected.locked_until || '未锁定' }}</p><div v-if="can('users:write')" class="identity-actions"><el-button :disabled="editor.busy() || extraBusy || !selected.local_login_enabled" @click="action('unlock')">解除登录锁定</el-button><el-button :disabled="editor.busy()||extraBusy" @click="action('revoke-sessions')">注销全部会话</el-button></div></div>

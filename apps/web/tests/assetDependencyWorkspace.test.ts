@@ -1,10 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { ApiError, type ApiClient } from '../src/api/client'
 import { createDependencyWorkspace, readDependencyDraft, readDependencyReceipt, validateDependencyEdge, type DependencyContext, type DependencyDraft, type ProposedDependency } from '../src/utils/assetDependencyWorkspace'
-const a='55000000-0000-4000-8000-000000000001', b='55000000-0000-4000-8000-000000000002', c='55000000-0000-4000-8000-000000000003', tenant='55000000-0000-4000-8000-000000000011', actor='55000000-0000-4000-8000-000000000021'
-const context: DependencyContext={tenantId:tenant,assetId:a,actorId:actor,permissionVersion:1,canWrite:true}
-const edge=(parent=a,child=b):ProposedDependency=>({parent_id:parent,child_id:child,proposed_type:null,proposed_suppression_scope:null,proposed_enabled:null})
-const draft=(version=0,edges:ProposedDependency[]=[]):DependencyDraft=>({asset_id:a,tenant_id:tenant,version,version_kind:'tenant_dependency_graph',updated_at:version?'2026-10-02T12:00:00.000Z':null,complete:true,proposed_edges:edges,lifecycle_status:'DRAFT',decision_status:'pending',configuration_status:'CONFIG_PENDING',effective_rules:null,monitoring_applied:false,question_ids:['Q20'],source:'postgresql',technical_limits:{max_additions:100,max_graph_edges:10000,max_body_bytes:131072}})
+import {a,b,c,tenant,actor,context,edge,draft} from './fixtures/assetDependency'
 function setup(){const request=vi.fn();const changed=vi.fn();let sequence=0;const workspace=createDependencyWorkspace({request} as unknown as Pick<ApiClient,'request'>,changed,()=>`test-key-${++sequence}`);workspace.reset(context);return {request,changed,workspace}}
 function deferred<T>(){let resolve!:(value:T)=>void;const promise=new Promise<T>(r=>{resolve=r});return {resolve,promise}}
 

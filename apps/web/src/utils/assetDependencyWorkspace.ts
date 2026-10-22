@@ -11,7 +11,7 @@ export interface DependencyDraft {
 }
 export interface DependencyContext { tenantId: string; assetId: string; actorId: string; permissionVersion: number; canWrite: boolean }
 interface Attempt { key: string; payload: string; baseline: DependencyDraft; state: 'uncertain' | 'accepted' | 'rejected' }
-export interface DependencyState { draft: DependencyDraft | null; receipt: DependencyDraft | null; attempt: Attempt | null; busy: 'read' | 'write' | null; error: unknown }
+export interface DependencyState { readAttempted: boolean; cancelledRead: boolean; draft: DependencyDraft | null; receipt: DependencyDraft | null; attempt: Attempt | null; busy: 'read' | 'write' | null; error: unknown }
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const object = (value: unknown): value is Record<string, unknown> => Boolean(value && typeof value === 'object' && !Array.isArray(value))
 const exact = (value: unknown, keys: string[]): value is Record<string, unknown> => object(value) && Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key))
@@ -60,50 +60,78 @@ export function readDependencyReceipt(value: unknown, context: DependencyContext
   return result
 }
 
+export const emptyDependencyState = (): DependencyState => ({ draft: null, receipt: null, attempt: null, busy: null, error: null, readAttempted: false, cancelledRead: false })
 export function createDependencyWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: DependencyState) => void, newKey: () => string = () => createRequestId()) {
-  let context: DependencyContext | null = null, epoch = 0, request: AbortController | undefined
-  let state: DependencyState = { draft: null, receipt: null, attempt: null, busy: null, error: null }
+  let context: DependencyContext | null = null, epoch = 0, request: AbortController | undefined, disposed = false
+  let state = emptyDependencyState(), highest: DependencyDraft | null = null
   const emit = () => changed(detachedWorkspaceState(state))
-  const path = () => `/assets/${context!.assetId}/dependencies`
+  const path = (scope: DependencyContext) => `/assets/${scope.assetId}/dependencies`
   const unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
-  function reset(next: DependencyContext | null) { request?.abort(); ++epoch; const valid = next && [next.tenantId, next.assetId, next.actorId].every(id => uuid.test(id)) && Number.isSafeInteger(next.permissionVersion) && next.permissionVersion >= 1 && typeof next.canWrite === 'boolean'; context = valid ? { ...next! } : null; state = { draft: null, receipt: null, attempt: null, busy: null, error: next && !valid ? invalid() : null }; emit() }
+  function reset(next: DependencyContext | null) {
+    request?.abort(); request = undefined; ++epoch; highest = null
+    const valid = !disposed && next && [next.tenantId, next.assetId, next.actorId].every(id => uuid.test(id)) && Number.isSafeInteger(next.permissionVersion) && next.permissionVersion >= 1 && typeof next.canWrite === 'boolean'
+    context = valid ? { ...next! } : null; state = emptyDependencyState(); if (!disposed && next && !valid) state.error = invalid(); emit()
+  }
+  function remember(result: DependencyDraft) {
+    for (const known of [highest,state.receipt]) {
+      if (!known) continue
+      if (result.version < known.version || !contains(known,result) || result.version === known.version && (result.proposed_edges.length !== known.proposed_edges.length || result.updated_at !== known.updated_at)) throw invalid()
+    }
+    highest = copy(result)
+  }
   async function refresh() {
-    if (!context || state.busy === 'write') return false
-    request?.abort(); const current = ++epoch, scope = { ...context }, controller = new AbortController(); request = controller
-    state = { ...state, draft: null, busy: 'read', error: null }; emit()
+    if (disposed || !context || state.busy === 'write') return false
+    request?.abort(); const current = ++epoch, scope = context, controller = new AbortController(); request = controller
+    state = { ...state, draft: null, busy: 'read', error: null, readAttempted: true, cancelledRead: false }; emit()
+    if (disposed || current !== epoch || controller.signal.aborted || context !== scope) return false
     try {
-      const result = readDependencyDraft(await client.request<unknown>(path(), { signal: controller.signal }), scope)
-      if (current !== epoch || controller.signal.aborted) return false
-      if (state.receipt && (result.version < state.receipt.version || !contains(state.receipt, result))) throw invalid()
+      const raw = await client.request<unknown>(path(scope), { signal: controller.signal })
+      if (disposed || current !== epoch || controller.signal.aborted || context !== scope) return false
+      const result = readDependencyDraft(raw, scope); remember(result)
       state = { ...state, draft: result }; return true
-    } catch (error) { if (current === epoch && !isCancelled(error)) state = { ...state, error }; return false }
-    finally { if (current === epoch) { state = { ...state, busy: null }; emit() } }
+    } catch (error) { if (!disposed && current === epoch) state = { ...state, ...(isCancelled(error) ? {cancelledRead:true} : {error}) }; return false }
+    finally { if (!disposed && current === epoch) { request = undefined; state = { ...state, busy: null }; emit() } }
+  }
+  const canRetryRead = () => !disposed && !!context && state.readAttempted && !state.busy && !!(state.error || state.cancelledRead)
+  const retryRead = () => canRetryRead() ? refresh() : Promise.resolve(false)
+  function cancelRead() {
+    if (disposed || state.busy !== 'read') return false
+    ++epoch; request?.abort(); request = undefined
+    state = { ...state, draft: null, busy: null, error: null, cancelledRead: true }; emit(); return true
   }
   async function send(attempt: Attempt, retry = false) {
-    if (!context?.canWrite || state.busy) return false
-    const current = ++epoch, scope = { ...context }, controller = new AbortController(); request?.abort(); request = controller
-    state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
+    if (disposed || !context?.canWrite || state.busy) return false
+    const current = ++epoch, scope = context, controller = new AbortController(); request?.abort(); request = controller
+    state = { ...state, busy: 'write', error: null, readAttempted: false, cancelledRead: false, attempt: { ...attempt, state: 'uncertain' } }; emit()
+    if (disposed || current !== epoch || controller.signal.aborted || context !== scope) return false
     try {
       const body = JSON.parse(attempt.payload) as { expected_version: number; additions: ProposedDependency[] }
-      const raw = await client.request<unknown>(path(), { method: 'POST', body, idempotencyKey: attempt.key, signal: controller.signal })
-      if (current !== epoch || controller.signal.aborted) return false
+      const raw = await client.request<unknown>(path(scope), { method: 'POST', body, idempotencyKey: attempt.key, signal: controller.signal })
+      if (disposed || current !== epoch || controller.signal.aborted || context !== scope) return false
       const receipt = readDependencyReceipt(raw, scope, attempt.baseline, body.additions)
-      state = { ...state, receipt, draft: receipt, busy: null, attempt: { ...attempt, state: 'accepted' } }; emit()
-      await refresh(); return true
+      // An original receipt can precede a newer read. Retain it without lowering the graph floor.
+      if (!highest || receipt.version >= highest.version) remember(receipt)
+      state = { ...state, receipt, draft: highest && highest.version > receipt.version ? null : receipt, busy: null, attempt: { ...attempt, state: 'accepted' } }; emit()
+      if (disposed || current !== epoch || context !== scope) return false
+      await refresh(); return !disposed && context === scope
     } catch (error) {
-      if (current !== epoch) return false
+      if (disposed || current !== epoch || context !== scope) return false
       const uncertain = retry || isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_')
       state = { ...state, error, draft: null, attempt: { ...attempt, state: uncertain ? 'uncertain' : 'rejected' } }; return false
-    } finally { if (current === epoch) { state = { ...state, busy: null }; emit() } }
+    } finally { if (!disposed && current === epoch) { request = undefined; state = { ...state, busy: null }; emit() } }
   }
   async function submit(edge: ProposedDependency) {
-    if (!context?.canWrite || state.busy || unresolved() || !state.draft || state.draft.version >= Number.MAX_SAFE_INTEGER) return false
+    if (disposed || !context?.canWrite || state.busy || unresolved() || !state.draft || state.draft.version >= Number.MAX_SAFE_INTEGER) return false
     validateDependencyEdge(edge)
     if (edge.parent_id !== context.assetId && edge.child_id !== context.assetId) throw invalid()
-    const baseline = copy(state.draft), payload = JSON.stringify({ expected_version: baseline.version, additions: [copy(edge)] })
-    return send({ key: newKey(), payload, baseline, state: 'uncertain' })
+    const scope = context, turn = epoch, baseline = copy(state.draft), payload = JSON.stringify({ expected_version: baseline.version, additions: [copy(edge)] })
+    let key: string
+    try { key = newKey(); if (typeof key !== 'string' || !/^[A-Za-z0-9._:-]{1,128}$/.test(key)) throw new Error() }
+    catch { if (!disposed && turn === epoch && context === scope) { state = {...state,readAttempted:false,cancelledRead:false,error:new ApiError(0,'DEPENDENCY_PREPARATION_FAILED','保存请求尚未发送，请重试准备；原输入保留','—')};emit() };return false }
+    if (disposed || turn !== epoch || context !== scope || state.busy || unresolved()) return false
+    return send({ key, payload, baseline, state: 'uncertain' })
   }
   async function retry() { return state.attempt?.state === 'uncertain' ? send(state.attempt, true) : false }
   emit()
-  return { reset, refresh, submit, retry, unresolved, dispose: () => reset(null), state: () => detachedWorkspaceState(state) }
+  return { reset, refresh, cancelRead, retryRead, canRetryRead, submit, retry, unresolved, dispose: () => { disposed = true; reset(null) }, state: () => detachedWorkspaceState(state) }
 }

@@ -1,0 +1,44 @@
+{
+  "status": "PASS_DEPENDENCY_ORIGINAL_READ_RECOVERY",
+  "new_tests": 28,
+  "new_logic_tests": 17,
+  "new_dom_tests": 11,
+  "original_logic_run": {
+    "failed": 17,
+    "passed": 0
+  },
+  "focused": {
+    "files": 3,
+    "tests": 47,
+    "failures": 0
+  },
+  "vitest": {
+    "files": 281,
+    "tests": 4680,
+    "failures": 0
+  },
+  "node_contract_tests": 179,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180739,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "f02eaeff2857965392ac2b9da44a8f9a78ffcd811519c829cd47635bfac8b7dd",
+    "scope": "static-artifacts-only"
+  },
+  "test_boundary": "Actual Vue/Element Plus controls; drawer and graph-table shells stubbed; no browser acceptance",
+  "http_smoke": "4_DISTINCT_LOOPBACK_VITE_RESOURCES_PASS_AND_STOPPED",
+  "browser": "105_SPECIFICATIONS_12_FILES_ACTUAL_NOT_RUN",
+  "formal_contract_tc": "128_NOT_RUN",
+  "backend_sql_or_real_account_changed": false,
+  "remaining": "Dependency complete draft confirmation and large graph segmented display",
+  "source_sha256": {
+    "apps/web/src/utils/assetDependencyWorkspace.ts": "8d56f1d997e78588f1fd35a55d5c3f8c58854d42a2d022055a623891fa3ca4f3",
+    "apps/web/src/components/AssetDependencyWorkspace.vue": "279fbf75c5622eb8f65c51ce6fc5e0d9e4be8396a18e1d7a7e831bae282bc4dc",
+    "apps/web/tests/assetDependencyWorkspace.test.ts": "ea29ba869867c5b5c8f263d1d2e0c7db38cef7382cbb9646a60efea97923d26c",
+    "apps/web/tests/fixtures/assetDependency.ts": "f0cc349f5cf6fa2c65448f8fd3b8e3910bf5bc4640993e75478dc9756a43a7d8",
+    "apps/web/tests/assetDependencyReadRecovery.test.ts": "a8126af4b0d804d647157eba5b203ae8336f46c0201c1a65d475196457c6bd53",
+    "apps/web/tests/assetDependencyRecoveryPanel.test.ts": "b034f3a04b975e76f0b64f85dddc7ad57dc1d5a11e2344b84311471d7e11bf96"
+  }
+}

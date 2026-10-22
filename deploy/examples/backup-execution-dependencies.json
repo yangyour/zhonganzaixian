@@ -53,5 +53,6 @@
   "backup_version_registration_authorizer_reference": null,
   "backup_collection_completion_evidence_verifier_reference": null,
   "backup_version_registration_binding_reference": null,
-  "backup_version_inventory_authorizer_reference": null
+  "backup_version_inventory_authorizer_reference": null,
+  "backup_version_inventory_binding_reference": null
 }

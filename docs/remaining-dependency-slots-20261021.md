@@ -55,3 +55,5 @@
 [回执逐条追加日志格式](delivery-receipt-journal-20261021.md)可独立验证原命令和有序历史，尚非数据库仓库。已有receipt_history_repository_reference、receipt_journal_authorizer_reference、receipt_provider_correlation_reference、receipt_callback_authenticator_reference等引用继续null；操作者/权限版本仅记录，不作为授权或验签证明。
 
 [V50回执日志仓库](delivery-receipt-postgres-20261021.md)已有显式构造实现；生产receipt_history_repository_reference和receipt_journal_authorizer_reference仍未配置。仓库要求注入操作授权及可信原请求/回执前置核验，合成测试回调不得移作默认允许；签名回执入口、供应商映射、Worker和真实发送许可仍独立待完成。
+
+[备份版本只读 HTTP 边界](backup-version-inventory-api-20261021.md)接独立授权仓储及安全元数据投影，未装配明确503；增加只读仓储工厂、实际回环HTTP合成验证，真实授权适配及资产详情前端仍待，不开放下载/解密/设备执行。

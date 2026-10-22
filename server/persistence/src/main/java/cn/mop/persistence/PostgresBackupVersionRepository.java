@@ -43,10 +43,18 @@ public final class PostgresBackupVersionRepository {
  private record Command(Access access,Scope scope,UUID id,long runVersion,long archiveVersion,LeaseClaim lease,String objectReference,String executionReference,String trace){}
  private record Prepared(Candidate candidate,Registration existing){}
  private record RunView(BackupRunState state,UUID command,String action,String reference,LeaseClaim lease,long leaseEventVersion,Instant observedAt){}
- private final DataSource source;private final Authorizer authorizer;private final ObjectVerifier objectVerifier;private final CompletionPrerequisiteVerifier completionVerifier;
+ private final DataSource source;private final Authorizer authorizer;private final ObjectVerifier objectVerifier;private final CompletionPrerequisiteVerifier completionVerifier;private final boolean registrationAllowed;
  private final BackupRunSnapshotCodec codec=new BackupRunSnapshotCodec();
- public PostgresBackupVersionRepository(DataSource source,Authorizer authorizer,ObjectVerifier objectVerifier,CompletionPrerequisiteVerifier completionVerifier){this.source=Objects.requireNonNull(source);this.authorizer=Objects.requireNonNull(authorizer);this.objectVerifier=Objects.requireNonNull(objectVerifier);this.completionVerifier=Objects.requireNonNull(completionVerifier);}
+ public PostgresBackupVersionRepository(DataSource source,Authorizer authorizer,ObjectVerifier objectVerifier,CompletionPrerequisiteVerifier completionVerifier){this(source,authorizer,objectVerifier,completionVerifier,true);}
+ private PostgresBackupVersionRepository(DataSource source,Authorizer authorizer,ObjectVerifier objectVerifier,CompletionPrerequisiteVerifier completionVerifier,boolean registrationAllowed){this.source=Objects.requireNonNull(source);this.authorizer=Objects.requireNonNull(authorizer);this.objectVerifier=Objects.requireNonNull(objectVerifier);this.completionVerifier=Objects.requireNonNull(completionVerifier);this.registrationAllowed=registrationAllowed;}
+ /** Read-only assembly needs real per-version authorization, never dummy success write proofs. */
+ public static PostgresBackupVersionRepository readOnly(DataSource source,Authorizer readAuthorizer){
+  Objects.requireNonNull(readAuthorizer);
+  return new PostgresBackupVersionRepository(source,(c,a,s,o)->{if(o!=Operation.READ)throw registrationDisabled();readAuthorizer.authorize(c,a,s,o);},(a,c,r)->{throw registrationDisabled();},(c,a,s,r,l,e)->{throw registrationDisabled();},false);
+ }
+ private static DomainException registrationDisabled(){return new DomainException(403,"BACKUP_VERSION_REGISTRATION_DISABLED","此仓储实例仅提供独立授权的只读查询");}
  public Receipt register(Access access,Scope scope,UUID command,long expectedRunVersion,long expectedArchiveVersion,LeaseClaim lease,String objectRecheckReference,String executionReference,String trace){
+  if(!registrationAllowed)throw registrationDisabled();
   var input=new Command(access,scope,command,expectedRunVersion,expectedArchiveVersion,lease,objectRecheckReference,executionReference,trace);validate(input);
   Prepared prepared=transaction(access,scope,Operation.REGISTER,c->prepare(c,input));if(prepared.existing()!=null)return new Receipt(prepared.existing(),true);
   Candidate original=prepared.candidate();

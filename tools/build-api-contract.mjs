@@ -1,3 +1,4 @@
+import { addBackupVersionInventoryContract } from './backup-version-inventory-contract.mjs';
 import { addObservationWindowContract } from './observation-window-contract.mjs';
 import { addCmdbSourcePreflightContract } from './cmdb-source-preflight-contract.mjs';
 import { addCmdbTypeCatalogContract } from './cmdb-type-catalog-contract.mjs';
@@ -962,7 +963,8 @@ addCmdbTypeCatalogContract(contract);
 addCmdbSourcePreflightContract(contract);
 addObservationWindowContract(contract);
 contract.paths['/inspection-quarterly-reports/{id}/preview.pdf']={get:{operationId:'downloadQuarterlyReportPdfDraft',summary:'前后两次授权及冻结文档复核的有限PDF草稿，不批准、发布或保存正式报告',parameters:[pathId,{name:'If-Match',in:'header',required:true,schema:{type:'string',pattern:'^"[0-9a-f]{64}"$'}}],'x-mop-capabilities':['inspection_quarterly_reports:read'],'x-mop-read-only':true,responses:{200:{description:'最多200页、8MiB的DRAFT文件；字体及SHA必须显式配置，非PDF/UA验收',headers:{'X-MOP-Report-ID':{schema:uuid},'X-MOP-Tenant-ID':{schema:uuid},'X-MOP-Document-SHA256':{schema:{type:'string',pattern:'^[0-9a-f]{64}$'}},'X-MOP-PDF-SHA256':{schema:{type:'string',pattern:'^[0-9a-f]{64}$'}},'X-MOP-PDF-Pages':{schema:{type:'integer',minimum:1,maximum:200}},'X-MOP-Preview-Status':{schema:{const:'DRAFT'}},'Content-Disposition':{schema:{type:'string'}},'Cache-Control':{schema:{const:'no-store'}}},content:{'application/pdf':{schema:{type:'string',format:'binary',maxLength:8388608}}}},...Object.fromEntries([400,401,403,404,412,413,422,428,503].map(code=>[code,{description:'未生成PDF或未释放已生成字节，不能回退到缓存文件',content:{'application/json':{schema:ref('Error')}}}]))}}};
-contract.info.version = '0.76.0';
+addBackupVersionInventoryContract(contract);
+contract.info.version = '0.77.0';
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

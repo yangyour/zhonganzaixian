@@ -40,4 +40,10 @@ class BackupExecutionDependenciesTest(unittest.TestCase):
         for k,v in d['runtime_publications'].items():
             self.assertIn(k,keys)
             self.assertIsNone(v,k)
+    def test_inventory_service_binding_stays_unconfigured(self):
+        d=json.loads((ROOT/'deploy/examples/backup-execution-dependencies.json').read_text())
+        self.assertIn('backup_version_inventory_binding_reference',d)
+        self.assertIsNone(d['backup_version_inventory_binding_reference'])
+        self.assertIsNone(d['backup_version_inventory_authorizer_reference'])
+        self.assertIs(d['backup_execution_enabled'],False)
 if __name__=='__main__': unittest.main()

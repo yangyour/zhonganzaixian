@@ -1,3 +1,7 @@
+# V50 当前冻结边界（2026-10-21，自有临时库证据）
+
+当前集成谱系V1–V50 SQL均已应用并字节冻结；任何后续SQL变更新增V51或更高，禁止改写已执行资源。V50首次应用证据为docs/evidence/delivery-receipt-postgres-20261021/catalog-attempt-1/v50-application.json，固定摘要及guard摘要见tools/niko-test/frozen-delivery-receipt-journal-migration.json；V46–V49各自冻结清单保留。下文V45及更早边界为历史阶段记录，不代表当前可改写V46–V50。工具链恢复后的普通Maven/HTTP合成测试不构成新的实际PostgreSQL迁移或生产验收；API/Worker仍不得自动迁移。
+
 # 前端功能与交互验收（2026-10-21）
 
 新增或修改前端功能须遵循 docs/frontend-acceptance-standard.md：WCAG 2.2 AA 目标、可完成任务、状态/恢复/权限隔离、键盘焦点、响应式与分层证据。模拟接口、组件测试、真实浏览器及真实服务分别记录；浏览器启动失败不得记为通过。用户要求逐功能记录并及时合入 main。

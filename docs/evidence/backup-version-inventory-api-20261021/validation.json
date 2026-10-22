@@ -1,0 +1,85 @@
+{
+  "result": "PASS_BACKUP_VERSION_INVENTORY_HTTP_BOUNDARY_WITH_DEFAULT_BINDING_DISABLED",
+  "new_java_tests": 39,
+  "new_java_layers": {
+    "read_only_repository": 3,
+    "controller_and_binding": 27,
+    "mvc_security_filter_chain": 8,
+    "explicit_loopback_http": 1
+  },
+  "focused_tests_passed": 39,
+  "maven_verify": {
+    "tests": 4124,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1032,
+    "executed": 3092,
+    "status": "PASS",
+    "loopback_test_default": "SKIPPED_BY_EXPLICIT_GATE; separate authorized run PASS"
+  },
+  "new_contract_tests": 5,
+  "node_contract_tests_passed": 178,
+  "new_python_tests": 1,
+  "python_tests_passed": 135,
+  "vitest": {
+    "files_passed": 269,
+    "tests_passed": 4425
+  },
+  "typecheck": "PASS",
+  "api_contract_version": "0.77.0",
+  "api_contract_check": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180740,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "5eb1fdfbab78f7cb71097824b100d9c815e9cd6cca7159bb8aabb31443efe9fb",
+    "scope": "static-artifacts-only"
+  },
+  "api_jar_sha256": "dcc07450a040863655e5c8bf282b3e9d687f9ba9333a69b90d76ee0ff40854ec",
+  "browser_specs": {
+    "tests": 97,
+    "files": 11,
+    "status": "DISCOVERED_NOT_EXECUTED"
+  },
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "preserved_failures": [
+    "Java test initially used compound var declaration; split declarations",
+    "AJV test URN lacked namespace identifier; corrected test schema ID",
+    "Three legacy contract cases pinned 0.76.0; updated exact expectations for additive 0.77.0 contract"
+  ],
+  "default_runtime_binding": "NO_QUERY_BEAN; returns 503, no draft/admin permission fallback",
+  "dependency_reference_slots": 30,
+  "new_postgresql_integration_run": false,
+  "object_storage_kms_or_device_access": false,
+  "sql_migrations_changed": false,
+  "frozen_sql_boundary": "V1-V50; AGENTS historical V45 note superseded with verified V50 evidence",
+  "real_account_or_permission_changes": 0,
+  "remaining": [
+    "Production inventory authority and revocation-lock adapter",
+    "Explicit service binding and real database integration",
+    "Existing asset-detail front-end panel",
+    "Download/decryption/retention/recovery/execution consumers"
+  ],
+  "source_sha256": {
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresBackupVersionRepository.java": "3dc7a32822e1e74d2130f364a607c4797c7b2501769bc791453440e51c42ec4b",
+    "server/persistence/src/test/java/cn/mop/persistence/BackupVersionReadOnlyBoundaryTest.java": "714bb7552ef3b99d6d3544872c89978bde7d1597245cb0408f43683ee436a234",
+    "server/api/src/main/java/cn/mop/api/BackupVersionInventoryQuery.java": "8ab26264b7104f3581e3816978a9a1b48bfe921ea0c039d2605d6be555424115",
+    "server/api/src/main/java/cn/mop/api/BackupVersionInventoryController.java": "c2fddf6be719a1f5fccbc3684f721e3d64dc0a233ad1607b0c5f47dbbc4f09a9",
+    "server/api/src/test/java/cn/mop/api/BackupVersionInventoryControllerTest.java": "5aa717da33d8141d2213a4f9191dbff25be95db7d39636335b559fbb0bb8750f",
+    "server/api/src/test/java/cn/mop/api/BackupVersionInventoryHttpSecurityTest.java": "04c13dbaaaabeb7df9b931ad7a543ed395c104fe56c4bef3a2970590cf94ba5f",
+    "server/api/src/test/java/cn/mop/api/BackupVersionInventoryLoopbackTest.java": "3ab4c928cd5f883543acc56c424f3caefef1c240d7ffcc20bc237f438e69bd9b",
+    "tools/backup-version-inventory-contract.mjs": "3056d2e0a8f82127954d7cb1129212bdcb5cf7d803f51b84f2a3bda1391f254a",
+    "tools/build-api-contract.mjs": "da7ed05d8053126ff1c0087414014b48c75fd4e9cd0a1e22e8a18812ce0562a9",
+    "contracts/local-api.openapi.json": "810f066be88efb27727d3ee153c6602044e7f4d98180ce0b4eebe3e5662d32a4",
+    "tests/backup-version-inventory-contract.test.mjs": "e18838a0319e2428d464326b1cff0a957ef180821804dc61fbbc1b5102d27bda",
+    "tests/contracts.test.mjs": "118f275d37cb6815580bc5b91b3068e573478d811bba7c328fde8d791de57f16",
+    "deploy/examples/backup-execution-dependencies.json": "900d26496315eeb9b393eb4a376e6d1c3e4d11814cd4335d626ca75ed890a9fa",
+    "tools/test_backup_execution_dependencies.py": "1a2c58298a627f09e88e6be42441aaa572bc4cae5e2003a0a61674bc16fbfca4",
+    "AGENTS.md": "d42f0d315666eba512e947343b3df379586a11ef439f360797459fd0521055d6"
+  }
+}

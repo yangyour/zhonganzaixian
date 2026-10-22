@@ -1,0 +1,9 @@
+{
+  "result": "PASS",
+  "production_classes_present": [
+    "BOOT-INF/classes/cn/mop/api/BackupVersionInventoryController.class",
+    "BOOT-INF/classes/cn/mop/api/BackupVersionInventoryQuery.class"
+  ],
+  "synthetic_test_classes_present": [],
+  "scope": "PACKAGED_JAR_ONLY_NOT_DEPLOYMENT"
+}

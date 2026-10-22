@@ -1,0 +1,52 @@
+{
+  "result": "PASS_MEMBER_MAIN_LIST_AND_RELATION_READ_RECOVERY",
+  "new_tests": 38,
+  "new_test_layers": {
+    "protocol_and_version": 23,
+    "real_member_page_dom": 15
+  },
+  "focused_tests_passed": 62,
+  "vitest": {
+    "files_passed": 259,
+    "tests_passed": 4267
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180742,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "028cf78093931f733e9e2f32fc65cd560e5a3411ee2933ae169c7ec5248d9347",
+    "scope": "static-artifacts-only"
+  },
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "browser_specs": {
+    "tests": 86,
+    "files": 10,
+    "status": "DISCOVERED_NOT_EXECUTED"
+  },
+  "axe": "NOT_RUN",
+  "modal": "EXPLICIT_STUB_NOT_BROWSER_ACCEPTANCE",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "real_account_password_or_permission_changes": 0,
+  "formal_acceptance_passes_added": 0,
+  "remaining_in_this_page": [
+    "Independent target-tenant role read recovery",
+    "Protection of other unsaved tabs when saving one action"
+  ],
+  "source_sha256": {
+    "apps/web/src/pages/IdentityUsersPage.vue": "15da52122ec6a88f9f694f32cb12237537dfaee99ed1e0606ef858be2e4e184d",
+    "apps/web/src/utils/identityUserRead.ts": "92414fe4308b6905a49c4e5a8fd60df0b788734ed2b4d7354d4eadac3b4197a0",
+    "apps/web/tests/helpers/memberReadFixture.ts": "31fb90b65bd9753aa0dbadde1eb0b62858d93c9f0bda9166050ac9f01d2f93ce",
+    "apps/web/tests/identityUserRead.test.ts": "a5021e0dda4a036b880edda6ea3836250d01db70062b8fe0c447f670b024b313",
+    "apps/web/tests/identityMemberRecovery.test.ts": "5dc4316215938bd145f18c03c491ce1e62a50e4cfa2bf524cf7679920a573276"
+  }
+}

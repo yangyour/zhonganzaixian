@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-22 后续主干重部署目前被 SSH 管理通道阻塞：保存目标192.168.1.215:22出现banner EOF/超时；当前电脑192.168.5.0/24、VPN只配置10.8.0.0/24，未观察到测试LAN明确路由。业务域名真实ready=true/durable=true且仍为上轮Web摘要，不能登记为数据库/基础组件离线或本轮发布成功。用途：版本盘点、不可变工件上传与既有7应用切换；影响：候选已构建但未部署；候选路径：用户提供可达SSH/跳板入口或恢复相应网络，未经确认不替换主机信任、不更换组件。状态BLOCKED_MANAGEMENT_CONNECTIVITY；详见[本次验证及浏览器修复](../test-environment-redeploy-20261022.md)。
+
 2026-10-22 指定 LAN 更新：复用同一 PostgreSQL17.9、MinIO RELEASE.2025-09-07、Redis7.4.9、RabbitMQ4.3.2、Zabbix7.0.31、Java17.0.20.1/Nginx1.31.6，无新增基础组件；7基础容器在迁移和三轮发布中生命周期不变。项目库独立 V39→V50，应用发布0迁移，14服务/真实依赖ready=true，production_ready=false，详见[实际证据](../test-environment-update-20261022.md)。
 
 本轮额外只读探测确认备份版本列表缺少独立授权查询 Bean 装配：源码只有可选接口/工厂，无正式提供者；真实API返回503 `BACKUP_VERSION_INVENTORY_NOT_CONFIGURED`。用途：按当前租户/设备独立授权读取版本元数据；影响：版本列表不可用，不授予下载/执行；候选：由经确认授权源实现并显式装配受限 PostgreSQL 查询；状态：NOT_CONFIGURED/未批准替代授权，不以草稿权限或空成功响应替代。该缺口不代表PostgreSQL离线。

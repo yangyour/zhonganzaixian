@@ -5,7 +5,7 @@ import {createApp,nextTick,type App} from 'vue'
 import {readFileSync} from 'node:fs'
 import {resolve} from 'node:path'
 const mocks=vi.hoisted(()=>({confirm:vi.fn(),warning:vi.fn(),leave:null as null|(()=>Promise<boolean>),guard:null as null|(()=>Promise<boolean>),unregister:vi.fn()}))
-vi.mock('vue-router',()=>({onBeforeRouteLeave:(cb:()=>Promise<boolean>)=>{mocks.leave=cb}}))
+vi.mock('vue-router',()=>({useRouter:()=>({options:{history:{state:window.history.state}}}),onBeforeRouteLeave:(cb:()=>Promise<boolean>)=>{mocks.leave=cb}}))
 vi.mock('element-plus',async original=>({...await original<typeof import('element-plus')>(),ElMessage:{warning:mocks.warning},ElMessageBox:{confirm:mocks.confirm}}))
 vi.mock('../src/utils/contextTransitionGuard',()=>({contextTransitionGuards:{register:(cb:()=>Promise<boolean>)=>{mocks.guard=cb;return mocks.unregister}}}))
 import {ElAlert} from 'element-plus'
@@ -14,6 +14,7 @@ import {api,ApiError} from '../src/api/client'
 import {session,switchingTenant,contextGeneration} from '../src/stores/session'
 import type {Session} from '../src/api/types'
 import {id,other,scope,summary,detail,running,page,receipt,filters} from './assetExport.fixture'
+import {assetExportHandoffScope,createAssetExportHandoff} from '../src/utils/assetExportHandoff'
 let app:App|undefined,host:HTMLElement,vm:any
 const auth:Session={user:{id:scope.actorId,role:'padmin',display_name:'合成内部管理员'},tenant:{id:scope.tenantId,name:'合成租户'},allowed_tenants:[],permission_version:1,csrf_token:'SYNTHETIC_NOT_CREDENTIAL',capabilities:['assets:read'],mode:'remote_test',identity_source:'synthetic-unit-only'}
 const deferred=<T,>()=>{let resolve!:(v:T)=>void;const promise=new Promise<T>(r=>resolve=r);return{promise,resolve}}
@@ -24,7 +25,7 @@ function input(label:string,value:string){const e=host.querySelector<HTMLInputEl
 function checkbox(label:string,value:boolean){const e=host.querySelector<HTMLInputElement>(`[aria-label="${label}"]`)!;e.checked=value;e.dispatchEvent(new Event('change',{bubbles:true}))}
 function requests(){const data={current:detail(),rows:[] as ReturnType<typeof summary>[]};const mock=vi.spyOn(api,'request').mockImplementation(async(path,options)=>{if(options?.method==='POST'){data.current=detail({filters:(options.body as any).filters});data.rows=[summary({filters:data.current.filters})];return receipt() as any}if(path.startsWith('/asset-export-jobs?'))return page(data.rows) as any;if(path==='/asset-export-jobs/'+id+'/publication'){const d=data.current;return {job_id:id,tenant_id:scope.tenantId,created_by:scope.actorId,permission_version:1,version:d.version,status:d.status==='SUCCEEDED'?'PUBLISHED':'NOT_PUBLISHED',prepared:!!d.prepared,file_sha256:d.prepared?.file_sha256??null,size_bytes:d.prepared?.size_bytes??null,row_count:d.prepared?.row_count??null,stored_at:d.status==='SUCCEEDED'?d.updated_at:null,observed_at:d.updated_at,publication_enabled:false,download_grant_available:false,notification_sent:false,source:'postgresql'} as any}if(path==='/asset-export-jobs/'+id)return data.current as any;throw new Error('Unexpected test path')});return{data,mock}}
 beforeEach(()=>{session.value=structuredClone(auth);switchingTenant.value=false;contextGeneration.value++;mocks.confirm.mockReset().mockResolvedValue(undefined);mocks.warning.mockReset();mocks.unregister.mockReset();mocks.leave=null;mocks.guard=null})
-afterEach(()=>{app?.unmount();app=undefined;host?.remove();vi.restoreAllMocks();session.value=null})
+afterEach(()=>{window.history.replaceState(null,'');app?.unmount();app=undefined;host?.remove();vi.restoreAllMocks();session.value=null})
 it('opens and reopens the export composer without creating a request or losing input',async()=>{const h=requests();mount();await settle();const composer=host.querySelector<HTMLDetailsElement>('.export-compose')!;expect(composer.open).toBe(false);button('新建导出请求').click();await settle();expect(composer.open).toBe(true);composer.open=false;composer.dispatchEvent(new Event('toggle'));await settle();button('新建导出请求').click();await settle();expect(composer.open).toBe(true);checkbox('导出文本不限',false);input('导出检索文本','保留本人筛选');await settle();composer.open=false;composer.dispatchEvent(new Event('toggle'));await settle();button('新建导出请求').click();await settle();expect(vm.form.query).toBe('保留本人筛选');expect(h.mock).toHaveBeenCalledTimes(1);expect(h.mock.mock.calls[0]![1]?.method).toBeUndefined()})
 it('polls only the selected unprepared job using GET and never publishes',async()=>{const h=requests();mount();await settle();await vm.select(id);await settle();h.data.current=running();const before=h.mock.mock.calls.length;vm.pollPreparation();await settle();expect(vm.state.selected.prepared).not.toBeNull();expect(h.mock.mock.calls.slice(before).some(c=>c[0]==='/asset-export-jobs/'+id+'/publication')).toBe(true);expect(h.mock.mock.calls.slice(before).every(c=>!c[1]?.method||c[1].method==='GET')).toBe(true);const completed=h.mock.mock.calls.length;vm.pollPreparation();await settle();expect(h.mock).toHaveBeenCalledTimes(completed)})
 it('pauses progress polling on hidden page or explicit pause',async()=>{const h=requests();mount();await settle();await vm.select(id);await settle();const hidden=vi.spyOn(document,'hidden','get').mockReturnValue(true),before=h.mock.mock.calls.length;vm.pollPreparation();await settle();expect(h.mock).toHaveBeenCalledTimes(before);hidden.mockReturnValue(false);vm.autoRefresh=false;vm.pollPreparation();await settle();expect(h.mock).toHaveBeenCalledTimes(before)})
@@ -58,3 +59,30 @@ it('unknown child publication prevents parent list selection reset and new prepa
 it('retained publication controls are disabled while parent progress read is active',async()=>{const h=requests();mount();await settle();await vm.select(id);await settle();const wait=deferred<unknown>();h.mock.mockReturnValueOnce(wait.promise as any);vm.pollPreparation();await settle();expect(button('刷新发布状态').disabled).toBe(true);const count=h.mock.mock.calls.length;button('刷新发布状态').click();await settle();expect(h.mock).toHaveBeenCalledTimes(count);wait.resolve(detail());await settle();expect(button('刷新发布状态').disabled).toBe(false)})
 it('explicit new editor clears old read recovery notice without issuing a command',async()=>{const h=requests();mount();await settle();const wait=deferred<unknown>();h.mock.mockReturnValueOnce(wait.promise as any);const pending=vm.browse();await settle();button('取消导出作业读取').click();await settle();expect(host.textContent).toContain('已取消读取');expect(await vm.beginNew()).toBe(true);await settle();expect(host.textContent).not.toContain('已取消读取');expect([...host.querySelectorAll('button')].some(b=>b.textContent==='重试原导出作业读取')).toBe(false);wait.resolve(page());await pending;expect(h.mock.mock.calls.filter(c=>c[1]?.method==='POST')).toHaveLength(0)})
 it('actual publication panel restores original download grant after failed independent refresh',async()=>{const h=requests();h.data.current={...running(),status:'SUCCEEDED'};const original=h.mock.getMockImplementation()!;let publicationReads=0,grants=0;const expires='2026-10-04T00:15:00Z',url='/api/v1/asset-export-jobs/'+id+'/content?grant='+Date.parse(expires)+'.'+'a'.repeat(43);h.mock.mockImplementation(async(path,options)=>{if(path==='/asset-export-jobs/'+id+'/content-grants'){grants++;if(grants===1)throw new ApiError(0,'NETWORK_ERROR','lost','test');return{job_id:id,content_url:url,expires_at:expires,file_sha256:h.data.current.prepared!.file_sha256,size_bytes:h.data.current.prepared!.size_bytes} as any}if(path==='/asset-export-jobs/'+id+'/publication'){publicationReads++;if(publicationReads===2)throw new ApiError(503,'UPSTREAM_UNAVAILABLE','failed read','test');const value:any=await original(path,options);return{...value,publication_enabled:true,download_grant_available:true}}return original(path,options)});mount();await settle();await vm.select(id);await settle();button('获取下载链接').click();await settle();expect(host.textContent).toContain('上一次请求结果未确认');button('刷新发布状态').click();await settle();expect(host.querySelector('.publication-panel .download')).toBeNull();button('重试提交').click();await settle();expect(host.querySelector('.publication-panel .download a')?.getAttribute('href')).toBe(url);const calls=h.mock.mock.calls.filter(c=>c[0].endsWith('/content-grants'));expect(calls).toHaveLength(2);expect(calls[1]![1]!.idempotencyKey).toBe(calls[0]![1]!.idempotencyKey);expect(calls[1]![1]!.body).toEqual(calls[0]![1]!.body);expect(h.mock.mock.calls.some(c=>c[0].includes('/content?'))).toBe(false)})
+
+
+it('prefills an acknowledged-only export from the current asset list without submitting',async()=>{
+ const h=requests()
+ const handoff=createAssetExportHandoff(assetExportHandoffScope(session.value,contextGeneration.value),{q:'设备关键字',type:'switch',site_id:'site-one',cursor:'original-page',page_size:'25'})
+ window.history.replaceState({assetExportHandoff:handoff},'')
+ mount();await settle()
+ expect(vm.filters()).toEqual({query:'设备关键字',type:'switch',status:null,site_id:'site-one'})
+ expect(vm.acknowledge).toBe(false)
+ expect(button('提交导出申请').disabled).toBe(true)
+ expect(host.textContent).toContain('导出全部匹配记录，不仅是当前页')
+ expect(host.querySelector('details.export-compose')?.hasAttribute('open')).toBe(true)
+ expect(h.mock.mock.calls.every(c=>!c[1]?.method)).toBe(true)
+ session.value={...structuredClone(auth),account_version:2};await settle()
+ expect(vm.filters()).toEqual(filters())
+ expect(host.textContent).not.toContain('返回原筛选列表')
+})
+
+it('rejects a stale handoff visibly and keeps submission unacknowledged',async()=>{
+ const h=requests()
+ window.history.replaceState({assetExportHandoff:createAssetExportHandoff('other-scope',{q:'old'})},'')
+ mount();await settle()
+ expect(vm.filters()).toEqual(filters())
+ expect(host.textContent).toContain('原列表筛选已失效')
+ expect(button('提交导出申请').disabled).toBe(true)
+ expect(h.mock.mock.calls.every(c=>!c[1]?.method)).toBe(true)
+})

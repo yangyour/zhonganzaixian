@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed,onMounted,onUnmounted,reactive,ref,shallowRef,watch} from 'vue'
-import {onBeforeRouteLeave} from 'vue-router'
+import {onBeforeRouteLeave,useRouter} from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import { feedback as ElMessage } from '../utils/feedback'
 import {api} from '../api/client'
@@ -12,6 +12,11 @@ import {displayTime} from '../utils/display'
 import ReadRecoveryActions from '../components/ReadRecoveryActions.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import AssetExportPublicationPanel from '../components/AssetExportPublicationPanel.vue'
+import {assetExportHandoffScope,readAssetExportHandoff} from '../utils/assetExportHandoff'
+const router=useRouter()
+const incomingHandoff=router.options?.history?.state?.assetExportHandoff
+const sourceListQuery=ref<Record<string,string>|null>(null)
+let handoffConsumed=false
 const publicationPanel=ref<InstanceType<typeof AssetExportPublicationPanel>|null>(null)
 const fresh=()=>({type:'',status:'',siteAny:true,site:'',queryAny:true,query:''})
 const form=reactive(fresh()),acknowledge=ref(false),dirty=ref(false),confirming=ref(false),validation=ref('')
@@ -20,7 +25,7 @@ let disposed=false
 const autoRefresh=ref(true),formOpen=ref(false),readScope=ref(0)
 let preparationTimer:ReturnType<typeof setInterval>|undefined
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&['padmin','msp'].includes(session.value.user.role)&&can('assets:read')&&!switchingTenant.value))
-const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value]))
+const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,permitted.value]))
 const busy=computed(()=>Boolean(state.value.busy)||confirming.value),locked=computed(()=>busy.value||state.value.attempt!==null)
 const originalFilters=computed<AssetExportFilters|null>(()=>state.value.attempt?JSON.parse(state.value.attempt.payload).filters:null)
 const typeLabels:Record<string,string>={router:'路由器',switch:'交换机',firewall:'防火墙',ap:'无线AP',wireless_controller:'无线控制器',other:'其他'}
@@ -30,7 +35,28 @@ function change(key:keyof typeof form,value:string|boolean){if(disposed||!permit
 function inputValue(event:Event){return(event.target as HTMLInputElement).value}
 function checked(event:Event){return(event.target as HTMLInputElement).checked}
 function changeAck(value:boolean){if(disposed||!permitted.value||locked.value)return false;acknowledge.value=value;return true}
-watch(contextKey,()=>{readScope.value++;Object.assign(form,fresh());acknowledge.value=false;dirty.value=false;confirming.value=false;validation.value='';const s=session.value;workspace.reset(!disposed&&permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role,canRead:true}:null);if(permitted.value&&!disposed)void workspace.list()},{immediate:true,flush:'sync'})
+watch(contextKey,()=>{
+  readScope.value++;Object.assign(form,fresh());acknowledge.value=false;dirty.value=false;confirming.value=false;validation.value=''
+  sourceListQuery.value=null
+  const s=session.value
+  workspace.reset(!disposed&&permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role,canRead:true}:null)
+  if(!disposed&&permitted.value){
+    if(!handoffConsumed){
+      handoffConsumed=true
+      const handoff=readAssetExportHandoff(incomingHandoff,assetExportHandoffScope(s,contextGeneration.value))
+      if(handoff){
+        const f=handoff.filters
+        Object.assign(form,{type:f.type??'',status:f.status??'',siteAny:f.site_id===null,site:f.site_id??'',queryAny:f.query===null,query:f.query??''})
+        sourceListQuery.value=handoff.listQuery
+        formOpen.value=true
+      }else if(incomingHandoff!==undefined&&incomingHandoff!==null){
+        formOpen.value=true
+        validation.value='原列表筛选已失效或未通过核对，请返回资产列表重新发起，或重新填写并确认导出范围。'
+      }
+    }
+    void workspace.list()
+  }
+},{immediate:true,flush:'sync'})
 async function readAccepted(){const receipt=state.value.receipt;if(!disposed&&permitted.value&&receipt)await workspace.select(receipt.job_id)}
 async function submit(){if(disposed||!permitted.value||locked.value||!acknowledge.value||publicationPanel.value&&!publicationPanel.value.mayLeave())return false;validation.value='';try{assetExportInput(filters())}catch{validation.value='筛选未通过：请核对类型、状态和文本长度；没有受理';return false}const accepted=await workspace.submit(filters());if(accepted)await readAccepted();return accepted}
 async function retry(){if(disposed||!permitted.value||busy.value||publicationPanel.value&&!publicationPanel.value.mayLeave())return false;const accepted=await workspace.retry();if(accepted)await readAccepted();return accepted}
@@ -41,7 +67,7 @@ function cancelRead(){if(publicationPanel.value&&!publicationPanel.value.mayLeav
 async function retryRead(){if(disposed||!permitted.value||busy.value||publicationPanel.value&&!publicationPanel.value.mayLeave())return false;return workspace.retryRead()}
 async function select(id:string){if(disposed||!permitted.value||busy.value||publicationPanel.value&&!publicationPanel.value.mayLeave())return false;return workspace.select(id)}
 async function discard(){if(publicationPanel.value&&!publicationPanel.value.mayLeave())return false;if(workspace.unresolved()){ElMessage.warning('原请求正在提交或结果未知，必须先用原请求恢复；普通刷新不能确认');return false}if(confirming.value)return false;if(!dirty.value&&!state.value.attempt)return true;const turn=contextKey.value;confirming.value=true;try{await ElMessageBox.confirm('已受理作业会保留在服务器；继续将清除本页筛选草稿与原收据显示，确认继续？','离开当前准备请求',{confirmButtonText:'清除并继续',cancelButtonText:'留在本页',type:'warning'});return!disposed&&turn===contextKey.value&&!workspace.unresolved()}catch{return false}finally{if(!disposed&&turn===contextKey.value)confirming.value=false}}
-async function beginNew(){const turn=contextKey.value;if(disposed||!permitted.value||busy.value||!await discard()||turn!==contextKey.value||!workspace.begin())return false;readScope.value++;Object.assign(form,fresh());acknowledge.value=false;dirty.value=false;validation.value='';return true}
+async function beginNew(){const turn=contextKey.value;if(disposed||!permitted.value||busy.value||!await discard()||turn!==contextKey.value||!workspace.begin())return false;readScope.value++;Object.assign(form,fresh());sourceListQuery.value=null;acknowledge.value=false;dirty.value=false;validation.value='';return true}
 function unlockRejected(){if(disposed||!permitted.value||busy.value||state.value.attempt?.state!=='rejected'||!workspace.begin())return false;readScope.value++;acknowledge.value=false;dirty.value=true;return true}
 onBeforeRouteLeave(discard);const unregister=contextTransitionGuards.register(discard)
 function beforeUnload(event:BeforeUnloadEvent){if(dirty.value||state.value.attempt||workspace.unresolved()){event.preventDefault();event.returnValue=''}}
@@ -57,6 +83,10 @@ defineExpose({form,state,acknowledge,locked,autoRefresh,pollPreparation,filters,
  
  <p v-if="!permitted" class="panel">当前身份没有内部导出准备权限，或租户正在切换；未展示旧数据</p>
  <template v-else>
+  <div v-if="sourceListQuery" class="panel content-toolbar" aria-label="资产列表导出衔接">
+    <span>已带入资产列表的已应用筛选，请核对后提交；导出全部匹配记录，不仅是当前页。<template v-if="!state.attempt&&!state.receipt">尚未创建导出任务。</template></span>
+    <router-link :to="{path:'/assets',query:sourceListQuery}">返回原筛选列表</router-link>
+  </div>
   
   <section class="panel export-list"><div class="actions content-toolbar"><h2>我的导出作业</h2><button type="button" :disabled="busy" @click="browse()">刷新任务列表</button><div class="content-actions"><button v-if="permitted" class="export-create" type="button" @click="formOpen=true">新建导出请求</button></div></div><p v-if="!state.page">{{state.busy==='read'?'正在加载任务列表…':state.error?'任务列表加载未完成':'暂未加载任务列表'}}</p>
    <template v-else><p class="export-count">{{state.paged?'续页':'第一页'}} · 本页 {{state.page.items.length}} 条</p><p v-if="!state.page.items.length">当前筛选范围内暂无导出作业记录</p><div class="proto-table-wrap"><table class="job-cards proto-table"><thead><tr><th>导出作业</th><th>准备状态</th><th>筛选文本</th><th>创建时间</th><th>操作</th></tr></thead><tbody><tr v-for="job in state.page.items" :key="job.id"><td><span class="export-file-icon">X</span><span>设备台账 XLSX</span><small>{{job.id}} · v{{job.version}}</small></td><td><span class="proto-badge">{{statusText(job.status)}}</span></td><td>{{valueText(job.filters.query)}}</td><td>{{displayTime(job.created_at)}}<span class="proto-sub">Asia/Shanghai</span></td><td><button class="proto-link" type="button" :disabled="busy" @click="select(job.id)">读取当前进度</button></td></tr></tbody></table></div><button type="button" :disabled="busy||!state.page.has_more" @click="browse(true)">下一页本人作业</button></template>

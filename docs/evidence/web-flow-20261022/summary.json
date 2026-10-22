@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-22",
+  "target": "desktop Web",
+  "origin": "https://github.com/yangyour/zhonganzaixian.git",
+  "branch": "main",
+  "upstream": "origin/main",
+  "baseline": "485166f",
+  "build_id": "2ac49e25b90538a3c04162c402f50b4a4d160e5de9b76b53251a67e7b02b87a2",
+  "unit_dom_tests": 4913,
+  "test_files": 296,
+  "typecheck": "PASS",
+  "build": "PASS",
+  "release_policy": "PASS",
+  "real_api_browser": {
+    "viewports": [
+      "1440x900",
+      "1440x560"
+    ],
+    "browser": "155.0.4283.62",
+    "page_errors": 0,
+    "passed": 10,
+    "checks": 10,
+    "business_writes": 0
+  },
+  "isolated_ticket_browser": {
+    "passed": 2,
+    "checks": 2,
+    "real_server_requests": 0,
+    "business_writes": 0
+  },
+  "menu_styles_changed": false,
+  "global_styles_changed": false,
+  "mobile_optimization": "DEFERRED_BY_USER",
+  "deployed": false,
+  "detector": {
+    "interpretation": "existing ticket section accent; unchanged",
+    "count": 1
+  },
+  "raw_evidence": ".local/web-flow-20261022",
+  "not_run": [
+    "real ticket write workflow",
+    "native screen reader",
+    "physical touch",
+    "Firefox/WebKit/360",
+    "production and contract acceptance"
+  ]
+}

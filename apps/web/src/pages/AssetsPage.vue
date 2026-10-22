@@ -13,6 +13,7 @@ import AppTable from '../components/AppTable.vue'
 import AppliedFilters from '../components/AppliedFilters.vue'
 import { createSearchCompositionGuard, syncFilterDraft } from '../utils/listSearch'
 import { useListDetailNavigation } from '../utils/useListDetailNavigation'
+import { assetExportHandoffScope, createAssetExportHandoff } from '../utils/assetExportHandoff'
 import AssetStateFacts from '../components/AssetStateFacts.vue'
 import AssetDraftCreatePanel from '../components/AssetDraftCreatePanel.vue'
 import SampleFreshness from '../components/SampleFreshness.vue'
@@ -65,6 +66,13 @@ const pageMetrics = computed(() => [
   { label: '待接入', value: rows.value.filter(item => item.sync_state === 'PENDING_ONBOARDING').length, detail: '监控配置待同步', tone: 'warning' },
 ])
 const exportAllowed = computed(() => ['msp', 'padmin'].includes(session.value?.user.role || '') && can('assets:read'))
+async function openExport() {
+  if (!exportAllowed.value || loading.value || pendingFilters.value || !readable()) return
+  try {
+    const handoff = createAssetExportHandoff(assetExportHandoffScope(session.value, contextGeneration.value), route.query)
+    await router.push({ path: '/asset-export-jobs', state: { assetExportHandoff: handoff } })
+  } catch { ElMessage.warning('无法带入当前筛选，请核对条件后重试；未创建导出任务') }
+}
 function filterStatus(value: string) { updateAppliedFilter('status', value) }
 watch(() => queryString('asset_id'), () => { detailTab.value = 'overview' })
 const nextCursor = ref<string | null>(null)
@@ -258,7 +266,7 @@ onUnmounted(() => { disposed=true;listGeneration++;detailGeneration++;listContro
         <div class="asset-status-chips" aria-label="按资产状态筛选"><button v-for="item in statusFilters" :key="item.value" type="button" :disabled="loading" :class="{ active: queryString('status') === item.value }" :aria-pressed="queryString('status') === item.value" @click="filterStatus(item.value)">{{ item.label }}</button></div>
         <div class="asset-select-filters"><el-select v-model="filters.type" clearable placeholder="全部类型" aria-label="设备类型"><el-option v-for="type in assetTypes" :key="type.value" :label="type.label" :value="type.value" /></el-select><el-input v-model="filters.site_id" clearable placeholder="全部站点 / 站点 ID" aria-label="站点 ID" enterkeyhint="search" /><el-button type="primary" native-type="submit" :disabled="loading">查询</el-button><el-button :disabled="loading" @click="resetFilters">重置</el-button><el-button :icon="Refresh" :loading="loading" aria-label="刷新已应用的资产筛选" title="仅刷新已应用条件，保留未提交输入" @click="loadAssets">刷新</el-button></div>
       </el-form>
-      <div class="asset-extended-filters content-toolbar"><span class="extended-filter-label">高级检索</span><template v-if="metadataAllowed"><el-button text bg size="small" @click="metadataQueryOpen = true">扩展资料检索</el-button><PermissionGate capability="asset_dates:read"><el-button text bg size="small" @click="dateQueryOpen = true">维保与超期筛查</el-button></PermissionGate></template><CmdbTypeCatalogPanel /><div class="content-actions"><div class="assets-heading-actions"><div class="asset-view-switch" aria-label="资产显示方式"><button type="button" :class="{ active: assetView === 'list' }" :aria-pressed="assetView === 'list'" @click="assetView = 'list'"><List />列表</button><button type="button" :class="{ active: assetView === 'grid' }" :aria-pressed="assetView === 'grid'" @click="assetView = 'grid'"><Grid />蜂巢</button></div><el-button v-if="exportAllowed" :icon="Download" @click="router.push('/asset-export-jobs')">导出</el-button><PermissionGate capability="assets:write"><el-button v-if="importAllowed" :icon="Upload" @click="importOpen = true">导入</el-button><el-button type="primary" :icon="Plus" @click="openCreate">创建资产草稿</el-button></PermissionGate></div></div></div>
+      <div class="asset-extended-filters content-toolbar"><span class="extended-filter-label">高级检索</span><template v-if="metadataAllowed"><el-button text bg size="small" @click="metadataQueryOpen = true">扩展资料检索</el-button><PermissionGate capability="asset_dates:read"><el-button text bg size="small" @click="dateQueryOpen = true">维保与超期筛查</el-button></PermissionGate></template><CmdbTypeCatalogPanel /><div class="content-actions"><div class="assets-heading-actions"><div class="asset-view-switch" aria-label="资产显示方式"><button type="button" :class="{ active: assetView === 'list' }" :aria-pressed="assetView === 'list'" @click="assetView = 'list'"><List />列表</button><button type="button" :class="{ active: assetView === 'grid' }" :aria-pressed="assetView === 'grid'" @click="assetView = 'grid'"><Grid />蜂巢</button></div><el-button v-if="exportAllowed" :icon="Download" :disabled="loading || pendingFilters" :title="pendingFilters ? '请先应用或撤销筛选修改' : '沿用已应用筛选准备导出'" @click="openExport">导出</el-button><PermissionGate capability="assets:write"><el-button v-if="importAllowed" :icon="Upload" @click="importOpen = true">导入</el-button><el-button type="primary" :icon="Plus" @click="openCreate">创建资产草稿</el-button></PermissionGate></div></div></div>
       <AppliedFilters :items="filterItems" :pending="pendingFilters" :loading="loading" :failed="Boolean(error)" :loaded="loaded" :count="rows.length" @remove="removeFilter" @clear="resetFilters" @apply="applyPendingFilters" @discard="discardFilterEdits" />
       <ApiErrorNotice :error="error" guidance="请点击“重试”重新加载当前列表。"><el-button size="small" @click="loadAssets">重试</el-button></ApiErrorNotice>
       <AppTable v-if="assetView === 'list'" :error="error" :rows="rows" :loading="loading" :empty-text="error ? '列表加载失败，请点击重试' : !loaded ? '正在读取资产列表…' : filterItems.length ? '未找到匹配资产，可调整或清空筛选条件' : '当前授权范围内暂无资产'">

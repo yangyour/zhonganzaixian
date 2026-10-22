@@ -12,6 +12,7 @@ import { assetTypes, displayTime, typeLabel, sourceLabel } from '../utils/displa
 import AppTable from '../components/AppTable.vue'
 import AppliedFilters from '../components/AppliedFilters.vue'
 import { createSearchCompositionGuard, syncFilterDraft } from '../utils/listSearch'
+import { useListDetailNavigation } from '../utils/useListDetailNavigation'
 import AssetStateFacts from '../components/AssetStateFacts.vue'
 import AssetDraftCreatePanel from '../components/AssetDraftCreatePanel.vue'
 import SampleFreshness from '../components/SampleFreshness.vue'
@@ -34,6 +35,8 @@ const deviceIcons = { router: Connection, switch: Switch, firewall: Lock, ap: Po
 const ElTableColumn = ElementTableColumn<Asset>
 const route = useRoute()
 const router = useRouter()
+const listRoot = ref<HTMLElement>()
+const detailRoot = ref<HTMLElement>()
 const pageSizes = [10, 15, 25, 50, 100]
 const queryString = (key: string) => typeof route.query[key] === 'string' ? route.query[key] as string : ''
 const pageSize = computed(() => pageSizes.includes(Number(queryString('page_size'))) ? Number(queryString('page_size')) : 15)
@@ -75,6 +78,14 @@ let listGeneration = 0, disposed = false
 const readScope=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,session.value?.mode,can('assets:read'),can('assets:write'),switchingTenant.value]))
 const readable=()=>!disposed&&!switchingTenant.value&&!!session.value&&can('assets:read')
 const signature = computed(() => JSON.stringify(['q', 'status', 'type', 'site_id', 'cursor', 'page_size'].map(queryString)))
+const detailNavigation = useListDetailNavigation({
+  route, router, key: 'asset_id', scope: () => readScope.value,
+  signature: () => signature.value, rows: () => loaded.value && !error.value ? rows.value : [],
+  allowed: readable, list: listRoot, detail: detailRoot,
+})
+const detailPosition = detailNavigation.position
+const detailTotal = detailNavigation.total
+const detailNavigating = detailNavigation.busy
 watch(signature, () => {
   syncFilterDraft(filters, appliedFilters.value, previousAppliedFilters)
   previousAppliedFilters = { ...appliedFilters.value }
@@ -119,7 +130,7 @@ function nextPage() { if (!nextCursor.value) return; cursorHistory.value.push(qu
 function previousPage() { const cursor = cursorHistory.value.pop(); void router.replace({ query: { ...route.query, cursor: cursor || undefined } }) }
 function firstPage() { cursorHistory.value = []; void router.replace({ query: { ...route.query, cursor: undefined } }) }
 
-const detailOpen = computed({ get: () => Boolean(queryString('asset_id')), set: value => { if (!value) void router.replace({ query: { ...route.query, asset_id: undefined } }) } })
+const detailOpen = computed({ get: () => Boolean(queryString('asset_id')), set: value => { if (!value) void closeDetail() } })
 const asset = ref<Asset | null>(null)
 const detailClock = shallowRef<HttpClockObservation | null>(null)
 const detailError = ref<unknown>(null)
@@ -138,7 +149,18 @@ async function loadDetail(id: string) {
   finally { if (generation === detailGeneration) detailLoading.value = false }
 }
 function refreshDetail() { void loadDetail(queryString('asset_id')) }
-function openDetail(id: string) { void router.replace({ query: { ...route.query, asset_id: id } }) }
+async function openDetail(id: string, event?: Event) {
+  try { await detailNavigation.open(id, event) }
+  catch (cause) { detailError.value = cause }
+}
+async function closeDetail() {
+  try { await detailNavigation.close() }
+  catch (cause) { detailError.value = cause }
+}
+function adjacentDetail(direction: -1 | 1) {
+  const id = detailNavigation.adjacent(direction)
+  if (id) void openDetail(id)
+}
 async function requestOnboarding() {
   if (!asset.value||!readable()||!can('assets:write')||onboarding.value) return
   const owner=readScope.value,id=asset.value.id,turn=detailGeneration
@@ -220,7 +242,7 @@ onUnmounted(() => { disposed=true;listGeneration++;detailGeneration++;listContro
 <template>
   <section class="assets-prototype-page" :aria-busy="loading||detailLoading">
     <p v-if="!readable()" role="status">当前没有资产读取权限，或正在切换租户；原范围数据已清除。</p>
-    <div v-if="readable()" v-show="!detailOpen" class="asset-list-workspace">
+    <div v-if="readable()" v-show="!detailOpen" ref="listRoot" class="asset-list-workspace">
     <h1 class="page-title-sr">资产管理</h1>
     
     <div class="panel">
@@ -235,8 +257,8 @@ onUnmounted(() => { disposed=true;listGeneration++;detailGeneration++;listContro
       <AppTable v-if="assetView === 'list'" :error="error" :rows="rows" :loading="loading" :empty-text="error ? '列表加载失败，请点击重试' : !loaded ? '正在读取资产列表…' : filterItems.length ? '未找到匹配资产，可调整或清空筛选条件' : '当前授权范围内暂无资产'">
         <el-table-column v-for="column in assetLedgerColumns" :key="column.key" :label="column.label" :min-width="column.minWidth" :fixed="column.key === 'actions' ? 'right' : undefined">
           <template #default="{ row }">
-              <div v-if="column.key === 'name'" class="asset-identity-cell"><span class="asset-type-symbol" :class="'asset-type-' + row.type" aria-hidden="true"><component :is="deviceIcons[row.type] || Box" /></span><div><el-button link type="primary" class="asset-link" @click="openDetail(row.id)">{{ assetLedgerCell(row, column.key).text }}</el-button><span class="cell-sub mono">{{ row.management_ip || '—' }}</span></div></div>
-              <el-button v-else-if="column.key === 'actions'" link type="primary" @click="openDetail(row.id)">{{ assetLedgerCell(row, column.key).text }}</el-button>
+              <div v-if="column.key === 'name'" class="asset-identity-cell"><span class="asset-type-symbol" :class="'asset-type-' + row.type" aria-hidden="true"><component :is="deviceIcons[row.type] || Box" /></span><div><el-button link type="primary" class="asset-link" :data-list-record="row.id" @click="openDetail(row.id, $event)">{{ assetLedgerCell(row, column.key).text }}</el-button><span class="cell-sub mono">{{ row.management_ip || '—' }}</span></div></div>
+              <el-button v-else-if="column.key === 'actions'" link type="primary" :data-list-record="row.id" @click="openDetail(row.id, $event)">{{ assetLedgerCell(row, column.key).text }}</el-button>
               <span v-else-if="column.key === 'availability' || column.key === 'sync'" class="ledger-state" :class="{ 'ledger-state-pending': column.key === 'sync' }">{{ assetLedgerCell(row, column.key).text }}</span>
             <span v-else :class="{ 'tabular-nums': ['cpu', 'memory', 'problems', 'sampled'].includes(column.key) }">{{ assetLedgerCell(row, column.key).text }}</span>
               <span v-if="column.key !== 'name' && assetLedgerCell(row, column.key).detail && !['cpu','memory','business','problems','owner'].includes(column.key)" class="cell-sub">{{ assetLedgerCell(row, column.key).detail }}</span>
@@ -244,12 +266,21 @@ onUnmounted(() => { disposed=true;listGeneration++;detailGeneration++;listContro
         </el-table-column>
         <template #empty-action><el-button v-if="loaded && !error && filterItems.length" @click="resetFilters">清空筛选，查看全部资产</el-button></template>
       </AppTable>
-      <div v-else class="asset-honeycomb-region" :aria-busy="loading"><el-skeleton v-if="loading" :rows="5" animated /><div v-else-if="rows.length" class="asset-honeycomb"><button v-for="item in rows" :key="item.id" type="button" class="asset-tile" :class="'asset-tile-' + item.status" @click="openDetail(item.id)"><span class="tile-top"><component :is="deviceIcons[item.type] || Box" /><span>{{ typeLabel(item.type) }}</span></span><strong>{{ item.name }}</strong><span class="mono">{{ item.management_ip }}</span><span>{{ item.site_name || item.site_id }}</span><div><b>{{ assetLedgerCell(item, 'availability').text }}</b><small>{{ assetLedgerCell(item, 'sync').text }}</small></div></button></div><el-empty v-else :description="error ? '读取未完成，请按上方提示重试' : !loaded ? '正在读取资产列表…' : filterItems.length ? '未找到匹配资产，可调整或清空筛选条件' : '当前授权范围内暂无资产'"><el-button v-if="loaded && !error && filterItems.length" @click="resetFilters">清空筛选，查看全部资产</el-button></el-empty></div>
+      <div v-else class="asset-honeycomb-region" :aria-busy="loading"><el-skeleton v-if="loading" :rows="5" animated /><div v-else-if="rows.length" class="asset-honeycomb"><button v-for="item in rows" :key="item.id" type="button" class="asset-tile" :class="'asset-tile-' + item.status" :data-list-record="item.id" @click="openDetail(item.id, $event)"><span class="tile-top"><component :is="deviceIcons[item.type] || Box" /><span>{{ typeLabel(item.type) }}</span></span><strong>{{ item.name }}</strong><span class="mono">{{ item.management_ip }}</span><span>{{ item.site_name || item.site_id }}</span><div><b>{{ assetLedgerCell(item, 'availability').text }}</b><small>{{ assetLedgerCell(item, 'sync').text }}</small></div></button></div><el-empty v-else :description="error ? '读取未完成，请按上方提示重试' : !loaded ? '正在读取资产列表…' : filterItems.length ? '未找到匹配资产，可调整或清空筛选条件' : '当前授权范围内暂无资产'"><el-button v-if="loaded && !error && filterItems.length" @click="resetFilters">清空筛选，查看全部资产</el-button></el-empty></div>
       <div class="table-footer"><span class="tabular-nums">本页 {{ loading || error || !loaded ? '—' : rows.length }} 条</span><div class="cursor-pagination"><el-select :model-value="pageSize" :disabled="loading" aria-label="每页条数" @change="resizePage"><el-option v-for="size in pageSizes" :key="size" :label="`${size} 条 / 页`" :value="size" /></el-select><el-button v-if="queryString('cursor') && !cursorHistory.length" :disabled="loading" @click="firstPage">返回首页</el-button><el-button v-else :disabled="loading || !cursorHistory.length" @click="previousPage">上一页</el-button><el-button :disabled="loading || !hasMore" @click="nextPage">下一页</el-button></div></div>
     </div>
     </div>
-    <section v-if="detailOpen&&readable()" class="asset-detail-workspace asset-drawer" aria-label="资产详情">
-      <div class="asset-detail-top"><el-button :icon="ArrowLeft" text @click="detailOpen = false">返回资产列表</el-button><span>资产管理 / 资产详情</span><el-button :icon="Refresh" :loading="detailLoading" @click="refreshDetail">刷新详情</el-button></div>
+    <section v-if="detailOpen&&readable()" ref="detailRoot" class="asset-detail-workspace asset-drawer" aria-label="资产详情">
+      <div class="asset-detail-top">
+        <el-button :icon="ArrowLeft" text :disabled="detailNavigating" @click="closeDetail">返回资产列表</el-button>
+        <span v-if="detailPosition >= 0" role="status">本页第 {{ detailPosition + 1 }} / {{ detailTotal }} 条</span>
+        <span v-else>资产管理 / 资产详情</span>
+        <div class="content-actions">
+          <el-button v-if="detailPosition >= 0" :disabled="detailNavigating || detailLoading || detailPosition === 0" @click="adjacentDetail(-1)">上一条资产</el-button>
+          <el-button v-if="detailPosition >= 0" :disabled="detailNavigating || detailLoading || detailPosition + 1 >= detailTotal" @click="adjacentDetail(1)">下一条资产</el-button>
+          <el-button :icon="Refresh" :loading="detailLoading" @click="refreshDetail">刷新详情</el-button>
+        </div>
+      </div>
       <ApiErrorNotice :error="detailError" />
       <el-skeleton v-if="detailLoading" :rows="8" animated />
       <template v-if="asset"><header class="asset-detail-hero"><div class="asset-hero-title"><span class="asset-type-symbol"><component :is="deviceIcons[asset.type] || Box" /></span><div><div class="title-with-context"><h1>{{ asset.name }}</h1><span class="ledger-state">{{ assetLedgerCell(asset, 'availability').text }}</span><span class="ledger-state ledger-state-pending">{{ assetLedgerCell(asset, 'sync').text }}</span></div><p>{{ asset.management_ip }} · {{ typeLabel(asset.type) }} · {{ displayTenantName(session?.tenant.name ?? '') }} / {{ asset.site_name || asset.site_id }}</p></div></div><div class="asset-hero-actions"><PermissionGate capability="assets:write"><el-button v-if="metadataAllowed" @click="openMetadata">扩展资料</el-button><el-button v-if="metadataAllowed" @click="openWarranty">维保档案</el-button></PermissionGate><el-button @click="openDependencies">依赖拓扑</el-button><el-button v-if="can('assets:read')" @click="router.push('/network-monitoring')">网络监控</el-button></div><div class="asset-facts-grid"><div><small>资产标识</small><strong class="mono" :title="asset.id">{{ asset.id }}</strong></div><div><small>所属站点</small><strong>{{ asset.site_name || asset.site_id }}</strong></div><div><small>资料来源</small><strong>{{ sourceLabel(asset.source) }}</strong></div><div><small>生命周期</small><strong>{{ asset.lifecycle_status === 'DRAFT' ? '草稿' : asset.lifecycle_status }}</strong></div><div><small>最近采样</small><strong class="tabular-nums">{{ assetLedgerCell(asset, 'sampled').text }}</strong></div><div><small>登记版本</small><strong class="tabular-nums">v{{ asset.version }}</strong></div></div></header>

@@ -12,6 +12,7 @@ import { impactScopeLabel, ticketCategories, urgencyLabel } from '../utils/ticke
 import AppTable from '../components/AppTable.vue'
 import AppliedFilters from '../components/AppliedFilters.vue'
 import { createSearchCompositionGuard, syncFilterDraft } from '../utils/listSearch'
+import { useListDetailNavigation } from '../utils/useListDetailNavigation'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import TicketReportForm from '../components/TicketReportForm.vue'
 import TicketDetailOverview from '../components/TicketDetailOverview.vue'
@@ -26,6 +27,7 @@ import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import { createReportOperationReader, type ReportOperationReadState } from '../utils/reportOperation'
 
 const route = useRoute(), router = useRouter()
+const listRoot = ref<HTMLElement>()
 const queryString = (key: string) => typeof route.query[key] === 'string' ? route.query[key] as string : ''
 const pageSizes = [10, 15, 25, 50, 100]
 const pageSize = computed(() => pageSizes.includes(Number(queryString('page_size'))) ? Number(queryString('page_size')) : 15)
@@ -53,6 +55,16 @@ const pageSizeLimit = ref(100)
 let listController: AbortController | undefined
 let listGeneration = 0
 const signature = computed(() => JSON.stringify(['q', 'category', 'urgency', 'cursor', 'page_size'].map(queryString)))
+const detailNavigation = useListDetailNavigation({
+  route, router, key: 'ticket_id',
+  scope: () => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id,
+    session.value?.user.role, session.value?.permission_version, session.value?.account_version, can('tickets:read')]),
+  signature: () => signature.value, rows: () => loaded.value && !error.value ? rows.value : [],
+  allowed: () => Boolean(session.value && can('tickets:read')), list: listRoot, restoreAfterClose: false,
+})
+const detailPosition = detailNavigation.position
+const detailTotal = detailNavigation.total
+const detailNavigating = detailNavigation.busy
 watch(signature, () => {
   syncFilterDraft(filters, appliedFilters.value, previousAppliedFilters)
   previousAppliedFilters = { ...appliedFilters.value }
@@ -101,7 +113,7 @@ const detailOpen = computed({ get: () => Boolean(queryString('ticket_id')), set:
 async function closeDetail() {
   if (detailClosing.value || !queryString('ticket_id') || detailOverview.value?.canLeave() === false) return
   detailClosing.value = true
-  try { await router.replace({ query: { ...route.query, ticket_id: undefined } }) }
+  try { await detailNavigation.close() }
   catch (cause) { detailError.value = cause }
   finally { detailClosing.value = false }
 }
@@ -148,7 +160,14 @@ async function loadDetail(id = queryString('ticket_id')) {
   } catch (cause) { if (!isCancelled(cause) && generation === detailGeneration) detailError.value = cause }
   finally { if (generation === detailGeneration) detailLoading.value = false }
 }
-function openDetail(id: string) { void router.replace({ query: { ...route.query, ticket_id: id } }) }
+async function openDetail(id: string, event?: Event) {
+  try { await detailNavigation.open(id, event) }
+  catch (cause) { detailError.value = cause }
+}
+function adjacentDetail(direction: -1 | 1) {
+  const id = detailNavigation.adjacent(direction)
+  if (id) void openDetail(id)
+}
 function discardRetainedPhotos() {
   const id = queryString('ticket_id')
   if (photoWorkspace.discard(id) && id) void loadDetail(id)
@@ -239,7 +258,7 @@ onUnmounted(() => { unregisterContextGuard(); unregisterRouteResolve?.(); unregi
 </script>
 
 <template>
-  <section class="tickets-page">
+  <section ref="listRoot" class="tickets-page">
     <h1 class="page-title-sr">报障与受理 </h1>
     
     
@@ -251,12 +270,12 @@ onUnmounted(() => { unregisterContextGuard(); unregisterRouteResolve?.(); unregi
       <AppliedFilters :items="filterItems" :pending="pendingFilters" :loading="loading" :failed="Boolean(error)" :loaded="loaded" :count="rows.length" @remove="removeFilter" @clear="resetFilters" />
       <ApiErrorNotice :error="error"><el-button size="small" @click="loadTickets">重试</el-button></ApiErrorNotice>
       <AppTable :error="error" :rows="rows" :loading="loading" :empty-text="error ? '故障申报列表加载失败，请重试' : !loaded ? '正在加载故障申报列表…' : filterItems.length ? '当前筛选条件下暂无匹配工单，可调整或清空筛选条件' : customerView ? '暂无本人故障申报记录' : '当前租户暂无故障申报记录'">
-        <el-table-column label="登记号 / 标题" min-width="250"><template #default="{ row }"><el-button type="primary" link class="asset-link ticket-detail-link" @click="openDetail(row.id)">{{ row.title }}</el-button><span class="cell-sub mono">{{ row.receipt_no }}</span></template></el-table-column>
+        <el-table-column label="登记号 / 标题" min-width="250"><template #default="{ row }"><el-button type="primary" link class="asset-link ticket-detail-link" :data-list-record="row.id" @click="openDetail(row.id, $event)">{{ row.title }}</el-button><span class="cell-sub mono">{{ row.receipt_no }}</span></template></el-table-column>
         <el-table-column label="故障分类 / 设备" min-width="160"><template #default="{ row }">{{ row.category }}<span class="cell-sub">{{ row.asset_name || '暂未指定设备' }}</span></template></el-table-column>
         <el-table-column label="影响 / 紧急程度" min-width="150"><template #default="{ row }">{{ impactScopeLabel[row.impact_scope as keyof typeof impactScopeLabel] }}<span class="cell-sub">{{ urgencyLabel[row.urgency as keyof typeof urgencyLabel] }}</span></template></el-table-column>
         <el-table-column label="受理 / 流程状态" min-width="175"><template #default="{ row }"><el-tag type="info">{{ row.registration_status === 'REGISTERED' ? '已受理入库' : row.registration_status }}</el-tag><span class="cell-sub">{{ row.state === null ? '待流转分派' : row.state }}</span></template></el-table-column>
         <el-table-column label="提交时间" min-width="170"><template #default="{ row }">{{ displayTime(row.created_at) }}</template></el-table-column>
-        <el-table-column label="操作" width="110" fixed="right"><template #default="{ row }"><el-button type="primary" link class="ticket-detail-link" @click="openDetail(row.id)">查看详情</el-button></template></el-table-column>
+        <el-table-column label="操作" width="110" fixed="right"><template #default="{ row }"><el-button type="primary" link class="ticket-detail-link" :data-list-record="row.id" @click="openDetail(row.id, $event)">查看详情</el-button></template></el-table-column>
         <template #empty-action><el-button v-if="loaded && !error && filterItems.length" @click="resetFilters">清空筛选，查看全部工单</el-button></template>
       </AppTable>
       <div class="table-footer"><span>本页 {{ loading || error || !loaded ? '—' : rows.length }} 条记录</span><div class="cursor-pagination ticket-pagination"><el-select :model-value="pageSize" :disabled="loading" aria-label="报障每页条数" @change="resizePage"><el-option v-for="size in pageSizes.filter(size => size <= pageSizeLimit)" :key="size" :label="`${size} 条 / 页`" :value="size" /></el-select><el-button v-if="queryString('cursor') && !cursorHistory.length" :disabled="loading" @click="firstPage">返回首页</el-button><el-button v-else :disabled="loading || !cursorHistory.length" @click="previousPage">上一页</el-button><el-button :disabled="loading || !hasMore" @click="nextPage">下一页</el-button></div></div>
@@ -268,7 +287,7 @@ onUnmounted(() => { unregisterContextGuard(); unregisterRouteResolve?.(); unregi
     <el-button v-if="noteTarget && noteTarget.tenant_id === session?.tenant.id && can('ticket_notes:read_internal')" class="retained-worklog-button" @click="noteOpen = true">恢复“{{ noteTarget.receipt_no }}”的内部备注面板</el-button>
     <WorklogWorkspace ref="worklogWorkspace" :guarded-by-parent="true" v-model="worklogOpen" :ticket="worklogTarget" @saved="refreshOverview" />
     <el-button v-if="worklogTarget && can('worklogs:read_own')" class="retained-worklog-button" @click="worklogOpen = true">恢复“{{ worklogTarget.receipt_no }}”的工时填报面板</el-button>
-    <el-drawer :key="queryString('ticket_id')" v-model="detailOpen" title="工单详情" size="100%" class="ticket-detail-drawer" :with-header="false" :before-close="closeDetail" destroy-on-close>
+    <el-drawer v-model="detailOpen" title="工单详情" size="100%" class="ticket-detail-drawer" :with-header="false" :before-close="closeDetail" destroy-on-close @closed="detailNavigation.restore">
       <RetainedPhotoNotice v-if="retainedPhotos" :target-id="photoTargetId" :ticket="appendTicket" :count="detailPhotos.rows.value.length" :can-discard="photoWorkspace.canDiscard.value" @resume="openDetail(photoTargetId)" @discard="discardRetainedPhotos" />
       <ApiErrorNotice :error="detailError"><el-button size="small" @click="loadDetail()">重新加载详情</el-button></ApiErrorNotice>
       <el-skeleton v-if="detailLoading" :rows="9" animated />
@@ -290,7 +309,13 @@ onUnmounted(() => { unregisterContextGuard(); unregisterRouteResolve?.(); unregi
         <ReportPhotoPanel :queue="detailPhotos" :existing="ticket.attachments" :selectable="matchingPhotoTarget && detailAppender.permitted.value" :show-selections="matchingPhotoTarget" :disabled="detailLoading" :appender="matchingPhotoTarget ? detailAppender : undefined" />
         <el-descriptions v-if="!customerView" :column="1" border class="asset-descriptions"><el-descriptions-item label="记录 ID"><span class="mono">{{ ticket.id }}</span></el-descriptions-item><el-descriptions-item label="租户 ID"><span class="mono">{{ ticket.tenant_id }}</span></el-descriptions-item><el-descriptions-item label="报障人 ID"><span class="mono">{{ ticket.reporter_id }}</span></el-descriptions-item><el-descriptions-item label="登记操作 ID"><span class="mono">{{ ticket.operation_id }}</span></el-descriptions-item><el-descriptions-item label="版本">v{{ ticket.version }}</el-descriptions-item><el-descriptions-item label="外部同步">待接入 ITSM 外部工单同步</el-descriptions-item></el-descriptions>
       </TicketDetailOverview>
-      <template #footer><el-button :loading="detailLoading" :disabled="detailClosing || detailAppender.busy.value || detailAppender.reading.value" @click="loadDetail()">刷新详情</el-button><el-button :loading="detailClosing" @click="closeDetail">关闭</el-button></template>
+      <template #footer>
+        <span v-if="detailPosition >= 0" role="status">本页第 {{ detailPosition + 1 }} / {{ detailTotal }} 条</span>
+        <el-button v-if="detailPosition >= 0" :disabled="detailNavigating || detailClosing || detailLoading || detailPosition === 0" @click="adjacentDetail(-1)">上一条报障</el-button>
+        <el-button v-if="detailPosition >= 0" :disabled="detailNavigating || detailClosing || detailLoading || detailPosition + 1 >= detailTotal" @click="adjacentDetail(1)">下一条报障</el-button>
+        <el-button :loading="detailLoading" :disabled="detailClosing || detailAppender.busy.value || detailAppender.reading.value" @click="loadDetail()">刷新详情</el-button>
+        <el-button :loading="detailClosing" @click="closeDetail">关闭</el-button>
+      </template>
     </el-drawer>
   </section>
 </template>

@@ -59,6 +59,7 @@ function expectCount(value: '—' | '0' | '1') {
   expect(host.querySelector('.table-footer > span')?.textContent).toContain(`本页 ${value} 条`)
 }
 beforeEach(() => {
+  vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
   session.value = structuredClone(auth); switchingTenant.value = false; contextGeneration.value=0
   host = document.createElement('div'); document.body.append(host)
   vi.stubGlobal('ResizeObserver', class { observe() {} unobserve() {} disconnect() {} })

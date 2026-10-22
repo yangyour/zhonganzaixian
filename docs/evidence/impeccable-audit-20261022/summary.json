@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-22",
+  "source_commit": "36b91a12e8a3275c4dfa9b1ce5ce7721cca65542",
+  "browser": "155.0.4283.62",
+  "business_routes_entered": 41,
+  "business_routes_attempted": 42,
+  "business_viewport_combinations": 94,
+  "login_viewport_combinations": 4,
+  "overflow_count": 0,
+  "page_errors": 0,
+  "nonlogin_business_writes": 0,
+  "score": 13,
+  "max_score": 20,
+  "findings": {
+    "P1": 4,
+    "P2": 4,
+    "P0": 0,
+    "P3": 1
+  },
+  "menu_styles_changed": false,
+  "frontend_changed": false,
+  "typecheck": "PASS",
+  "raw_evidence": ".local/impeccable-audit-20261022",
+  "not_run": [
+    "MSP-only my-worklogs browser",
+    "all form submissions",
+    "fault injection matrix",
+    "screen reader",
+    "physical touch",
+    "native zoom",
+    "Firefox/WebKit/360",
+    "controlled performance benchmark"
+  ]
+}

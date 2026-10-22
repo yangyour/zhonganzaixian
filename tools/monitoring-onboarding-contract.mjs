@@ -79,3 +79,49 @@ export function addMonitoringPlanningContract(contract) {
     responses: { 200: { description: 'Valid disabled configuration or positioned invalid plan; never a partial configuration',
       content: { 'application/json': { schema: ref('MonitoringPlanResult') } } }, ...errors } } };
 }
+
+export function addMonitoringObservationContract(contract) {
+  const object = properties => ({ type: 'object', additionalProperties: false, properties, required: Object.keys(properties) });
+  const ref = name => ({ $ref: '#/components/schemas/' + name });
+  const nullable = schema => ({ anyOf: [schema, { type: 'null' }] });
+  const uuid = { type: 'string', format: 'uuid' }, timestamp = { type: 'string', format: 'date-time' };
+  const statuses = ['CONFIG_PENDING', 'TARGET_DISABLED', 'UNSUPPORTED_ENGINE', 'NO_DATA', 'STALE', 'SCRAPE_SUCCEEDED', 'SCRAPE_FAILED', 'SOURCE_UNAVAILABLE', 'SOURCE_INVALID_RESPONSE'];
+  const report = object({ target_id: uuid, configuration_sha256: { type: 'string', pattern: '^[0-9a-f]{64}$' },
+    observation_status: { type: 'string', enum: statuses }, reason: { type: 'string', pattern: '^[A-Z_]{1,100}$' },
+    evaluated_at: nullable(timestamp), checked_at: nullable(timestamp), sample_at: nullable(timestamp),
+    sample_age_seconds: nullable({ type: 'number', minimum: 0 }), scrape_up: nullable({ type: 'integer', enum: [0, 1] }),
+    max_age_seconds: nullable({ type: 'integer', minimum: 1, maximum: 86400 }), lookback_seconds: nullable({ type: 'integer', minimum: 1, maximum: 86400 }),
+    network_attempted: { type: 'boolean' }, continuous_collection_verified: { const: false }, active_configuration_verified: { const: false },
+    device_identity_verified: { const: false }, health_verified: { const: false } });
+  report.allOf = [
+    { if: { properties: { observation_status: { enum: ['CONFIG_PENDING', 'TARGET_DISABLED', 'UNSUPPORTED_ENGINE'] } } },
+      then: { properties: Object.fromEntries(['evaluated_at', 'checked_at', 'sample_at', 'sample_age_seconds', 'scrape_up', 'max_age_seconds', 'lookback_seconds'].map(k => [k, { type: 'null' }]).concat([['network_attempted', { const: false }]])) },
+      else: { properties: { evaluated_at: timestamp, max_age_seconds: { type: 'integer', minimum: 1, maximum: 86400 }, lookback_seconds: { type: 'integer', minimum: 1, maximum: 86400 }, network_attempted: { const: true } } } },
+    { if: { properties: { observation_status: { enum: ['SCRAPE_SUCCEEDED', 'SCRAPE_FAILED', 'STALE'] } } },
+      then: { properties: { sample_at: timestamp, sample_age_seconds: { type: 'number', minimum: 0 }, checked_at: timestamp } },
+      else: { properties: { sample_at: { type: 'null' }, sample_age_seconds: { type: 'null' }, scrape_up: { type: 'null' } } } },
+    { if: { properties: { observation_status: { const: 'SCRAPE_SUCCEEDED' } } }, then: { properties: { scrape_up: { const: 1 } } } },
+    { if: { properties: { observation_status: { const: 'SCRAPE_FAILED' } } }, then: { properties: { scrape_up: { const: 0 } } } },
+    { if: { properties: { observation_status: { const: 'STALE' } } }, then: { properties: { scrape_up: { type: 'null' } } } },
+    { if: { properties: { observation_status: { enum: ['NO_DATA', 'SOURCE_INVALID_RESPONSE'] } } }, then: { properties: { checked_at: timestamp } } },
+  ];
+  report['x-mop-cross-field-checks'] = [
+    'Sample time comes from timestamp(up), not the instant query evaluation timestamp; same identity and exactly one state/sample-time pair required',
+    'Sample must be within the explicit source lookback; age is measured at response receipt and compared with the explicit max-age',
+    'SCRAPE_SUCCEEDED and SCRAPE_FAILED require age <= max_age_seconds; STALE requires age > max_age_seconds and always null scrape_up',
+    'The reported configuration hash is the current registration, not evidence that the complete scrape configuration was applied',
+    'No raw labels, source URLs, upstream error bodies, credentials, cached success, synthesized zero or device-health conclusion'];
+  const result = object({ data: object({ tenant_id: uuid, actor_id: uuid, permission_version: { type: 'integer', minimum: 1 },
+    asset_scope_checked: { const: true }, source: { const: 'PROMETHEUS_SCRAPE_OBSERVATION' }, report: ref('MonitoringScrapeObservationReport') }), trace_id: { type: 'string' } });
+  Object.assign(contract.components.schemas, { MonitoringScrapeObservationReport: report, MonitoringScrapeObservationResult: result });
+  contract.paths['/monitoring-onboarding/registered-targets/{id}/observation'] = { get: {
+    operationId: 'readRegisteredMonitoringScrapeObservation', summary: '读取当前授权登记目标的采集状态，不等同设备健康或持续采集验收',
+    'x-mop-capabilities': ['assets:read', 'configurations:read'], 'x-mop-read-only': true, 'x-mop-current-membership-recheck': true,
+    'x-mop-arbitrary-destination-accepted': false, 'x-mop-deployment-performed': false,
+    'x-mop-network-io': 'One fixed query to an explicitly configured and allowlisted tenant source, not to the monitored device; no client query parameters',
+    'x-mop-default-disabled': true, 'x-mop-cache-fallback': false,
+    parameters: [{ name: 'id', in: 'path', required: true, schema: uuid }],
+    responses: { 200: { description: 'Read-only observation; inspect observation_status, never infer healthy from HTTP 200', content: { 'application/json': { schema: ref('MonitoringScrapeObservationResult') } } },
+      ...Object.fromEntries([400, 401, 403, 404, 409, 429, 503].map(code => [code, { description: 'Scope, request, concurrent read or registration rejection; no fallback target or source', content: { 'application/json': { schema: ref('Error') } } }])) }
+  } };
+}

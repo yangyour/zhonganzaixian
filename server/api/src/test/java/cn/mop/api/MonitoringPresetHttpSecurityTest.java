@@ -37,6 +37,7 @@ class MonitoringPresetHttpSecurityTest {
   @Bean MonitoringPresetProbeService service(MonitoringPresetRegistry r,AtomicInteger probes){return new MonitoringPresetProbeService(r,t->{probes.incrementAndGet();return MonitoringPresetProbeService.outcome(t,"FAILED","CONNECTION_FAILED");});}
   @Bean MonitoringOnboardingPlanner onboardingPlanner(){return MonitoringOnboardingPlannerTest.empty();}
   @Bean MonitoringOnboardingController onboardingController(PlatformRepository p,MonitoringOnboardingPlanner planner){return new MonitoringOnboardingController(p,planner);}
+  @Bean MonitoringScrapeObservationController observationController(PlatformRepository p,MonitoringPresetProbeService registered){return new MonitoringScrapeObservationController(p,registered,new MonitoringScrapeObservationService(Map.of(),(a,t,e)->{throw new AssertionError("No configured source");},java.time.Clock.systemUTC()));}
   @Bean MonitoringPresetController controller(PlatformRepository p,MonitoringPresetProbeService s){return new MonitoringPresetController(p,s);}
  }
  @Autowired WebApplicationContext context;@Autowired PlatformRepository repository;@Autowired MonitoringPresetRegistry registry;@Autowired AtomicInteger probes;
@@ -71,4 +72,15 @@ class MonitoringPresetHttpSecurityTest {
   when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"padmin",7,true,List.of("assets:read","configurations:read"))));
   mvc.perform(post("/api/v1/monitoring-onboarding/plans").with(user(ACTOR)).with(csrf().asHeader()).sessionAttr("mop.tenant_id",TENANT).contentType("application/json").content(planBody())).andExpect(status().isForbidden());assertEquals(0,probes.get());
  }
+ @Test void observationRequiresAuthenticationAndCurrentCapabilities()throws Exception{
+  mvc.perform(get(BASE+"/"+target.id()+"/observation")).andExpect(status().isUnauthorized());
+  mvc.perform(get(BASE+"/"+target.id()+"/observation").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store")).andExpect(jsonPath("$.data.report.observation_status").value("TARGET_DISABLED")).andExpect(jsonPath("$.data.report.network_attempted").value(false));
+  when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"padmin",7,true,List.of("assets:read"))));
+  mvc.perform(get(BASE+"/"+target.id()+"/observation").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isForbidden());assertEquals(0,probes.get());
+ }
+ @Test void observationRejectsClientQueryAndForeignTarget()throws Exception{
+  mvc.perform(get(BASE+"/"+target.id()+"/observation").param("query","up").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isBadRequest());
+  mvc.perform(get(BASE+"/"+ACTOR+"/observation").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isNotFound());assertEquals(0,probes.get());
+ }
+
 }

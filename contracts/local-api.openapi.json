@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.80.0",
+    "version": "0.81.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -41926,6 +41926,116 @@
           },
           "409": {
             "description": "Rejected input or changed current scope; no preparation result released",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/monitoring-onboarding/registered-targets/{id}/observation": {
+      "get": {
+        "operationId": "readRegisteredMonitoringScrapeObservation",
+        "summary": "读取当前授权登记目标的采集状态，不等同设备健康或持续采集验收",
+        "x-mop-capabilities": [
+          "assets:read",
+          "configurations:read"
+        ],
+        "x-mop-read-only": true,
+        "x-mop-current-membership-recheck": true,
+        "x-mop-arbitrary-destination-accepted": false,
+        "x-mop-deployment-performed": false,
+        "x-mop-network-io": "One fixed query to an explicitly configured and allowlisted tenant source, not to the monitored device; no client query parameters",
+        "x-mop-default-disabled": true,
+        "x-mop-cache-fallback": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Read-only observation; inspect observation_status, never infer healthy from HTTP 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringScrapeObservationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Scope, request, concurrent read or registration rejection; no fallback target or source",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Scope, request, concurrent read or registration rejection; no fallback target or source",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope, request, concurrent read or registration rejection; no fallback target or source",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Scope, request, concurrent read or registration rejection; no fallback target or source",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Scope, request, concurrent read or registration rejection; no fallback target or source",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Scope, request, concurrent read or registration rejection; no fallback target or source",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Scope, request, concurrent read or registration rejection; no fallback target or source",
             "content": {
               "application/json": {
                 "schema": {
@@ -84064,6 +84174,382 @@
               "catalog",
               "source",
               "network_accessed"
+            ]
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ]
+      },
+      "MonitoringScrapeObservationReport": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "configuration_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "observation_status": {
+            "type": "string",
+            "enum": [
+              "CONFIG_PENDING",
+              "TARGET_DISABLED",
+              "UNSUPPORTED_ENGINE",
+              "NO_DATA",
+              "STALE",
+              "SCRAPE_SUCCEEDED",
+              "SCRAPE_FAILED",
+              "SOURCE_UNAVAILABLE",
+              "SOURCE_INVALID_RESPONSE"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "pattern": "^[A-Z_]{1,100}$"
+          },
+          "evaluated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "checked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sample_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sample_age_seconds": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scrape_up": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "enum": [
+                  0,
+                  1
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "max_age_seconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 86400
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lookback_seconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 86400
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "network_attempted": {
+            "type": "boolean"
+          },
+          "continuous_collection_verified": {
+            "const": false
+          },
+          "active_configuration_verified": {
+            "const": false
+          },
+          "device_identity_verified": {
+            "const": false
+          },
+          "health_verified": {
+            "const": false
+          }
+        },
+        "required": [
+          "target_id",
+          "configuration_sha256",
+          "observation_status",
+          "reason",
+          "evaluated_at",
+          "checked_at",
+          "sample_at",
+          "sample_age_seconds",
+          "scrape_up",
+          "max_age_seconds",
+          "lookback_seconds",
+          "network_attempted",
+          "continuous_collection_verified",
+          "active_configuration_verified",
+          "device_identity_verified",
+          "health_verified"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "observation_status": {
+                  "enum": [
+                    "CONFIG_PENDING",
+                    "TARGET_DISABLED",
+                    "UNSUPPORTED_ENGINE"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "evaluated_at": {
+                  "type": "null"
+                },
+                "checked_at": {
+                  "type": "null"
+                },
+                "sample_at": {
+                  "type": "null"
+                },
+                "sample_age_seconds": {
+                  "type": "null"
+                },
+                "scrape_up": {
+                  "type": "null"
+                },
+                "max_age_seconds": {
+                  "type": "null"
+                },
+                "lookback_seconds": {
+                  "type": "null"
+                },
+                "network_attempted": {
+                  "const": false
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "evaluated_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "max_age_seconds": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 86400
+                },
+                "lookback_seconds": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 86400
+                },
+                "network_attempted": {
+                  "const": true
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "observation_status": {
+                  "enum": [
+                    "SCRAPE_SUCCEEDED",
+                    "SCRAPE_FAILED",
+                    "STALE"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "sample_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "sample_age_seconds": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "checked_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "sample_at": {
+                  "type": "null"
+                },
+                "sample_age_seconds": {
+                  "type": "null"
+                },
+                "scrape_up": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "observation_status": {
+                  "const": "SCRAPE_SUCCEEDED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "scrape_up": {
+                  "const": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "observation_status": {
+                  "const": "SCRAPE_FAILED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "scrape_up": {
+                  "const": 0
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "observation_status": {
+                  "const": "STALE"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "scrape_up": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "observation_status": {
+                  "enum": [
+                    "NO_DATA",
+                    "SOURCE_INVALID_RESPONSE"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "checked_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        ],
+        "x-mop-cross-field-checks": [
+          "Sample time comes from timestamp(up), not the instant query evaluation timestamp; same identity and exactly one state/sample-time pair required",
+          "Sample must be within the explicit source lookback; age is measured at response receipt and compared with the explicit max-age",
+          "SCRAPE_SUCCEEDED and SCRAPE_FAILED require age <= max_age_seconds; STALE requires age > max_age_seconds and always null scrape_up",
+          "The reported configuration hash is the current registration, not evidence that the complete scrape configuration was applied",
+          "No raw labels, source URLs, upstream error bodies, credentials, cached success, synthesized zero or device-health conclusion"
+        ]
+      },
+      "MonitoringScrapeObservationResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "actor_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "permission_version": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "asset_scope_checked": {
+                "const": true
+              },
+              "source": {
+                "const": "PROMETHEUS_SCRAPE_OBSERVATION"
+              },
+              "report": {
+                "$ref": "#/components/schemas/MonitoringScrapeObservationReport"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "actor_id",
+              "permission_version",
+              "asset_scope_checked",
+              "source",
+              "report"
             ]
           },
           "trace_id": {

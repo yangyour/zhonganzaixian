@@ -248,8 +248,8 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.80.0');
-  assert.equal(contract.info.version, '0.80.0');
+  assert.equal(contract.info.version, '0.81.0');
+  assert.equal(contract.info.version, '0.81.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -944,7 +944,7 @@ test('补充SLA口径只能绑定明确发布版本，不接收策略或身份�
 
 test('SLA提醒记录不等于路由或送达，读取无业务写入',()=>{const p=contract.paths['/tickets/{ticketId}/sla/reminders'];assert.equal(p.get['x-mop-read-only'],true);assert.equal(p.post,undefined);const s=contract.components.schemas.TicketSlaReminder;assert.equal(s.properties.notification_status.const,'NOT_ROUTED');assert.equal(s.properties.delivered.const,false);assert.deepEqual(s.properties.progress.enum,[0.5,0.8,1]);});
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.80.0');
+  assert.equal(contract.info.version, '0.81.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/workflow/sla'].get;
@@ -1008,7 +1008,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.80.0');
+  assert.equal(contract.info.version, '0.81.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1481,4 +1481,51 @@ test('monitoring preparation endpoint is privileged CSRF-protected and has no ne
   assert.deepEqual(operation['x-mop-capabilities'], ['assets:read', 'configurations:read', 'configurations:write']);
   assert.ok(operation.parameters.some(parameter => parameter.name === 'X-CSRF-Token' && parameter.required));
   assert.equal(contract.paths['/monitoring-onboarding/presets'].get['x-mop-network-io'], false);
+});
+
+const scrapeObservation = () => ({ target_id: '79000000-0000-4000-8000-000000000003', configuration_sha256: 'a'.repeat(64),
+  observation_status: 'SCRAPE_SUCCEEDED', reason: 'SCRAPE_SAMPLE_CURRENT', evaluated_at: '2026-10-22T12:00:00Z', checked_at: '2026-10-22T12:00:00Z',
+  sample_at: '2026-10-22T11:59:55Z', sample_age_seconds: 5, scrape_up: 1, max_age_seconds: 60, lookback_seconds: 300,
+  network_attempted: true, continuous_collection_verified: false, active_configuration_verified: false, device_identity_verified: false, health_verified: false });
+
+test('scrape observation separates current up, failure and stale null state', () => {
+  const r = scrapeObservation();
+  assert.equal(validates('MonitoringScrapeObservationReport', r), true);
+  assert.equal(validates('MonitoringScrapeObservationReport', { ...r, observation_status: 'SCRAPE_FAILED', scrape_up: 0 }), true);
+  assert.equal(validates('MonitoringScrapeObservationReport', { ...r, observation_status: 'SCRAPE_FAILED' }), false);
+  const stale = { ...r, observation_status: 'STALE', sample_age_seconds: 61, scrape_up: null };
+  assert.equal(validates('MonitoringScrapeObservationReport', stale), true);
+  assert.equal(validates('MonitoringScrapeObservationReport', { ...stale, scrape_up: 1 }), false);
+  assert.equal(validates('MonitoringScrapeObservationReport', { ...r, sample_at: null }), false);
+});
+
+test('scrape no-data and invalid-source cannot invent a sample or healthy flags', () => {
+  const r = scrapeObservation();
+  for (const state of ['NO_DATA', 'SOURCE_INVALID_RESPONSE', 'SOURCE_UNAVAILABLE']) {
+    const missing = { ...r, observation_status: state, sample_at: null, sample_age_seconds: null, scrape_up: null };
+    assert.equal(validates('MonitoringScrapeObservationReport', missing), true);
+    assert.equal(validates('MonitoringScrapeObservationReport', { ...missing, scrape_up: 0 }), false);
+  }
+  for (const flag of ['continuous_collection_verified', 'active_configuration_verified', 'device_identity_verified', 'health_verified'])
+    assert.equal(validates('MonitoringScrapeObservationReport', { ...r, [flag]: true }), false);
+});
+
+test('unconfigured disabled and unsupported observations cannot claim network work', () => {
+  const base = { ...scrapeObservation(), network_attempted: false, evaluated_at: null, checked_at: null, sample_at: null,
+    sample_age_seconds: null, scrape_up: null, max_age_seconds: null, lookback_seconds: null };
+  for (const state of ['CONFIG_PENDING', 'TARGET_DISABLED', 'UNSUPPORTED_ENGINE']) {
+    const r = { ...base, observation_status: state };
+    assert.equal(validates('MonitoringScrapeObservationReport', r), true);
+    assert.equal(validates('MonitoringScrapeObservationReport', { ...r, network_attempted: true }), false);
+  }
+});
+
+test('scrape observation accepts only an authenticated registered id and has no cached success', () => {
+  const operation = contract.paths['/monitoring-onboarding/registered-targets/{id}/observation'].get;
+  assert.deepEqual(operation['x-mop-capabilities'], ['assets:read', 'configurations:read']);
+  assert.equal(operation['x-mop-read-only'], true);
+  assert.equal(operation['x-mop-arbitrary-destination-accepted'], false);
+  assert.equal(operation['x-mop-cache-fallback'], false);
+  assert.deepEqual(operation.parameters.map(p => [p.name, p.in]), [['id', 'path']]);
+  assert.equal(operation.requestBody, undefined);
 });

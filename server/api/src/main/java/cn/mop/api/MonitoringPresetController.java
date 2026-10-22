@@ -14,7 +14,7 @@ public class MonitoringPresetController {
     public MonitoringPresetController(PlatformRepository platform,MonitoringPresetProbeService service){this.platform=platform;this.service=service;}
     @ModelAttribute void privateHeaders(HttpServletResponse r){r.setHeader("Cache-Control","no-store");r.setHeader("Referrer-Policy","no-referrer");}
     @GetMapping Object list(HttpServletRequest request){var member=access(request,false);boolean expanded=listQuery(request);configured();List<Map<String,Object>> rows=new ArrayList<>();Map<String,Asset> original=new HashMap<>();
-        for(var t:service.registry.forTenant(member.tenantId())){Asset a=asset(member,t);original.put(t.id(),a);rows.add(map("target_id",t.id(),"asset_name",a.name(),"configuration",t.configuration(),"configuration_sha256",t.hash(),"test_authorized",service.registry.approved(t)));}
+        for(var t:service.registry.forTenant(member.tenantId())){Asset a=asset(member,t);original.put(t.id(),a);rows.add(map("target_id",t.id(),"asset_name",a.name(),"configuration",t.configuration(),"configuration_sha256",t.hash(),"test_authorized",service.testAuthorized(t)));}
         for(var t:service.registry.forTenant(member.tenantId()))if(!original.get(t.id()).equals(asset(member,t)))throw expired();recheck(member,request,false);
         if(!expanded){Set<String> legacyBindings=new HashSet<>();for(var t:service.registry.forTenant(member.tenantId()))if(!legacyBindings.add(t.assetId()+":"+t.preset().id()))throw new DomainException(409,"CONFIGURATION_VIEW_REQUIRED","该配置包含同设备多服务目标，请使用支持expanded视图的客户端读取完整目标；未返回部分列表");}
         return success(map("tenant_id",member.tenantId(),"actor_id",member.userId(),"permission_version",member.permissionVersion(),"items",rows,"source","SERVER_EXPLICIT_CONFIGURATION","continuous_collection_verified",false),request);
@@ -26,7 +26,7 @@ public class MonitoringPresetController {
         return success(map("tenant_id",member.tenantId(),"actor_id",member.userId(),"permission_version",member.permissionVersion(),"report",result,"source","SERVER_ONE_SHOT_PROBE"),request);
     }
     private static String body(HttpServletRequest r){try{if(r.getContentLengthLong()>256)throw invalid();byte[] bytes=r.getInputStream().readNBytes(257);if(bytes.length>256)throw invalid();var node=MonitoringPresetRegistry.JSON.readTree(bytes);MonitoringPresetRegistry.fields(node,Set.of("configuration_sha256"));String hash=MonitoringPresetRegistry.text(node,"configuration_sha256");if(!hash.matches("[0-9a-f]{64}"))throw invalid();return hash;}catch(Exception ex){throw invalid();}}
-    private void configured(){if(!service.enabled())throw new DomainException(503,"CONFIG_PENDING","服务器尚未启用登记目标测试配置");}
+    private void configured(){if(!service.enabled())throw new DomainException(503,"CONFIG_PENDING","服务器尚未配置登记目标目录");}
     private Asset asset(Membership m,MonitoringPresetRegistry.Target t){var a=platform.authorizedAsset(m.tenantId(),m.userId(),m.permissionVersion(),t.assetId()).orElseThrow(MonitoringPresetController::notFound);if(!a.tenantId().equals(m.tenantId())||!a.id().equals(t.assetId())||!a.managementIp().equals(t.assetIp()))throw notFound();return a;}
     private Membership access(HttpServletRequest r,boolean test){return MonitoringOnboardingAccess.member(platform,r,test);}
     private void recheck(Membership m,HttpServletRequest r,boolean test){MonitoringOnboardingAccess.recheck(platform,m,r,test);}

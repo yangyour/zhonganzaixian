@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "tenant_id": null,
+      "endpoint": null,
+      "max_age_seconds": null,
+      "lookback_seconds": null,
+      "timeout_seconds": 5
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-22",
+  "api_version": "0.81.0",
+  "scope": "Backend only; no frontend changes or business deployment",
+  "backend": {
+    "total": 4310,
+    "executed": 3268,
+    "skipped": 1042,
+    "failures": 0,
+    "errors": 0,
+    "new_tests": 34,
+    "official_prometheus_loopback_test": "PASS"
+  },
+  "node": {
+    "tests": 196,
+    "passed": 196,
+    "failed": 0
+  },
+  "python": {
+    "tests": 230,
+    "passed": 230,
+    "skipped": 0,
+    "official_prometheus_file_sd_test": "PASS"
+  },
+  "package": {
+    "status": "PASS",
+    "sha256": "647221e78ced8b75842806990bbaba8ef2a65b906e8102159544e70579e1d713",
+    "catalog_bytes_match": true,
+    "configuration_baseline_bytes_match": true,
+    "test_classes_excluded": true,
+    "openapi": "Versioned separately, not embedded by existing Maven resource configuration"
+  },
+  "checks": {
+    "contract_generation": "PASS",
+    "formal_progress": "PASS"
+  },
+  "loopback": {
+    "prometheus_version": "3.15.1",
+    "official_archive_sha256": "6a726885328ad9efebbf36e876ce2fb6225468a71fd1e7ce3ba666d5f4d97a84",
+    "namespace": "isolated 790 tenant labels; temporary loopback exporters and TSDB only",
+    "verified": [
+      "scrape success",
+      "503 scrape failure",
+      "recovery",
+      "no data",
+      "duplicate job ambiguity",
+      "source stopped",
+      "process and temporary directory cleanup"
+    ]
+  },
+  "initial_failures_fixed": [
+    "Removed an unreachable checked HttpTimeoutException catch from asynchronous source transport",
+    "Updated three existing API version assertions from 0.80.0 to 0.81.0"
+  ],
+  "validation_harness_correction": "Initial JAR check assumed OpenAPI was embedded; inspected actual Maven resources and verified catalog/configuration baseline instead. No production resource layout changed.",
+  "not_run": [
+    "Business deployment",
+    "Real devices or production Prometheus source",
+    "Source authentication setup",
+    "Real identity-provider login",
+    "Business database integration",
+    "Frontend acceptance"
+  ],
+  "formal_acceptance": {
+    "total": 128,
+    "NOT_RUN": 128
+  },
+  "database_migrations": 0,
+  "frozen_sql": "V1-V50 unchanged"
+}

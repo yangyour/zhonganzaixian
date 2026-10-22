@@ -1,7 +1,6 @@
 package cn.mop.api;
 
 import cn.mop.domain.DomainException;
-import java.io.*;
 import java.net.*;
 import java.net.http.*;
 import java.nio.*;
@@ -10,7 +9,6 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.regex.*;
-import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLException;
 import static cn.mop.api.ApiResponse.map;
 
@@ -19,24 +17,25 @@ final class MonitoringPresetProbeService {
     interface Runner { Map<String,Object> run(MonitoringPresetRegistry.Target target); }
     final MonitoringPresetRegistry registry;
     private final Runner runner;
+    private final boolean testsEnabled;
     private final Semaphore slot=new Semaphore(1);
-    MonitoringPresetProbeService(MonitoringPresetRegistry registry,Runner runner){this.registry=registry;this.runner=Objects.requireNonNull(runner);}
+    MonitoringPresetProbeService(MonitoringPresetRegistry registry,Runner runner){this(registry,runner,true);}
+    MonitoringPresetProbeService(MonitoringPresetRegistry registry,Runner runner,boolean testsEnabled){this.registry=registry;this.runner=Objects.requireNonNull(runner);this.testsEnabled=testsEnabled;}
+    boolean testAuthorized(MonitoringPresetRegistry.Target target){return testsEnabled&&registry!=null&&registry.approved(target);}
     boolean enabled(){return registry!=null;}
     Map<String,Object> test(MonitoringPresetRegistry.Target t){
-        if(!enabled()||!registry.approved(t))throw new DomainException(503,"CONFIG_PENDING","该目标尚未配置精确端点与下游测试授权");
+        if(!testAuthorized(t))throw new DomainException(503,"CONFIG_PENDING","该目标尚未配置精确端点与下游测试授权");
         if(!slot.tryAcquire())throw new DomainException(429,"RATE_LIMITED","已有单次探测在执行，请稍后重试");
         try{return runner.run(t);}finally{slot.release();}
     }
     static Map<String,Object> base(MonitoringPresetRegistry.Target t){return map("target_id",t.id(),"configuration_sha256",t.hash(),"probe_status","NOT_RUN","continuous_collection_verified",false,"device_identity_verified",false,"health_verified",false,"sample_count",null,"matched_metrics",List.of());}
     static Map<String,Object> outcome(MonitoringPresetRegistry.Target t,String state,String reason){var r=base(t);r.put("probe_status",state);if(reason!=null)r.put("reason",reason);return r;}
     static Runner network(){return new NetworkRunner();}
-    static final int MAX_BYTES=2*1024*1024;
-    static final class ProbeFailure extends RuntimeException {final String reason;ProbeFailure(String reason){super(reason);this.reason=reason;}}
+    static final int MAX_BYTES=MonitoringHttpTransport.MAX_BYTES;
+    static final class ProbeFailure extends MonitoringHttpTransport.Failure {ProbeFailure(String reason){super(reason);}}
     static ProbeFailure failure(String reason){return new ProbeFailure(reason);}
     static final class NetworkRunner implements Runner {
-        private static HttpClient client(){SSLParameters tls=new SSLParameters();tls.setEndpointIdentificationAlgorithm("HTTPS");return HttpClient.newBuilder().sslParameters(tls).followRedirects(HttpClient.Redirect.NEVER).connectTimeout(Duration.ofSeconds(5))
-            .proxy(new ProxySelector(){public List<Proxy> select(URI uri){return List.of(Proxy.NO_PROXY);}public void connectFailed(URI u,SocketAddress a,IOException e){}}).build();}
-        private final HttpClient client=client();
+        private final HttpClient client=MonitoringHttpTransport.client();
         public Map<String,Object> run(MonitoringPresetRegistry.Target t){
             CompletableFuture<HttpResponse<byte[]>> pending=null;
             try{
@@ -47,16 +46,16 @@ final class MonitoringPresetProbeService {
                 }
                 String path=t.endpoint().toString();if(t.downstream()!=null){path+="?target="+encode(t.downstream())+"&module="+encode(t.preset().module());if(t.authProfile()!=null)path+="&auth="+encode(t.authProfile());}
                 HttpRequest request=HttpRequest.newBuilder(URI.create(path)).timeout(Duration.ofSeconds(t.timeout())).header("Accept","text/plain; version=0.0.4").header("Accept-Encoding","identity").GET().build();
-                pending=client.sendAsync(request,ignored->new LimitedBody());HttpResponse<byte[]> response=pending.get(t.timeout(),TimeUnit.SECONDS);
+                pending=client.sendAsync(request,ignored->new MonitoringHttpTransport.LimitedBody());HttpResponse<byte[]> response=pending.get(t.timeout(),TimeUnit.SECONDS);
                 if(response.statusCode()!=200)throw failure("HTTP_STATUS_REJECTED");
                 if(!response.headers().firstValue("Content-Encoding").orElse("identity").equalsIgnoreCase("identity"))throw failure("ENCODING_REJECTED");
                 String type=response.headers().firstValue("Content-Type").orElse("").split(";",2)[0].trim().toLowerCase(Locale.ROOT);
                 if(!Set.of("text/plain","application/openmetrics-text").contains(type))throw failure("CONTENT_TYPE_REJECTED");
                 var summary=metrics(response.body(),t.preset());var result=base(t);result.putAll(summary);result.put("probe_status","SAMPLE_VERIFIED_ONCE");return result;
-            }catch(ProbeFailure ex){return outcome(t,"FAILED",ex.reason);}
+            }catch(MonitoringHttpTransport.Failure ex){return outcome(t,"FAILED",ex.reason);}
             catch(TimeoutException|java.net.http.HttpTimeoutException|java.net.SocketTimeoutException ex){return outcome(t,"FAILED","PROBE_TIMEOUT");}
             catch(InterruptedException ex){Thread.currentThread().interrupt();return outcome(t,"FAILED","PROBE_INTERRUPTED");}
-            catch(ExecutionException ex){Throwable cause=ex.getCause();return outcome(t,"FAILED",cause instanceof ProbeFailure f?f.reason:cause instanceof HttpTimeoutException?"PROBE_TIMEOUT":cause instanceof SSLException?"TLS_VERIFICATION_OR_HANDSHAKE_FAILED":"CONNECTION_FAILED");}
+            catch(ExecutionException ex){Throwable cause=ex.getCause();return outcome(t,"FAILED",cause instanceof MonitoringHttpTransport.Failure f?f.reason:cause instanceof HttpTimeoutException?"PROBE_TIMEOUT":cause instanceof SSLException?"TLS_VERIFICATION_OR_HANDSHAKE_FAILED":"CONNECTION_FAILED");}
             catch(Exception ex){return outcome(t,"FAILED","CONNECTION_FAILED");}
             finally{if(pending!=null&&!pending.isDone())pending.cancel(true);}
         }
@@ -78,13 +77,5 @@ final class MonitoringPresetProbeService {
         }
         if(matched.isEmpty())throw failure("EXPECTED_METRICS_MISSING");if(p.successMetric()!=null){var v=values.get(p.successMetric());if(v==null||v.size()!=1||v.get(0)!=1d)throw failure("TARGET_PROBE_FAILED");}
         return map("sample_count",count,"matched_metrics",List.copyOf(matched),"metric_values_stored",false);
-    }
-    static final class LimitedBody implements HttpResponse.BodySubscriber<byte[]> {
-        final CompletableFuture<byte[]> body=new CompletableFuture<>();final ByteArrayOutputStream bytes=new ByteArrayOutputStream();Flow.Subscription subscription;
-        public CompletionStage<byte[]> getBody(){return body;}
-        public synchronized void onSubscribe(Flow.Subscription value){subscription=value;value.request(1);}
-        public synchronized void onNext(List<ByteBuffer> chunks){if(body.isDone())return;for(ByteBuffer chunk:chunks){if(chunk.remaining()>MAX_BYTES-bytes.size()){subscription.cancel();bytes.reset();body.completeExceptionally(failure("RESPONSE_TOO_LARGE"));return;}byte[] part=new byte[chunk.remaining()];chunk.get(part);bytes.writeBytes(part);}subscription.request(1);}
-        public synchronized void onError(Throwable error){bytes.reset();body.completeExceptionally(failure("CONNECTION_FAILED"));}
-        public synchronized void onComplete(){body.complete(bytes.toByteArray());bytes.reset();}
     }
 }

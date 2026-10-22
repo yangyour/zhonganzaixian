@@ -13,7 +13,7 @@ final class MonitoringPresetRegistry {
         .streamReadConstraints(StreamReadConstraints.builder().maxNestingDepth(10).maxStringLength(1024).maxNumberLength(16).build()).build())
         .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS).enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
     record Preset(String id,String engine,String kind,String path,List<String> metrics,String module,String successMetric){Preset{metrics=List.copyOf(metrics);}}
-    record Target(String id,String tenantId,String assetId,Preset preset,URI endpoint,String downstream,String authProfile,int timeout,String json,String hash){
+    record Target(String id,String tenantId,String assetId,Preset preset,URI endpoint,String downstream,String authProfile,int timeout,boolean enabled,String json,String hash){
         Object configuration(){try{return JSON.readValue(json,Object.class);}catch(Exception ex){throw invalid();}}
         String assetIp(){if(downstream==null)return endpoint.getHost();if(preset.id().equals("http-service"))return URI.create(downstream).getHost();if(preset.id().equals("tcp-service"))return URI.create("tcp://"+downstream).getHost();return downstream;}
         @Override public String toString(){return "MonitoringTarget[redacted]";}
@@ -42,7 +42,7 @@ final class MonitoringPresetRegistry {
                 @SuppressWarnings("unchecked") Map<String,Object> values=JSON.convertValue(row,Map.class);
                 String single=JSON.writeValueAsString(Map.of("version",1,"targets",List.of(new TreeMap<>(values))));
                 String hash=HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(single.getBytes(StandardCharsets.UTF_8)));
-                Target t=new Target(id,tenant,asset,p,e,target,auth,timeout,single,hash);
+                Target t=new Target(id,tenant,asset,p,e,target,auth,timeout,row.get("enabled").booleanValue(),single,hash);
                 if(found.put(id,t)!=null||!bindings.add(List.of(tenant,asset,p.id(),e.toString(),destinationKey(p,target))))throw invalid();
             }
             targets=Collections.unmodifiableMap(found);endpoints=allowlist(allowedEndpoints);downstreams=allowlist(allowedDownstreams);

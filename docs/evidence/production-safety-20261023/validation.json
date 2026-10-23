@@ -1,0 +1,78 @@
+{
+  "recorded_at_utc": "2026-10-23T07:41:29.452763+00:00",
+  "source_commit": "9482f4598d48c8dca826381b9f4b3b2e93d6da20",
+  "integration_parent_main": "17541885",
+  "scope": "PURE_UNIT_AND_SYNTHETIC_TRANSPORT_ONLY",
+  "python_suites": [
+    {
+      "suite": "production_preflight",
+      "tests": 19,
+      "skipped": 0
+    },
+    {
+      "suite": "lan_update",
+      "tests": 30,
+      "skipped": 0
+    },
+    {
+      "suite": "contract_acceptance_and_progress",
+      "tests": 32,
+      "skipped": 1
+    },
+    {
+      "suite": "attachment_scan",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "suite": "recovery_drill",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "suite": "credential_rotation",
+      "tests": 16,
+      "skipped": 0
+    }
+  ],
+  "python_found": 124,
+  "python_executed": 123,
+  "python_failures": 0,
+  "java_suites": [
+    {
+      "suite": "ProjectIdentitySecurityTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "SecureSessionTransportTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "SessionServiceSecurityTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "java_executed": 18,
+  "api_reactor_build": "SUCCESS",
+  "api_contract_consistency": "PASS",
+  "historical_fixture_tests_skipped_in_earlier_run": 13,
+  "real_public_entry_evidence": "docs/evidence/production-preflight-20261023/public-entry.json",
+  "live_component_integration_this_run": false,
+  "scanner_or_kms_contacted": false,
+  "business_data_written": false,
+  "migrations_executed": 0,
+  "deployment_performed": false,
+  "restore_executed": false,
+  "production_ready": false,
+  "formal_tc_status": "NOT_RUN",
+  "customer_signoff_verified": false
+}

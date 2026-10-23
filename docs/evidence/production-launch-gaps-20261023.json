@@ -1,0 +1,46 @@
+{
+  "reviewed_at_utc": "2026-10-23T06:18:18.2925878+00:00",
+  "project": "MOP / 众安在线",
+  "repository": "https://github.com/yangyour/zhonganzaixian.git",
+  "branch": "main",
+  "upstream": "origin/main",
+  "local_head": "1e4a59db36e78c2cd188f3ea05446e57ec41c3da",
+  "remote_main": "1e4a59db36e78c2cd188f3ea05446e57ec41c3da",
+  "scope": "Read-only public readiness probe and repository/evidence review; no authenticated business actions or server inventory rerun",
+  "http_probe": {
+    "endpoint": "http://mop.all-online.com.cn/api/v1/health/ready",
+    "http_status": 200,
+    "status": "READY_REMOTE_TEST",
+    "mode": "remote_test",
+    "ready": true,
+    "durable": true,
+    "production_ready": false,
+    "asset_import_can_import": false,
+    "asset_import_business_status": "CONFIG_PENDING",
+    "backup_effective": false,
+    "backup_device_execution_allowed": false,
+    "quarterly_report_published": false
+  },
+  "https_probe": {
+    "verified": false,
+    "certificate_validation_bypassed": false,
+    "errors": [
+      {
+        "type": "System.Net.Http.HttpRequestException",
+        "message": "The SSL connection could not be established, see inner exception."
+      },
+      {
+        "type": "System.Security.Authentication.AuthenticationException",
+        "message": "The remote certificate is invalid according to the validation procedure: RemoteCertificateNameMismatch, RemoteCertificateChainErrors"
+      }
+    ]
+  },
+  "repository_checks": {
+    "formal_tc_not_run_count": 128,
+    "rls_sql_files_found": 0,
+    "prod_profile_java_files_found": 0,
+    "latest_release_record": "docs/contract-layout-20261023.md",
+    "latest_recorded_artifact_commit": "effbe2748a7e4f958ee909ffa6f5be39b21e6858",
+    "existing_web_changes_excluded": true
+  }
+}

@@ -316,6 +316,27 @@ class BackupTaskSchedulerTest {
         assertTrue(archiveCommands.isEmpty());
     }
 
+
+    @Test void reconcileModeSkipsStagedAndAlreadyVerifiedWithoutReadingProofOrRegistering(){
+        var page=new Page(List.of(task(Phase.STAGED,0,false),task(Phase.VERIFIED,2,true)),null);
+        var scheduler=new BackupTaskScheduler(schedule(),(a,s,c,n)->page,proofs,this::archive,this::registration,BackupTaskScheduler.Mode.RECONCILE_ONLY);
+        var cycle=scheduler.tick();assertEquals(2,cycle.discovered());assertEquals(2,cycle.skippedByMode());assertEquals(0,cycle.archiveRecorded());assertEquals(0,cycle.registrationsRecorded());assertEquals(0,proofReads.get());assertTrue(archiveCommands.isEmpty());assertTrue(registrationCommands.isEmpty());
+    }
+    @Test void reconcileModeProcessesOnlyOriginalUncertainDispatches(){
+        var page=new Page(List.of(task(Phase.STORE_STARTED,1,true),task(Phase.VERIFY_REQUIRED,2,true)),null);
+        var scheduler=new BackupTaskScheduler(schedule(),(a,s,c,n)->page,proofs,this::archive,this::registration,BackupTaskScheduler.Mode.RECONCILE_ONLY);
+        var cycle=scheduler.tick();assertEquals(2,cycle.archiveRecorded());assertEquals(0,cycle.registrationsRecorded());assertEquals(0,cycle.skippedByMode());assertEquals(2,archiveCommands.size());assertTrue(registrationCommands.isEmpty());assertEquals(archiveCommands.get(0).dispatch(),archiveCommands.get(1).dispatch());
+    }
+    @Test void reconcileModeDoesNotTrustFreshStagedStateAfterStaleDiscovery(){
+        var fixture=new BackupArchiveDispatchTest();fixture.setup();
+        var original=new Task(fixture.scope,fixture.source.submissionId(),fixture.source.runVersion(),fixture.now,Phase.STAGED,0, null,null,0,lease);
+        var targetAccess=fixture.access;
+        var dispatch=BackupTaskCommands.dispatch(binding,targetAccess,original);
+        var stale=new Task(fixture.scope,original.submissionId(),original.stagedRunVersion(),original.stagedAt(),Phase.STORE_STARTED,1,dispatch.id(),dispatch.owner(),1,lease);
+        var schedule=new BackupTaskSchedule(true,binding,List.of(new Target(targetAccess,new AssetScope(fixture.scope.tenantId(),fixture.scope.assetId()))),10,100);
+        var scheduler=new BackupTaskScheduler(schedule,(a,s,c,n)->new Page(List.of(stale),null),proofs,fixture.consumer()::reconcileOnly,cmd->{fail("No registration");return null;},BackupTaskScheduler.Mode.RECONCILE_ONLY);
+        assertEquals(1,scheduler.tick().reconciliationRequired());assertEquals(0,fixture.writes);assertEquals(List.of("read"),fixture.actions);
+    }
     private BackupTaskSchedule schedule() {
         return new BackupTaskSchedule(true, binding, List.of(new Target(access, assetScope)), 10, 100);
     }

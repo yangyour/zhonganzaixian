@@ -30,6 +30,7 @@ import javax.sql.DataSource;
  * No Spring registration, device dispatch, re-encryption, lease release or deletion occurs here.
  */
 public final class BackupTaskScheduler {
+    public enum Mode { POSTPROCESS, RECONCILE_ONLY }
     /** Read existing trusted evidence identifiers for this exact source; never manufacture successful evidence. */
     public interface ProofSource {
         String archiveReference(Task original);
@@ -37,7 +38,8 @@ public final class BackupTaskScheduler {
     }
 
     public record Cycle(boolean enabled, int discovered, int archiveRecorded, int registrationsRecorded,
-            int reconciliationRequired, int blocked, int unavailable, int discoveryFailures) {
+            int reconciliationRequired, int blocked, int unavailable, int discoveryFailures, int skippedByMode) {
+        public Cycle(boolean enabled,int discovered,int archiveRecorded,int registrationsRecorded,int reconciliationRequired,int blocked,int unavailable,int discoveryFailures){this(enabled,discovered,archiveRecorded,registrationsRecorded,reconciliationRequired,blocked,unavailable,discoveryFailures,0);}
         /** Describes this bounded cycle only, never storage/KMS readiness or current backup health. */
         public boolean noProcessingErrors() {
             return enabled && reconciliationRequired == 0 && blocked == 0 && unavailable == 0 && discoveryFailures == 0;
@@ -60,6 +62,7 @@ public final class BackupTaskScheduler {
     }
 
     private final BackupTaskSchedule schedule;
+    private final Mode mode;
     private final Discovery discovery;
     private final ProofSource proofs;
     private final ArchiveConsumer archives;
@@ -108,8 +111,34 @@ public final class BackupTaskScheduler {
         return new BackupTaskScheduler(schedule, discovery::discover, proofs, archive::once, registration::once);
     }
 
+    /** No crypto writer or version-registration consumer is assembled in this mode. */
+    public static BackupTaskScheduler assembleReconciliation(BackupTaskSchedule schedule,DataSource source,
+            PostgresBackupTaskAuthorization authorization,ProofSource proofs,
+            PostgresBackupArchiveRepository.EnvelopeVerifier envelopeVerifier,
+            PostgresBackupArchiveRepository.EvidenceVerifier evidenceVerifier) {
+        Objects.requireNonNull(schedule);Objects.requireNonNull(source);Objects.requireNonNull(authorization);
+        if(schedule.enabled()&&!authorization.bindingReference().equals("backup-task-binding:"+schedule.binding()))throw new IllegalArgumentException("CONFIG_PENDING: reconciliation authorization binding mismatch");
+        var repository=new PostgresBackupArchiveRepository(source,(connection,access,scope,action)->{
+            if(action!=PostgresBackupArchiveRepository.Action.READ&&action!=PostgresBackupArchiveRepository.Action.MARK_UNCONFIRMED&&action!=PostgresBackupArchiveRepository.Action.VERIFY_OBJECT)
+                throw new DomainException(403,"BACKUP_RECONCILIATION_ONLY","只核对模式不允许新增暂存、开始派发或确认未派发");
+            authorization.archiveAuthorizer().authorize(connection,access,scope,action);
+        },envelopeVerifier,evidenceVerifier);
+        var consumer=BackupArchiveDispatch.reconciliationOnly(new BackupArchiveDispatch.Binding(schedule.enabled(),schedule.binding()==null?null:"backup-archive-dispatch:"+schedule.binding()),
+            (binding,access,scope,step)->boundary(source,authorization,access,new AssetScope(scope.tenantId(),scope.assetId()),
+                step==BackupArchiveDispatch.Step.RECONCILE_ORIGINAL?Operation.ARCHIVE_RECONCILE:Operation.ARCHIVE_READ),repository);
+        var discovery=new PostgresBackupTaskDiscovery(source,authorization);
+        return new BackupTaskScheduler(schedule,discovery::discover,proofs,consumer::reconcileOnly,
+            command->{throw new DomainException(403,"BACKUP_RECONCILIATION_ONLY","只核对模式不登记版本或完成备份运行");},Mode.RECONCILE_ONLY);
+    }
+
     BackupTaskScheduler(BackupTaskSchedule schedule, Discovery discovery, ProofSource proofs,
             ArchiveConsumer archives, RegistrationConsumer registrations) {
+        this(schedule,discovery,proofs,archives,registrations,Mode.POSTPROCESS);
+    }
+
+    BackupTaskScheduler(BackupTaskSchedule schedule, Discovery discovery, ProofSource proofs,
+            ArchiveConsumer archives, RegistrationConsumer registrations,Mode mode) {
+        this.mode=Objects.requireNonNull(mode);
         this.schedule = Objects.requireNonNull(schedule);
         this.discovery = Objects.requireNonNull(discovery);
         this.proofs = Objects.requireNonNull(proofs);
@@ -126,7 +155,7 @@ public final class BackupTaskScheduler {
         if (!schedule.enabled()) {
             return new Cycle(false, 0, 0, 0, 0, 0, 0, 0);
         }
-        int discovered = 0, archived = 0, registered = 0, reconciliation = 0, blocked = 0, unavailable = 0, failures = 0;
+        int discovered = 0, archived = 0, registered = 0, reconciliation = 0, blocked = 0, unavailable = 0, failures = 0, skipped = 0;
         for (Target target : schedule.targets()) {
             if (stopRequested.getAsBoolean() || Thread.currentThread().isInterrupted()) {
                 break;
@@ -142,9 +171,10 @@ public final class BackupTaskScheduler {
             for (Task task : page.items()) {
                 if (stopRequested.getAsBoolean() || Thread.currentThread().isInterrupted()) {
                     // Leave this page cursor unchanged so cancellation cannot skip its remaining durable tasks.
-                    return new Cycle(true, discovered, archived, registered, reconciliation, blocked, unavailable, failures);
+                    return new Cycle(true, discovered, archived, registered, reconciliation, blocked, unavailable, failures, skipped);
                 }
                 discovered++;
+                if(mode==Mode.RECONCILE_ONLY&&(task.phase()==Phase.STAGED||task.phase()==Phase.VERIFIED)){skipped++;continue;}
                 boolean invoked = false;
                 try {
                     if (task.phase() == Phase.VERIFIED) {
@@ -191,7 +221,7 @@ public final class BackupTaskScheduler {
                 cursors.put(target.scope(), page.nextAfter());
             }
         }
-        return new Cycle(true, discovered, archived, registered, reconciliation, blocked, unavailable, failures);
+        return new Cycle(true, discovered, archived, registered, reconciliation, blocked, unavailable, failures, skipped);
     }
 
     /** Explicit caller-owned lifecycle. The supplied stop signal is checked between bounded cycles. */

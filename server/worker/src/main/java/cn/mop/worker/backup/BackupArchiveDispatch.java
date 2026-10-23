@@ -44,6 +44,24 @@ public final class BackupArchiveDispatch {
   this(binding,authority,postgres(Objects.requireNonNull(journal)),originalWriter(Objects.requireNonNull(crypto),Objects.requireNonNull(archive)));
  }
  BackupArchiveDispatch(Binding binding,Authority authority,Journal journal,OriginalWriter writer){this.binding=Objects.requireNonNull(binding);this.authority=Objects.requireNonNull(authority);this.journal=Objects.requireNonNull(journal);this.writer=Objects.requireNonNull(writer);}
+ /** Restricted assembly: no writer is installed, and callers use reconcileOnly rather than start/store. */
+ public static BackupArchiveDispatch reconciliationOnly(Binding binding,Authority authority,PostgresBackupArchiveRepository repository){
+  Objects.requireNonNull(authority);
+  return new BackupArchiveDispatch(binding,(b,a,s,step)->{
+   if(step==Step.START_STORE||step==Step.STORE_ORIGINAL)throw new DomainException(403,"BACKUP_RECONCILIATION_ONLY","只核对模式不允许开始或上传对象");
+   authority.check(b,a,s,step);
+  },postgres(Objects.requireNonNull(repository)),(a,p)->{throw new DomainException(403,"BACKUP_RECONCILIATION_ONLY","只核对模式未装配上传器");});
+ }
+ /** Existing dispatch only. A stale STAGED discovery can never authorize a new upload. */
+ public Result reconcileOnly(Command command){
+  Objects.requireNonNull(command);
+  if(!binding.enabled())return new Result(Status.DISABLED,null,false);
+  check(command,Step.READ);Receipt current=journal.current(command.access(),command.scope()).orElseThrow(BackupArchiveDispatch::missing);validate(current,command);if(current.replay())throw unavailable();
+  if(current.event().phase()==Phase.STAGED)return result(command,Status.RECONCILIATION_REQUIRED,null,false);
+  if(!command.dispatch().equals(current.event().dispatch()))throw conflict();
+  if(current.event().phase()==Phase.VERIFIED)return result(command,Status.ARCHIVE_VERIFICATION_RECORDED,current.event().version(),false);
+  return reconcile(command,current,false);
+ }
  public Result once(Command command){
   Objects.requireNonNull(command);
   if(!binding.enabled())return new Result(Status.DISABLED,null,false);

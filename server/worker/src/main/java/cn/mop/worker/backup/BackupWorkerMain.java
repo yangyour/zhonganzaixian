@@ -17,7 +17,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class BackupWorkerMain {
     private BackupWorkerMain() {}
 
-    public static void run(boolean checkOnly) {
+    public static void run(boolean checkOnly) {run(checkOnly,BackupTaskScheduler.Mode.POSTPROCESS);}
+
+    public static void run(boolean checkOnly,BackupTaskScheduler.Mode mode) {
         var stopped = new AtomicBoolean();
         Thread owner = Thread.currentThread();
         Thread hook = new Thread(() -> {
@@ -31,14 +33,14 @@ public final class BackupWorkerMain {
         }, "backup-postprocessing-stop");
         Runtime.getRuntime().addShutdownHook(hook);
         try {
-            var settings = BackupWorkerSettings.from(System::getenv);
+            var settings = BackupWorkerSettings.from(System::getenv,mode);
             var proof = new SignedBackupCollectionProofs(settings.proofDirectory(), settings.collectorPublicKey(),
                     settings.collectorBinding(), Clock.systemUTC());
             try (var source = openDataSource(settings)) {
                 var authorization = new PostgresBackupTaskAuthorization("backup-task-binding:" + settings.schedule().binding(),
                         new BackupGrantFile(settings.grantsFile()), Clock.systemUTC());
                 for (var target : settings.schedule().targets()) {
-                    for (Operation operation : BackupWorkerSettings.REQUIRED_OPERATIONS) {
+                    for (Operation operation : BackupWorkerSettings.requiredOperations(mode)) {
                         authorization.requireCurrent(source, target.access(), target.scope().assetId(), operation);
                     }
                 }
@@ -65,20 +67,23 @@ public final class BackupWorkerMain {
                     if (!runtime.ready()) {
                         throw new IllegalStateException("CONFIG_PENDING: actual backup storage/KMS readiness failed");
                     }
-                    var archive = new BackupEnvelopeArchive(runtime.crypto(), runtime.objects(), (access, scope, operation) -> {
+                    var archive = new BackupEnvelopeArchive(runtime.crypto(), mode==BackupTaskScheduler.Mode.RECONCILE_ONLY?readOnlyObjects(runtime.objects()):runtime.objects(), (access, scope, operation) -> {
+                        if(mode==BackupTaskScheduler.Mode.RECONCILE_ONLY&&operation==BackupEnvelopeArchive.Operation.STORE)return false;
                         authorization.requireCurrent(source, new Access(access.tenantId(), access.actorId(), access.permissionVersion()),
                                 scope.assetId(), operation == BackupEnvelopeArchive.Operation.STORE
                                         ? Operation.ARCHIVE_START : Operation.ARCHIVE_RECONCILE);
                         return true;
                     });
-                    var scheduler = BackupTaskScheduler.assemble(settings.schedule(), source, authorization, proof,
+                    var scheduler = mode==BackupTaskScheduler.Mode.RECONCILE_ONLY
+                            ? BackupTaskScheduler.assembleReconciliation(settings.schedule(),source,authorization,proof,proof.envelopeVerifier(runtime.crypto()),proof.archiveVerifier(archive))
+                            : BackupTaskScheduler.assemble(settings.schedule(), source, authorization, proof,
                             proof.envelopeVerifier(runtime.crypto()), proof.archiveVerifier(archive), proof.objectVerifier(archive),
                             proof.completionVerifier(), runtime.crypto(), archive);
                     if (checkOnly) {
-                        System.out.println("BACKUP_WORKER_DEPENDENCIES_READY capture=false deletion=false processing_started=false");
+                        System.out.println("BACKUP_WORKER_DEPENDENCIES_READY mode="+mode+" capture=false deletion=false processing_started=false");
                         return;
                     }
-                    scheduler.run(stopped::get, cycle -> System.out.println("BACKUP_POSTPROCESSING " + cycle));
+                    scheduler.run(stopped::get, cycle -> System.out.println("BACKUP_POSTPROCESSING mode="+mode+" " + cycle));
                 }
             }
         } catch (InterruptedException interrupted) {
@@ -93,6 +98,16 @@ public final class BackupWorkerMain {
             }
         }
     }
+    /** Defense in depth: no immutable PUT port is reachable from a reconciliation runtime. */
+    static BackupEnvelopeArchive.ObjectStore readOnlyObjects(BackupEnvelopeArchive.ObjectStore original){
+        java.util.Objects.requireNonNull(original);
+        return new BackupEnvelopeArchive.ObjectStore(){
+            public boolean ready(){return original.ready();}
+            public byte[] read(BackupEnvelopeEncryption.Scope scope,long bytes,String hash){return original.read(scope,bytes,hash);}
+            public void storeImmutable(BackupEnvelopeEncryption.Envelope envelope){throw new cn.mop.domain.DomainException(403,"BACKUP_RECONCILIATION_ONLY","只核对模式禁止上传对象");}
+        };
+    }
+
     /** Shared privilege guard must finish before grants, storage/KMS readiness or scheduler construction. */
     static HikariDataSource openDataSource(BackupWorkerSettings settings) {
         return openDataSource(settings, RuntimeDataSources::openRestrictedTest);

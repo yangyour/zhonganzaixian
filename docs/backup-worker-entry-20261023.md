@@ -29,3 +29,7 @@
 ## 本轮边界
 
 单元测试使用临时合成签名密钥和文件验证协议/错签名/过期/错范围/原命令/取消，不是实际采集证据。打包CLI只验证缺配置拒绝，不启用处理。真实可信采集器清单、获批KMS适配器和真实存储端到端测试仍缺，记录为未就绪。B01下载/解密/差异与B02业务治理继续推进，B01整项不标VERIFIED。
+
+## 追加：受限只核对入口
+
+`--backup-reconcile-only` / `--backup-reconcile-only-check` 已新增，使用显式 `MOP_BACKUP_RECONCILE_ONLY_ENABLED` 和缩减操作集合，STAGED不上传、VERIFIED不登记。对象写端口与仓储写动作均独立限制；只允许原核验日志追加，不宣称数据库整体只读。详见[模式说明](backup-reconciliation-only-20261023.md)；未启动真实处理。

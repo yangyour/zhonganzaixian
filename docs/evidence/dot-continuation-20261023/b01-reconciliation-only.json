@@ -1,0 +1,43 @@
+{
+  "status": "RECONCILIATION_ONLY_MODE_CODE_VALIDATED",
+  "independent_main_baseline": "0888887d5b03fa720605316b8d36f4e76c290200",
+  "full_java_run": {
+    "discovered": 4953,
+    "executed": 3835,
+    "skipped": 1118,
+    "failures": 0,
+    "errors": 0
+  },
+  "final_backup_regression_in_both_trees": {
+    "discovered": 215,
+    "executed": 160,
+    "skipped": 55,
+    "failures": 0,
+    "errors": 0,
+    "includes_one_additional_factory_denial_test": true
+  },
+  "latest_test_reports": {
+    "discovered": 4954,
+    "executed": 3836,
+    "skipped": 1118,
+    "failures": 0,
+    "errors": 0
+  },
+  "modes": [
+    "--backup-reconcile-only",
+    "--backup-reconcile-only-check"
+  ],
+  "new_object_upload_allowed": false,
+  "version_registration_allowed": false,
+  "run_completion_allowed": false,
+  "confirm_no_dispatch_allowed": false,
+  "journal_verification_append_allowed": true,
+  "database_entirely_read_only": false,
+  "real_postgresql_oss_kms": "NOT_RUN_MISSING_PRIVATE_CONFIGURATION_AND_APPROVED_PROVIDER",
+  "actual_worker_started": false,
+  "real_device_operations": 0,
+  "migrations": 0,
+  "deployed": false,
+  "formal_acceptance": "NOT_RUN",
+  "independent_main_worker_package": "PASSED_NOT_STARTED"
+}

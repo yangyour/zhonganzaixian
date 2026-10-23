@@ -345,7 +345,9 @@
         "docs/backup-access-provider-20261023.md",
         "docs/evidence/backup-access-provider-20261023/validation.json",
         "docs/evidence/backup-version-content-20261023/validation.json",
-        "docs/backup-worker-runtime-guard-20261023.md"
+        "docs/backup-worker-runtime-guard-20261023.md",
+        "docs/backup-reconciliation-only-20261023.md",
+        "docs/evidence/dot-continuation-20261023/b01-reconciliation-only.json"
       ],
       "commits": [
         "735be359",

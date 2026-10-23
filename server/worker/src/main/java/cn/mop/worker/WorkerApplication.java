@@ -21,10 +21,10 @@ import org.springframework.core.env.Environment;
 public class WorkerApplication {
     public static void main(String[] args) {
         if (java.util.Arrays.stream(args).anyMatch(argument -> argument.startsWith("--backup-"))) {
-            if (args.length != 1 || !java.util.Set.of("--backup-postprocess", "--backup-postprocess-check").contains(args[0])) {
+            if (args.length != 1 || !java.util.Set.of("--backup-postprocess", "--backup-postprocess-check", "--backup-reconcile-only", "--backup-reconcile-only-check").contains(args[0])) {
                 throw new IllegalArgumentException("Backup postprocessing accepts exactly one explicit mode");
             }
-            cn.mop.worker.backup.BackupWorkerMain.run("--backup-postprocess-check".equals(args[0]));
+            cn.mop.worker.backup.BackupWorkerMain.run(args[0].endsWith("-check"),args[0].startsWith("--backup-reconcile-only")?cn.mop.worker.backup.BackupTaskScheduler.Mode.RECONCILE_ONLY:cn.mop.worker.backup.BackupTaskScheduler.Mode.POSTPROCESS);
             return;
         }
         if (java.util.Arrays.asList(args).contains("--notification-relay")) {

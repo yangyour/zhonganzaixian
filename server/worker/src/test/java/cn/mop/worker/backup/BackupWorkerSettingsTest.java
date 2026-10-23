@@ -42,6 +42,19 @@ class BackupWorkerSettingsTest {
         }
     }
 
+
+    @Test void reconcileModeRequiresExplicitEnablementAndDoesNotRequireWriteGrants() throws Exception {
+        var settings=valid();assertThrows(RuntimeException.class,()->BackupWorkerSettings.from(settings::get,BackupTaskScheduler.Mode.RECONCILE_ONLY));
+        settings.put("MOP_BACKUP_RECONCILE_ONLY_ENABLED","true");
+        var mapper=new ObjectMapper();var file=Path.of(settings.get("MOP_BACKUP_ACCESS_GRANTS_FILE"));var tree=mapper.readTree(file.toFile());
+        var grant=(com.fasterxml.jackson.databind.node.ObjectNode)tree.get("grants").get(0);var ops=grant.putArray("operations");
+        BackupWorkerSettings.requiredOperations(BackupTaskScheduler.Mode.RECONCILE_ONLY).forEach(operation->ops.add(operation.name()));mapper.writeValue(file.toFile(),tree);
+        assertEquals(1,BackupWorkerSettings.from(settings::get,BackupTaskScheduler.Mode.RECONCILE_ONLY).schedule().targets().size());
+        assertFalse(BackupWorkerSettings.requiredOperations(BackupTaskScheduler.Mode.RECONCILE_ONLY).contains(cn.mop.persistence.BackupTaskGrant.Operation.ARCHIVE_START));
+        assertFalse(BackupWorkerSettings.requiredOperations(BackupTaskScheduler.Mode.RECONCILE_ONLY).contains(cn.mop.persistence.BackupTaskGrant.Operation.VERSION_REGISTER));
+        assertThrows(RuntimeException.class,()->BackupWorkerSettings.from(settings::get));
+        settings.put("MOP_BACKUP_RECONCILE_ONLY_ENABLED","false");assertThrows(RuntimeException.class,()->BackupWorkerSettings.from(settings::get,BackupTaskScheduler.Mode.RECONCILE_ONLY));
+    }
     private HashMap<String, String> valid() throws Exception {
         String tenant = UUID.randomUUID().toString(), actor = UUID.randomUUID().toString();
         Path file = directory.resolve("grants.json");

@@ -19,7 +19,14 @@ public record BackupWorkerSettings(String jdbcUrl, String password, Path grantsF
             Operation.ARCHIVE_START, Operation.ARCHIVE_RECONCILE, Operation.VERSION_READ,
             Operation.VERSION_REGISTER, Operation.CRYPTO_VERIFY);
 
-    public static BackupWorkerSettings from(Function<String, String> settings) {
+    public static Set<Operation> requiredOperations(BackupTaskScheduler.Mode mode){
+        return mode==BackupTaskScheduler.Mode.RECONCILE_ONLY?Set.of(Operation.DISCOVER,Operation.ARCHIVE_READ,Operation.ARCHIVE_RECONCILE,Operation.CRYPTO_VERIFY):REQUIRED_OPERATIONS;
+    }
+    public static BackupWorkerSettings from(Function<String, String> settings) {return from(settings,BackupTaskScheduler.Mode.POSTPROCESS);}
+    public static BackupWorkerSettings from(Function<String, String> settings,BackupTaskScheduler.Mode mode) {
+        java.util.Objects.requireNonNull(mode);
+        String restricted=settings.apply("MOP_BACKUP_RECONCILE_ONLY_ENABLED");
+        if(mode==BackupTaskScheduler.Mode.RECONCILE_ONLY?!"true".equals(restricted):restricted!=null&&!"false".equals(restricted))throw invalid();
         if (!"remote_test".equals(settings.apply("SPRING_PROFILES_ACTIVE"))
                 || !"true".equals(settings.apply("MOP_BACKUP_WORKER_ENABLED"))
                 || !"mop_test_runtime".equals(settings.apply("SPRING_DATASOURCE_USERNAME"))) {
@@ -41,7 +48,7 @@ public record BackupWorkerSettings(String jdbcUrl, String password, Path grantsF
         var targets = new BackupGrantFile(grants).get().stream()
                 .filter(grant -> grant.bindingReference().equals("backup-task-binding:" + binding)
                         && grant.actorId().equals(actor) && tenants.contains(grant.tenantId())
-                        && Instant.now().isBefore(grant.expiresAt()) && grant.operations().containsAll(REQUIRED_OPERATIONS))
+                        && Instant.now().isBefore(grant.expiresAt()) && grant.operations().containsAll(requiredOperations(mode)))
                 .map(grant -> new BackupTaskSchedule.Target(new Access(grant.tenantId(), actor, grant.permissionVersion()),
                         new AssetScope(grant.tenantId(), grant.assetId())))
                 .toList();

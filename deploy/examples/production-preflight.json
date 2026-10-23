@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "public_origin": null,
+  "source_commit": null,
+  "artifact_sha256": null,
+  "database_isolation_decision_ref": null,
+  "component_approval_ref": null,
+  "production_approval_ref": null
+}

@@ -1,0 +1,77 @@
+{
+  "format": 1,
+  "recorded_at_utc": "2026-10-23T06:56:58.912608+00:00",
+  "operation": "READ_ONLY_PREFLIGHT",
+  "manifest_sha256": "d54726c659def844ca6ca852316e1a2996f6298856bd96171198b151be846d5f",
+  "production_ready": false,
+  "deployment_performed": false,
+  "formal_tc_status": "NOT_RUN",
+  "result": "BLOCKED",
+  "checks": [
+    {
+      "id": "public_origin",
+      "status": "PASS",
+      "code": "DECLARED"
+    },
+    {
+      "id": "source_commit",
+      "status": "PASS",
+      "code": "DECLARED"
+    },
+    {
+      "id": "artifact_sha256",
+      "status": "BLOCKED",
+      "code": "NOT_CONFIGURED"
+    },
+    {
+      "id": "database_isolation_decision_ref",
+      "status": "BLOCKED",
+      "code": "CUSTOMER_CONFIRMATION_PENDING"
+    },
+    {
+      "id": "component_approval_ref",
+      "status": "BLOCKED",
+      "code": "CUSTOMER_CONFIRMATION_PENDING"
+    },
+    {
+      "id": "production_approval_ref",
+      "status": "BLOCKED",
+      "code": "CUSTOMER_CONFIRMATION_PENDING"
+    },
+    {
+      "id": "tls_identity",
+      "status": "FAIL",
+      "code": "CERTIFICATE_VALIDATION_FAILED"
+    },
+    {
+      "id": "tls_expiry",
+      "status": "NOT_RUN",
+      "code": "VERIFIED_TLS_REQUIRED"
+    },
+    {
+      "id": "dependency_readiness",
+      "status": "NOT_RUN",
+      "code": "VERIFIED_TLS_REQUIRED"
+    },
+    {
+      "id": "runtime_environment",
+      "status": "NOT_RUN",
+      "code": "VERIFIED_TLS_REQUIRED"
+    },
+    {
+      "id": "hsts",
+      "status": "NOT_RUN",
+      "code": "VERIFIED_TLS_REQUIRED"
+    },
+    {
+      "id": "session_cookie",
+      "status": "NOT_RUN",
+      "code": "VERIFIED_TLS_REQUIRED"
+    },
+    {
+      "id": "http_redirect",
+      "status": "FAIL",
+      "code": "HTTP_NOT_PERMANENTLY_REDIRECTED"
+    }
+  ]
+}

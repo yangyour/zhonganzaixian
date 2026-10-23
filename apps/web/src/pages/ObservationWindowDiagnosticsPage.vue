@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useDemoExample } from '../utils/useDemoExample'
 import {computed,nextTick,onUnmounted,ref,shallowRef,watch} from 'vue'
 import {onBeforeRouteLeave} from 'vue-router'
 import {ElMessageBox} from 'element-plus'
@@ -16,21 +17,23 @@ watch(contextKey,()=>{discarding.value=false;const s=session.value;workspace.res
 function edit(event:Event){if(permitted.value&&!discarding.value)workspace.change((event.target as HTMLTextAreaElement).value)}
 async function analyze(){if(!permitted.value||discarding.value)return false;return workspace.analyze()}
 async function cancel(){workspace.cancel();await nextTick();editor.value?.focus()}
-async function discard(){if(discarding.value)return false;if(!state.value.text)return true;const turn=contextKey.value;discarding.value=true;try{await ElMessageBox.confirm('输入和诊断结果只在当前页面内存中，未保存规则。继续会清除这些内容，确认继续？','保留观察窗诊断输入',{confirmButtonText:'清除并继续',cancelButtonText:'保留输入',type:'warning'});return !disposed&&turn===contextKey.value}catch{return false}finally{if(!disposed&&turn===contextKey.value)discarding.value=false}}
+async function discard(){if(demoExample.pristine.value)return true;if(discarding.value)return false;if(!state.value.text)return true;const turn=contextKey.value;discarding.value=true;try{await ElMessageBox.confirm('输入和诊断结果只在当前页面内存中，未保存规则。继续会清除这些内容，确认继续？','保留观察窗诊断输入',{confirmButtonText:'清除并继续',cancelButtonText:'保留输入',type:'warning'});return !disposed&&turn===contextKey.value}catch{return false}finally{if(!disposed&&turn===contextKey.value)discarding.value=false}}
 async function clear(){const turn=contextKey.value;if(permitted.value&&await discard()&&!disposed&&turn===contextKey.value){workspace.change('');await nextTick();editor.value?.focus()}}
 const skeleton=JSON.stringify({condition:{comparison:null,threshold:null,unit:null},hold_seconds:null,max_gap_seconds:null,observed_at:null,samples:[]},null,2)
 async function insertSkeleton(){const turn=contextKey.value;if(permitted.value&&await discard()&&!disposed&&turn===contextKey.value){workspace.change(skeleton);await nextTick();editor.value?.focus()}}
 onBeforeRouteLeave(discard);const unregister=contextTransitionGuards.register(discard)
-function beforeUnload(event:BeforeUnloadEvent){if(state.value.text){event.preventDefault();event.returnValue=''}}
+function beforeUnload(event:BeforeUnloadEvent){if(demoExample.pristine.value)return;if(state.value.text){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
 onUnmounted(()=>{disposed=true;unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
 const bytes=computed(()=>state.value.text.length>524288?'超过 524288':new TextEncoder().encode(state.value.text).length)
 const statusLabels:Record<ObservationStatus,string>={CONFIG_PENDING:'候选参数未完整，结论未定',CONFLICT:'候选冲突，未自动改写',NO_SAMPLES:'未提供采样，不能判断',STALE_LATEST:'最新样本已超过明确间隔',UNKNOWN_LATEST:'最新样本未知或采集错误',NO_CURRENT_MATCH:'最新样本不满足候选条件',MATCHING_SPAN_NOT_REACHED:'已观察到的匹配跨度不足',MATCHING_SPAN_REACHED:'候选观察跨度达到，但不是实际恢复确认'}
 const reasonLabels:Record<string,string>={CONDITION_INCOMPLETE:'比较符、阈值或单位未完整',HOLD_MISSING:'保持时长未提供',MAX_GAP_MISSING:'允许最大采样间隔未提供',NEGATIVE_HOLD:'保持时长为负数',NEGATIVE_MAX_GAP:'最大采样间隔为负数',UNIT_MISMATCH:'已知值的单位不一致，未换算'}
+const demoExample = useDemoExample<unknown>('observation-window-diagnostics', permitted, () => state.value.text, async value => { workspace.change(JSON.stringify(value, null, 2)); await analyze() })
 </script>
 <template>
 <section class="observation-page">
  <h1 class="page-title-sr">采样观察窗诊断</h1>
+ <p v-if="demoExample.loaded.value" class="hint" role="note">[DEMO] 已加载独立测试样例；这些是假设输入，不代表真实业务或已生效配置。</p>
  <p v-if="!permitted">当前账号没有此诊断的使用权限。</p>
  <div v-else class="observation-layout">
   <section class="obs-panel input-panel">

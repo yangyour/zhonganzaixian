@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useDemoExample } from '../utils/useDemoExample'
 import {computed,nextTick,onUnmounted,ref,shallowRef,watch} from 'vue'
 import {onBeforeRouteLeave} from 'vue-router'
 import {api} from '../api/client'
@@ -96,10 +97,12 @@ function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()){event.
 window.addEventListener('beforeunload',beforeUnload)
 onUnmounted(()=>{exportTurn++;exporting.value=false;readTurn++;readOrigin=null;unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
 defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyEvaluation,queryReport,readDetail,cancelRead,readStatus,exportServices,exportStatus})
+const demoExample = useDemoExample<{month:string}>('sla-reports', permitted, () => periodInput.value, async value => { periodInput.value=value.month; await queryReport() })
 </script>
 <template>
  <section class="sla-reports">
   <h1 class="page-title-sr">SLA 月度报表与赔付试算 </h1>
+ <p v-if="demoExample.loaded.value" class="hint" role="note">[DEMO] 已加载独立测试样例；这些是假设输入，不代表真实业务或已生效配置。</p>
   <p class="panel" v-if="!permitted">当前身份无权访问内部 SLA 月报与赔付台账，或正在切换租户。</p>
   <template v-else>
    

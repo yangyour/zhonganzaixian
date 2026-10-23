@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onBeforeUnmount, reactive, shallowRef, watch } from 'vue'
+import { useDemoExample } from '../utils/useDemoExample'
+import { computed, onBeforeUnmount, reactive, shallowRef, watch } from 'vue'
 import { api } from '../api/client'
 import { session, contextGeneration } from '../stores/session'
 import { createSlaScenarioWorkspace, type SlaInput, type SlaRow, type SlaState } from '../utils/slaScenarioWorkspace'
@@ -22,10 +23,13 @@ const times = [{ key: 'response_due_at', label: '响应截止' }, { key: 'respon
 const refs = [{ key: 'sla_snapshot', label: '假设SLA快照引用' }, { key: 'exclusion_approval', label: '假设排除审批引用' }] as const
 const exclusions = [{ value: 'NONE', label: '不排除' }, { value: 'PENDING_APPROVAL', label: '申请待批（仍计入）' }, { value: 'REJECTED', label: '申请拒绝（仍计入）' }, { value: 'APPROVED', label: '假设已批准（须引用）' }, { value: 'UNKNOWN', label: '状态未知' }]
 const labels: Record<string, string> = { CALCULATED: '场景已测算', UNRESOLVED: '输入仍有未解决项', NO_APPLICABLE: '无适用分母', MET: '场景内达标', NOT_MET: '场景内未达标', NOT_APPLICABLE: '不适用', UNKNOWN: '未知', POPULATION_NOT_COMPLETE: '总体完整性未声明为完整', APPLICABILITY_UNKNOWN: '部分场景适用性未知', TIMING_UNRESOLVED: '时间或快照输入未完整', NO_APPLICABLE_TICKETS: '没有适用场景，不显示0%或100%', PRIORITY_UNKNOWN: '优先级未知', PRIORITY_OUTSIDE_SLA: 'P4不在适用范围', EXCLUSION_UNKNOWN: '排除状态未知', APPROVAL_EVIDENCE_MISSING: '假设批准缺少引用', APPROVED_EXCLUSION: '仅按假设批准排除', SLA_SNAPSHOT_MISSING: '快照引用缺失', RESPONSE_DUE_MISSING: '响应截止缺失', RESPONSE_ACTUAL_MISSING: '实际响应缺失', RECOVERY_DUE_MISSING: '恢复截止缺失', RECOVERY_ACTUAL_MISSING: '实际恢复缺失', RESPONSE_LATE: '响应超时', RECOVERY_LATE: '恢复超时' }
+const demoPermitted = computed(() => Boolean(session.value?.capabilities.includes('sla_scenarios:read')))
+const demoExample = useDemoExample<SlaInput>('sla-scenarios', demoPermitted, () => JSON.stringify(draft), async value => { draft.population_complete=value.population_complete; draft.tickets=value.tickets; workspace.change(draft); await workspace.calculate() })
 </script>
 <template>
   <section class="sla-scenarios">
     <h1 class="page-title-sr">SLA 场景测算 </h1>
+ <p v-if="demoExample.loaded.value" class="hint" role="note">[DEMO] 已加载独立测试样例；这些是假设输入，不代表真实业务或已生效配置。</p>
     
     
     

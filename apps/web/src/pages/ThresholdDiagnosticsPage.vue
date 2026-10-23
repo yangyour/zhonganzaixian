@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useDemoExample } from '../utils/useDemoExample'
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
@@ -16,6 +17,7 @@ watch(contextKey, () => { discarding.value = false; const s = session.value; wor
 function change(text: string) { if (permitted.value && !discarding.value) workspace.change(text) }
 async function analyze() { if (!permitted.value || discarding.value || !state.value.text) return false; return workspace.analyze() }
 async function discard() {
+ if (demoExample.pristine.value) return true
  if (discarding.value) return false
  if (!state.value.text) return true
  const turn = contextKey.value; discarding.value = true
@@ -24,7 +26,7 @@ async function discard() {
 async function clearInput() { const turn = contextKey.value; if (!permitted.value || !await discard() || turn !== contextKey.value) return false; workspace.change(''); return true }
 onBeforeRouteLeave(discard)
 const unregister = contextTransitionGuards.register(discard)
-function beforeUnload(event: BeforeUnloadEvent) { if (state.value.text) { event.preventDefault(); event.returnValue = '' } }
+function beforeUnload(event: BeforeUnloadEvent) { if (demoExample.pristine.value) return; if (state.value.text) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', beforeUnload)
 onUnmounted(() => { disposed = true; unregister(); workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
 const example = JSON.stringify({ direction: null, warning: { comparison: null, threshold: null, unit: null }, critical: { comparison: null, threshold: null, unit: null }, recovery: { comparison: null, threshold: null, unit: null }, trigger_hold_seconds: null, recovery_hold_seconds: null }, null, 2)
@@ -34,10 +36,12 @@ const conditions = computed(() => { const i = state.value.result?.inputs; return
 const operator = (value: ThresholdComparison | null | undefined) => value ? ({ GT: '>', GE: '≥', LT: '<', LE: '≤' }[value]) : '未确认'
 const booleanText = (value: boolean | null) => value === null ? '未知 / 无法比较' : value ? '是' : '否'
 defineExpose({ change, analyze, clearInput, state })
+const demoExample = useDemoExample<unknown>('threshold-diagnostics', permitted, () => state.value.text, async value => { workspace.change(JSON.stringify(value, null, 2)); await analyze() })
 </script>
 <template>
  <section class="threshold-page">
   <h1 class="page-title-sr">告警阈值规则诊断</h1>
+ <p v-if="demoExample.loaded.value" class="hint" role="note">[DEMO] 已加载独立测试样例；这些是假设输入，不代表真实业务或已生效配置。</p>
   <el-empty v-if="!permitted" description="仅当前平台配置管理员可以诊断共享阈值候选" />
   <template v-else>
    

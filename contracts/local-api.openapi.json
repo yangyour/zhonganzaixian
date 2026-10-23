@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.83.0",
+    "version": "0.84.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -37425,7 +37425,8 @@
             }
           }
         },
-        "x-mop-capability": "users:read"
+        "x-mop-capability": "users:read",
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       }
     },
     "/wecom/check": {
@@ -37578,7 +37579,8 @@
             }
           }
         },
-        "x-mop-capability": "users:write"
+        "x-mop-capability": "users:write",
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       }
     },
     "/wecom/bindings": {
@@ -37699,7 +37701,8 @@
             }
           }
         },
-        "x-mop-capability": "users:read"
+        "x-mop-capability": "users:read",
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       }
     },
     "/wecom/bindings/{userId}": {
@@ -37831,7 +37834,8 @@
             }
           }
         ],
-        "x-mop-capability": "users:read"
+        "x-mop-capability": "users:read",
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       },
       "put": {
         "operationId": "setWeComBinding",
@@ -37990,7 +37994,8 @@
         },
         "x-mop-capability": "users:write",
         "x-mop-cross-tenant": "404",
-        "x-mop-user-global-scope-required": true
+        "x-mop-user-global-scope-required": true,
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       }
     },
     "/wecom/test-messages": {
@@ -38140,7 +38145,8 @@
             }
           }
         },
-        "x-mop-capability": "users:write"
+        "x-mop-capability": "users:write",
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       }
     },
     "/my/notifications/{id}/wecom": {
@@ -38421,7 +38427,8 @@
             }
           }
         },
-        "x-mop-capability": "tickets:read"
+        "x-mop-capability": "tickets:read",
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       }
     },
     "/wecom/deliveries/{id}": {
@@ -38553,7 +38560,8 @@
             }
           }
         ],
-        "x-mop-capability": "tickets:read"
+        "x-mop-capability": "tickets:read",
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       }
     },
     "/auth/wecom/options": {
@@ -38967,7 +38975,8 @@
             }
           }
         },
-        "x-mop-capability": "users:read"
+        "x-mop-capability": "users:read",
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       }
     },
     "/email/check": {
@@ -39111,7 +39120,8 @@
             }
           }
         },
-        "x-mop-capability": "users:write"
+        "x-mop-capability": "users:write",
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       }
     },
     "/email/bindings": {
@@ -39223,7 +39233,8 @@
             }
           }
         },
-        "x-mop-capability": "users:read"
+        "x-mop-capability": "users:read",
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       }
     },
     "/email/bindings/{userId}": {
@@ -39346,7 +39357,8 @@
             }
           }
         ],
-        "x-mop-capability": "users:read"
+        "x-mop-capability": "users:read",
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       },
       "put": {
         "operationId": "setEmailBinding",
@@ -39495,7 +39507,8 @@
           }
         },
         "x-mop-capability": "users:write",
-        "x-mop-user-global-scope-required": true
+        "x-mop-user-global-scope-required": true,
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       }
     },
     "/my/email-binding": {
@@ -39748,7 +39761,8 @@
             }
           }
         },
-        "x-mop-capability": "users:write"
+        "x-mop-capability": "users:write",
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       }
     },
     "/my/notifications/{id}/email": {
@@ -40010,7 +40024,8 @@
             }
           }
         },
-        "x-mop-capability": "tickets:read"
+        "x-mop-capability": "tickets:read",
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       }
     },
     "/email/deliveries/{id}": {
@@ -40133,7 +40148,8 @@
             }
           }
         ],
-        "x-mop-capability": "tickets:read"
+        "x-mop-capability": "tickets:read",
+        "x-mop-demo-disabled-scope": "Explicit demo allowlist uses isolated binding keys; only inactive example.invalid/DEMO_ bindings; provider I/O and dispatch rejected before enqueue."
       }
     },
     "/change-notice-drafts/{id}/revisions/{draft_revision}/approval": {
@@ -42766,6 +42782,85 @@
           }
         }
       }
+    },
+    "/demo/examples/{page}": {
+      "get": {
+        "operationId": "readExplicitDemoPageExample",
+        "summary": "读取显式授权演示租户的假设输入；实际租户无示例，未写业务或访问供应商",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "sla-scenarios",
+                "sla-reports",
+                "operational-comparison",
+                "capacity-estimates",
+                "observation-window-diagnostics",
+                "threshold-diagnostics",
+                "contact-import-preview"
+              ]
+            }
+          }
+        ],
+        "x-mop-read-only": true,
+        "x-mop-current-membership-recheck": true,
+        "x-mop-demo-namespace-allowlist": true,
+        "x-mop-capability-by-page": {
+          "sla-scenarios": "sla_scenarios:read",
+          "sla-reports": "sla_scenarios:read",
+          "operational-comparison": "operations:compare_explicit",
+          "capacity-estimates": "capacity:estimate",
+          "observation-window-diagnostics": "configurations:read",
+          "threshold-diagnostics": "configurations:read",
+          "contact-import-preview": "contacts:write"
+        },
+        "responses": {
+          "200": {
+            "description": "Explicit test inputs only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoPageExampleResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Rejected authentication, scope or page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Rejected authentication, scope or page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Rejected authentication, scope or page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -44032,6 +44127,11 @@
               },
               "password_change_required": {
                 "type": "boolean"
+              },
+              "demo_examples_enabled": {
+                "type": "boolean",
+                "const": true,
+                "description": "Only explicitly configured demo tenants; absence means no demo example loading."
               }
             },
             "required": [
@@ -86631,6 +86731,91 @@
           "trace_id"
         ],
         "additionalProperties": false
+      },
+      "DemoPageExampleResult": {
+        "type": "object",
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tenant_id",
+              "actor_id",
+              "page",
+              "available",
+              "source",
+              "input",
+              "business_data_written",
+              "provider_accessed"
+            ],
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "actor_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "page": {
+                "type": "string",
+                "enum": [
+                  "sla-scenarios",
+                  "sla-reports",
+                  "operational-comparison",
+                  "capacity-estimates",
+                  "observation-window-diagnostics",
+                  "threshold-diagnostics",
+                  "contact-import-preview"
+                ]
+              },
+              "available": {
+                "type": "boolean"
+              },
+              "source": {
+                "const": "EXPLICIT_DEMO_INPUT"
+              },
+              "input": {
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "business_data_written": {
+                "const": false
+              },
+              "provider_accessed": {
+                "const": false
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "available": {
+                      "const": false
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "input": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        }
       }
     }
   },

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useDemoExample } from '../utils/useDemoExample'
 import { computed, nextTick, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
@@ -38,6 +39,7 @@ function importRuntime(values: ReturnType<typeof capacityImportedValues>, checke
 async function calculate() { if (!permitted.value || state.value.busy) return; workspace.change(input()); await workspace.calculate() }
 const hasDraft = computed(() => draft.includeBuffer || [...Object.values(draft.inputs), ...Object.values(draft.model), ...Object.values(draft.proxy_buffer)].some(value => value !== ''))
 async function mayDiscard() {
+  if (demoExample.pristine.value) return true
   if (discarding.value) return false
   if (!hasDraft.value) return true
   const scope = authorizationKey.value, before = JSON.stringify(draft); discarding.value = true
@@ -50,16 +52,18 @@ async function resetDraft() { const scope = authorizationKey.value; if (await ma
 async function cancelCalculation() { workspace.cancel(); await focusInput() }
 onBeforeRouteLeave(mayDiscard)
 const unregister = contextTransitionGuards.register(mayDiscard)
-function beforeUnload(event: BeforeUnloadEvent) { if (hasDraft.value) { event.preventDefault(); event.returnValue = '' } }
+function beforeUnload(event: BeforeUnloadEvent) { if (demoExample.pristine.value) return; if (hasDraft.value) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', beforeUnload)
 onBeforeUnmount(() => { disposed = true; unregister(); workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
 const missingLabels: Record<string, string> = Object.fromEntries([...fields.map(f => [f.key, f.label]), ...modelFields.map(f => ['model.' + f.key, f.label]), ['inputs', '容量输入组'], ['model', '模型参数组']])
 const bufferMissing: Record<string, string> = Object.fromEntries([...bufferFields.map(f => [f.key, f.label]), ['proxy_buffer', '尚未启用Proxy缓冲输入']])
+const demoExample = useDemoExample<Record<'inputs'|'model'|'proxy_buffer',Record<string,string|number>>>('capacity-estimates', permitted, () => JSON.stringify(draft), async value => { for(const f of fields) draft.inputs[f.key]=String(value.inputs[f.key]); for(const f of modelFields) draft.model[f.key]=String(value.model[f.key]); for(const f of bufferFields) draft.proxy_buffer[f.key]=String(value.proxy_buffer[f.key]); draft.includeBuffer=true; await calculate() })
 </script>
 <template>
   <CapacityScenarioPanel ref="scenarios" :calculation="input()" />
   <section ref="capacityRoot" class="capacity-page">
     <h1 class="page-title-sr">容量与 Proxy 缓冲评估</h1>
+ <p v-if="demoExample.loaded.value" class="hint" role="note">[DEMO] 已加载独立测试样例；这些是假设输入，不代表真实业务或已生效配置。</p>
     <el-empty v-if="!permitted" description="当前身份没有平台容量估算权限" />
     <template v-else>
       

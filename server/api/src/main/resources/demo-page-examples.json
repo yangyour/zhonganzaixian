@@ -1,0 +1,21 @@
+{
+  "threshold-diagnostics": {
+    "direction":"HIGH_IS_BAD","warning":{"comparison":"GT","threshold":"70","unit":"%"},
+    "critical":{"comparison":"GT","threshold":"90","unit":"%"},"recovery":{"comparison":"LT","threshold":"65","unit":"%"},
+    "trigger_hold_seconds":"120","recovery_hold_seconds":"60"
+  },
+  "observation-window-diagnostics": {
+    "condition":{"comparison":"GT","threshold":"80","unit":"%"},"hold_seconds":"120","max_gap_seconds":"60","observed_at":null,"samples":[]
+  },
+  "operational-comparison":{"elapsed_millis":["1200","2400","3000","4800","7200"],"staffing":{"active_tenants":"3","on_call_fte":"1","second_line_fte":"0.5"}},
+  "capacity-estimates":{
+    "inputs":{"hosts":"7","items_per_host":"20","interval_seconds":"60","history_days":30,"bytes_per_value":"32","trend_ratio":"0.1","trend_days":365,"headroom_ratio":"0.3"},
+    "model":{"version":"DEMO-EXPLICIT-ASSUMPTION-1","bytes_per_trend_row":"64","pool_nvps_limit":"1000"},
+    "proxy_buffer":{"site_nvps":"2","outage_seconds":"3600","bytes_per_value":"32","margin_factor":"1.5"}
+  },
+  "contact-import-preview":{"rows":[{"name":"[DEMO] 格式预览联系人","roles":["TECHNICAL_CONTACT"],"mobile":null,"email":"preview@example.invalid","wecom_user_id":null,"preferred_priorities":[],"quiet_window":null,"enabled":false}]},
+  "sla-scenarios":{"population_complete":true,"tickets":[
+    {"scenario_ref":"DEMO-按时恢复","priority":"P1","exclusion":"NONE","exclusion_approval":null,"sla_snapshot":{"id":"DEMO-ASSUMED-SLA","version":1},"response_due_at":"2026-10-23T01:00:00Z","recovery_due_at":"2026-10-23T04:00:00Z","response_actual_at":"2026-10-23T00:30:00Z","recovery_actual_at":"2026-10-23T03:00:00Z"},
+    {"scenario_ref":"DEMO-恢复超时","priority":"P2","exclusion":"NONE","exclusion_approval":null,"sla_snapshot":{"id":"DEMO-ASSUMED-SLA","version":1},"response_due_at":"2026-10-23T02:00:00Z","recovery_due_at":"2026-10-23T08:00:00Z","response_actual_at":"2026-10-23T01:00:00Z","recovery_actual_at":"2026-10-23T09:00:00Z"}
+  ]}
+}

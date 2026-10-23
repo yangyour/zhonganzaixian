@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useDemoExample } from '../utils/useDemoExample'
 import { computed, nextTick, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
@@ -23,6 +24,7 @@ watch(draft, () => workspace.change(input()), { deep: true, flush: 'sync' })
 async function calculate() { if (!permitted.value || state.value.busy) return; workspace.change(input()); await workspace.calculate() }
 const hasDraft=computed(()=>draft.sampleMode!=='unknown'||draft.samples!==''||draft.includeStaffing||[draft.activeTenants,draft.onCallFte,draft.secondLineFte].some(v=>v!==''))
 async function mayDiscard(){
+ if(demoExample.pristine.value)return true
  if(discarding.value)return false
  if(!hasDraft.value)return true
  const owner=scopeKey.value,before=JSON.stringify(draft);discarding.value=true
@@ -32,15 +34,17 @@ async function focusSubmit(){await nextTick();submitButton.value?.$el?.focus()}
 async function resetDraft(){const owner=scopeKey.value;if(await mayDiscard()&&!disposed&&permitted.value&&owner===scopeKey.value){clearDraft();await focusSubmit()}}
 async function cancelCalculation(){workspace.cancel();await focusSubmit()}
 onBeforeRouteLeave(mayDiscard);const unregister=contextTransitionGuards.register(mayDiscard)
-function beforeUnload(event:BeforeUnloadEvent){if(hasDraft.value){event.preventDefault();event.returnValue=''}}
+function beforeUnload(event:BeforeUnloadEvent){if(demoExample.pristine.value)return;if(hasDraft.value){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
 onBeforeUnmount(()=>{disposed=true;unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
 const reasons: Record<string, string> = { ALL_EXPLICIT: '明确输入的算术结果', INPUT_UNAVAILABLE: '未提供输入', EMPTY_SAMPLE: '明确没有样本', UNKNOWN_SAMPLE: '存在未知样本，未丢弃或按零计算', MISSING_INPUT: '输入未完整', ZERO_FTE: 'FTE为零，除法未定义' }
 const missing: Record<string, string> = { input: '尚未提供人力组', active_tenants: '明确的活跃租户数', on_call_fte: '月度值守FTE', second_line_fte: '月度二线FTE' }
+const demoExample = useDemoExample<{elapsed_millis:string[];staffing:{active_tenants:string;on_call_fte:string;second_line_fte:string}}>('operational-comparison', permitted, () => JSON.stringify(draft), async value => { Object.assign(draft, {sampleMode:'provided',samples:value.elapsed_millis.join('\n'),includeStaffing:true,activeTenants:value.staffing.active_tenants,onCallFte:value.staffing.on_call_fte,secondLineFte:value.staffing.second_line_fte}); await calculate() })
 </script>
 <template>
  <section class="operational-page">
   <h1 class="page-title-sr">经营样本与人力测算</h1>
+ <p v-if="demoExample.loaded.value" class="hint" role="note">[DEMO] 已加载独立测试样例；这些是假设输入，不代表真实业务或已生效配置。</p>
   <el-empty v-if="!permitted" description="当前身份无显式经营对照权限" />
   <template v-else>
    

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useDemoExample } from '../utils/useDemoExample'
 import '../styles/adminPrototype.css'
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
@@ -18,19 +19,22 @@ watch(() => state.value.text, () => { previewScope.value++ }, {flush:'sync'})
 const permitted = computed(() => Boolean(session.value && ['padmin', 'tadmin'].includes(session.value.user.role) && can('contacts:read') && can('contacts:write') && !switchingTenant.value))
 const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.account_version, session.value?.user.role, permitted.value]))
 watch(contextKey, () => { const s = session.value; workspace.reset(s && permitted.value ? { tenantId: s.tenant.id, actorId: s.user.id, permissionVersion: s.permission_version, role: s.user.role, canRead: true, canWrite: true } : null) }, { immediate: true, flush: 'sync' })
-async function discard() { const turn = contextKey.value, input = state.value.text; if (input) { try { await ElMessageBox.confirm('此页输入和预览只在当前页面内存中，离开后将清除；没有保存联系人或导入作业。确认放弃输入？', '保留预览输入', { confirmButtonText: '放弃并继续', cancelButtonText: '保留输入', type: 'warning' }) } catch { return false } } else await Promise.resolve(); return !disposed && turn === contextKey.value && input === state.value.text }
+async function discard() {
+ if (demoExample.pristine.value) return true; const turn = contextKey.value, input = state.value.text; if (input) { try { await ElMessageBox.confirm('此页输入和预览只在当前页面内存中，离开后将清除；没有保存联系人或导入作业。确认放弃输入？', '保留预览输入', { confirmButtonText: '放弃并继续', cancelButtonText: '保留输入', type: 'warning' }) } catch { return false } } else await Promise.resolve(); return !disposed && turn === contextKey.value && input === state.value.text }
 async function clearInput() { const turn = contextKey.value, input = state.value.text; if (!await discard() || disposed || turn !== contextKey.value || input !== state.value.text) return false; workspace.change(''); return true }
 onBeforeRouteLeave(discard)
 const unregister = contextTransitionGuards.register(discard)
-function beforeUnload(event: BeforeUnloadEvent) { if (state.value.text) { event.preventDefault(); event.returnValue = '' } }
+function beforeUnload(event: BeforeUnloadEvent) { if (demoExample.pristine.value) return; if (state.value.text) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', beforeUnload)
 onUnmounted(() => { disposed = true; unregister(); workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
 const example = JSON.stringify({ rows: [{ name: '仅格式示例，请替换为明确资料', roles: ['REPORTER'], mobile: null, email: null, wecom_user_id: null, preferred_priorities: null, quiet_window: null, enabled: false }] }, null, 2)
 defineExpose({ change: workspace.change, preview: workspace.preview, clearInput, state })
+const demoExample = useDemoExample<unknown>('contact-import-preview', permitted, () => state.value.text, async value => { workspace.change(JSON.stringify(value, null, 2)); await workspace.preview() })
 </script>
 <template>
  <section class="preview-page admin-prototype">
   <h1 class="page-title-sr">联系人导入格式预览</h1>
+ <p v-if="demoExample.loaded.value" class="hint" role="note">[DEMO] 已加载独立测试样例；这些是假设输入，不代表真实业务或已生效配置。</p>
   
   <nav class="admin-tabs" aria-label="联系人工作区"><router-link to="/customer-contacts">联系人列表</router-link><router-link to="/contact-imports">批量新建与作业</router-link><span class="active">导入格式预览</span></nav>
   <el-empty v-if="!permitted" description="当前身份没有联系人预览权限" />

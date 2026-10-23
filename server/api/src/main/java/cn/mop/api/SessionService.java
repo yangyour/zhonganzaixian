@@ -32,6 +32,9 @@ public class SessionService {
     private final ObjectProvider<ProjectIdentityService> projectIdentity;
     @org.springframework.beans.factory.annotation.Autowired(required=false)
     private WeComService weCom;
+    /** Optional demo affordance; the example endpoint rechecks current tenant authorization. */
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
+    private DemoChannelScope demoChannels;
     private record Access(FixtureUser user,Tenant tenant,Membership membership,List<String> capabilities){}
     public SessionService(PlatformRepository repository,ObjectMapper mapper,SecurityContextRepository contexts,HttpSessionCsrfTokenRepository csrfRepository,ObjectProvider<OidcClientInitiatedLogoutSuccessHandler> oidcLogout){
         this(repository,mapper,contexts,csrfRepository,oidcLogout,null);
@@ -154,6 +157,9 @@ public class SessionService {
         var authentication=SecurityContextHolder.getContext().getAuthentication();
         var principal=authentication!=null&&authentication.getPrincipal() instanceof ProjectSessionIdentity value?value:null;
         var result=map("user",projected,"tenant",access.tenant,"allowed_tenants",repository.allowedTenants(access.user.id()),"capabilities",access.membership.capabilities(),"permission_version",access.membership.permissionVersion(),"csrf_token",token,"mode",repository.metadata().mode(),"identity_source",principal==null?repository.metadata().identitySource():principal.identitySource());
+        if (demoChannels != null && demoChannels.contains(access.tenant.id())) {
+            result.put("demo_examples_enabled", true);
+        }
         if(principal!=null&&projectIdentity!=null&&projectIdentity.getIfAvailable()!=null){var current=projectIdentity.getIfAvailable().repository().sessionState(principal.getName()).orElseThrow(SessionService::notFound);result.put("account_version",current.securityVersion());result.put("password_change_required",current.passwordChangeRequired());}
         return result;
     }

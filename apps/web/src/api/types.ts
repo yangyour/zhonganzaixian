@@ -8,6 +8,7 @@ export interface Session {
   user: PlatformUser; tenant: Tenant; allowed_tenants: Tenant[]; capabilities: string[]
   permission_version: number; csrf_token: string; mode: RuntimeMode; identity_source: string
   account_version?: number; password_change_required?: boolean
+  demo_examples_enabled?: boolean
 }
 export type AssetStatus = 'unknown' | 'ok' | 'problem' | 'maintenance' | 'disabled'
 export type AssetType = 'router' | 'switch' | 'firewall' | 'ap' | 'wireless_controller' | 'other'

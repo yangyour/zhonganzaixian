@@ -8,7 +8,7 @@
 
 - B01.1：`735be359` 独立版本列表提供者；已合main，收尾记录 `6d510c2a`。53项Java/HTTP、1项指定PG只读及94项面板/客户端检查通过。
 - B01.2：`0a67482c` 显式Worker/签名采集证明；已合main，收尾记录 `47b32aae`。98项Java通过、1项环境条件跳过；4项打包CLI拒绝检查通过。真实KMS产品适配、采集器证据和OSS链路仍未配置/联调。
-- B01.3：已有下载/解密/脱敏差异服务、GET接口、独立权限、审计和页面接线完成收尾验证；只推本分支，提交哈希在下方补记，未由本线合main。47项Java逻辑 + 1项指定PG只读、123项前端、209项契约、4项合成桌面浏览器及类型/生产构建通过。见 [功能契约](../backup-version-content-20261023.md) 和 `docs/evidence/backup-version-content-20261023/`。仍为代码完成待真实链路验证，B01/B02均不标整项VERIFIED，正式TC仍NOT_RUN。
+- B01.3：已有下载/解密/脱敏差异服务、GET接口、独立权限、审计和页面接线完成收尾验证；已提交并推送 `15ec3453` 到本分支，未由本线合main。47项Java逻辑 + 1项指定PG只读、123项前端、209项契约、4项合成桌面浏览器及类型/生产构建通过。见 [功能契约](../backup-version-content-20261023.md) 和 `docs/evidence/backup-version-content-20261023/`。仍为代码完成待真实链路验证，B01/B02均不标整项VERIFIED，正式TC仍NOT_RUN。
 
 ### 剩余项：可独立开发与客户/组件依赖分开
 
@@ -24,7 +24,7 @@
 
 ### 未提交内容与资源
 
-B01.3代码与文档将在收尾提交后一并推送，本线没有需要另外保留的未验证WIP。此前B01.3命名stash已成功恢复并删除，非遗留stash。原始测试日志、浏览器截图及本地构建位于本检出Git忽略的 `.local/backup-discovery/`、`tests/artifacts/backup-content-browser/`、`apps/web/dist/`；它们不是已部署版本。
+B01.3代码与文档已以 `15ec3453` 提交推送，本线没有需要另外保留的未验证WIP。此前B01.3命名stash已成功恢复并删除，非遗留stash。原始测试日志、浏览器截图及本地构建位于本检出Git忽略的 `.local/backup-discovery/`、`tests/artifacts/backup-content-browser/`、`apps/web/dist/`；它们不是已部署版本。
 
 本线候选API 18214未启动；Web 15214、SSH转发19214及测试Chromium已随验证结束关闭，端口复核无监听。本线无持有的integration/migration/environment锁，不动其他会话锁或资源。没有部署、迁移、实际设备/外部存储操作或真实业务写入；实际PG验证仅查询/授权锁。全局清单JSON保持由集成线维护。
 

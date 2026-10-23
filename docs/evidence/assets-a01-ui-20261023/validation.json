@@ -48,5 +48,21 @@
     "500 rows within 60 seconds",
     "formal asynchronous import and error workbook",
     "full A02-A05 implementation"
-  ]
+  ],
+  "main_integration": {
+    "merge": "494400cf",
+    "base": "47b32aae",
+    "clean_java": {
+      "total": 4302,
+      "executed": 3253,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1049
+    },
+    "asset_web_tests": 106,
+    "production_build": "PASSED",
+    "contract_tests": 200,
+    "gap_checker": "PASSED; completion_verified=false",
+    "deployment": false
+  }
 }

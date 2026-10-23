@@ -24,10 +24,14 @@ import java.util.UUID;
 public final class PostgresMonitoringEventCenterRepository implements MonitoringEventCenterRepository {
     private final DataSource source;
     private final PostgresPlatformRepository platform;
+    /** Shares the event transaction for recurrence intents and frozen-deadline reminder tasks. */
+    private final PostgresTicketWorkflowRepository ticketWorkflows;
 
     public PostgresMonitoringEventCenterRepository(DataSource source, PostgresPlatformRepository platform) {
         this.source = source;
         this.platform = platform;
+        this.ticketWorkflows = new PostgresTicketWorkflowRepository(source, platform,
+            new com.fasterxml.jackson.databind.ObjectMapper());
     }
 
     @FunctionalInterface private interface SqlWork<T> { T run(Connection c) throws SQLException; }
@@ -147,8 +151,11 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
             throw new DomainException(422, "RECOVERY_WITHOUT_PROBLEM", "恢复信号缺少当前租户同设备同规则的故障事件");
         if (latestOpen.isPresent() && latestOpen.get().monitorState() == MonitorState.RECOVERED
             && cmd.sourcePhase() == MonitorState.RECOVERED) return latestOpen.get();
-        if (latestOpen.isPresent() && latestOpen.get().ticketId() != null)
+        boolean terminalTicket = false;
+        if (latestOpen.isPresent() && latestOpen.get().ticketId() != null) {
             lock(c, "mop.ticket.workflow|" + a.tenantId() + "|" + latestOpen.get().ticketId());
+            terminalTicket = ticketWorkflows.terminal(c, a.tenantId(), latestOpen.get().ticketId());
+        }
         String upstreamProblemAsset = findActiveUpstreamProblemAsset(c, a.tenantId(), cmd.assetId());
         Optional<MaintenanceWindow> activeMw = findActiveMaintenanceWindow(c, a.tenantId(), cmd.assetId(), occurred);
 
@@ -158,7 +165,8 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
         FlapDecision flapDecision;
         SuppressionDecision suppression;
 
-        if (latestOpen.isPresent() && (latestOpen.get().monitorState() == MonitorState.PROBLEM
+        if (latestOpen.isPresent() && !(terminalTicket && cmd.sourcePhase() == MonitorState.PROBLEM)
+            && (latestOpen.get().monitorState() == MonitorState.PROBLEM
             || cmd.sourcePhase() == MonitorState.RECOVERED
             || MonitoringEventPipeline.shouldMergeWithinWindow(latestOpen.get().lastOccurredAt(), occurred, latestOpen.get().handlingState()))) {
             EventSummary prev = latestOpen.get();
@@ -260,6 +268,12 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
         if (cmd.sourcePhase() == MonitorState.PROBLEM) {
             processAutoTicketForEvent(c, a, eventId, cmd.assetId(), assetName, cmd.ruleCode(), cmd.ruleName(),
                 cmd.severity(), suppression.suppressionState(), cmd.simulateAutoTicketFailure(), now);
+            if (latestOpen.isPresent() && latestOpen.get().id().equals(eventId)
+                    && latestOpen.get().monitorState() == MonitorState.RECOVERED
+                    && latestOpen.get().ticketId() != null) {
+                ticketWorkflows.monitoringRecurrence(c, a.tenantId(), latestOpen.get().ticketId(),
+                    eventId, nextSeq, suppression.suppressionState() == SuppressionState.NONE, now);
+            }
         }
 
         platform.audit(a.actorId(), a.tenantId(), "monitoring.event.ingest", "monitoring_event", eventId, "SUCCEEDED",
@@ -724,6 +738,10 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
             s.setString(6, eventId);
             s.setLong(7, ev.version());
             if (s.executeUpdate() != 1) throw new DomainException(409, "VERSION_CONFLICT", "监控事件关联版本已变化，本次事务未提交");
+        }
+        if (ev.monitorState() == MonitorState.PROBLEM) {
+            ticketWorkflows.monitoringRecurrence(c, tenant, ticketId, eventId, ev.occurrenceCount(),
+                ev.suppressionState() == SuppressionState.NONE, now);
         }
     }
 

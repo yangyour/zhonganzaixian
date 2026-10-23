@@ -86,6 +86,18 @@ public final class TicketNotificationPlanner {
                 internal(recipients, in.assigneeId(), ref + " 客户已重开", "客户反馈问题仍未解决并重开了工单，请查看客户说明后继续处理。");
                 for (String collaborator : in.collaborators()) internal(recipients, collaborator, ref + " 客户已重开", "您协办的工单已被客户重开。");
             }
+            case "ticket.monitoring_recurred" -> {
+                if (in.assigneeId() == null) {
+                    pending.add(PENDING_QUEUE);
+                } else {
+                    internal(recipients, in.assigneeId(), ref + " 监控故障复发",
+                        "关联监控事件再次报告故障，请核对当前状态并继续处理；原SLA截止时间保持不变。");
+                }
+                for (String collaborator : in.collaborators()) {
+                    internal(recipients, collaborator, ref + " 监控故障复发",
+                        "您协办工单的关联监控事件再次报告故障，请核对恢复及复核记录。");
+                }
+            }
             case "ticket.manager_review_required" -> pending.add(PENDING_MANAGER);
             case "ticket.cancelled" -> customer(recipients, in, ref + " 已撤销", "该工单已由平台管理员撤销。");
             case "ticket.sla_50", "ticket.sla_80", "ticket.sla_100" -> {

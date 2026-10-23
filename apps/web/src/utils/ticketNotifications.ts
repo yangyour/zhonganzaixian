@@ -20,7 +20,7 @@ const text=(v:unknown,max:number):v is string=>typeof v==='string'&&v.trim().len
 const older=(time:string,id:string,before:Cursor)=>exportTime(time)<exportTime(before.time)||exportTime(time)===exportTime(before.time)&&id<before.id
 const validContext=(c:NotificationContext|null):c is NotificationContext=>Boolean(c&&exportUuid(c.tenantId)&&exportUuid(c.actorId)&&exportInteger(c.permissionVersion,1)&&typeof c.internal==='boolean')
 
-export const eventLabels:Record<string,string>={opened:'建立工单',accepted:'已接单',started:'开始处理',reassigned:'转派',resolved:'待确认',confirmation_reminder:'确认提醒',closed:'客户确认关闭',auto_closed:'超时自动关闭',reopened:'客户重开',manager_review_required:'经理复核',cancelled:'已撤销',sla_50:'SLA 50%',sla_80:'SLA 80%',sla_100:'SLA 100%'}
+export const eventLabels:Record<string,string>={opened:'建立工单',accepted:'已接单',started:'开始处理',reassigned:'转派',resolved:'待确认',confirmation_reminder:'确认提醒',closed:'客户确认关闭',auto_closed:'超时自动关闭',reopened:'客户重开',monitoring_recurred:'监控故障复发',manager_review_required:'经理复核',cancelled:'已撤销',sla_50:'SLA 50%',sla_80:'SLA 80%',sla_100:'SLA 100%'}
 export const pendingReasonLabels:Record<string,string>={Q15_ONCALL_QUEUE_RECIPIENTS:'值班/派单接收对象待客户确认（Q15）',Q15_ESCALATION_CHAIN:'超时升级链待客户确认（Q15）',Q09_SERVICE_MANAGER_ROLE:'服务经理角色待客户确认（Q09）',UNMAPPED_EVENT_TYPE:'事件类型尚未登记接收规则',RECIPIENT_INACTIVE:'原接收人已停用，未替换他人'}
 export const blockerLabels:Record<string,string>={Q14_CHANNEL_MATRIX:'渠道×级别矩阵待确认（Q14）',Q18_PROVIDER_CREDENTIALS:'通道凭据待提供（Q18）'}
 export const eventLabel=(type:string)=>eventLabels[type.replace(/^ticket\./,'')]??type

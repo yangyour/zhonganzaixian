@@ -68,6 +68,8 @@ class MonitoringRecoveryClockWorkerTest {
                     var recovery = recoveredAt == null ? null : recoveredAt.atOffset(ZoneOffset.UTC);
                     when(rows.getObject(2)).thenReturn(recovery);
                     when(rows.getObject(2, OffsetDateTime.class)).thenReturn(recovery);
+                } else if (sql.startsWith("SELECT EXISTS(SELECT 1 FROM public.mop_ticket_workflow_clock")) {
+                    when(rows.getBoolean(1)).thenReturn(false);
                 } else if (!sql.startsWith("INSERT INTO public.mop_ticket_workflow_")) {
                     throw new AssertionError("Unexpected query: " + sql);
                 }

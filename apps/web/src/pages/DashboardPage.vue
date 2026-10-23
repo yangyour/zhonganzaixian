@@ -144,7 +144,7 @@ onUnmounted(() => { alive = false; clearInterval(timer); workspace.dispose() })
   </section>
 </template>
 <style scoped>
-.dashboard-page{min-width:0;max-width:100%;padding-top:4px}
+.dashboard-page{--mop-faint:var(--mop-muted);min-width:0;max-width:100%;padding-top:4px}
 .dashboard-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;margin:0 0 12px;min-height:40px}
 .dashboard-range{display:inline-flex;align-items:center;gap:8px}
 .dashboard-auto{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--mop-text-2);cursor:pointer}

@@ -1,0 +1,436 @@
+{
+  "status": "PASSED",
+  "source_commit": "2291ddf83bca358cb2b54c539e029d9db13e8739",
+  "build_id": "e0737ea7596c3873b9577663efc0de4a35b4efb0edcce75d79a6d3096eb3c5a8",
+  "cases": [
+    {
+      "route": "/dashboard",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "screen-dashboard-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/assets",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "screen-assets-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/customer-topology",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "screen-customer-topology-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "screen-monitoring-events-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/network-monitoring",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "screen-network-monitoring-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/backup-plan-drafts",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "screen-backup-plan-drafts-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/inspection-quarterly-reports",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "screen-inspection-quarterly-reports-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/ticket-notifications",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "screen-ticket-notifications-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/my-tasks",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "screen-my-tasks-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/sla-reports",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "screen-sla-reports-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/dashboard",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "screen-dashboard-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/assets",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "screen-assets-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/customer-topology",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "screen-customer-topology-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "screen-monitoring-events-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/network-monitoring",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "screen-network-monitoring-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/backup-plan-drafts",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "screen-backup-plan-drafts-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/inspection-quarterly-reports",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "screen-inspection-quarterly-reports-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/ticket-notifications",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "screen-ticket-notifications-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/my-tasks",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "screen-my-tasks-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/sla-reports",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "screen-sla-reports-1024.png",
+      "passed": true
+    }
+  ],
+  "interactions": [
+    {
+      "name": "real_browser_local_login",
+      "passed": true
+    },
+    {
+      "name": "dashboard_window_DAYS_7",
+      "passed": true
+    },
+    {
+      "name": "dashboard_window_DAYS_30",
+      "passed": true
+    },
+    {
+      "name": "dashboard_window_HOURS_24",
+      "passed": true
+    },
+    {
+      "name": "dashboard_pause_automatic_refresh",
+      "passed": true
+    },
+    {
+      "name": "dashboard_resume_automatic_refresh",
+      "passed": true
+    },
+    {
+      "name": "dashboard_manual_refresh",
+      "passed": true
+    },
+    {
+      "name": "resource_metric_内存",
+      "passed": true
+    },
+    {
+      "name": "resource_metric_磁盘",
+      "passed": true
+    },
+    {
+      "name": "resource_metric_CPU",
+      "passed": true
+    },
+    {
+      "name": "sidebar_collapse",
+      "passed": true
+    },
+    {
+      "name": "sidebar_expand",
+      "passed": true
+    },
+    {
+      "name": "asset_search_empty_result",
+      "passed": true
+    },
+    {
+      "name": "asset_reset_search",
+      "passed": true
+    },
+    {
+      "name": "asset_grid_view",
+      "passed": true
+    },
+    {
+      "name": "asset_list_view",
+      "passed": true
+    },
+    {
+      "name": "asset_detail_open",
+      "passed": true
+    },
+    {
+      "name": "asset_detail_to_scoped_topology",
+      "passed": true
+    },
+    {
+      "name": "topology_browser_back_to_assets",
+      "passed": true
+    },
+    {
+      "name": "asset_browser_back_restores_detail",
+      "passed": true
+    },
+    {
+      "name": "asset_detail_return_to_list",
+      "passed": true
+    },
+    {
+      "name": "monitoring_card_view",
+      "passed": true
+    },
+    {
+      "name": "monitoring_list_view",
+      "passed": true
+    },
+    {
+      "name": "monitoring_pause_auto_refresh",
+      "passed": true
+    },
+    {
+      "name": "monitoring_resume_auto_refresh",
+      "passed": true
+    },
+    {
+      "name": "monitoring_real_history_read",
+      "passed": true,
+      "samples": 60
+    },
+    {
+      "name": "compact_desktop_navigation_open",
+      "passed": true
+    },
+    {
+      "name": "compact_desktop_navigation_escape",
+      "passed": true
+    },
+    {
+      "name": "sla_monthly_fact_read",
+      "passed": true
+    }
+  ],
+  "axe": [
+    {
+      "route": "/dashboard",
+      "width": 1440,
+      "violations": []
+    },
+    {
+      "route": "/dashboard",
+      "width": 1024,
+      "violations": []
+    }
+  ],
+  "business_writes": 0,
+  "messages_sent": 0,
+  "credentials_recorded": false,
+  "scope": "DESKTOP_WEB_1024_AND_1440",
+  "mobile_acceptance": "DEFERRED_PER_LATEST_PROJECT_SCOPE",
+  "harness_corrections": [
+    {
+      "name": "asset_detail_return_to_list",
+      "initial_attempt": {
+        "name": "asset_detail_return_to_list",
+        "passed": false
+      },
+      "reason": "Initial conditional visibility check ran before browser-back route restoration; return button had not been clicked. Retry waits for the actual restored detail and resulting list."
+    },
+    {
+      "name": "persistent_report_binding",
+      "reason": "Earlier helper closures retained the first report object; reconciled the returned final-version case records and reran the two final axe checks. Empty result arrays are not accepted."
+    }
+  ],
+  "visual_review": {
+    "reviewed_routes": [
+      "/dashboard",
+      "/assets",
+      "/customer-topology",
+      "/monitoring-events",
+      "/network-monitoring",
+      "/backup-plan-drafts",
+      "/inspection-quarterly-reports",
+      "/ticket-notifications",
+      "/my-tasks",
+      "/sla-reports"
+    ],
+    "layout": "No page-level horizontal overflow, required initial controls visible; intentional table/menu scrolling retained",
+    "screenshots_private": true
+  },
+  "verified_at": "2026-10-23T08:58:24.486Z",
+  "browser_version": "155.0.4283.62",
+  "owned_browser_closed": true
+}

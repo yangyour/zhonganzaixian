@@ -1,0 +1,16 @@
+{
+  "checked_at_utc": "2026-10-23T08:50:10.5443008+00:00",
+  "url": "https://mop.all-online.com.cn/api/v1/health/ready",
+  "certificate_validation_bypassed": false,
+  "status": "TLS_NOT_VERIFIED",
+  "errors": [
+    {
+      "type": "System.Net.Http.HttpRequestException",
+      "message": "The SSL connection could not be established, see inner exception."
+    },
+    {
+      "type": "System.Security.Authentication.AuthenticationException",
+      "message": "The remote certificate is invalid according to the validation procedure: RemoteCertificateNameMismatch, RemoteCertificateChainErrors"
+    }
+  ]
+}

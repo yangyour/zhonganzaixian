@@ -1,0 +1,2044 @@
+{
+  "status": "PASSED",
+  "checks": [
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/health/ready",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn real readiness",
+      "passed": true,
+      "production_ready": false
+    },
+    {
+      "name": "http://mop.all-online.com.cn /login",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn Content-Security-Policy",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn X-Content-Type-Options",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn Referrer-Policy",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn X-Frame-Options",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn Permissions-Policy",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /release-manifest.json",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn manifest matches",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn manifest cache policy",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/mop-missing-flow-check.js",
+      "passed": true,
+      "status": 404
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/assets",
+      "passed": true,
+      "status": 401
+    },
+    {
+      "name": "http://mop.all-online.com.cn /.vite/manifest.json",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 .vite/manifest.json",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/AccessUnavailablePage-Bby0EDt7.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/AccessUnavailablePage-Bby0EDt7.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/AccessUnavailablePage-CFERxh6Z.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/AccessUnavailablePage-CFERxh6Z.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/AccountPage-1Oo7q0Js.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/AccountPage-1Oo7q0Js.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/AccountPage-By4Mv4jg.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/AccountPage-By4Mv4jg.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/adminPrototype-Sdtbn93B.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/adminPrototype-Sdtbn93B.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/AppTable-BtFVFU8r.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/AppTable-BtFVFU8r.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/AppTable-Cx2MYKpm.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/AppTable-Cx2MYKpm.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/assetDependencyWorkspace-B0OtlZe6.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/assetDependencyWorkspace-B0OtlZe6.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/assetExportHandoff-CV_6SCl1.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/assetExportHandoff-CV_6SCl1.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/assetExportJobs-CFhPsogM.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/assetExportJobs-CFhPsogM.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/AssetExportJobsPage-C1wcUBso.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/AssetExportJobsPage-C1wcUBso.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/AssetExportJobsPage-DBSKxoIU.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/AssetExportJobsPage-DBSKxoIU.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/assetExportPublication-DK4hW2SH.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/assetExportPublication-DK4hW2SH.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/AssetsPage-BvlT3_9S.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/AssetsPage-BvlT3_9S.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/AssetsPage-Qx0SUITk.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/AssetsPage-Qx0SUITk.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/AuditPage-4lXch_0R.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/AuditPage-4lXch_0R.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/AuditPage-B9pRSARI.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/AuditPage-B9pRSARI.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/BackupPlanDraftsPage-DFATwByA.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/BackupPlanDraftsPage-DFATwByA.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/BackupPlanDraftsPage-DxCScQ7U.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/BackupPlanDraftsPage-DxCScQ7U.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/CapabilityCatalogPage-CJFpSs9o.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/CapabilityCatalogPage-CJFpSs9o.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/CapabilityCatalogPage-DUEAtqYC.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/CapabilityCatalogPage-DUEAtqYC.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/CapacityEstimatePage-B5C3MV9X.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/CapacityEstimatePage-B5C3MV9X.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/CapacityEstimatePage-BP6Yk6qR.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/CapacityEstimatePage-BP6Yk6qR.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/capacityEstimateWorkspace-Bd2GYz-2.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/capacityEstimateWorkspace-Bd2GYz-2.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/capacityRuntimeInputs-CcLQumj4.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/capacityRuntimeInputs-CcLQumj4.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ChangeNoticeDraftsPage-CokrF6Nw.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ChangeNoticeDraftsPage-CokrF6Nw.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ChangeNoticeDraftsPage-DS0EimF8.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ChangeNoticeDraftsPage-DS0EimF8.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/channelTargetBinding-Bj3-tQ3x.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/channelTargetBinding-Bj3-tQ3x.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ConfigurationRevisions-POEdY-y6.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ConfigurationRevisions-POEdY-y6.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ConfigurationRevisions.vue_vue_type_style_index_0_lang-nk3a4lL5.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ConfigurationRevisions.vue_vue_type_style_index_0_lang-nk3a4lL5.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ConfigurationsPage-C7Uk8_6l.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ConfigurationsPage-C7Uk8_6l.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ConfigurationsPage-D83BuuPl.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ConfigurationsPage-D83BuuPl.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ContactImportPreviewPage-_znRMyT1.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ContactImportPreviewPage-_znRMyT1.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ContactImportPreviewPage-DyrnP3F-.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ContactImportPreviewPage-DyrnP3F-.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/contactImportPreviewWorkspace-CcziR_YN.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/contactImportPreviewWorkspace-CcziR_YN.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ContactImportsPage-Cq2O61Ge.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ContactImportsPage-Cq2O61Ge.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ContactImportsPage-CqbIICsO.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ContactImportsPage-CqbIICsO.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/CustomerContactFacts-BM6gOmwH.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/CustomerContactFacts-BM6gOmwH.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/CustomerContactFacts-D_Z38612.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/CustomerContactFacts-D_Z38612.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/CustomerContactsPage-ChvI8BAk.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/CustomerContactsPage-ChvI8BAk.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/CustomerContactsPage-DvP4nF7E.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/CustomerContactsPage-DvP4nF7E.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/customerContactWorkspace-sWom-ouT.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/customerContactWorkspace-sWom-ouT.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/CustomerTopologyPage-r27FEIIg.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/CustomerTopologyPage-r27FEIIg.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/CustomerTopologyPage-YluII11m.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/CustomerTopologyPage-YluII11m.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/DashboardPage-B4QPNAkf.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/DashboardPage-B4QPNAkf.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/DashboardPage-Dty1UcG4.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/DashboardPage-Dty1UcG4.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/dashboardWorkflows-DzJ90jdy.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/dashboardWorkflows-DzJ90jdy.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/email-C3LZtPKz.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/email-C3LZtPKz.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/EmailPage-BMoQFF4Y.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/EmailPage-BMoQFF4Y.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/EmailPage-T7I6xCXu.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/EmailPage-T7I6xCXu.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ExportInboxPage-CBQrBRdg.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ExportInboxPage-CBQrBRdg.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ExportInboxPage-CYikfMKq.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ExportInboxPage-CYikfMKq.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/IdentityCommandNotice.vue_vue_type_script_setup_true_lang-3Azf8l-7.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/IdentityCommandNotice.vue_vue_type_script_setup_true_lang-3Azf8l-7.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/IdentityRolesPage-BfcNaGdz.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/IdentityRolesPage-BfcNaGdz.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/IdentityRolesPage-C0myHGyr.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/IdentityRolesPage-C0myHGyr.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/IdentitySettingsPage-BNjBptv8.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/IdentitySettingsPage-BNjBptv8.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/IdentitySettingsPage-D_xKlFDP.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/IdentitySettingsPage-D_xKlFDP.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/IdentityUsersPage-DakzzaAf.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/IdentityUsersPage-DakzzaAf.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/IdentityUsersPage-DTKuxnHx.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/IdentityUsersPage-DTKuxnHx.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/index-6oil9j9-.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/index-6oil9j9-.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/index-B5j3HPvf.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/index-B5j3HPvf.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/index-Bxnx5xIl.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/index-Bxnx5xIl.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/index-DfpF5n7-.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/index-DfpF5n7-.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/InspectionQuarterlyReportsPage-BptOLpRL.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/InspectionQuarterlyReportsPage-BptOLpRL.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/InspectionQuarterlyReportsPage-CBw66rPI.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/InspectionQuarterlyReportsPage-CBw66rPI.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/InspectionSourceCollectionsPage-BHPA1ydi.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/InspectionSourceCollectionsPage-BHPA1ydi.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/InspectionSourceCollectionsPage-nsXQchXk.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/InspectionSourceCollectionsPage-nsXQchXk.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/inspectionSourceCollectionWorkspace-BahK-ohT.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/inspectionSourceCollectionWorkspace-BahK-ohT.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/inspectionTemplates-CHczHSwA.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/inspectionTemplates-CHczHSwA.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/InspectionTemplatesPage-BvD7kArz.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/InspectionTemplatesPage-BvD7kArz.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/InspectionTemplatesPage-D_jwlNrF.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/InspectionTemplatesPage-D_jwlNrF.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/InspectionWorksheetFacts-CvNvGI12.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/InspectionWorksheetFacts-CvNvGI12.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/InspectionWorksheetFacts-jNZLgqay.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/InspectionWorksheetFacts-jNZLgqay.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/inspectionWorksheetForm-Cug2wEFn.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/inspectionWorksheetForm-Cug2wEFn.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/inspectionWorksheets-CLSDE1W0.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/inspectionWorksheets-CLSDE1W0.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/InspectionWorksheetsPage-A3sZsSb5.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/InspectionWorksheetsPage-A3sZsSb5.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/InspectionWorksheetsPage-D3a28PqI.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/InspectionWorksheetsPage-D3a28PqI.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/inspectionWorksheetWorkspace-DqNuuGra.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/inspectionWorksheetWorkspace-DqNuuGra.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/internalNoteWorkspace-XKGlpiLt.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/internalNoteWorkspace-XKGlpiLt.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/LiveMonitoringPanel-B4OpWJe1.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/LiveMonitoringPanel-B4OpWJe1.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/LiveMonitoringPanel-CO_YKBGQ.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/LiveMonitoringPanel-CO_YKBGQ.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/login-infrastructure-20261015-C_aHNh-i.webp",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/login-infrastructure-20261015-C_aHNh-i.webp",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/LoginPage-lU2YA2f6.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/LoginPage-lU2YA2f6.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/LoginPage-wS_vo3PL.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/LoginPage-wS_vo3PL.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/main-BqSRtlIL.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/main-BqSRtlIL.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/main-DOMkAVXj.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/main-DOMkAVXj.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ManualIncidentsPage-BKHVWpIt.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ManualIncidentsPage-BKHVWpIt.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ManualIncidentsPage-pgJUjDC6.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ManualIncidentsPage-pgJUjDC6.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/monitoringEvents-DZIgsZba.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/monitoringEvents-DZIgsZba.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/MonitoringEventsPage-DHQAVrc3.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/MonitoringEventsPage-DHQAVrc3.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/MonitoringEventsPage-DrYmkDfr.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/MonitoringEventsPage-DrYmkDfr.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/MonitoringOnboardingPage-DCPvqdjz.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/MonitoringOnboardingPage-DCPvqdjz.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/MonitoringOnboardingPage-DCVHd73E.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/MonitoringOnboardingPage-DCVHd73E.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/MyTasksPage-Bn3OEKvY.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/MyTasksPage-Bn3OEKvY.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/MyTasksPage-n-IzkFEN.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/MyTasksPage-n-IzkFEN.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/networkMonitoring-BV8lbtIS.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/networkMonitoring-BV8lbtIS.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/NetworkMonitoringPage-BV9baOXc.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/NetworkMonitoringPage-BV9baOXc.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/NetworkMonitoringPage-JM2hSG89.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/NetworkMonitoringPage-JM2hSG89.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/NotFoundPage-BfNdmXJc.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/NotFoundPage-BfNdmXJc.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/NotFoundPage-enfWHgvt.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/NotFoundPage-enfWHgvt.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ObservationWindowDiagnosticsPage-CjKqqm7y.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ObservationWindowDiagnosticsPage-CjKqqm7y.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ObservationWindowDiagnosticsPage-DiiFjRoC.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ObservationWindowDiagnosticsPage-DiiFjRoC.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/onCallBoard-Cg9hbUiG.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/onCallBoard-Cg9hbUiG.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/OnCallBoardPage-BQoiL7jf.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/OnCallBoardPage-BQoiL7jf.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/OnCallBoardPage-Xs4JCj0c.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/OnCallBoardPage-Xs4JCj0c.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/OperationalComparisonPage-DDANOuKB.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/OperationalComparisonPage-DDANOuKB.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/OperationalComparisonPage-DjAQoYP6.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/OperationalComparisonPage-DjAQoYP6.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/OwnNotificationPreferencesPage-Cr6oW2kh.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/OwnNotificationPreferencesPage-Cr6oW2kh.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/OwnNotificationPreferencesPage-Dp_LmoBj.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/OwnNotificationPreferencesPage-Dp_LmoBj.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/OwnWorklogsPage-CiEAAbHV.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/OwnWorklogsPage-CiEAAbHV.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/OwnWorklogsPage-DSDzRjuA.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/OwnWorklogsPage-DSDzRjuA.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/PermissionGate.vue_vue_type_script_setup_true_lang-iR-wT08Z.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/PermissionGate.vue_vue_type_script_setup_true_lang-iR-wT08Z.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ReadRecoveryActions-BIWZW_nJ.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ReadRecoveryActions-BIWZW_nJ.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ReadRecoveryActions-CZQcEizg.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ReadRecoveryActions-CZQcEizg.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/RuntimeConfigurationsPage-CUcelpkF.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/RuntimeConfigurationsPage-CUcelpkF.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/RuntimeConfigurationsPage-DuRnYue9.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/RuntimeConfigurationsPage-DuRnYue9.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/serviceTiers-BwifFyUT.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/serviceTiers-BwifFyUT.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ServiceTiersPage-BfzzpEPF.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ServiceTiersPage-BfzzpEPF.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ServiceTiersPage-BupSfR0F.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ServiceTiersPage-BupSfR0F.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/SlaReportsPage-B0Q0_DW5.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/SlaReportsPage-B0Q0_DW5.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/SlaReportsPage-BRj5Ta-r.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/SlaReportsPage-BRj5Ta-r.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/SlaScenariosPage-9lykCu2a.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/SlaScenariosPage-9lykCu2a.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/SlaScenariosPage-B89JRvyU.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/SlaScenariosPage-B89JRvyU.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/TenantInventoryPage-D-GrnoaP.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/TenantInventoryPage-D-GrnoaP.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/TenantInventoryPage-XJk4ayFX.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/TenantInventoryPage-XJk4ayFX.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ThresholdDiagnosticsPage-B-_1oG-M.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ThresholdDiagnosticsPage-B-_1oG-M.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ThresholdDiagnosticsPage-Bczc-u0x.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ThresholdDiagnosticsPage-Bczc-u0x.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/thresholdDiagnosticWorkspace-DYAWWdWg.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/thresholdDiagnosticWorkspace-DYAWWdWg.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ticket-D1TIexmy.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ticket-D1TIexmy.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/TicketNotificationsPage-BBDMU0iT.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/TicketNotificationsPage-BBDMU0iT.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/TicketNotificationsPage-ClAUloyy.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/TicketNotificationsPage-ClAUloyy.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/TicketsPage-CWcSPeAe.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/TicketsPage-CWcSPeAe.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/TicketsPage-DJlO9uFM.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/TicketsPage-DJlO9uFM.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/ticketWorkflow-nEAEFjkH.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/ticketWorkflow-nEAEFjkH.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/TicketWorkflowsPage-DdmHbxWO.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/TicketWorkflowsPage-DdmHbxWO.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/TicketWorkflowsPage-DUpsT28S.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/TicketWorkflowsPage-DUpsT28S.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/useListDetailNavigation-bEcltsqn.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/useListDetailNavigation-bEcltsqn.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/useListDetailNavigation-C4p_wBnT.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/useListDetailNavigation-C4p_wBnT.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/wecom-DZoVie1n.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/wecom-DZoVie1n.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/WeComPage-BLUk-wq4.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/WeComPage-BLUk-wq4.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/WeComPage-PkXoI1-0.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/WeComPage-PkXoI1-0.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/worklogPageSummary-A1v4ysG0.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/worklogPageSummary-A1v4ysG0.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /assets/writeFailure-CNjbu2tC.js",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 assets/writeFailure-CNjbu2tC.js",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /index.html",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 index.html",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /startup.css",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 startup.css",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /third-party-notices/noble-hashes-2.4.0-LICENSE.txt",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 third-party-notices/noble-hashes-2.4.0-LICENSE.txt",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /WW_verify_iFfTEbx1uklTpULT.txt",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "static sha256 WW_verify_iFfTEbx1uklTpULT.txt",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/auth/csrf",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn login",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/session",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn current account",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/dashboard/pending-tickets",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn new pending snapshot scope",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn pending totals are internally consistent",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn unknown workflow does not become complete total",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/dashboard/pending-tickets?tenant_id=forbidden",
+      "passed": true,
+      "status": 400
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/assets?page_size=100",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/customer-topology?asset_id=90cdb296-c3c6-47fb-bf1e-1e82761226e3",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn real PG batch focus 90cdb296-c3c6-47fb-bf1e-1e82761226e3",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn opaque site codes remain valid 90cdb296-c3c6-47fb-bf1e-1e82761226e3",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/customer-topology?asset_id=9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn real PG batch focus 9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn opaque site codes remain valid 9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/customer-topology?asset_id=b409d0cf-a8ef-4f8a-bf93-176444421ddd",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn real PG batch focus b409d0cf-a8ef-4f8a-bf93-176444421ddd",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn opaque site codes remain valid b409d0cf-a8ef-4f8a-bf93-176444421ddd",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/customer-topology?asset_id=8a8b5f47-5bd4-4abd-8f39-8d6f43794299",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn real PG batch focus 8a8b5f47-5bd4-4abd-8f39-8d6f43794299",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn opaque site codes remain valid 8a8b5f47-5bd4-4abd-8f39-8d6f43794299",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/customer-topology?asset_id=79000000-0000-4000-8000-000000000099",
+      "passed": true,
+      "status": 404
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/assets/90cdb296-c3c6-47fb-bf1e-1e82761226e3/backup-versions",
+      "passed": true,
+      "status": 503
+    },
+    {
+      "name": "http://mop.all-online.com.cn backup explicit authorization still required",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/inspection-quarterly-reports",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn actual tenant isolation /api/v1/inspection-quarterly-reports",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/inspection-worksheets",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn actual tenant isolation /api/v1/inspection-worksheets",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/backup-plan-drafts",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn actual tenant isolation /api/v1/backup-plan-drafts",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/dashboard?window=HOURS_24",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn fixed dashboard HOURS_24",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn no fabricated metrics HOURS_24",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/dashboard?window=DAYS_7",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn fixed dashboard DAYS_7",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn no fabricated metrics DAYS_7",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/dashboard?window=DAYS_30",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn fixed dashboard DAYS_30",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn no fabricated metrics DAYS_30",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/customer-topology",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn scoped dependency draft",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/customer-topology?tenant_id=forbidden",
+      "passed": true,
+      "status": 400
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/monitoring-onboarding/presets",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn monitoring catalogue available",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/monitoring-onboarding/registered-targets?view=expanded",
+      "passed": true,
+      "status": 503
+    },
+    {
+      "name": "http://mop.all-online.com.cn monitoring remains unconfigured /api/v1/monitoring-onboarding/registered-targets?view=expanded",
+      "passed": true,
+      "error_code": "CONFIG_PENDING"
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/monitoring-onboarding/registered-targets/79000000-0000-4000-8000-000000000099/observation",
+      "passed": true,
+      "status": 503
+    },
+    {
+      "name": "http://mop.all-online.com.cn monitoring remains unconfigured /api/v1/monitoring-onboarding/registered-targets/79000000-0000-4000-8000-000000000099/observation",
+      "passed": true,
+      "error_code": "CONFIG_PENDING"
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/monitoring-onboarding/registered-targets/79000000-0000-4000-8000-000000000099/observation?tenant_id=forbidden",
+      "passed": true,
+      "status": 400
+    },
+    {
+      "name": "http://mop.all-online.com.cn monitoring rejects scope override",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/assets?page_size=100",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn actual data markers /api/v1/assets?page_size=100",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/tickets",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn actual data markers /api/v1/tickets",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/events",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn actual data markers /api/v1/events",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/asset-export-jobs?page_size=15",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn actual data markers /api/v1/asset-export-jobs?page_size=15",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/my-export-messages",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn actual data markers /api/v1/my-export-messages",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/network-monitoring",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn actual data markers /api/v1/network-monitoring",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn /api/v1/identity/users?include_inactive=true",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn actual data markers /api/v1/identity/users?include_inactive=true",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/health/ready",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 real readiness",
+      "passed": true,
+      "production_ready": false
+    },
+    {
+      "name": "http://192.168.1.215:10010 /login",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 Content-Security-Policy",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 X-Content-Type-Options",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 Referrer-Policy",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 X-Frame-Options",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 Permissions-Policy",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /release-manifest.json",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 manifest matches",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 manifest cache policy",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /assets/mop-missing-flow-check.js",
+      "passed": true,
+      "status": 404
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/assets",
+      "passed": true,
+      "status": 401
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/auth/csrf",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 login",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/session",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 current account",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/dashboard/pending-tickets",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 new pending snapshot scope",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 pending totals are internally consistent",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 unknown workflow does not become complete total",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/dashboard/pending-tickets?tenant_id=forbidden",
+      "passed": true,
+      "status": 400
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/assets?page_size=100",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/customer-topology?asset_id=90cdb296-c3c6-47fb-bf1e-1e82761226e3",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 real PG batch focus 90cdb296-c3c6-47fb-bf1e-1e82761226e3",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 opaque site codes remain valid 90cdb296-c3c6-47fb-bf1e-1e82761226e3",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/customer-topology?asset_id=9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 real PG batch focus 9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 opaque site codes remain valid 9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/customer-topology?asset_id=b409d0cf-a8ef-4f8a-bf93-176444421ddd",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 real PG batch focus b409d0cf-a8ef-4f8a-bf93-176444421ddd",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 opaque site codes remain valid b409d0cf-a8ef-4f8a-bf93-176444421ddd",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/customer-topology?asset_id=8a8b5f47-5bd4-4abd-8f39-8d6f43794299",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 real PG batch focus 8a8b5f47-5bd4-4abd-8f39-8d6f43794299",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 opaque site codes remain valid 8a8b5f47-5bd4-4abd-8f39-8d6f43794299",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/customer-topology?asset_id=79000000-0000-4000-8000-000000000099",
+      "passed": true,
+      "status": 404
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/assets/90cdb296-c3c6-47fb-bf1e-1e82761226e3/backup-versions",
+      "passed": true,
+      "status": 503
+    },
+    {
+      "name": "http://192.168.1.215:10010 backup explicit authorization still required",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/inspection-quarterly-reports",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 actual tenant isolation /api/v1/inspection-quarterly-reports",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/inspection-worksheets",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 actual tenant isolation /api/v1/inspection-worksheets",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/backup-plan-drafts",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 actual tenant isolation /api/v1/backup-plan-drafts",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/dashboard?window=HOURS_24",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 fixed dashboard HOURS_24",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 no fabricated metrics HOURS_24",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/dashboard?window=DAYS_7",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 fixed dashboard DAYS_7",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 no fabricated metrics DAYS_7",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/dashboard?window=DAYS_30",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 fixed dashboard DAYS_30",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 no fabricated metrics DAYS_30",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/customer-topology",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 scoped dependency draft",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/customer-topology?tenant_id=forbidden",
+      "passed": true,
+      "status": 400
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/monitoring-onboarding/presets",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 monitoring catalogue available",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/monitoring-onboarding/registered-targets?view=expanded",
+      "passed": true,
+      "status": 503
+    },
+    {
+      "name": "http://192.168.1.215:10010 monitoring remains unconfigured /api/v1/monitoring-onboarding/registered-targets?view=expanded",
+      "passed": true,
+      "error_code": "CONFIG_PENDING"
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/monitoring-onboarding/registered-targets/79000000-0000-4000-8000-000000000099/observation",
+      "passed": true,
+      "status": 503
+    },
+    {
+      "name": "http://192.168.1.215:10010 monitoring remains unconfigured /api/v1/monitoring-onboarding/registered-targets/79000000-0000-4000-8000-000000000099/observation",
+      "passed": true,
+      "error_code": "CONFIG_PENDING"
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/monitoring-onboarding/registered-targets/79000000-0000-4000-8000-000000000099/observation?tenant_id=forbidden",
+      "passed": true,
+      "status": 400
+    },
+    {
+      "name": "http://192.168.1.215:10010 monitoring rejects scope override",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/assets?page_size=100",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 actual data markers /api/v1/assets?page_size=100",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/tickets",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 actual data markers /api/v1/tickets",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/events",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 actual data markers /api/v1/events",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/asset-export-jobs?page_size=15",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 actual data markers /api/v1/asset-export-jobs?page_size=15",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/my-export-messages",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 actual data markers /api/v1/my-export-messages",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/network-monitoring",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 actual data markers /api/v1/network-monitoring",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 /api/v1/identity/users?include_inactive=true",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 actual data markers /api/v1/identity/users?include_inactive=true",
+      "passed": true
+    }
+  ],
+  "build_id": "15ee933a2a84177818415a856313d617b65ce036e7991af69c05008f451e9bff",
+  "business_writes": 0,
+  "messages_sent": 0,
+  "verified_at": "2026-10-23T08:34:26.552384+00:00",
+  "asset_count": 4,
+  "ticket_count": 0,
+  "event_count": 0
+}

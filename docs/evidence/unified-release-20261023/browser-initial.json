@@ -1,0 +1,626 @@
+{
+  "status": "FUNCTIONAL_PASSED_ACCESSIBILITY_FAILED",
+  "cases": [
+    {
+      "route": "/dashboard",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "initial-screenshots/screen-dashboard-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/assets",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "initial-screenshots/screen-assets-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/customer-topology",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "initial-screenshots/screen-customer-topology-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "initial-screenshots/screen-monitoring-events-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/network-monitoring",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "initial-screenshots/screen-network-monitoring-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/backup-plan-drafts",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "initial-screenshots/screen-backup-plan-drafts-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/inspection-quarterly-reports",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "initial-screenshots/screen-inspection-quarterly-reports-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/ticket-notifications",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "initial-screenshots/screen-ticket-notifications-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/my-tasks",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "initial-screenshots/screen-my-tasks-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/sla-reports",
+      "width": 1440,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 200,
+      "main_right": 1440,
+      "viewport_width": 1440,
+      "screenshot": "initial-screenshots/screen-sla-reports-1440.png",
+      "passed": true
+    },
+    {
+      "route": "/dashboard",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "initial-screenshots/screen-dashboard-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/assets",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "initial-screenshots/screen-assets-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/customer-topology",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "initial-screenshots/screen-customer-topology-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "initial-screenshots/screen-monitoring-events-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/network-monitoring",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "initial-screenshots/screen-network-monitoring-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/backup-plan-drafts",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "initial-screenshots/screen-backup-plan-drafts-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/inspection-quarterly-reports",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "initial-screenshots/screen-inspection-quarterly-reports-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/ticket-notifications",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "initial-screenshots/screen-ticket-notifications-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/my-tasks",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "initial-screenshots/screen-my-tasks-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/sla-reports",
+      "width": 1024,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 1024,
+      "viewport_width": 1024,
+      "screenshot": "initial-screenshots/screen-sla-reports-1024.png",
+      "passed": true
+    },
+    {
+      "route": "/dashboard",
+      "width": 390,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 390,
+      "viewport_width": 390,
+      "screenshot": "initial-screenshots/screen-dashboard-390.png",
+      "passed": true
+    },
+    {
+      "route": "/assets",
+      "width": 390,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 390,
+      "viewport_width": 390,
+      "screenshot": "initial-screenshots/screen-assets-390.png",
+      "passed": true
+    },
+    {
+      "route": "/customer-topology",
+      "width": 390,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 390,
+      "viewport_width": 390,
+      "screenshot": "initial-screenshots/screen-customer-topology-390.png",
+      "passed": true
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 390,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 390,
+      "viewport_width": 390,
+      "screenshot": "initial-screenshots/screen-monitoring-events-390.png",
+      "passed": true
+    },
+    {
+      "route": "/network-monitoring",
+      "width": 390,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 390,
+      "viewport_width": 390,
+      "screenshot": "initial-screenshots/screen-network-monitoring-390.png",
+      "passed": true
+    },
+    {
+      "route": "/backup-plan-drafts",
+      "width": 390,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 390,
+      "viewport_width": 390,
+      "screenshot": "initial-screenshots/screen-backup-plan-drafts-390.png",
+      "passed": true
+    },
+    {
+      "route": "/inspection-quarterly-reports",
+      "width": 390,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 390,
+      "viewport_width": 390,
+      "screenshot": "initial-screenshots/screen-inspection-quarterly-reports-390.png",
+      "passed": true
+    },
+    {
+      "route": "/ticket-notifications",
+      "width": 390,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 390,
+      "viewport_width": 390,
+      "screenshot": "initial-screenshots/screen-ticket-notifications-390.png",
+      "passed": true
+    },
+    {
+      "route": "/my-tasks",
+      "width": 390,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 390,
+      "viewport_width": 390,
+      "screenshot": "initial-screenshots/screen-my-tasks-390.png",
+      "passed": true
+    },
+    {
+      "route": "/sla-reports",
+      "width": 390,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 390,
+      "viewport_width": 390,
+      "screenshot": "initial-screenshots/screen-sla-reports-390.png",
+      "passed": true
+    },
+    {
+      "route": "/dashboard",
+      "width": 320,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 320,
+      "viewport_width": 320,
+      "screenshot": "initial-screenshots/screen-dashboard-320.png",
+      "passed": true
+    },
+    {
+      "route": "/assets",
+      "width": 320,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 320,
+      "viewport_width": 320,
+      "screenshot": "initial-screenshots/screen-assets-320.png",
+      "passed": true
+    },
+    {
+      "route": "/customer-topology",
+      "width": 320,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 320,
+      "viewport_width": 320,
+      "screenshot": "initial-screenshots/screen-customer-topology-320.png",
+      "passed": true
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 320,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 320,
+      "viewport_width": 320,
+      "screenshot": "initial-screenshots/screen-monitoring-events-320.png",
+      "passed": true
+    },
+    {
+      "route": "/network-monitoring",
+      "width": 320,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 320,
+      "viewport_width": 320,
+      "screenshot": "initial-screenshots/screen-network-monitoring-320.png",
+      "passed": true
+    },
+    {
+      "route": "/backup-plan-drafts",
+      "width": 320,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 320,
+      "viewport_width": 320,
+      "screenshot": "initial-screenshots/screen-backup-plan-drafts-320.png",
+      "passed": true
+    },
+    {
+      "route": "/inspection-quarterly-reports",
+      "width": 320,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 320,
+      "viewport_width": 320,
+      "screenshot": "initial-screenshots/screen-inspection-quarterly-reports-320.png",
+      "passed": true
+    },
+    {
+      "route": "/ticket-notifications",
+      "width": 320,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 320,
+      "viewport_width": 320,
+      "screenshot": "initial-screenshots/screen-ticket-notifications-320.png",
+      "passed": true
+    },
+    {
+      "route": "/my-tasks",
+      "width": 320,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 320,
+      "viewport_width": 320,
+      "screenshot": "initial-screenshots/screen-my-tasks-320.png",
+      "passed": true
+    },
+    {
+      "route": "/sla-reports",
+      "width": 320,
+      "http_status": 200,
+      "route_matches": true,
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "main_left": 0,
+      "main_right": 320,
+      "viewport_width": 320,
+      "screenshot": "initial-screenshots/screen-sla-reports-320.png",
+      "passed": true
+    }
+  ],
+  "interactions": [
+    {
+      "name": "real_browser_local_login",
+      "passed": true,
+      "landing": "/assets"
+    }
+  ],
+  "business_writes": 0,
+  "messages_sent": 0,
+  "credentials_recorded": false,
+  "source_commit": "8b7692895773eed8b6fb76fea651985e9b25bc71",
+  "build_id": "15ee933a2a84177818415a856313d617b65ce036e7991af69c05008f451e9bff",
+  "harness_corrections": [
+    "Login wait initially assumed /dashboard; actual configured landing is /assets, authenticated identity verified without application changes."
+  ],
+  "axe": [
+    {
+      "route": "/dashboard",
+      "width": 1024,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 1,
+          "targets": [
+            [
+              ".legend-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "route": "/dashboard",
+      "width": 390,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 7,
+          "targets": [
+            [
+              "article[data-kpi=\"ASSET_ONLINE_RATE\"] > .mop-kpi-value"
+            ],
+            [
+              "article[data-kpi=\"CURRENT_PROBLEMS\"] > .mop-kpi-value"
+            ],
+            [
+              "article[data-kpi=\"MONTH_SERVICE_AVAILABILITY\"] > .mop-kpi-value"
+            ],
+            [
+              "article[data-kpi=\"PENDING_TICKETS\"] > .mop-kpi-value"
+            ],
+            [
+              "article[data-kpi=\"MTTA_24H\"] > .mop-kpi-value"
+            ],
+            [
+              "article[data-kpi=\"DELIVERY_RATE_24H\"] > .mop-kpi-value"
+            ],
+            [
+              ".legend-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "route": "/dashboard",
+      "width": 320,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 7,
+          "targets": [
+            [
+              "article[data-kpi=\"ASSET_ONLINE_RATE\"] > .mop-kpi-value"
+            ],
+            [
+              "article[data-kpi=\"CURRENT_PROBLEMS\"] > .mop-kpi-value"
+            ],
+            [
+              "article[data-kpi=\"MONTH_SERVICE_AVAILABILITY\"] > .mop-kpi-value"
+            ],
+            [
+              "article[data-kpi=\"PENDING_TICKETS\"] > .mop-kpi-value"
+            ],
+            [
+              "article[data-kpi=\"MTTA_24H\"] > .mop-kpi-value"
+            ],
+            [
+              "article[data-kpi=\"DELIVERY_RATE_24H\"] > .mop-kpi-value"
+            ],
+            [
+              ".legend-note"
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

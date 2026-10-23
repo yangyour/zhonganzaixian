@@ -1,0 +1,16 @@
+{
+  "status": "PASSED",
+  "environment": "lan-test-20261008",
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "cmdb_rollback_cases": 6,
+  "report_capture_cases": 7,
+  "dashboard_pending_cases": 4,
+  "actual_tenant_written": false,
+  "isolated_test_namespaces_used": true,
+  "migrations_executed": 0,
+  "report_and_dashboard_test_principals_deactivated": true,
+  "server_git_tree": "58a77b738b5a7dc45c3f248da7fd6a289cd820de",
+  "backend_identical_since_pg_verification": true,
+  "cmdb_log_sha256": "beb365507b87268382575ad291c2721f1560607cb6847d23ec0e0ef9870f9bf1",
+  "scope": "Repository/transaction checks; not complete TCP write flows or formal contract acceptance"
+}

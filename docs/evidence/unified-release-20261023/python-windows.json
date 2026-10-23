@@ -1,0 +1,65 @@
+{
+  "status": "PASSED",
+  "python": "3.14.3",
+  "verified_at": "2026-10-23T08:22:02.660331+00:00",
+  "modules": [
+    "test_attachment_scan",
+    "test_autoticket_retry_template",
+    "test_backup_execution_dependencies",
+    "test_basic_network_provision",
+    "test_cmdb_dependency_template",
+    "test_cmdb_import_schema",
+    "test_contract_acceptance",
+    "test_contract_progress",
+    "test_credential_rotation",
+    "test_customer_cmdb_dictionary",
+    "test_delivery_journal_vector",
+    "test_delivery_snapshot_vector",
+    "test_dependency_template_check",
+    "test_device_api_check",
+    "test_device_network_probe",
+    "test_event_dependency_template",
+    "test_export_source_recovery",
+    "test_firewall_api_probe",
+    "test_huawei_snmp_probe",
+    "test_lan_update",
+    "test_niko_export_page_e2e",
+    "test_notification_dependency_template",
+    "test_production_preflight",
+    "test_real_data_cleanup",
+    "test_recovery_drill",
+    "test_ssh_host_trust",
+    "test_test_server_deployment",
+    "test_tunnel"
+  ],
+  "posix_modules_verified_separately": [
+    "test_demo_plan",
+    "test_export_queue_restart",
+    "test_monitoring_file_sd",
+    "test_monitoring_inventory",
+    "test_monitoring_presets",
+    "test_monitoring_prometheus_loopback",
+    "test_niko_api_artifact",
+    "test_niko_contact_worker",
+    "test_niko_export_worker",
+    "test_niko_fault_guards",
+    "test_niko_oss_config",
+    "test_niko_private_bootstrap"
+  ],
+  "tests": 280,
+  "executed": 278,
+  "skipped": 2,
+  "failures": 0,
+  "errors": 0,
+  "failed_cases": [],
+  "skipped_cases": [
+    {
+      "name": "test_symlink_outside_repository_is_rejected_before_read (test_contract_progress.ContractProgressTest.test_symlink_outside_repository_is_rejected_before_read)",
+      "reason": "Windows host lacks symlink creation privilege; host policy is unchanged"
+    },
+    {
+      "name": "test_symlink_refused (test_export_source_recovery.SourceRecoveryExportTest.test_symlink_refused)",
+      "reason": "Windows host lacks symlink creation privilege; native Linux CI verifies this guard"
+    }
+  ]
+}

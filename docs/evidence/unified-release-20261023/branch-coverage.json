@@ -1,0 +1,303 @@
+{
+  "verified_at": "2026-10-23T08:58:29.577702+00:00",
+  "source_commit": "2291ddf83bca358cb2b54c539e029d9db13e8739",
+  "remote_main": "2291ddf83bca358cb2b54c539e029d9db13e8739",
+  "remote_branches": [
+    {
+      "ref": "origin/codex/export-auto-preparation",
+      "sha": "c75b00aff99040b694fb74995805a3c9f864c9fe",
+      "included": true
+    },
+    {
+      "ref": "origin/codex/export-inbox",
+      "sha": "4dc17ee0179cdc0cb3836297881b03f03837ad21",
+      "included": true
+    },
+    {
+      "ref": "origin/codex/export-message-recovery",
+      "sha": "15905434909404e50b811d1ddbbd28034b596c13",
+      "included": true
+    },
+    {
+      "ref": "origin/codex/impeccable-ui-20261014",
+      "sha": "fe131c5d156fce8ae3643d28f0b2f2132d6b26e7",
+      "included": true
+    },
+    {
+      "ref": "origin/codex/launch-assets-20261023",
+      "sha": "edc7b4abf6dbc485b4e454be80f128bb1dce5b19",
+      "included": true
+    },
+    {
+      "ref": "origin/codex/launch-backups-20261023",
+      "sha": "175418852f28f273f419cc6c5741e94045883c99",
+      "included": true
+    },
+    {
+      "ref": "origin/codex/launch-monitoring-20261023",
+      "sha": "927c8821f81f7d6d37b9386a26e4fee32c76bc9c",
+      "included": true
+    },
+    {
+      "ref": "origin/codex/launch-notifications-20261023",
+      "sha": "ecce9434ff7aa44e2e1d233cba4ca4fc33a5d00b",
+      "included": true
+    },
+    {
+      "ref": "origin/codex/launch-production-20261023",
+      "sha": "c5452fb9a013eb208dc2b3fcba03df096083db95",
+      "included": true
+    },
+    {
+      "ref": "origin/codex/launch-reports-20261023",
+      "sha": "a4853f0b4a443252031a22a926badbc42c55f69e",
+      "included": true
+    },
+    {
+      "ref": "origin/codex/page-ui-refinement-20261014",
+      "sha": "7935975746d9694aea5b74d3ef523c286e8b30da",
+      "included": true
+    },
+    {
+      "ref": "origin/codex/ticket-detail-reference-20261015",
+      "sha": "a1f31a4f302aeb710616425d559b6b46861990e5",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/continue-development-20261020",
+      "sha": "8bb50c01d84d5b338d7cfdc72ecdf74dbf08f2e4",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/d09-inspection-report-20261019",
+      "sha": "8b7a6c165e2617be2335083f2faf3d32329b9104",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/d10-change-approval-20261019",
+      "sha": "10f9ebcfaa4ad2b566c34de38a5aea8188f0e697",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/d11-notification-channel-20261019",
+      "sha": "cdbdf774afad621fa1d1444c970519f13a33ca33",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/event-handling-state-20261021",
+      "sha": "9114ca5985fe627d4f329f11e9e0adc845ef8728",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/notification-routing-evidence-20261021",
+      "sha": "b925403cc4a42c6c8fd1e71acf4045bc50ccc014",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/notification-routing-plan-20261021",
+      "sha": "04f3a89e2dccb030dfa842ff65851781ca053117",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/parallel-integration-20261019",
+      "sha": "28e8da23b93aced8f51bf21f5087425c85aa1250",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/public-webhook-transport-20261021",
+      "sha": "a23646059cf666b5d4f9e3f95c1033ae222a4f36",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/sla-clock-20261020",
+      "sha": "4219e01fe41a2fefbf09619448c898dbdc274f62",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/sla-reminder-intents-20261020",
+      "sha": "0d2b7b1c877597d76a87d8793a3149ea9f58e829",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/ticket-api-20261020",
+      "sha": "317e7a2effc38b9b07fc212b9ce9c6362675c532",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/ticket-autoclose-20261020",
+      "sha": "b5b41e2a5fa3d6ad6eaadaec2ed5d6b44722ad33",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/ticket-opening-20261020",
+      "sha": "a1c977982ca5b0a164d9b1590cf084bdcfcd9bd0",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/ticket-sla-policy-20261020",
+      "sha": "eb38e8776db77b98f591f629c92c3688798fdd96",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/ticket-sla-projection-20261020",
+      "sha": "44dcae9211854abac3cb961edad732805514a658",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/ticket-storage-20261020",
+      "sha": "75fc0a76976c38faa50fed0b52a385d41543df5e",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/ticket-ui-20261020",
+      "sha": "19945a6bfd4a4ffde64cd228a275b7986f3d3154",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/topology-batch-review-20261023",
+      "sha": "585bb5626ab5ce31d1cf4ff43f02857ec859e166",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/zabbix-event-puller-20261021",
+      "sha": "5acc5ddbb35e12662233c2a089f8652a91d27bf4",
+      "included": true
+    },
+    {
+      "ref": "origin/dot/zabbix-read-envelope-20261021",
+      "sha": "b9ee49d249b16a2e7be0fe6310d07f2bbd13371e",
+      "included": true
+    },
+    {
+      "ref": "origin/feat/d07-ticket-lifecycle",
+      "sha": "4b126e98d4c4237193a058d68bc4d3cbcc9ef92a",
+      "included": true
+    },
+    {
+      "ref": "origin/handoff/cloud-20261001-photos",
+      "sha": "cca471d68064f212c506d033d056a381e2ef256d",
+      "included": true
+    },
+    {
+      "ref": "origin/web-redesign",
+      "sha": "251ea43c0f162298b93f92d0a81fb2826a066761",
+      "included": true
+    }
+  ],
+  "local_branches": [
+    {
+      "ref": "codex/export-auto-preparation",
+      "sha": "c75b00aff99040b694fb74995805a3c9f864c9fe",
+      "included": true
+    },
+    {
+      "ref": "codex/export-inbox",
+      "sha": "4dc17ee0179cdc0cb3836297881b03f03837ad21",
+      "included": true
+    },
+    {
+      "ref": "codex/export-message-recovery",
+      "sha": "15905434909404e50b811d1ddbbd28034b596c13",
+      "included": true
+    },
+    {
+      "ref": "codex/impeccable-ui-20261014",
+      "sha": "fe131c5d156fce8ae3643d28f0b2f2132d6b26e7",
+      "included": true
+    },
+    {
+      "ref": "codex/page-ui-refinement-20261014",
+      "sha": "7935975746d9694aea5b74d3ef523c286e8b30da",
+      "included": true
+    },
+    {
+      "ref": "codex/ticket-detail-reference-20261015",
+      "sha": "a1f31a4f302aeb710616425d559b6b46861990e5",
+      "included": true
+    },
+    {
+      "ref": "feat/d07-ticket-lifecycle",
+      "sha": "4b126e98d4c4237193a058d68bc4d3cbcc9ef92a",
+      "included": true
+    },
+    {
+      "ref": "handoff/cloud-20261001-photos",
+      "sha": "2122f0de0abbd1fdb1e1d9e51e56a7f56c4693ad",
+      "included": true
+    }
+  ],
+  "worktrees": [
+    {
+      "path": "E:/work/wxw9/zhonganzaixian/mop-platform",
+      "sha": "ef79812ba9c196d32fe6d2651790a56f41b3901f",
+      "included": true,
+      "uncommitted": false
+    },
+    {
+      "path": "E:/work/wxw9/zhonganzaixian/.worktrees/export-auto-preparation",
+      "sha": "15905434909404e50b811d1ddbbd28034b596c13",
+      "included": true,
+      "uncommitted": false
+    },
+    {
+      "path": "E:/work/wxw9/zhonganzaixian/.worktrees/ticket-detail-reference",
+      "sha": "a1f31a4f302aeb710616425d559b6b46861990e5",
+      "included": true,
+      "uncommitted": false
+    },
+    {
+      "path": "E:/work/wxw9/zhonganzaixian/mop-platform/.local/frontend-acceptance-validation",
+      "sha": "b7a8bc8c0f8408af00cc33d43b0f9972abcaa1a2",
+      "included": true,
+      "uncommitted": false
+    },
+    {
+      "path": "E:/work/wxw9/zhonganzaixian/tmp/impeccable-ui",
+      "sha": "7935975746d9694aea5b74d3ef523c286e8b30da",
+      "included": true,
+      "uncommitted": false
+    }
+  ],
+  "parallel_checkouts": [
+    {
+      "area": "assets",
+      "sha": "edc7b4abf6dbc485b4e454be80f128bb1dce5b19",
+      "included": true,
+      "clean": true
+    },
+    {
+      "area": "monitoring",
+      "sha": "927c8821f81f7d6d37b9386a26e4fee32c76bc9c",
+      "included": true,
+      "clean": true
+    },
+    {
+      "area": "notifications",
+      "sha": "ecce9434ff7aa44e2e1d233cba4ca4fc33a5d00b",
+      "included": true,
+      "clean": true
+    },
+    {
+      "area": "backups",
+      "sha": "175418852f28f273f419cc6c5741e94045883c99",
+      "included": true,
+      "clean": true
+    },
+    {
+      "area": "reports",
+      "sha": "a4853f0b4a443252031a22a926badbc42c55f69e",
+      "included": true,
+      "clean": true
+    },
+    {
+      "area": "production",
+      "sha": "c5452fb9a013eb208dc2b3fcba03df096083db95",
+      "included": true,
+      "clean": true
+    }
+  ],
+  "original_uncommitted_changes_excluded_by_user": true,
+  "excluded_original_paths": [],
+  "release_checkout_clean": true,
+  "all_committed_heads_included": true
+}

@@ -34,13 +34,14 @@ it('contract Top5 switches CPU, memory and unconnected disk without inventing a 
  expect(host.querySelector('.live-history')).toBeNull()
  expect(host.querySelector('.contract-ranking')?.textContent).toContain('12.5%')
  expect(host.querySelector('meter')?.getAttribute('max')).toBe('100')
- const selector=host.querySelector<HTMLSelectElement>('[aria-label="资源排行指标"]')!
- selector.value='memory';selector.dispatchEvent(new Event('change',{bubbles:true}));await settle()
+ const selector=host.querySelector<HTMLElement>('[role="group"][aria-label="资源排行指标"]')!
+ const pick=async(label:string)=>{const option=[...selector.querySelectorAll('button')].find(button=>button.textContent===label)!;option.click();await settle();expect(option.getAttribute('aria-pressed')).toBe('true')}
+ await pick('内存')
  expect(host.querySelector('.contract-ranking')?.textContent).toContain('58.0%')
- selector.value='disk';selector.dispatchEvent(new Event('change',{bubbles:true}));await settle()
+ await pick('磁盘')
  expect(host.querySelector('.contract-ranking')?.textContent).toContain('尚未接入')
  expect(host.querySelector('meter')).toBeNull()
- selector.value='cpu';selector.dispatchEvent(new Event('change',{bubbles:true}));await settle()
+ await pick('CPU')
  expect(host.querySelector('.contract-ranking')?.textContent).toContain('12.5%')
  expect(calls.mock.calls.every(([,options])=>!options?.method||options.method==='GET')).toBe(true)
 })

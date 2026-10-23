@@ -2,6 +2,7 @@
 // Contract layout and authorization regression; synthetic data, not live acceptance.
 import { beforeEach, afterEach, it, expect, vi } from 'vitest'
 import { createApp, nextTick, type App } from 'vue'
+import { createMemoryHistory, createRouter } from 'vue-router'
 vi.mock('../src/components/LiveMonitoringPanel.vue', () => ({ default: { props: ['autoRefresh', 'mode'], methods: {refresh() {}}, template: '<div data-panel="live" :data-mode="mode"><span data-refresh>{{autoRefresh}}</span></div>' } }))
 vi.mock('../src/components/DashboardEventsPanel.vue', () => ({ default: { methods: {refresh() {}}, template: '<div data-panel="events" />' } }))
 vi.mock('../src/components/DashboardWorkflowsPanel.vue', () => ({ default: { methods: {refresh() {}}, template: '<div data-panel="workflows" />' } }))
@@ -30,9 +31,37 @@ it('renders the six contract KPIs and fixed panel order without invented values'
   expect(host.querySelector('[data-mode="ranking"]')).not.toBeNull()
 })
 it('switches the actual dashboard request window and displays its unknown state', async () => {
-  await settle(); const select = host.querySelector('select')!; select.value = 'DAYS_7'; select.dispatchEvent(new Event('change')); await settle()
+  await settle()
+  const range = host.querySelector('[role="group"][aria-label="首页时间范围"]')!
+  const week = [...range.querySelectorAll('button')].find(button => button.textContent === '7天')!
+  expect(week.getAttribute('aria-pressed')).toBe('false')
+  week.click(); await settle()
   expect(api.request).toHaveBeenLastCalledWith('/dashboard?window=DAYS_7', expect.objectContaining({ method: 'GET' }))
   expect(host.querySelector('[data-block="ALERT_TREND"]')?.textContent).toContain('7天')
+  expect(week.getAttribute('aria-pressed')).toBe('true')
+})
+it('links each permitted KPI to its contract list page and omits unauthorized targets', async () => {
+  app.unmount()
+  const blank = { template: '<p />' }
+  const router = createRouter({ history: createMemoryHistory(), routes: [
+    { path: '/dashboard', name: 'dashboard', component: Page, meta: { capability: 'dashboard:read' } },
+    { path: '/assets', name: 'assets', component: blank, meta: { capability: 'assets:read' } },
+    { path: '/monitoring-events', name: 'monitoring-events', component: blank, meta: { roles: ['padmin', 'msp'], capability: 'tickets:read' } },
+    { path: '/sla-reports', name: 'sla-reports', component: blank, meta: { roles: ['padmin', 'msp'], capability: 'sla_scenarios:read' } },
+    { path: '/ticket-workflows', name: 'ticket-workflows', component: blank, meta: { capability: 'tickets:read' } },
+    { path: '/ticket-notifications', name: 'ticket-notifications', component: blank, meta: { capability: 'tickets:read' } },
+  ] })
+  await router.push('/dashboard'); await router.isReady()
+  app = createApp({ template: '<router-view />' }); app.use(router); app.mount(host); await settle()
+  const links = Object.fromEntries([...host.querySelectorAll('[data-kpi]')].map(card => [card.getAttribute('data-kpi'), card.querySelector('a')?.getAttribute('href') ?? null]))
+  expect(links).toEqual({ ASSET_ONLINE_RATE: '/assets', CURRENT_PROBLEMS: '/monitoring-events', MONTH_SERVICE_AVAILABILITY: null, PENDING_TICKETS: '/ticket-workflows', MTTA_24H: '/monitoring-events', DELIVERY_RATE_24H: '/ticket-notifications' })
+  expect([...host.querySelectorAll('[data-kpi] strong')].every(node => node.textContent === '未知')).toBe(true)
+})
+it('keeps KPI drill-down links behind the same route gates as the menu', async () => {
+  await settle()
+  // No router is installed in this unit host, so no unauthorized or unresolved link may render.
+  expect(host.querySelectorAll('[data-kpi] a')).toHaveLength(0)
+  expect([...host.querySelectorAll('[data-kpi="CURRENT_PROBLEMS"] .mop-sev')].map(node => node.textContent)).toEqual(['灾难 —', '严重 —', '一般 —', '警告 —', '信息 —'])
 })
 it('auto-refresh control reaches the actual resource component without writes', async () => {
   await settle(); const input = host.querySelector('input')!; input.checked = false; input.dispatchEvent(new Event('change')); await nextTick()
@@ -58,7 +87,7 @@ it('rejects local fixtures and dashboard revocation', async () => {
 })
 it('keeps failure distinct from unknown successful metadata', async () => {
   await settle(); vi.mocked(api.request).mockRejectedValueOnce(new Error('unit failure'))
-  host.querySelector('button')!.click(); await settle()
+  host.querySelector<HTMLButtonElement>('button.dashboard-refresh')!.click(); await settle()
   expect(host.querySelector('[data-kpi] strong')?.textContent).toBe('读取失败')
   expect(host.querySelector('.dashboard-source-status')?.textContent).toContain('尚未取得有效首页状态')
 })

@@ -4,9 +4,11 @@ import {api,ApiError,isCancelled} from '../api/client'
 import {session,can,switchingTenant,contextGeneration} from '../stores/session'
 import {readMonitoringWorkspace,type MonitoringEventSummary} from '../utils/monitoringEvents'
 import {utcInstantNanos} from '../utils/utcInstant'
-import {displayTime} from '../utils/display'
+import {compactTime,displayTime} from '../utils/display'
 import ApiErrorNotice from './ApiErrorNotice.vue'
 const events=shallowRef<MonitoringEventSummary[]|null>(null),observed=ref(''),busy=ref(false),error=ref<unknown>(null)
+const assetLinks=computed(()=>can('assets:read'))
+const shortId=(value:string)=>value.slice(-6)
 const permitted=computed(()=>session.value?.mode==='remote_test'&&['padmin','msp'].includes(session.value.user.role)&&can('dashboard:read')&&can('tickets:read')&&!switchingTenant.value)
 let epoch=0,abort:AbortController|null=null,alive=true
 function reset(){++epoch;abort?.abort();abort=null;events.value=null;observed.value='';error.value=null;busy.value=false}
@@ -32,37 +34,53 @@ defineExpose({ refresh: load })
 </script>
 <template>
 <section v-if="permitted" class="dashboard-events" aria-labelledby="dashboard-events-title" :aria-busy="busy">
- <header class="de-head"><h2 id="dashboard-events-title">最近事件</h2><div class="actions"><button type="button" :disabled="busy" @click="load">{{busy?'读取中…':'刷新近期事件'}}</button><router-link to="/monitoring-events">事件中心</router-link></div></header>
+ <header class="de-head"><div class="de-title"><h2 id="dashboard-events-title">最近事件</h2><span>最近 7 条</span></div><div class="actions"><button type="button" :disabled="busy" @click="load">{{busy?'读取中…':'刷新近期事件'}}</button><router-link to="/monitoring-events">事件中心</router-link></div></header>
  <ApiErrorNotice :error="error" :retrying="busy" @retry="load" />
  <p v-if="!events" role="status" class="de-state">{{busy?'正在读取近期事件…':error?'事件读取失败，未沿用旧列表。':'尚未读取事件。'}}</p>
  <template v-else>
   <p role="status" class="de-meta">已读取 {{events.length}} 条近期记录 · {{displayTime(observed)}}</p>
   <p v-if="!events.length" class="de-state">当前查询没有事件记录（不代表全量设备健康）。</p>
-  <ol v-else class="events"><li v-for="event in events" :key="event.id" :class="'sev-'+event.severity.toLowerCase()"><span class="sev">{{severity[event.severity]}}</span><div class="ev-body"><h3><router-link :to="{path:'/monitoring-events',query:{event_id:event.id}}" :aria-label="event.rule_name+'，查看事件详情'">{{event.rule_name}}</router-link></h3><p><span :class="event.monitor_state==='PROBLEM'?'st-problem':'st-ok'">{{event.monitor_state==='PROBLEM'?'异常':'已恢复'}}</span> · {{handling[event.handling_state]}}<template v-if="event.suppression_state!=='NONE'"> · {{suppression[event.suppression_state]}}</template> · {{event.occurrence_count}} 次</p></div><time :datetime="event.last_occurred_at">{{displayTime(event.last_occurred_at)}}</time></li></ol>
+  <div v-else class="events-scroll" tabindex="0" role="region" aria-label="最近事件，可横向滚动">
+   <table class="events mop-table">
+    <caption class="sr-only">最近 {{events.length}} 条事件，按最近发生时间排序</caption>
+    <thead><tr><th scope="col">级别</th><th scope="col">问题</th><th scope="col">资产</th><th scope="col">状态</th><th scope="col">发生时间</th></tr></thead>
+    <tbody>
+     <tr v-for="event in events" :key="event.id" :class="'sev-'+event.severity.toLowerCase()">
+      <td><span class="sev mop-sev" :class="event.severity">{{severity[event.severity]}}</span></td>
+      <td class="ev-problem"><router-link class="event-link" :to="{path:'/monitoring-events',query:{event_id:event.id}}" :aria-label="event.rule_name+'，查看事件详情'">{{event.rule_name}}</router-link><span class="ev-flags"><span v-if="event.occurrence_count>1" class="mop-pill-count" :title="'合并 '+event.occurrence_count+' 条原始事件'">×{{event.occurrence_count}}</span><span v-if="event.suppression_state!=='NONE'" class="mop-chip-tag" :title="suppression[event.suppression_state]">已抑制</span></span></td>
+      <td><router-link v-if="assetLinks" class="ev-asset" :to="{path:'/assets',query:{asset_id:event.asset_id}}" :title="event.asset_id" :aria-label="'查看事件资产 '+event.asset_id">…{{shortId(event.asset_id)}}</router-link><span v-else class="ev-asset" :title="event.asset_id">…{{shortId(event.asset_id)}}</span></td>
+      <td><span class="mop-badge" :class="event.monitor_state==='PROBLEM'?'danger':'ok'">{{event.monitor_state==='PROBLEM'?'异常':'已恢复'}}</span><small>{{handling[event.handling_state]}}<template v-if="event.suppression_state!=='NONE'"> · {{suppression[event.suppression_state]}}</template></small></td>
+      <td><time :datetime="event.last_occurred_at" :title="displayTime(event.last_occurred_at)">{{compactTime(event.last_occurred_at)}}</time></td>
+     </tr>
+    </tbody>
+   </table>
+  </div>
  </template>
 </section>
 </template>
 <style scoped>
-.dashboard-events{min-width:0;padding:16px 18px;border:1px solid #e3e9f2;background:#fff;border-radius:10px;color:#24374a}
-.de-head,.actions{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.dashboard-events h2{font-size:15px;font-weight:600;margin:0;color:#0f172a}
-.actions button,.actions a{display:inline-flex;align-items:center;min-height:32px;box-sizing:border-box;padding:0 12px;color:#1d4ed8;background:#fff;border:1px solid #d5deea;border-radius:6px;font:inherit;font-size:13px;text-decoration:none;cursor:pointer}
-.actions button:hover:not(:disabled),.actions a:hover{background:#eff6ff;border-color:#93c5fd}
-.actions button:disabled{opacity:.6;cursor:default}
-.dashboard-events :focus-visible{outline:2px solid #2563eb;outline-offset:2px}
-.de-meta{margin:8px 0 4px;font-size:12px;color:#64748b;font-variant-numeric:tabular-nums}
-.de-state{margin:12px 0 0;padding:20px;border-radius:8px;background:#f8fafc;color:#475569;font-size:13px;text-align:center}
-.events{list-style:none;margin:4px 0 0;padding:0}
-.events li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #eef2f7}
-.events li:first-child{border-top:0}
-.sev{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:22px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:600;background:#f1f5f9;color:#475569}
-.sev-disaster .sev{background:#fee2e2;color:#991b1b}.sev-high .sev{background:#ffedd5;color:#9a3412}.sev-average .sev{background:#fef3c7;color:#92400e}.sev-warning .sev{background:#fef9c3;color:#854d0e}.sev-info .sev{background:#e0f2fe;color:#075985}
-.ev-body{min-width:0}
-.events h3{margin:0;font-size:14px;font-weight:600;line-height:1.4}
-.events h3 a{color:#0f172a;text-decoration:none;overflow-wrap:anywhere}
-.events h3 a:hover{color:#1d4ed8;text-decoration:underline}
-.ev-body p{margin:2px 0 0;font-size:12px;color:#64748b}
-.st-problem{color:#b91c1c;font-weight:600}.st-ok{color:#15803d;font-weight:600}
-.events time{font-size:12px;color:#64748b;white-space:nowrap;font-variant-numeric:tabular-nums}
-@media(max-width:760px){.dashboard-events{padding:14px}.actions button,.actions a{min-height:44px}.events li{grid-template-columns:auto minmax(0,1fr)}.events time{grid-column:2}.events h3 a{display:inline-block;min-height:24px}}
+.dashboard-events{display:flex;flex-direction:column;min-width:0;background:#fff;border:1px solid var(--mop-line,#e2e8f0);border-radius:8px;color:var(--mop-text,#2f4157)}
+.de-head{display:flex;justify-content:space-between;align-items:center;gap:8px 12px;flex-wrap:wrap;min-height:48px;padding:10px 16px;border-bottom:1px solid var(--mop-line-soft,#edf1f6)}
+.de-title{display:flex;align-items:baseline;gap:8px}.de-title span{font-size:12px;color:var(--mop-muted,#5d6e83)}
+.dashboard-events h2{font-size:14px;font-weight:600;margin:0;color:var(--mop-ink,#17263a)}
+.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.actions a{display:inline-flex;align-items:center;min-height:32px;padding:0 4px;color:var(--mop-primary,#2165c5);font-size:13px;font-weight:500;text-decoration:none}
+.actions a::after{content:'›';margin-left:4px;font-size:15px;line-height:1}
+.actions a:hover{text-decoration:underline;text-underline-offset:3px}
+.dashboard-events :focus-visible{outline:2px solid var(--mop-primary,#2165c5);outline-offset:2px}
+.de-meta{margin:0;padding:8px 16px 0;font-size:12px;color:var(--mop-muted,#5d6e83);font-variant-numeric:tabular-nums}
+.de-state{margin:12px 16px 16px;padding:24px 16px;border-radius:6px;background:var(--mop-sunken,#f7f9fc);color:var(--mop-text-2,#4f6177);font-size:13px;text-align:center}
+.events-scroll{overflow-x:auto;margin-top:8px}
+.events{min-width:520px}
+.events th:first-child,.events td:first-child{width:64px;padding-left:16px}
+.events td:last-child,.events th:last-child{padding-right:16px;white-space:nowrap}
+.ev-problem{min-width:180px}
+.event-link{color:var(--mop-ink,#17263a);font-weight:600;text-decoration:none;overflow-wrap:anywhere}
+.event-link:hover{color:var(--mop-primary,#2165c5);text-decoration:underline;text-underline-offset:3px}
+.ev-flags{display:inline-flex;gap:4px;margin-left:6px;vertical-align:middle}
+.ev-asset{font-family:var(--mop-font-mono,Consolas,monospace);font-size:12px;color:var(--mop-primary,#2165c5);white-space:nowrap}
+span.ev-asset{color:var(--mop-muted,#5d6e83)}
+.events td small{display:block;margin-top:3px;font-size:12px;color:var(--mop-muted,#5d6e83)}
+.events time{font-size:12px;color:var(--mop-text-2,#4f6177);white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(max-width:760px){.de-head{padding:10px 12px}.actions button,.actions a{min-height:44px}.de-meta{padding-inline:12px}.ev-asset{display:inline-flex;min-height:44px;align-items:center}.event-link{display:inline-block;min-height:24px}}
 </style>

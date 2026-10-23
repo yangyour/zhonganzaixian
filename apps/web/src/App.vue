@@ -24,6 +24,7 @@ import './styles/functional-prototype.css'
 import './styles/compact-workspaces.css'
 import './styles/workspace.css'
 import './styles/controls.css'
+import './styles/theme.css'
 import { displayTenantName } from './utils/displayTenantName'
 import { navigationModuleTitle } from './utils/navigationModules'
 const route = useRoute()

@@ -14,5 +14,4 @@
 .prototype-shell #main-content .el-empty{padding:16px 12px;}
 .prototype-shell #main-content .el-empty__image{display:none;}
 .prototype-shell #main-content .el-empty__description{margin-top:0;}
-.prototype-shell #main-content :is(.dashboard-events,.dashboard-reports,.dashboard-workflows){padding:12px;margin:8px 0;min-width:0;}
 .prototype-shell #main-content .panel:has(+.message-list){min-height:0;}

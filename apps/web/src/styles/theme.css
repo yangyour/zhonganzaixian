@@ -1,0 +1,316 @@
+/* MOP content theme (2026-10-23 redesign, contract appendix 1 SOW).
+   Scope: page content (#main-content) and teleported overlays only. The menu bar —
+   top module navigation, workspace sidebar, breadcrumb bar and mobile navigation
+   drawer — keeps navigation.css unchanged. Imported after every other layer. */
+:root {
+  --mop-ink: #17263a;
+  --mop-text: #2f4157;
+  --mop-text-2: #4f6177;
+  --mop-muted: #5d6e83;
+  --mop-faint: #8696aa;
+  --mop-line: #e2e8f0;
+  --mop-line-soft: #edf1f6;
+  --mop-line-strong: #cfd9e5;
+  --mop-canvas: #f5f9ff;
+  --mop-card: #fff;
+  --mop-sunken: #f7f9fc;
+  --mop-hover: #f3f7fd;
+  --mop-selected: #eaf2ff;
+  --mop-primary: #2165c5;
+  --mop-primary-hover: #1957ae;
+  --mop-primary-soft: #eaf2fe;
+  --mop-primary-line: #bcd3f5;
+  --mop-ok: #1d7a4c;      --mop-ok-bg: #e8f6ee;     --mop-ok-dot: #2e9c63;
+  --mop-danger: #b42318;  --mop-danger-bg: #fdecea; --mop-danger-dot: #d92d20;
+  --mop-warn: #8f5a07;    --mop-warn-bg: #fff4dc;   --mop-warn-dot: #d99a1a;
+  --mop-info: #1f5fb8;    --mop-info-bg: #e8f1fd;   --mop-info-dot: #3b82f6;
+  --mop-maint: #5b4bb0;   --mop-maint-bg: #f0edfc;  --mop-maint-dot: #7c6be0;
+  --mop-unknown: #56657a; --mop-unknown-bg: #eef2f6; --mop-unknown-dot: #98a6b8;
+  --mop-sev-disaster: #a51b13; --mop-sev-disaster-bg: #fde3e1;
+  --mop-sev-high: #b93b0b;     --mop-sev-high-bg: #ffeadd;
+  --mop-sev-average: #9a5b00;  --mop-sev-average-bg: #fff1d6;
+  --mop-sev-warning: #7a5d00;  --mop-sev-warning-bg: #fdf6c8;
+  --mop-sev-info: #1f5fb8;     --mop-sev-info-bg: #e5effd;
+  --mop-sev-none: #56657a;     --mop-sev-none-bg: #eef2f6;
+  --mop-radius-sm: 4px;
+  --mop-radius-md: 6px;
+  --mop-radius-lg: 8px;
+  --mop-shadow-1: 0 1px 2px rgba(15, 34, 64, .05);
+  --mop-shadow-2: 0 4px 14px rgba(15, 34, 64, .08);
+  --mop-shadow-3: 0 16px 40px rgba(15, 34, 64, .16);
+  --mop-hatch: repeating-linear-gradient(135deg, #eef2f7 0 6px, #f8fafc 6px 12px);
+  --mop-gap: 12px;
+  --mop-font-mono: "Cascadia Code", "JetBrains Mono", Consolas, "Microsoft YaHei", monospace;
+}
+
+/* ---------- Canvas and base typography ---------- */
+.prototype-shell #main-content { color: var(--mop-text); font-size: 13px; line-height: 1.6; }
+.prototype-shell #main-content :where(h2) { font-size: 15px; font-weight: 600; line-height: 1.5; color: var(--mop-ink); letter-spacing: 0; }
+.prototype-shell #main-content :where(h3) { font-size: 14px; font-weight: 600; line-height: 1.5; color: var(--mop-ink); }
+.prototype-shell #main-content :where(p) { line-height: 1.65; }
+.prototype-shell #main-content :where(code, kbd, .mono) { font-family: var(--mop-font-mono); }
+.prototype-shell #main-content :where(.tabular, .tabular-nums, td, time) { font-variant-numeric: tabular-nums; }
+.prototype-shell #main-content :where(a:not(.el-button)) { color: var(--mop-primary); }
+.prototype-shell #main-content :where(a:not(.el-button)):hover { color: var(--mop-primary-hover); text-decoration: underline; text-underline-offset: 3px; }
+.prototype-shell #main-content > section,
+.prototype-shell #main-content > div:not(.switching-panel) { min-width: 0; }
+/* Stacked page blocks keep one rhythm instead of per-page margins. */
+.prototype-shell #main-content > section > :is(.panel, .proto-panel, .admin-card, .mop-card, .identity-card) + :is(.panel, .proto-panel, .admin-card, .mop-card, .identity-card) { margin-top: var(--mop-gap); }
+@media (prefers-reduced-motion: reduce) {
+  .prototype-shell #main-content *, .el-overlay * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+
+/* ---------- Cards ---------- */
+.prototype-shell #main-content :is(.panel, .proto-panel, .admin-card, .identity-card, .live-monitoring, .dashboard-events, .dashboard-reports, .dashboard-workflows, .ws-card, .mop-card) {
+  background: var(--mop-card); border: 1px solid var(--mop-line); border-radius: var(--mop-radius-lg); box-shadow: var(--mop-shadow-1);
+}
+/* A self-contained panel placed inside a card shares the card's frame. */
+.prototype-shell #main-content :is(.mop-card, .panel, .proto-panel) > :is(.dashboard-events, .dashboard-workflows, .dashboard-reports, .live-monitoring) {
+  margin: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent;
+}
+.prototype-shell #main-content :is(.panel-heading, .proto-section-head, .admin-card-head, .mop-card-head) {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px;
+  min-height: 48px; padding: 10px 16px; background: transparent; border-bottom: 1px solid var(--mop-line-soft);
+}
+.prototype-shell #main-content :is(.panel-heading, .proto-section-head, .admin-card-head, .mop-card-head) :is(h2, h3) {
+  margin: 0; font-size: 14px; font-weight: 600; line-height: 22px; color: var(--mop-ink);
+}
+.prototype-shell #main-content :is(.panel-heading, .proto-section-head, .admin-card-head, .mop-card-head) > :is(span, small, p) { margin: 0; font-size: 12px; color: var(--mop-muted); }
+.prototype-shell #main-content .mop-card-title { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; min-width: 0; }
+.prototype-shell #main-content .mop-card-title > :is(span, small) { font-size: 12px; color: var(--mop-muted); font-variant-numeric: tabular-nums; }
+.prototype-shell #main-content .mop-card-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.prototype-shell #main-content .mop-card-actions .el-button + .el-button { margin-left: 0; }
+.prototype-shell #main-content .mop-card-body { padding: 16px; }
+.prototype-shell #main-content .mop-card-foot {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px;
+  padding: 10px 16px; border-top: 1px solid var(--mop-line-soft); color: var(--mop-muted); font-size: 12px; font-variant-numeric: tabular-nums;
+}
+.prototype-shell #main-content .mop-stack { display: grid; gap: var(--mop-gap); min-width: 0; }
+.prototype-shell #main-content .mop-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--mop-gap); }
+.prototype-shell #main-content .mop-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--mop-gap); }
+@media (max-width: 1100px) { .prototype-shell #main-content :is(.mop-grid-2, .mop-grid-3) { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Toolbars and filters ---------- */
+.prototype-shell #main-content .mop-toolbar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; padding: 12px 16px; border-bottom: 1px solid var(--mop-line-soft);
+}
+.prototype-shell #main-content .mop-toolbar > .mop-toolbar-end { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.prototype-shell #main-content .mop-toolbar .el-button + .el-button { margin-left: 0; }
+.prototype-shell #main-content .mop-toolbar-label { color: var(--mop-muted); font-size: 12px; white-space: nowrap; }
+.prototype-shell #main-content .mop-divider-v { width: 1px; align-self: stretch; min-height: 20px; background: var(--mop-line); }
+.prototype-shell #main-content .mop-note {
+  margin: 0; padding: 8px 16px; color: var(--mop-muted); background: var(--mop-sunken); border-bottom: 1px solid var(--mop-line-soft); font-size: 12px; line-height: 1.6;
+}
+.prototype-shell #main-content .mop-note strong { color: var(--mop-text-2); font-weight: 600; }
+
+/* Segmented control: time ranges, views and resource switches */
+.prototype-shell #main-content .mop-segmented {
+  display: inline-flex; align-items: center; gap: 2px; padding: 2px; border: 1px solid var(--mop-line); border-radius: var(--mop-radius-md); background: var(--mop-sunken); max-width: 100%; overflow-x: auto; scrollbar-width: none;
+}
+.prototype-shell #main-content .mop-segmented > button:not([class*="el-"]) {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px; flex-shrink: 0;
+  min-height: 26px; padding: 2px 12px; border: 0; border-radius: var(--mop-radius-sm); background: transparent; color: var(--mop-text-2);
+  font-size: 12px; font-weight: 500; line-height: 22px; white-space: nowrap; cursor: pointer; transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.prototype-shell #main-content .mop-segmented > button:not([class*="el-"]):hover:not(:disabled):not([aria-pressed="true"]) { background: #fff; color: var(--mop-primary); }
+.prototype-shell #main-content .mop-segmented > button:not([class*="el-"])[aria-pressed="true"] { background: #fff; color: var(--mop-primary); box-shadow: 0 1px 2px rgba(15, 34, 64, .12), 0 0 0 1px var(--mop-primary-line); font-weight: 600; }
+.prototype-shell #main-content .mop-segmented > button:not([class*="el-"]):disabled { color: var(--mop-faint); cursor: not-allowed; }
+.prototype-shell #main-content .mop-segmented svg { width: 14px; height: 14px; }
+.prototype-shell #main-content .mop-segmented .mop-count { min-width: 18px; padding: 0 5px; border-radius: 999px; background: var(--mop-line-soft); color: var(--mop-muted); font-size: 11px; line-height: 16px; text-align: center; font-variant-numeric: tabular-nums; }
+.prototype-shell #main-content .mop-segmented > button[aria-pressed="true"] .mop-count { background: var(--mop-primary-soft); color: var(--mop-primary); }
+
+/* ---------- Badges: state, severity and counters ---------- */
+.prototype-shell #main-content .mop-badge {
+  display: inline-flex; align-items: center; gap: 5px; max-width: 100%; min-height: 22px; padding: 0 8px;
+  border-radius: 999px; background: var(--mop-unknown-bg); color: var(--mop-unknown);
+  font-size: 12px; font-weight: 500; line-height: 22px; white-space: nowrap; vertical-align: middle;
+}
+.prototype-shell #main-content .mop-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .85; flex-shrink: 0; }
+.prototype-shell #main-content .mop-badge.plain::before { display: none; }
+.prototype-shell #main-content .mop-badge.ok { background: var(--mop-ok-bg); color: var(--mop-ok); }
+.prototype-shell #main-content .mop-badge.danger { background: var(--mop-danger-bg); color: var(--mop-danger); }
+.prototype-shell #main-content .mop-badge.warn { background: var(--mop-warn-bg); color: var(--mop-warn); }
+.prototype-shell #main-content .mop-badge.info { background: var(--mop-info-bg); color: var(--mop-info); }
+.prototype-shell #main-content .mop-badge.maint { background: var(--mop-maint-bg); color: var(--mop-maint); }
+.prototype-shell #main-content .mop-badge.unknown { background: var(--mop-unknown-bg); color: var(--mop-unknown); }
+.prototype-shell #main-content .mop-badge.unknown::before { background: transparent; border: 1.5px dashed currentColor; width: 5px; height: 5px; }
+.prototype-shell #main-content .mop-badge.outline { background: #fff; box-shadow: inset 0 0 0 1px var(--mop-line); }
+/* Severity follows SOW M4-5: 灾难 / 严重 / 一般 / 警告 / 信息 / 未分类. Square to differ from states. */
+.prototype-shell #main-content .mop-sev {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 40px; min-height: 22px; padding: 0 7px;
+  border-radius: var(--mop-radius-sm); font-size: 12px; font-weight: 600; line-height: 22px; white-space: nowrap;
+  background: var(--mop-sev-none-bg); color: var(--mop-sev-none);
+}
+.prototype-shell #main-content .mop-sev.disaster, .prototype-shell #main-content .mop-sev.DISASTER { background: var(--mop-sev-disaster-bg); color: var(--mop-sev-disaster); }
+.prototype-shell #main-content .mop-sev.high, .prototype-shell #main-content .mop-sev.HIGH { background: var(--mop-sev-high-bg); color: var(--mop-sev-high); }
+.prototype-shell #main-content .mop-sev.average, .prototype-shell #main-content .mop-sev.AVERAGE { background: var(--mop-sev-average-bg); color: var(--mop-sev-average); }
+.prototype-shell #main-content .mop-sev.warning, .prototype-shell #main-content .mop-sev.WARNING { background: var(--mop-sev-warning-bg); color: var(--mop-sev-warning); }
+.prototype-shell #main-content .mop-sev.info, .prototype-shell #main-content .mop-sev.INFO { background: var(--mop-sev-info-bg); color: var(--mop-sev-info); }
+.prototype-shell #main-content .mop-pill-count {
+  display: inline-flex; align-items: center; min-height: 20px; padding: 0 6px; border-radius: 999px;
+  background: var(--mop-primary-soft); color: var(--mop-primary); font-size: 12px; font-weight: 600; line-height: 20px; font-variant-numeric: tabular-nums;
+}
+.prototype-shell #main-content .mop-chip-tag {
+  display: inline-flex; align-items: center; min-height: 20px; padding: 0 6px; border: 1px solid var(--mop-line); border-radius: var(--mop-radius-sm);
+  background: #fff; color: var(--mop-text-2); font-size: 11px; line-height: 18px; white-space: nowrap;
+}
+/* Legacy badge classes read the same as .mop-badge */
+.prototype-shell #main-content :is(.proto-badge, .context-badge) { border-radius: 999px; border: 0; background: var(--mop-primary-soft); color: var(--mop-primary); padding: 0 8px; min-height: 22px; line-height: 22px; font-size: 12px; }
+.prototype-shell #main-content .ledger-state { border: 0; border-radius: 999px; padding: 0 8px; min-height: 22px; background: var(--mop-unknown-bg); color: var(--mop-unknown); font-size: 12px; line-height: 22px; }
+.prototype-shell #main-content .ledger-state-pending { background: var(--mop-warn-bg); color: var(--mop-warn); }
+.prototype-shell #main-content .el-tag { border-radius: 999px; height: 22px; padding: 0 8px; font-size: 12px; }
+
+/* ---------- KPI tiles (SOW KPI rows: M1-1, M3-1, M5-1, M5-12 ...) ---------- */
+.prototype-shell #main-content .mop-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--mop-gap); margin: 0 0 var(--mop-gap); }
+.prototype-shell #main-content .mop-kpi {
+  position: relative; display: flex; flex-direction: column; gap: 2px; min-width: 0; min-height: 104px; padding: 14px 16px 12px;
+  background: var(--mop-card); border: 1px solid var(--mop-line); border-radius: var(--mop-radius-lg); box-shadow: var(--mop-shadow-1); color: inherit; text-decoration: none;
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+.prototype-shell #main-content .mop-kpi > .mop-kpi-label { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin: 0; font-size: 13px; font-weight: 500; color: var(--mop-text-2); line-height: 20px; }
+.prototype-shell #main-content .mop-kpi > .mop-kpi-value { display: block; margin: 4px 0 2px; font-size: 26px; font-weight: 650; line-height: 34px; color: var(--mop-ink); font-variant-numeric: tabular-nums; letter-spacing: -.2px; overflow-wrap: anywhere; }
+.prototype-shell #main-content .mop-kpi > .mop-kpi-value small { margin-left: 4px; font-size: 13px; font-weight: 500; color: var(--mop-muted); }
+.prototype-shell #main-content .mop-kpi > .mop-kpi-detail { margin: 0; font-size: 12px; line-height: 1.6; color: var(--mop-muted); overflow-wrap: anywhere; }
+.prototype-shell #main-content .mop-kpi.unknown > .mop-kpi-value { color: var(--mop-faint); font-weight: 600; }
+.prototype-shell #main-content .mop-kpi.unknown::after { content: ''; position: absolute; inset: auto 0 0; height: 3px; border-radius: 0 0 var(--mop-radius-lg) var(--mop-radius-lg); background: var(--mop-hatch); }
+.prototype-shell #main-content .mop-kpi.tone-ok > .mop-kpi-value { color: var(--mop-ok); }
+.prototype-shell #main-content .mop-kpi.tone-danger > .mop-kpi-value { color: var(--mop-danger); }
+.prototype-shell #main-content .mop-kpi.tone-warn > .mop-kpi-value { color: var(--mop-warn); }
+.prototype-shell #main-content a.mop-kpi:hover, .prototype-shell #main-content .mop-kpi.linkable:hover { border-color: var(--mop-primary-line); box-shadow: var(--mop-shadow-2); text-decoration: none; }
+.prototype-shell #main-content .mop-kpi-link { display: inline-flex; align-items: center; gap: 2px; font-size: 12px; font-weight: 500; color: var(--mop-primary); white-space: nowrap; }
+.prototype-shell #main-content .mop-kpi-link svg { width: 12px; height: 12px; }
+.prototype-shell #main-content .mop-kpi-reading { color: var(--mop-faint); }
+
+/* ---------- Data tables (native and Element Plus) ---------- */
+.prototype-shell #main-content .mop-table-wrap { max-width: 100%; overflow-x: auto; scrollbar-width: thin; }
+.prototype-shell #main-content .mop-table-wrap:focus-visible { outline: 2px solid var(--mop-primary); outline-offset: -2px; }
+.prototype-shell #main-content :is(.mop-table, .proto-table, .admin-table, .live-table, .ws-table) { width: 100%; border-collapse: collapse; background: #fff; font-size: 13px; }
+.prototype-shell #main-content :is(.mop-table, .proto-table, .admin-table, .live-table, .ws-table) th {
+  height: 40px; padding: 8px 14px; border: 0; border-bottom: 1px solid var(--mop-line); background: var(--mop-sunken);
+  color: var(--mop-muted); font-size: 12px; font-weight: 600; text-align: left; white-space: nowrap;
+}
+.prototype-shell #main-content :is(.mop-table, .proto-table, .admin-table, .live-table, .ws-table) td {
+  padding: 10px 14px; border: 0; border-bottom: 1px solid var(--mop-line-soft); color: var(--mop-text); vertical-align: middle; line-height: 1.55; font-variant-numeric: tabular-nums;
+}
+.prototype-shell #main-content :is(.mop-table, .proto-table, .admin-table, .live-table, .ws-table) tbody tr { transition: background-color .12s ease; }
+.prototype-shell #main-content :is(.mop-table, .proto-table, .admin-table, .live-table, .ws-table) tbody tr:hover { background: var(--mop-hover); }
+.prototype-shell #main-content :is(.mop-table, .proto-table, .admin-table, .live-table, .ws-table) tbody tr:last-child td { border-bottom: 0; }
+.prototype-shell #main-content :is(.mop-table, .proto-table, .admin-table) td :is(small, .cell-sub, .proto-sub) { display: block; margin-top: 2px; color: var(--mop-muted); font-size: 12px; line-height: 1.5; }
+.prototype-shell #main-content :is(.mop-table, .proto-table, .admin-table) td strong { color: var(--mop-ink); font-weight: 600; }
+.prototype-shell #main-content .mop-table tr.is-selected td, .prototype-shell #main-content .mop-table tr[aria-selected="true"] td { background: var(--mop-selected); }
+.prototype-shell #main-content .mop-table .num { text-align: right; }
+.prototype-shell #main-content .mop-table caption { padding: 10px 14px 8px; }
+.prototype-shell #main-content .el-table {
+  --el-table-header-bg-color: var(--mop-sunken); --el-table-row-hover-bg-color: var(--mop-hover); --el-table-border-color: var(--mop-line-soft);
+  --el-table-header-text-color: var(--mop-muted); --el-table-text-color: var(--mop-text); font-size: 13px;
+}
+.prototype-shell #main-content .el-table th.el-table__cell { height: 40px; background: var(--mop-sunken); border-right: 0; font-size: 12px; font-weight: 600; }
+.prototype-shell #main-content .el-table td.el-table__cell { padding-block: 9px; }
+.prototype-shell #main-content .el-table .cell { padding-inline: 14px; line-height: 1.55; }
+.prototype-shell #main-content .el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell { background: #fbfcfe; }
+.prototype-shell #main-content .el-table .cell-sub { margin-top: 2px; font-size: 12px; color: var(--mop-muted); }
+/* ---------- Empty, unavailable and loading states ---------- */
+.prototype-shell #main-content .mop-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 120px; padding: 20px 16px;
+  color: var(--mop-muted); font-size: 13px; line-height: 1.6; text-align: center;
+}
+.prototype-shell #main-content .mop-empty > strong { color: var(--mop-text-2); font-size: 13px; font-weight: 600; }
+.prototype-shell #main-content .mop-empty > svg { width: 28px; height: 28px; color: #a9b8ca; }
+.prototype-shell #main-content .mop-empty .el-button { margin-top: 4px; }
+/* Not connected / unknown: hatched, never a healthy-looking blank. */
+.prototype-shell #main-content .mop-unavailable {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 132px; padding: 18px 16px;
+  border: 1px dashed var(--mop-line-strong); border-radius: var(--mop-radius-md); background: var(--mop-hatch); color: var(--mop-text-2); text-align: center; font-size: 13px;
+}
+.prototype-shell #main-content .mop-unavailable > strong { display: inline-flex; align-items: center; gap: 6px; padding: 1px 10px; border-radius: 999px; background: #fff; color: var(--mop-unknown); font-size: 12px; font-weight: 600; box-shadow: inset 0 0 0 1px var(--mop-line); }
+.prototype-shell #main-content .mop-unavailable > span { max-width: 520px; padding: 2px 8px; border-radius: var(--mop-radius-sm); background: rgba(255, 255, 255, .86); color: var(--mop-text-2); font-size: 12px; line-height: 1.7; }
+.prototype-shell #main-content .mop-skeleton-row { height: 12px; border-radius: 4px; background: linear-gradient(90deg, #eef2f7 25%, #f6f8fb 37%, #eef2f7 63%); background-size: 400% 100%; animation: mop-shimmer 1.4s ease infinite; }
+@keyframes mop-shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+/* Element Plus empty blocks inside cards: compact, icon-free text with the action. */
+.prototype-shell #main-content .el-empty { padding: 20px 12px; }
+.prototype-shell #main-content .el-empty__image { display: none; }
+.prototype-shell #main-content .el-empty__description { margin-top: 0; }
+.prototype-shell #main-content .el-empty__description p { color: var(--mop-muted); font-size: 13px; }
+.prototype-shell #main-content .table-empty { min-height: 148px; gap: 8px; padding: 20px 12px; }
+.prototype-shell #main-content .table-empty p { margin: 0; color: var(--mop-muted); font-size: 13px; line-height: 1.6; }
+.prototype-shell #main-content .empty-symbol { width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--mop-sunken); box-shadow: none; color: #9aacc2; }
+.prototype-shell #main-content .empty-symbol svg { width: 20px; height: 20px; }
+
+/* ---------- Freshness and live status ---------- */
+.prototype-shell #main-content .mop-fresh { display: inline-flex; align-items: center; gap: 6px; color: var(--mop-muted); font-size: 12px; line-height: 20px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.prototype-shell #main-content .mop-fresh::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--mop-unknown-dot); flex-shrink: 0; }
+.prototype-shell #main-content .mop-fresh.live::before { background: var(--mop-ok-dot); box-shadow: 0 0 0 3px rgba(46, 156, 99, .16); }
+.prototype-shell #main-content .mop-fresh.busy::before { background: var(--mop-info-dot); animation: mop-pulse 1s ease-in-out infinite alternate; }
+.prototype-shell #main-content .mop-fresh.failed { color: var(--mop-danger); }
+.prototype-shell #main-content .mop-fresh.failed::before { background: var(--mop-danger-dot); }
+@keyframes mop-pulse { to { opacity: .35; } }
+
+/* ---------- Feedback (inline API errors and notes) ---------- */
+.prototype-shell #main-content .api-error.el-alert {
+  align-items: flex-start; gap: 10px; margin: 0 0 var(--mop-gap); padding: 10px 14px; border: 1px solid #f3c8c3; border-left: 3px solid var(--mop-danger-dot);
+  border-radius: var(--mop-radius-md); background: #fff6f5;
+}
+.prototype-shell #main-content :is(.panel, .proto-panel, .admin-card, .mop-card) > .api-error.el-alert { margin: 12px 16px; width: auto; }
+.prototype-shell #main-content .api-error .el-alert__title { color: var(--mop-danger); font-size: 13px !important; font-weight: 600; line-height: 1.6 !important; }
+.prototype-shell #main-content .api-error .el-alert__description { margin: 2px 0 0; color: #7d2c24; font-size: 12px; }
+.prototype-shell #main-content .api-error .el-alert__icon { width: 18px; font-size: 18px; color: var(--mop-danger-dot); }
+.prototype-shell #main-content .api-error :is(p, small) { margin: 2px 0 4px; color: #7d2c24; font-size: 12px; }
+.prototype-shell #main-content .api-error .el-button { min-height: 28px; margin: 4px 8px 0 0; }
+.prototype-shell #main-content .el-alert--warning.is-light { border: 1px solid #f1dcae; background: #fffaf0; }
+.prototype-shell #main-content .el-alert--info.is-light { border: 1px solid var(--mop-line); background: var(--mop-sunken); }
+.prototype-shell #main-content .el-alert--success.is-light { border: 1px solid #c4e7d2; background: #f2fbf6; }
+.prototype-shell #main-content .el-alert { border-radius: var(--mop-radius-md); }
+.prototype-shell #main-content .read-recovery button:not([class*="el-"]) { min-height: 32px; padding: 4px 12px; border-color: var(--mop-line-strong); border-radius: var(--mop-radius-md); font-size: 13px; }
+
+/* ---------- Tabs ---------- */
+.prototype-shell #main-content :is(.mop-tabs, .feature-tabs, .proto-tabs, .admin-tabs, .asset-detail-tabs) {
+  display: flex; align-items: stretch; gap: 22px; min-height: 44px; margin: 0; padding: 0 16px; overflow-x: auto; scrollbar-width: none;
+  background: transparent; border-bottom: 1px solid var(--mop-line-soft);
+}
+.prototype-shell #main-content :is(.mop-tabs, .feature-tabs, .proto-tabs, .admin-tabs, .asset-detail-tabs) > :is(button, a, span):not([class*="el-"]) {
+  position: relative; display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; min-height: 44px; padding: 0; margin: 0;
+  border: 0; border-radius: 0; background: transparent; color: var(--mop-text-2); font-size: 13px; font-weight: 500; text-decoration: none; cursor: pointer; transition: color .15s ease;
+}
+.prototype-shell #main-content :is(.mop-tabs, .feature-tabs, .proto-tabs, .admin-tabs, .asset-detail-tabs) > :is(button, a):not([class*="el-"]):hover { color: var(--mop-primary); text-decoration: none; }
+.prototype-shell #main-content :is(.mop-tabs, .feature-tabs, .proto-tabs, .admin-tabs, .asset-detail-tabs) > :is(.active, [aria-selected="true"], [aria-pressed="true"], [aria-current="page"]):not([class*="el-"]) { color: var(--mop-primary); font-weight: 600; }
+.prototype-shell #main-content :is(.mop-tabs, .feature-tabs, .proto-tabs, .admin-tabs, .asset-detail-tabs) > :is(.active, [aria-selected="true"], [aria-pressed="true"], [aria-current="page"]):not([class*="el-"])::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px 2px 0 0; background: var(--mop-primary);
+}
+.prototype-shell #main-content .el-tabs__item { font-size: 13px; }
+.prototype-shell #main-content .el-tabs__item.is-active { font-weight: 600; }
+
+/* ---------- Details, facts and descriptions ---------- */
+.prototype-shell #main-content details > summary { cursor: pointer; color: var(--mop-text-2); font-size: 13px; font-weight: 500; }
+.prototype-shell #main-content details > summary:hover { color: var(--mop-primary); }
+.prototype-shell #main-content .mop-facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1px; margin: 0; border: 1px solid var(--mop-line-soft); border-radius: var(--mop-radius-md); background: var(--mop-line-soft); overflow: hidden; }
+.prototype-shell #main-content .mop-facts > div { min-width: 0; padding: 10px 12px; background: #fff; }
+.prototype-shell #main-content .mop-facts :is(dt, small) { display: block; margin: 0 0 2px; color: var(--mop-muted); font-size: 12px; font-weight: 400; }
+.prototype-shell #main-content .mop-facts :is(dd, strong) { display: block; margin: 0; color: var(--mop-ink); font-size: 13px; font-weight: 500; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.prototype-shell #main-content .el-descriptions__label.is-bordered-label { background: var(--mop-sunken); color: var(--mop-muted); font-weight: 500; }
+.prototype-shell #main-content .el-descriptions__body { color: var(--mop-text); }
+
+/* ---------- Pagination footers ---------- */
+.prototype-shell #main-content :is(.table-footer, .proto-table-footer, .admin-footer, .network-table-footer) {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; padding: 10px 16px;
+  border-top: 1px solid var(--mop-line-soft); background: transparent; color: var(--mop-muted); font-size: 12px; font-variant-numeric: tabular-nums;
+}
+.prototype-shell #main-content .cursor-pagination { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.prototype-shell #main-content .cursor-pagination .el-button { margin: 0; }
+
+/* ---------- Narrow screens and coarse pointers: 44px targets (frontend standard §9) ---------- */
+@media (max-width: 760px), (pointer: coarse) {
+  .prototype-shell #main-content .mop-segmented > button:not([class*="el-"]) { min-height: 40px; padding-inline: 14px; }
+  .prototype-shell #main-content :is(.mop-tabs, .feature-tabs, .proto-tabs, .admin-tabs, .asset-detail-tabs) > :is(button, a):not([class*="el-"]) { min-height: 44px; }
+  .prototype-shell #main-content .read-recovery button:not([class*="el-"]) { min-height: 44px; }
+}
+@media (max-width: 760px) {
+  .prototype-shell #main-content { font-size: 13px; }
+  .prototype-shell #main-content .mop-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .prototype-shell #main-content .mop-kpi { min-height: 92px; padding: 12px; }
+  .prototype-shell #main-content .mop-kpi > .mop-kpi-value { font-size: 22px; line-height: 30px; }
+  .prototype-shell #main-content :is(.panel-heading, .proto-section-head, .admin-card-head, .mop-card-head, .mop-toolbar) { padding-inline: 12px; }
+  .prototype-shell #main-content .mop-toolbar > .mop-toolbar-end { margin-left: 0; width: 100%; }
+  .prototype-shell #main-content .mop-card-actions { margin-left: 0; }
+  .prototype-shell #main-content .mop-card-body { padding: 12px; }
+  .prototype-shell #main-content :is(.mop-tabs, .feature-tabs, .proto-tabs, .admin-tabs, .asset-detail-tabs) { gap: 18px; padding-inline: 12px; }
+}

@@ -19,3 +19,14 @@
 ## 2026-10-23 合同附件布局更新
 
 用户明确要求按合同附件一《工作说明书》排版并组织模块。导航调整为合同业务章节和独立整行，首页恢复 M1-11 固定布局；保留原配色和业务控件。此授权覆盖上文相应布局限制，详见 [合同布局记录](contract-layout-20261023.md)。
+
+## 2026-10-23 内容区重设计授权（新基线）
+
+用户明确要求优化前端交互与整体样式、逐页按工作说明书改造，**菜单栏样式不变**，其余可大改。新的内容区基线为 `apps/web/src/styles/theme.css`（最后导入），逐页进度与验证见 [重设计记录](ui-redesign-20261023.md)。
+
+菜单栏文件保持不变，以本批起点 HEAD（LF 规范化）字节摘要为准：
+
+- apps/web/src/styles/navigation.css: ee0f82d921f8425438830f2860162981437063a6e375f036eae3a071b7bab14b
+- apps/web/src/components/HorizontalModuleNavigation.vue: b3d666901b2994ce1b595fe526e7a248f56637c929a60e4b62f4a794d9cff285
+- apps/web/src/components/SidebarNavigation.vue: 74cee71e1614029e887f871ef67f48eb8fb6d9134963aaa4f9393481b8bb740e
+- apps/web/src/components/NavigationIcon.vue: 1514ffe9e58a45f9778cc435bc048fecf00a49aa7042e2c4b430fe3b15cc99f5

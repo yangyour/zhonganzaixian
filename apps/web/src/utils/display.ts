@@ -10,4 +10,10 @@ export const displayValue = (value: unknown) => value === null || value === unde
 /** Contract-fixed business.timezone (04 registry), not the browser timezone or a selected report period. */
 export const businessTimeZone = 'Asia/Shanghai' as const
 export const displayTime = (value?: string | null) => value ? new Date(value).toLocaleString('zh-CN', { timeZone: businessTimeZone, hour12: false }) : '—'
+const compactFormat = new Intl.DateTimeFormat('zh-CN', { timeZone: businessTimeZone, month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+const clockFormat = new Intl.DateTimeFormat('zh-CN', { timeZone: businessTimeZone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+/** Dense table cells: "10/23 13:35" in the contract business time zone; the full value stays in displayTime. */
+export const compactTime = (value?: string | null) => { if (!value) return '—'; const date = new Date(value); return Number.isFinite(date.getTime()) ? compactFormat.format(date) : '—' }
+/** Axis ticks: "13:35" in the contract business time zone. */
+export const clockTime = (value?: string | number | null) => { if (value === null || value === undefined || value === '') return '—'; const date = new Date(value); return Number.isFinite(date.getTime()) ? clockFormat.format(date) : '—' }
 export const sourceLabel = (source: string) => ({ test_seed: '测试预置 · 未采集', manual: '手动草稿 · 未采集', manual_draft: '人工草稿 · 未采集', fixture: '测试夹具 · 未采集' } as Record<string, string>)[source] || source

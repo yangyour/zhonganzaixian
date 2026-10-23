@@ -8,6 +8,7 @@ import'../src/styles/prototype.css'
 import'../src/styles/compact-workspaces.css'
 import'../src/styles/workspace.css'
 import'../src/styles/controls.css'
+import'../src/styles/theme.css'
 import Page from'../src/pages/MonitoringOnboardingPage.vue'
 import{session,contextGeneration}from'../src/stores/session'
 session.value={user:{id:'55000000-0000-4000-8000-000000000002',role:'padmin',display_name:'Synthetic'},tenant:{id:'55000000-0000-4000-8000-000000000001',name:'Synthetic'},allowed_tenants:[],capabilities:['assets:read','configurations:read','configurations:write'],permission_version:1,csrf_token:'SYNTHETIC_NOT_CREDENTIAL',mode:'remote_test',identity_source:'project_local'}

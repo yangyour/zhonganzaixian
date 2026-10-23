@@ -1,0 +1,13 @@
+package cn.mop.api;
+import org.junit.jupiter.api.Test;
+import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
+class MonitoringTargetSignalTest {
+    Map<String,Object> result(String preset,String value,int age){var t=MonitoringScrapeObservationTest.target(preset,true);return MonitoringTargetSignal.evaluate(MonitoringScrapeObservationTest.bytes(MonitoringScrapeObservationTest.response(t,value,MonitoringScrapeObservationTest.seconds(MonitoringScrapeObservationTest.NOW.minusSeconds(age)))),t,MonitoringScrapeObservationTest.NOW,MonitoringScrapeObservationTest.NOW,60,300);}
+    @Test void declaredServiceSignalsDistinguishZeroFromScrapeSuccess(){for(String preset:List.of("postgresql","mysql","redis","http-service","tcp-service","icmp-device")){assertEquals("SIGNAL_FAILURE",result(preset,"0",5).get("status"));assertEquals("SIGNAL_SUCCESS",result(preset,"1",5).get("status"));assertEquals(false,result(preset,"1",5).get("health_verified"));}}
+    @Test void staleSignalNeverKeepsSuccessfulValue(){var r=result("redis","1",61);assertEquals("STALE",r.get("status"));assertNull(r.get("value"));}
+    @Test void missingSignalNeverBecomesSuccessful(){var t=MonitoringScrapeObservationTest.target("redis",true);var body=MonitoringScrapeObservationTest.response(t,"1",MonitoringScrapeObservationTest.seconds(MonitoringScrapeObservationTest.NOW));MonitoringScrapeObservationTest.rows(body).removeAll();var r=MonitoringTargetSignal.evaluate(MonitoringScrapeObservationTest.bytes(body),t,MonitoringScrapeObservationTest.NOW,MonitoringScrapeObservationTest.NOW,60,300);assertEquals("NO_DATA",r.get("status"));assertNull(r.get("value"));}
+    @Test void invalidSignalDoesNotLeakOrBecomeZero(){for(String value:List.of("NaN","2","-1","secret")){var r=result("mysql",value,5);assertEquals("INVALID_RESPONSE",r.get("status"));assertNull(r.get("value"));}}
+    @Test void unsupportedPresetDoesNotGuessMetric(){assertEquals("NOT_SUPPORTED",result("linux-node","1",0).get("status"));assertThrows(IllegalArgumentException.class,()->MonitoringTargetSignal.query(MonitoringScrapeObservationTest.target("linux-node",true)));}
+    @Test void queryOnlyAcceptsCatalogDeclaredMetric(){var t=MonitoringScrapeObservationTest.target("redis",true);String query=MonitoringTargetSignal.query(t);assertTrue(query.contains("timestamp(redis_up{"));assertTrue(query.contains("mop_tenant_id=\""+t.tenantId()+"\""));assertThrows(IllegalArgumentException.class,()->MonitoringScrapeObservationService.queryMetric(t,"arbitrary_metric"));}
+}

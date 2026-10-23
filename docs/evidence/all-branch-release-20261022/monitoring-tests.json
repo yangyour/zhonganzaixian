@@ -1,0 +1,43 @@
+{
+  "status": "PASSED",
+  "python": "3.14.4",
+  "tests": 85,
+  "executed": 84,
+  "skipped": 1,
+  "failures": 0,
+  "errors": 0,
+  "skipped_cases": [
+    {
+      "name": "test_continuous_scrapes_dynamic_target_and_failure_recovery (test_monitoring_prometheus_loopback.PrometheusLoopback.test_continuous_scrapes_dynamic_target_and_failure_recovery)",
+      "reason": "official Prometheus binary not explicitly configured"
+    }
+  ],
+  "failed_cases": [],
+  "official_prometheus_started": false,
+  "business_database_accessed": false,
+  "external_devices_probed": false,
+  "verified_at": "2026-10-23T00:26:13.569868+00:00",
+  "source_commit": "86713696932e476cbc6eb00c1e007895ff20a11a",
+  "file_sha256": {
+    "tools/monitoring_presets.py": "ce1b5c2402fd39b9cc6eb72348c5850abe10a7421811e0d5ffb3a8e79f6bdd98",
+    "tools/monitoring_inventory.py": "c8b0ce9fd511c65fc794be5f79900b826c3ae48318c4b0d9cefef8546886937d",
+    "tools/monitoring_file_sd.py": "cba11d860271071cff34f943de11b4073d2fe2941233f8e993e28619adc848a7",
+    "tools/test_monitoring_presets.py": "fd8bbafdae990908faea3468ab2a946b6f7b97159833489d3a1e54abd797dc01",
+    "tools/test_monitoring_inventory.py": "ce5a643a264af4e0b07d36ff05800ed98d4c19c394d155b84fc9fd26c9b1b3e6",
+    "tools/test_monitoring_file_sd.py": "092e1f216aa80873d85a3d653970a6420a6a24cc856476718fe73ea36d2a60e6",
+    "tools/test_monitoring_prometheus_loopback.py": "4925154453764fa142b890e6890fc1af79b48d5daebdce0400dfe185462d52e5",
+    "config/monitoring/presets.v1.json": "bc2ba6e9a49e658c31ac2582d9f7e1595c1c94e43303e47074806f5ee1589346",
+    "deploy/examples/monitoring/targets.disabled.json": "0030b98412bdf8a81fe099b21f2779d54f3ce1362498a248310a9499963b48ec",
+    "deploy/examples/monitoring/inventory.disabled.json": "2d7627e1963905cff359d04cd0f6923e0f86243fe4b36ec0ff8c5db2bf5a0e35",
+    "fixtures/monitoring-onboarding-golden.json": "be6f481eeeb465b5a90527604ea800e06a54066cc1c508587ac6e50ad60b5b2b",
+    "fixtures/monitoring-inventory-golden.json": "18fb60e4ccfdfaddac5603c1b73f7966f1505b8669826e7105575d539c746298"
+  },
+  "scratch_directory": "/opt/mop-lan-test/private/unit-monitoring-d27167efb2334061a7185a9cb7910606",
+  "credentials_recorded": false,
+  "windows_attempt": {
+    "tests": 85,
+    "errors": 4,
+    "skipped": 1,
+    "reason": "Two symlink privilege errors and two missing POSIX sh errors; original private log retained"
+  }
+}

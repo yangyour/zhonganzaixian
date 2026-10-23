@@ -1,0 +1,165 @@
+{
+  "status": "PASSED",
+  "verified_at": "2026-10-23T00:30:29.996681+00:00",
+  "source_commit": "86713696932e476cbc6eb00c1e007895ff20a11a",
+  "applications": [
+    {
+      "name": "mop-lan-api",
+      "source_commit": "86713696932e476cbc6eb00c1e007895ff20a11a",
+      "running": true,
+      "restart_count": 0
+    },
+    {
+      "name": "mop-lan-web",
+      "source_commit": "86713696932e476cbc6eb00c1e007895ff20a11a",
+      "running": true,
+      "restart_count": 0
+    },
+    {
+      "name": "mop-lan-photo-worker",
+      "source_commit": "86713696932e476cbc6eb00c1e007895ff20a11a",
+      "running": true,
+      "restart_count": 0
+    },
+    {
+      "name": "mop-lan-import-worker",
+      "source_commit": "86713696932e476cbc6eb00c1e007895ff20a11a",
+      "running": true,
+      "restart_count": 0
+    },
+    {
+      "name": "mop-lan-contact-worker",
+      "source_commit": "86713696932e476cbc6eb00c1e007895ff20a11a",
+      "running": true,
+      "restart_count": 0
+    },
+    {
+      "name": "mop-lan-export-preparation-worker",
+      "source_commit": "86713696932e476cbc6eb00c1e007895ff20a11a",
+      "running": true,
+      "restart_count": 0
+    },
+    {
+      "name": "mop-lan-af-collector",
+      "source_commit": "86713696932e476cbc6eb00c1e007895ff20a11a",
+      "running": true,
+      "restart_count": 0
+    }
+  ],
+  "preset_catalogue_version": 1,
+  "preset_validation": {
+    "valid": true,
+    "target_count": 13,
+    "configuration_sha256": "3c37a16bfd2c615e44265488d23c41f1f1da3a3d2abe36e6a7037bd20d8242f2",
+    "network_accessed": false
+  },
+  "inventory_plan": {
+    "valid": true,
+    "diagnostics": [],
+    "configuration_sha256": "da92fe8cbebd7479ccfaed1ff162ebb949e6b22e9aef9c2b6f1c1115ea5719ca",
+    "catalog_sha256": "bc2ba6e9a49e658c31ac2582d9f7e1595c1c94e43303e47074806f5ee1589346",
+    "target_count": 15,
+    "asset_count": 3,
+    "network_accessed": false,
+    "applied": false,
+    "continuous_collection_verified": false,
+    "asset_identity_verified": false,
+    "requirements": [
+      {
+        "preset_id": "containers",
+        "documentation_url": "https://prometheus.io/docs/guides/cadvisor/",
+        "state": "NOT_CHECKED",
+        "test_kind": "metrics"
+      },
+      {
+        "preset_id": "http-service",
+        "documentation_url": "https://prometheus.io/docs/guides/multi-target-exporter/",
+        "state": "NOT_CHECKED",
+        "test_kind": "blackbox"
+      },
+      {
+        "preset_id": "icmp-device",
+        "documentation_url": "https://github.com/prometheus/blackbox_exporter",
+        "state": "NOT_CHECKED",
+        "test_kind": "blackbox"
+      },
+      {
+        "preset_id": "linux-node",
+        "documentation_url": "https://prometheus.io/docs/guides/node-exporter/",
+        "state": "NOT_CHECKED",
+        "test_kind": "metrics"
+      },
+      {
+        "preset_id": "mysql",
+        "documentation_url": "https://github.com/prometheus/mysqld_exporter",
+        "state": "NOT_CHECKED",
+        "test_kind": "metrics"
+      },
+      {
+        "preset_id": "network-snmp",
+        "documentation_url": "https://github.com/prometheus/snmp_exporter",
+        "state": "NOT_CHECKED",
+        "test_kind": "snmp"
+      },
+      {
+        "preset_id": "postgresql",
+        "documentation_url": "https://github.com/prometheus-community/postgres_exporter",
+        "state": "NOT_CHECKED",
+        "test_kind": "metrics"
+      },
+      {
+        "preset_id": "redis",
+        "documentation_url": "https://github.com/oliver006/redis_exporter",
+        "state": "NOT_CHECKED",
+        "test_kind": "metrics"
+      },
+      {
+        "preset_id": "tcp-service",
+        "documentation_url": "https://github.com/prometheus/blackbox_exporter",
+        "state": "NOT_CHECKED",
+        "test_kind": "blackbox"
+      },
+      {
+        "preset_id": "windows-exporter",
+        "documentation_url": "https://github.com/prometheus-community/windows_exporter",
+        "state": "NOT_CHECKED",
+        "test_kind": "metrics"
+      },
+      {
+        "preset_id": "zabbix-linux",
+        "documentation_url": "https://www.zabbix.com/integrations/linux",
+        "state": "NOT_CHECKED",
+        "test_kind": "tcp"
+      },
+      {
+        "preset_id": "zabbix-snmp",
+        "documentation_url": "https://www.zabbix.com/documentation/7.0/en/manual/config/templates_out_of_the_box",
+        "state": "NOT_CHECKED",
+        "test_kind": "configuration_only"
+      },
+      {
+        "preset_id": "zabbix-windows",
+        "documentation_url": "https://www.zabbix.com/integrations/windows",
+        "state": "NOT_CHECKED",
+        "test_kind": "tcp"
+      }
+    ]
+  },
+  "file_discovery_summary": {
+    "version": 1,
+    "configuration_sha256": "3c37a16bfd2c615e44265488d23c41f1f1da3a3d2abe36e6a7037bd20d8242f2",
+    "prometheus_config_sha256": "075b0ea9fd608ad425425cced6dcb403d34262ec6a036fad4e608566ad3beafe",
+    "file_sd_sha256": {},
+    "enabled_prometheus_target_count": 0,
+    "job_count": 0,
+    "refresh_seconds": 30,
+    "network_accessed": false,
+    "applied": false,
+    "continuous_collection_verified": false
+  },
+  "active_pointer_matches": true,
+  "collectors_started": false,
+  "device_probes_performed": false,
+  "configuration_applied": false,
+  "credentials_recorded": false
+}

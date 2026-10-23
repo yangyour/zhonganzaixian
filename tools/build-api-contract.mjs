@@ -979,6 +979,16 @@ addMonitoringPlanningContract(contract);
 addMonitoringObservationContract(contract);
 addMonitoringServiceObservationContract(contract);
 contract.info.version = '0.83.0';
+contract['x-mop-secure-session-transport'] = {
+  enabled_by: 'mop.security.require-https=true',
+  default_enabled: false,
+  scope: 'DIRECT_TLS_ONLY',
+  plaintext_response: { status: 400, code: 'HTTPS_REQUIRED', schema: ref('Error') },
+  plaintext_exception: 'Credential-free loopback GET/HEAD /health/live or /health/ready only',
+  forwarded_headers_trusted: false,
+  session_cookie: 'MOP_SESSION; Secure; HttpOnly; SameSite=Strict; Path=/; host-only; non-persistent',
+  production_activation: false
+};
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

@@ -39,7 +39,7 @@ public class ProjectIdentityController {
         var a=access(request,null);var body=body(bytes,Set.of("expected_version","current_password","new_password"));
         Object result=command(a,body,request,null,()->{},()->accounts.changePassword(a,version(body),secret(body,"current_password"),secret(body,"new_password")));
         if(request.getSession(false)!=null)request.getSession(false).invalidate();SecurityContextHolder.clearContext();
-        var cookie=new Cookie("MOP_SESSION","");cookie.setPath("/");cookie.setHttpOnly(true);cookie.setMaxAge(0);cookie.setAttribute("SameSite","Strict");response.addCookie(cookie);
+        ProjectSessionCookie.expire(request, response);
         return success(result,request);
     }
     @GetMapping("/api/v1/identity/users") Object users(@RequestParam(defaultValue="") String query,@RequestParam(defaultValue="true") boolean include_inactive,@RequestParam(defaultValue="1") int page,HttpServletRequest request){

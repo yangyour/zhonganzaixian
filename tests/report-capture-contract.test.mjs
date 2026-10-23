@@ -55,3 +55,19 @@ test('pending ticket facts preserve unknown counts and exclude terminal rows', (
   assert.equal(route['x-mop-customer-scope'], 'REPORTER_ONLY');
   assert.equal(route['x-mop-snapshot-isolation'], 'REPEATABLE_READ');
 });
+
+test('SLA V2 remains additive and unknown SLA cannot become a complete zero count', () => {
+  const validate = ajv.getSchema('urn:mop:report-capture#/components/schemas/DashboardPendingTicketSla');
+  const sample = { tenant_id: '20000000-0000-4000-8000-000000000002', actor_id: '10000000-0000-4000-8000-000000000001',
+    permission_version: 1, observed_at: '2026-10-23T08:00:00Z', scope: 'REPORTER_ONLY', source: 'postgresql',
+    projection_version: 'MOP_PENDING_TICKETS_SLA_V2', registrations: 1, known_pending: 0, terminal: 0, unconfigured: 1,
+    pending_tickets: null, overdue_sla: null, known_overdue: 0, unknown_sla: 1, evaluated_pending: 0, unevaluated_pending: 0,
+    evaluation_limit: 100, unavailable_reasons: ['REGISTRATIONS_WITHOUT_WORKFLOW'], item_limit: 5,
+    sort: 'REGISTRATION_CREATED_AT_DESC_ID_DESC', writes_performed: false, items: [] };
+  assert.equal(validate(sample), true);
+  assert.equal(validate({ ...sample, overdue_sla: 0 }), false);
+  assert.equal(validate({ ...sample, pending_tickets: 0 }), false);
+  assert.equal(validate({ ...sample, evaluation_limit: 10000 }), false);
+  assert.equal(contract.components.schemas.DashboardPendingTickets.properties.overdue_sla.type, 'null');
+  assert.equal(contract.paths['/dashboard/pending-tickets/sla'].get['x-mop-snapshot-isolation'], 'REPEATABLE_READ');
+});

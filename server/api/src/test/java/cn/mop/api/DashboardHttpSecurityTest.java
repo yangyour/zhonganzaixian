@@ -49,6 +49,15 @@ class DashboardHttpSecurityTest {
                 cn.mop.domain.dashboard.DashboardPendingTicketsReader pendingReader) {
             return new DashboardPendingTicketsController(repository, pendingReader);
         }
+        @Bean
+        cn.mop.domain.dashboard.DashboardPendingTicketSlaReader slaReader() {
+            return mock(cn.mop.domain.dashboard.DashboardPendingTicketSlaReader.class);
+        }
+        @Bean
+        DashboardPendingTicketSlaController slaController(PlatformRepository repository,
+                cn.mop.domain.dashboard.DashboardPendingTicketSlaReader slaReader) {
+            return new DashboardPendingTicketSlaController(repository, slaReader);
+        }
         @Override public void configureMessageConverters(List<HttpMessageConverter<?>> converters){converters.add(new MappingJackson2HttpMessageConverter(mapper()));}
     }
     @Autowired WebApplicationContext context;
@@ -56,6 +65,8 @@ class DashboardHttpSecurityTest {
     @Autowired DashboardAvailabilityReader reader;
     @Autowired
     cn.mop.domain.dashboard.DashboardPendingTicketsReader pendingReader;
+    @Autowired
+    cn.mop.domain.dashboard.DashboardPendingTicketSlaReader slaReader;
     private MockMvc mvc;
     @BeforeEach void setup(){reset(repository,reader);mvc=webAppContextSetup(context).apply(springSecurity()).build();when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"viewer",7,true)));when(reader.read(any(),any())).thenAnswer(c->DashboardControllerTest.snapshot(c.getArgument(0),c.getArgument(1)));}
     private MockHttpServletRequestBuilder scoped(MockHttpServletRequestBuilder builder){var session=new MockHttpSession(context.getServletContext());session.setAttribute("mop.tenant_id",TENANT);return builder.session(session).with(user(ACTOR));}
@@ -72,6 +83,21 @@ class DashboardHttpSecurityTest {
         mvc.perform(get("/api/v1/dashboard/pending-tickets")).andExpect(status().isUnauthorized());
         mvc.perform(scoped(post("/api/v1/dashboard/pending-tickets")).with(csrf().asHeader()))
                 .andExpect(status().isMethodNotAllowed());
+    }
+    @Test
+    void slaV2RequiresSessionUsesNoStoreAndCannotMutateOrOverrideScope() throws Exception {
+        var base = new cn.mop.domain.dashboard.DashboardPendingTicketsReader.Snapshot(
+                UUID.fromString(TENANT), UUID.fromString(ACTOR), 7, DashboardControllerTest.TIME,
+                "REPORTER_ONLY", 0, 0, 0, 0, List.of());
+        when(slaReader.read(any())).thenReturn(new cn.mop.domain.dashboard.DashboardPendingTicketSlaReader.Snapshot(
+                base, 0, 0, 0, List.of()));
+        String path = "/api/v1/dashboard/pending-tickets/sla";
+        mvc.perform(scoped(get(path))).andExpect(status().isOk()).andExpect(header().string("Cache-Control", "no-store"))
+                .andExpect(jsonPath("$.data.projection_version").value("MOP_PENDING_TICKETS_SLA_V2"))
+                .andExpect(jsonPath("$.data.overdue_sla").value(0));
+        mvc.perform(get(path)).andExpect(status().isUnauthorized());
+        mvc.perform(scoped(get(path).param("tenant_id", TENANT))).andExpect(status().isBadRequest());
+        mvc.perform(scoped(post(path)).with(csrf().asHeader())).andExpect(status().isMethodNotAllowed());
     }
     @Test void getNeedsNoCsrfAndPreservesNullsWithNoStore()throws Exception{
         mvc.perform(scoped(get("/api/v1/dashboard"))).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store")).andExpect(jsonPath("$.trace_id").isString()).andExpect(jsonPath("$.data.tenant_id").value(TENANT)).andExpect(jsonPath("$.data.kpis[0].value").value(nullValue())).andExpect(jsonPath("$.data.panels[0].items").value(nullValue())).andExpect(jsonPath("$.data.metric_samples_loaded").value(false));

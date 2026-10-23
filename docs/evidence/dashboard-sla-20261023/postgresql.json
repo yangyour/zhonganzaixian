@@ -1,0 +1,23 @@
+{
+  "environment": "lan-test-20261008",
+  "schema_migrations": 0,
+  "actual_tenant_written": false,
+  "new_local_components": 0,
+  "external_messages": 0,
+  "test_tenants": [
+    "39fe0fc6-9605-4fcc-90e1-0a07886e49cf",
+    "b6bc9f83-5490-43b3-a351-e16191f2aa98"
+  ],
+  "test_actor": "2239aacf-ac2d-42f6-8630-c6b35c166e28",
+  "formal_contract_acceptance": "NOT_RUN",
+  "status": "PASSED",
+  "suite": "dashboard-sla",
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "schema_latest": "50",
+  "maven_exit_code": 0,
+  "actual_tenant_fingerprints_unchanged": true,
+  "migration_history_unchanged": true,
+  "test_principal_deactivated": true,
+  "test_viewers_deactivated": 2,
+  "finished_at": "2026-10-23T15:17:27.713420+00:00"
+}

@@ -42997,6 +42997,73 @@
         }
       }
     },
+    "/dashboard/pending-tickets/sla": {
+      "get": {
+        "operationId": "readDashboardPendingTicketSla",
+        "summary": "同快照服务端SLA状态、剩余服务时段预算及完整/未知的超时数量；V1不变",
+        "x-mop-capabilities": [
+          "dashboard:read",
+          "tickets:read"
+        ],
+        "x-mop-read-only": true,
+        "x-mop-allowed-query-keys": [],
+        "x-mop-customer-scope": "REPORTER_ONLY",
+        "x-mop-snapshot-isolation": "REPEATABLE_READ",
+        "responses": {
+          "200": {
+            "description": "Versioned V2 projection; no browser time calculation or unknown-to-zero conversion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardPendingTicketSlaResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid scope, permission, workflow state or dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid scope, permission, workflow state or dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid scope, permission, workflow state or dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid scope, permission, workflow state or dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-technical-evaluation-limit": 100
+      }
+    },
     "/demo/examples/{page}": {
       "get": {
         "operationId": "readExplicitDemoPageExample",
@@ -86935,6 +87002,529 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/DashboardPendingTickets"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "DashboardPendingTicketSla": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "permission_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "scope": {
+            "enum": [
+              "CURRENT_TENANT_INTERNAL",
+              "REPORTER_ONLY"
+            ]
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "projection_version": {
+            "const": "MOP_PENDING_TICKETS_SLA_V2"
+          },
+          "registrations": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "known_pending": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "terminal": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "unconfigured": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "pending_tickets": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "overdue_sla": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "known_overdue": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "unknown_sla": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "evaluated_pending": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "unevaluated_pending": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "evaluation_limit": {
+            "const": 100
+          },
+          "unavailable_reasons": {
+            "type": "array",
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "REGISTRATIONS_WITHOUT_WORKFLOW",
+                "SLA_INPUTS_OR_READER_UNAVAILABLE",
+                "EVALUATION_LIMIT_EXCEEDED"
+              ]
+            }
+          },
+          "item_limit": {
+            "const": 5
+          },
+          "sort": {
+            "const": "REGISTRATION_CREATED_AT_DESC_ID_DESC"
+          },
+          "writes_performed": {
+            "const": false
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "type": "object",
+              "properties": {
+                "ticket_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "receipt_no": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "registered_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "workflow_model": {
+                  "enum": [
+                    "WORKFLOW_V33",
+                    "LIFECYCLE_V42"
+                  ]
+                },
+                "state": {
+                  "type": "string"
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740990
+                },
+                "priority": {
+                  "enum": [
+                    null,
+                    "P1",
+                    "P2",
+                    "P3"
+                  ]
+                },
+                "frozen_service_tier": {
+                  "enum": [
+                    null,
+                    "BASIC",
+                    "STANDARD",
+                    "ADVANCED"
+                  ]
+                },
+                "sla_metric_version": {
+                  "enum": [
+                    null,
+                    "SLA_CLOCK_V2",
+                    "LIFECYCLE_SLA_CLOCK_V1"
+                  ]
+                },
+                "sla_version": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740990
+                },
+                "overdue": {
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "response_clock": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "RUNNING",
+                        "PENDING_CONFIG",
+                        "CONFIG_PENDING",
+                        "BREACHED",
+                        "MET",
+                        "PAUSED_FOR_CUSTOMER_CONFIRM",
+                        "PAUSED",
+                        "COMPLETED",
+                        "CANCELLED"
+                      ]
+                    },
+                    "breached": {
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "missing_reason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "deadline_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "completed_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "remaining_millis": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740990
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "remaining_basis": {
+                      "enum": [
+                        null,
+                        "FROZEN_SERVICE_WINDOWS",
+                        "EXPLICIT_BUDGET_MINUS_ELAPSED"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "breached",
+                    "missing_reason",
+                    "deadline_at",
+                    "completed_at",
+                    "remaining_millis",
+                    "remaining_basis"
+                  ],
+                  "additionalProperties": false
+                },
+                "recovery_clock": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "RUNNING",
+                        "PENDING_CONFIG",
+                        "CONFIG_PENDING",
+                        "BREACHED",
+                        "MET",
+                        "PAUSED_FOR_CUSTOMER_CONFIRM",
+                        "PAUSED",
+                        "COMPLETED",
+                        "CANCELLED"
+                      ]
+                    },
+                    "breached": {
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "missing_reason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "deadline_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "completed_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "remaining_millis": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740990
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "remaining_basis": {
+                      "enum": [
+                        null,
+                        "FROZEN_SERVICE_WINDOWS",
+                        "EXPLICIT_BUDGET_MINUS_ELAPSED"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "breached",
+                    "missing_reason",
+                    "deadline_at",
+                    "completed_at",
+                    "remaining_millis",
+                    "remaining_basis"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "ticket_id",
+                "receipt_no",
+                "title",
+                "registered_at",
+                "workflow_model",
+                "state",
+                "version",
+                "priority",
+                "frozen_service_tier",
+                "sla_metric_version",
+                "sla_version",
+                "overdue",
+                "response_clock",
+                "recovery_clock"
+              ],
+              "additionalProperties": false,
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "workflow_model": {
+                        "const": "WORKFLOW_V33"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "state": {
+                        "enum": [
+                          "OPEN",
+                          "ACCEPTED",
+                          "IN_PROGRESS",
+                          "RESOLVED"
+                        ]
+                      }
+                    }
+                  },
+                  "else": {
+                    "properties": {
+                      "state": {
+                        "enum": [
+                          "NEW",
+                          "IN_PROGRESS",
+                          "WAITING_VENDOR",
+                          "PENDING_CUSTOMER",
+                          "RESOLVED",
+                          "REOPENED"
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "tenant_id",
+          "actor_id",
+          "permission_version",
+          "observed_at",
+          "scope",
+          "source",
+          "projection_version",
+          "registrations",
+          "known_pending",
+          "terminal",
+          "unconfigured",
+          "pending_tickets",
+          "overdue_sla",
+          "known_overdue",
+          "unknown_sla",
+          "evaluated_pending",
+          "unevaluated_pending",
+          "evaluation_limit",
+          "unavailable_reasons",
+          "item_limit",
+          "sort",
+          "writes_performed",
+          "items"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "unknown_sla": {
+                  "const": 0
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "overdue_sla": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740990
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "overdue_sla": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "unconfigured": {
+                  "const": 0
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "pending_tickets": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740990
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "pending_tickets": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "DashboardPendingTicketSlaResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DashboardPendingTicketSla"
           },
           "trace_id": {
             "type": "string"

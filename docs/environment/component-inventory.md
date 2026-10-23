@@ -470,6 +470,8 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 
 新增只读生产预检查工具，复用已登记业务入口，不创建替代组件。2026-10-23 06:56 UTC真实TLS证书校验失败，HTTP未满足永久同源HTTPS跳转；影响为无法经可信HTTPS核对生产依赖／会话属性，后续HTTPS检查NOT_RUN。正式TLS资源／信任链和数据库隔离批准仍待客户；候选为现有代理的获批证书配置，未获批、未实施。没有安装／停止服务、迁移、业务写入；本轮未重新盘点组件版本。见[运行与验证说明](../production-preflight.md)及[证据](../evidence/production-preflight-20261023/public-entry.json)。
 
+附件扫描：现有登记未提供本轮可核验的获批扫描端点、版本、签名新鲜度和扫描策略；状态UNVERIFIED_NOT_ENABLED。影响为不能执行真实附件扫描／隔离发布验收。候选ClamD的有界流式适配代码已具备13项纯协议测试，不表示已批准ClamAV、已发现服务或已完成联调。未探测扫描端口、未安装或启动替代组件、未提交实际附件。未来优先盘点指定服务器已有能力，确认受控访问和隔离权限后接入；[接口和缺口](../attachment-scan-adapter.md)。
+
 # 2026-10-15 前端验收规范复用盘点
 
 通过既有固定主机密钥SSH只读盘点指定LAN测试环境：14个项目服务运行，PostgreSQL17.9、Nginx1.31.6、Redis7.4.9、RabbitMQ4.3.2、MinIO RELEASE.2025-09-07T16-13-09Z、Zabbix7.0.31。API ready=true、production_ready=false。本轮本地前端经回环预览访问既有项目API；无新增组件、迁移、服务生命周期或全局配置变更。组件在线不表示业务/生产验收。见[盘点证据](../evidence/frontend-acceptance-20261015/components.json)。

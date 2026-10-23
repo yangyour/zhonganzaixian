@@ -68,3 +68,62 @@
 
 - 已有资产基础台账、手工资料历史、依赖草稿与导出准备/发布/本人下载；A01回执可定位真实资产。
 - 后续核对缺失字段投影/来源标签、已录入资料与台账导出的一致性及权限恢复；未知Proxy/负责人不补造。未将已有导出接口等同全部合同闭环。
+
+## 用户停止开发后的收尾记录（2026-10-23）
+
+用户最新要求“结束现有开发，整理现有进度并提交，剩余的部分都总结到一个文档”。本线已停止新增开发，只保留验证过的提交及未完成工作；总剩余单文档由集成会话汇总。本节覆盖上文继续推进的安排，不再自动继续。
+
+### 已提交和已验证
+
+- `08a3a47c`：A01真实执行页面、创建者回执GET、同键同体恢复、停止等待与刷新恢复、逐行资产详情接线。已推送，已包含在main。
+- `494400cf`：以当时最新main `47b32aae` 正常合并A01。
+- `a8ec4523`：A01集成证据及未完成边界记录，已推送main和资产分支。停止时再次fetch并验证 `08a3a47c` 是 `origin/main` 的祖先；未另抢集成锁。
+- 验证：完整Web 4983项通过；首次完整Java执行3239/跳过1041；同步及清理输出后的main集成执行3253/跳过1049、零失败，106项资产专项、200项契约、类型检查及生产构建通过。真实指定PG17.9/MinIO/解析Worker：3个CSV产生6条资产，同键重放/整页刷新恢复无重复，7项真实HTTP授权边界，1440/1024桌面检查及新增区域axe零问题。
+- 证据：`docs/evidence/assets-a01-ui-20261023/{browser-http.json,cleanup.json,validation.json}`及同目录截图；运行说明 `docs/assets-a01-execution-ui-20261023.md`。正式TC、全部A01及128项整体均未核销。
+
+### A05未验证工作保存位置
+
+最新完整命名stash：`assets-stop-A05-unverified-20261023`，对象 **`1c26740136a7b3bea1a595ebe8dce7a69ebce1a1`**，基于本分支 `a8ec4523`。包含17个文件的已跟踪差异及新增文件，未提交为可发布代码。旧中间stash保留作备份，恢复以本收尾对象为准。
+
+已写但未交付的内容：公开字段白名单读取端口/PG仓储/API、站点名称/登记负责人/业务说明的来源和版本校验、资产台账及详情接线、取消/重读/旧版本不混合展示，以及隔离验证工具的A05输入。Java定向11项通过；Web先前69项及后续29项定向通过。最后加入的来源绑定校验/取消焦点断言及当前最终组合尚未完整复验，**未执行A05指定PG/HTTP/浏览器验证，也没有整体A05完成证据**。停止指示后没有启动A05测试环境。
+
+保存的文件：
+
+- `apps/web/src/pages/AssetsPage.vue`
+- `apps/web/src/utils/assetLedgerColumns.ts`
+- `apps/web/src/utils/assetLedgerFacts.ts`
+- `apps/web/tests/assetLedgerColumns.test.ts`
+- `apps/web/tests/assetLedgerFacts.test.ts`
+- `apps/web/tests/assetsLedgerFactsPage.test.ts`
+- `apps/web/tests/assetsPageFeedback.test.ts`
+- `contracts/local-api.openapi.json`
+- `server/api/src/main/java/cn/mop/api/AssetLedgerFactsConfiguration.java`
+- `server/api/src/main/java/cn/mop/api/AssetLedgerFactsController.java`
+- `server/api/src/test/java/cn/mop/api/AssetLedgerFactsControllerTest.java`
+- `server/api/src/test/java/cn/mop/persistence/PostgresAssetLedgerFactsRepositoryTest.java`
+- `server/domain/src/main/java/cn/mop/domain/assetmetadata/AssetLedgerFactsRepository.java`
+- `server/persistence/src/main/java/cn/mop/persistence/PostgresAssetLedgerFactsRepository.java`
+- `tools/asset-ledger-facts-contract.mjs`
+- `tools/build-api-contract.mjs`
+- `tools/cmdb-import-live-session.py`
+
+后续得到继续指示时，在 `E:\work\wxw9\zhonganzaixian\.parallel\launch-20261023\assets` 核对origin、功能分支及干净工作树，正常同步上游，再执行 `git stash apply 1c26740136a7b3bea1a595ebe8dce7a69ebce1a1`，处理可能的上游冲突；不使用reset或强推，不自动应用旧中间stash。测试日志在该检出的Git忽略 `.local-a05-*.log`。已清理本检出API及依赖的Maven target，避免未验证的A05编译类残留进入后续工件；恢复后必须重新构建和验证。
+
+### 供总剩余文档汇总的逐ID边界
+
+|ID|仍可独立开发/验证|客户或外部启用依赖|
+|---|---|---|
+|A01|全扩展属性结构化和可信关联；正式异步operation与错误回执文件；500行60秒、并发和进程故障验证；监控纳管由监控线衔接。页面与原请求恢复子项已有证据。|真实首批资产及争议字段/类型映射、权威关联来源、正式配额和客户TC。|
+|A02|申请/审核/开通及失败补偿；主机/Item/NVPS/Worker多维预留释放与计量；实际API、Worker、页面及恢复测试。原设备登记原子配额仅是已有子项。|首批真实租户/管理员/审核人/档位/限额；Q02生产物理隔离、正式资源池/身份源/外部ITSM接入。未决值继续null。|
+|A03|按M2-1/6/7/8/9/10/14逐项核销已有身份、角色、菜单、成员、联系人和档位实现；补邀请/MFA及职责门禁、双主体业务审批、台账缺项和新版真实环境证据。|正式岗位授权、管理员/审批人、组织和身份源规则；商务/客户批准。现有本地身份不等同外部组织接入。|
+|A04|到期定期处理及通知意图；退役/迁移/保留申请审批、状态机和历史；默认关闭的删除执行适配及故障测试。|保留期限、实际删除/设备迁移授权、资源池与执行窗口、通知实际接收人和外发授权。|
+|A05|恢复上述stash并补完整验证；可信详情/台账字段、来源和关联核验；核对导出准备/发布/下载与字段一致性及恢复。Proxy与监控字段只连接权威来源，不填假值。|实际Proxy/业务系统/负责人权威关系、正式导出/保留规则及客户验收。|
+
+A02/A04新增SQL没有分配或执行；通用流程并非因客户值未给而不可开发，本次按用户停止指示留待接续。清单JSON未被本线改写。
+
+### 资源与工作区状态
+
+- 自有候选API、SSH隧道、浏览器已关闭；自有Vite PID5472已按本检出路径与15211端口核验后停止。复查18211/15211均无监听。
+- 三次A01验证的临时测试身份均已禁用；实际租户资产/成员/站点/角色/配置摘要及V50历史不变。没有修改既有DEMO初始化、恢复旧fixture身份、物理删除合成证据或发送外部消息。
+- 本线无持有锁：A01的integration.lock已在完成集成后释放，environment.lock已由验证工具释放；从未取得migration.lock。停止时总会话持有的集成锁、通知线迁移锁均未触碰。
+- A05代码完整保存在本地命名stash；标准工作树清空其在制代码，只提交本进度收尾记录到资产分支。本收尾文档不自行再合main，交由总会话统一整理。

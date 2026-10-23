@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "scope": "local production preview HTTP/static assets only; not browser or authenticated API acceptance",
+  "checks": [
+    {
+      "path": "/customer-topology",
+      "status": 200,
+      "bytes": 854,
+      "sha256": "5154d8016e28d4a4bd3bfc1a3f74f2ffa138ebe72ba240b12ba3db75ffe84139"
+    },
+    {
+      "path": "/assets",
+      "status": 200,
+      "bytes": 854,
+      "sha256": "5154d8016e28d4a4bd3bfc1a3f74f2ffa138ebe72ba240b12ba3db75ffe84139"
+    },
+    {
+      "path": "/network-monitoring",
+      "status": 200,
+      "bytes": 854,
+      "sha256": "5154d8016e28d4a4bd3bfc1a3f74f2ffa138ebe72ba240b12ba3db75ffe84139"
+    },
+    {
+      "path": "/assets/CustomerTopologyPage-DuwYGng_.js",
+      "status": 200,
+      "bytes": 11098,
+      "sha256": "f8faacec84474b0f02e718e0ca098b00adb67dbe0b04c2488a13814708e05bb2"
+    }
+  ],
+  "server_stopped": true
+}

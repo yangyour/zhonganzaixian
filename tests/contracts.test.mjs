@@ -248,8 +248,8 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.82.0');
-  assert.equal(contract.info.version, '0.82.0');
+  assert.equal(contract.info.version, '0.83.0');
+  assert.equal(contract.info.version, '0.83.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -944,7 +944,7 @@ test('补充SLA口径只能绑定明确发布版本，不接收策略或身份�
 
 test('SLA提醒记录不等于路由或送达，读取无业务写入',()=>{const p=contract.paths['/tickets/{ticketId}/sla/reminders'];assert.equal(p.get['x-mop-read-only'],true);assert.equal(p.post,undefined);const s=contract.components.schemas.TicketSlaReminder;assert.equal(s.properties.notification_status.const,'NOT_ROUTED');assert.equal(s.properties.delivered.const,false);assert.deepEqual(s.properties.progress.enum,[0.5,0.8,1]);});
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.82.0');
+  assert.equal(contract.info.version, '0.83.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/workflow/sla'].get;
@@ -1008,7 +1008,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.82.0');
+  assert.equal(contract.info.version, '0.83.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1561,4 +1561,18 @@ test('service observation preserves read-only scope and has no metric override',
   assert.deepEqual(op['x-mop-capabilities'], ['assets:read','configurations:read']);
   assert.deepEqual(op.parameters.map(p => p.name), ['id']);
   assert.equal(op['x-mop-current-membership-recheck'], true);
+});
+
+test('customer topology is bounded read-only current tenant data with version-pinned pagination',()=>{
+ const op=contract.paths['/customer-topology'].get;
+ assert.equal(op['x-mop-capability'],'assets:read');assert.equal(op['x-mop-read-only'],true);assert.equal(op['x-mop-permission-version-recheck'],true);
+ assert.deepEqual(op.parameters.map(p=>p.name),['offset','graph_version','asset_id']);assert.equal(contract.paths['/customer-topology'].post,undefined);
+});
+test('customer topology never labels drafts as verified physical or applied monitoring links',()=>{
+ const value={tenant_id:id('1'),version:0,updated_at:null,source:'postgresql',scope:'CURRENT_TENANT',lifecycle_status:'DRAFT',physical_topology_verified:false,monitoring_applied:false,focus_asset_id:null,offset:0,page_size:50,total_edges:0,has_more:false,nodes:[],edges:[]};
+ assert.equal(validates('CustomerTopology',value),true);
+ for(const patch of [{physical_topology_verified:true},{monitoring_applied:true},{lifecycle_status:'ACTIVE'},{page_size:100},{tenant_id:null},{total_edges:10001}])assert.equal(validates('CustomerTopology',{...value,...patch}),false);
+});
+test('customer topology rejects oversized node and edge payloads',()=>{
+ const schema=contract.components.schemas.CustomerTopology;assert.equal(schema.properties.nodes.maxItems,101);assert.equal(schema.properties.edges.maxItems,50);assert.equal(schema.additionalProperties,false);
 });

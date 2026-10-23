@@ -1,0 +1,63 @@
+{
+  "base_commit": "625e6d263c4d78a68479436b5610ff55f3069b7a",
+  "api_version": "0.83.0",
+  "scope": "current-customer dependency draft view and compact resource navigation",
+  "java": {
+    "tests": 4350,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1042,
+    "executed": 3308
+  },
+  "topology_java_focused": 19,
+  "frontend": {
+    "files": 298,
+    "passed": 4945,
+    "failed": 0,
+    "evidence_layer": "Vitest/jsdom, not real browser"
+  },
+  "node_contracts": {
+    "passed": 207,
+    "failed": 0
+  },
+  "python": {
+    "passed": 248,
+    "skipped": 0,
+    "local_prometheus_fixture": true
+  },
+  "build": {
+    "typecheck": "PASS",
+    "vite": "PASS",
+    "static_release_verification": "PASS",
+    "candidate_security_policy": "PASS",
+    "web_build_id": "8aa0eaca591a975c3376d52861dfbe0cbd371255c8c481358897adf2e7b5a368",
+    "jar_sha256": "7dec37dda7296c6298503340bfdf7b4f795c68ab1375b50928ee18f74c7c81c2",
+    "warning": "existing main chunk exceeds 500 kB advisory; not a runtime performance acceptance"
+  },
+  "not_run": [
+    "real browser/visual/axe: previous browser execution denial not retried",
+    "customer-topology authenticated live PostgreSQL HTTP integration",
+    "LAN deployment and actual customer topology acceptance",
+    "physical network discovery and connection verification"
+  ],
+  "boundaries": {
+    "new_migrations": 0,
+    "business_data_written": false,
+    "demo_account_created": false,
+    "monitoring_activated": false,
+    "deployed": false,
+    "contract_cases_not_run": 128
+  },
+  "initial_failures_resolved": [
+    "DOM navigation test awaited router commit instead of only microtasks",
+    "test Element Plus stub typed using defineComponent",
+    "three existing contract API-version assertions updated from 0.82 to 0.83"
+  ],
+  "source_sha256": {
+    "server/api/src/main/java/cn/mop/api/CustomerTopologyController.java": "3479772de38d874e774e754981b172371ea185b77b39e1080f95cc0fbbf85727",
+    "apps/web/src/pages/CustomerTopologyPage.vue": "f92163a69ec93123474b08ca746d073f3d224e279463c1abf3b1d61a59b494d1",
+    "apps/web/src/utils/customerTopology.ts": "6d15efaaf64103da5a0cf7db0355901d8176b38005ff5b63a8faeffbc37d33e0",
+    "apps/web/src/utils/navigationModules.ts": "74e640541ecd83e4b5993c439d651d85bf75b6082d054cfaf33fdf65b3bf5b76",
+    "contracts/local-api.openapi.json": "12410b3db00853f1d0657a7f3e379ccdb2f8fe6ab665347575f1f7dbbe4c4e64"
+  }
+}

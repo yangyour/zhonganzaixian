@@ -475,6 +475,13 @@ const dependencyDraft = object({
   effective_rules: { type: 'null' }, monitoring_applied: { const: false }, question_ids: { const: ['Q20'] }, source: { const: 'postgresql' },
   technical_limits: object({ max_additions: { const: 100 }, max_graph_edges: { const: 10000 }, max_body_bytes: { const: 131072 } }),
 });
+const customerTopology = object({
+  tenant_id: uuid, version: {type:'integer',minimum:0,maximum:9007199254740991}, updated_at:{...dateTime,type:['string','null']},
+  source:{const:'postgresql'}, scope:{const:'CURRENT_TENANT'}, lifecycle_status:{const:'DRAFT'}, physical_topology_verified:{const:false}, monitoring_applied:{const:false},
+  focus_asset_id:{...uuid,type:['string','null']}, offset:{type:'integer',minimum:0,maximum:10000}, page_size:{const:50}, total_edges:{type:'integer',minimum:0,maximum:10000}, has_more:{type:'boolean'},
+  nodes:{type:'array',maxItems:101,items:object({id:uuid,name:string,type:string,management_ip:string,site_id:uuid})}, edges:{type:'array',maxItems:50,items:dependencyEdge},
+});
+customerTopology['x-mop-cross-field-checks']=['nodes exactly cover paged edge endpoints plus optional focus; all assets freshly authorized in current tenant','offset + edges.length determines has_more; next pages pin graph_version; changed graph returns 409','draft dependency arrows are not verified physical links, monitored health or effective suppression'];
 const dependencyAppend = object({ expected_version: { type: 'integer', minimum: 0, maximum: 9007199254740990, description: '当前完整租户图的CAS版本，不是资产版本；所有引用在同租户且每条新增边须连接路径资产。未知业务元数据明确null。' }, additions: { type: 'array', minItems: 1, maxItems: 100, uniqueItems: true, items: dependencyEdge } });
 const tenantLongMax = '9223372036854775807';
 const tenantLongAlternatives = ['0', '[1-9][0-9]{0,17}', tenantLongMax];
@@ -500,6 +507,7 @@ const contract = {
       post: mutation('createAssetDraft', '创建本租户持久资产草稿；不自动纳管', object({ name: { type: 'string', minLength: 1, maxLength: 100 }, type: { type: 'string', enum: types }, management_ip: string, site_id: string }), ref('AssetResult')),
     },
     '/assets/{id}': { get: action('getAsset', '当前授权与资产详情同一只读快照；不存在及跨租户均404', ref('AssetResult'), { 'x-mop-read-authorization': 'fresh active user/member/permission-version in database snapshot', parameters: [pathId] }) },
+    '/customer-topology': { get: action('readCustomerTopology', '读取当前客户登记依赖拓扑，固定每页50条、关联节点授权回读；不扫描设备、不推断物理连接、不应用监控规则', ref('CustomerTopologyResult'), {parameters:[parameter('offset','query',{type:'integer',minimum:0,maximum:10000,default:0},false),parameter('graph_version','query',{type:'integer',minimum:0,maximum:9007199254740991},false),parameter('asset_id','query',uuid,false)], 'x-mop-capability':'assets:read','x-mop-read-only':true,'x-mop-reject-unknown-query-keys':true,'x-mop-reject-duplicate-query-keys':true,'x-mop-permission-version-recheck':true}) },
     '/assets/{id}/dependencies': {
       get: action('readAssetDependencyDraft', '读取完整租户依赖草稿；路径资产必须同租户可见，读不写入，无监控生效', ref('AssetDependencyDraftResult'), { parameters: [pathId], 'x-mop-capability': 'assets:read', 'x-mop-reject-unknown-query-keys': true }),
       post: mutation('appendAssetDependencyDraft', '租户图CAS、完整图防环及幂等事务追加不可变草稿；不发布抑制规则。JSON<=128KiB/2048tokens/4层，拒绝重复键/尾随值', ref('AssetDependencyAppend'), ref('AssetDependencyDraftResult'), { parameters: [pathId, ...headers], 'x-mop-capability': 'assets:write', 'x-mop-roles': ['padmin', 'msp', 'tadmin'], 'x-mop-permission-version-recheck': true, 'x-mop-reject-unknown-query-keys': true }),
@@ -671,6 +679,7 @@ const contract = {
       Worklog: worklogEntry, WorklogRevision: worklogRevision,
       WorklogCreate: object({ expected_ticket_version: worklogVersion, ...worklogInputFields }), WorklogUpdate: object({ expected_version: worklogVersion, ...worklogInputFields }),
       WorklogResult: envelope(ref('Worklog')), WorklogListResult: envelope(worklogList), WorklogHistoryResult: envelope(worklogHistory),
+      CustomerTopology: customerTopology, CustomerTopologyResult: envelope(ref('CustomerTopology')),
       AssetDependencyEdge: dependencyEdge, AssetDependencyDraft: dependencyDraft, AssetDependencyDraftResult: envelope(ref('AssetDependencyDraft')), AssetDependencyAppend: dependencyAppend,
       TicketRegistration: ticketRegistration,
       TicketRegistrationResult: envelope(ref('TicketRegistration')),
@@ -969,7 +978,7 @@ addMonitoringOnboardingContract(contract);
 addMonitoringPlanningContract(contract);
 addMonitoringObservationContract(contract);
 addMonitoringServiceObservationContract(contract);
-contract.info.version = '0.82.0';
+contract.info.version = '0.83.0';
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

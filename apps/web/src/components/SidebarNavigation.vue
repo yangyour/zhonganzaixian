@@ -9,11 +9,16 @@ const route = useRoute(), router = useRouter()
 </script>
 <template>
   <div class="sidebar-section">
-    <div class="sidebar-section-heading"><span>{{ module.title }}</span><small>{{ module.items.length }} 项功能</small></div>
+    <div class="sidebar-section-heading"><span>{{ module.title }}</span></div>
     <nav class="secondary-navigation" :aria-label="module.title + '功能导航'">
-      <a v-for="item in module.items" :key="item.name" :href="router.resolve({ name: item.name }).href" :data-page="item.name" :aria-label="item.title" :class="{ active: navigationEntryName(route.name) === item.name }" :aria-current="navigationEntryName(route.name) === item.name ? 'page' : undefined" :title="collapsed ? item.title : undefined" @click="navigateFromLink($event, () => emit('navigate', item.name))">
+      <template v-for="(item,index) in module.items" :key="item.name"><div v-if="item.section && item.section !== module.items[index-1]?.section && !collapsed" class="sidebar-group-label">{{ item.section }}</div>
+      <a :href="router.resolve({ name: item.name }).href" :data-page="item.name" :aria-label="item.title" :class="{ active: navigationEntryName(route.name) === item.name }" :aria-current="navigationEntryName(route.name) === item.name ? 'page' : undefined" :title="collapsed ? item.title : undefined" @click="navigateFromLink($event, () => emit('navigate', item.name))">
         <NavigationIcon :name="item.name" /><span>{{ item.title }}</span>
-      </a>
+      </a></template>
     </nav>
   </div>
 </template>
+
+<style scoped>
+.sidebar-group-label{font-size:12px;color:#526276;padding:10px 12px 2px;line-height:20px}
+</style>

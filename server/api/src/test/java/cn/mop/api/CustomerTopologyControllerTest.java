@@ -1,0 +1,34 @@
+package cn.mop.api;
+import cn.mop.domain.*;
+import cn.mop.domain.assetdependency.AssetDependencyRepository;
+import cn.mop.domain.assetdependency.AssetDependencyRepository.*;
+import org.junit.jupiter.api.*;
+import org.springframework.mock.web.MockHttpServletRequest;
+import java.time.Instant;
+import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+class CustomerTopologyControllerTest {
+ static final String TENANT="79000000-0000-4000-8000-000000000001",ACTOR="79000000-0000-4000-8000-000000000002",A=id(10),B=id(11);
+ PlatformRepository platform;AssetDependencyRepository deps;CustomerTopologyController controller;
+ static String id(int n){return String.format("79000000-0000-4000-8000-%012d",n);}
+ @BeforeEach void setup(){platform=mock(PlatformRepository.class);deps=mock(AssetDependencyRepository.class);controller=new CustomerTopologyController(platform,deps);when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"viewer",7,true)));when(deps.current(TENANT,ACTOR)).thenReturn(new Draft(TENANT,0,null,List.of()));}
+ MockHttpServletRequest request(){var r=new MockHttpServletRequest("GET","/api/v1/customer-topology");r.setUserPrincipal(()->ACTOR);r.getSession().setAttribute("mop.tenant_id",TENANT);return r;}
+ Asset asset(String id){return new Asset(id,TENANT,"Synthetic device","switch","192.0.2.1",id(3),"unknown","DRAFT","MANUAL",null,null,1,null,null,null,null);}
+ void allow(String id){when(platform.authorizedAsset(TENANT,ACTOR,7,id)).thenReturn(Optional.of(asset(id)));}
+ ProposedEdge edge(String p,String c){return new ProposedEdge(p,c,null,null,null);}
+ Map<?,?> read(MockHttpServletRequest r){return (Map<?,?>)((Map<?,?>)controller.read(r)).get("data");}
+ @Test void emptyCustomerDoesNotNeedArbitraryAnchorAssetOrInventConnections(){var d=read(request());assertEquals(TENANT,d.get("tenant_id"));assertEquals(List.of(),d.get("nodes"));assertEquals(List.of(),d.get("edges"));assertEquals(false,d.get("physical_topology_verified"));assertEquals(false,d.get("monitoring_applied"));verify(platform,never()).authorizedAsset(anyString(),anyString(),anyLong(),anyString());}
+ @Test void boundedPageReturnsNamedSameTenantNodesAndVersionPinnedContinuation(){var edges=new ArrayList<ProposedEdge>();allow(A);for(int n=20;n<75;n++){allow(id(n));edges.add(edge(A,id(n)));}when(deps.current(TENANT,ACTOR)).thenReturn(new Draft(TENANT,3,Instant.now(),edges));var first=read(request());assertEquals(50,((List<?>)first.get("edges")).size());assertEquals(51,((List<?>)first.get("nodes")).size());assertEquals(true,first.get("has_more"));var r=request();r.addParameter("offset","50");r.addParameter("graph_version","3");var next=read(r);assertEquals(5,((List<?>)next.get("edges")).size());assertEquals(false,next.get("has_more"));assertEquals(55,next.get("total_edges"));}
+ @Test void focusedNodeWithNoEdgesRemainsVisible(){allow(A);var r=request();r.addParameter("asset_id",A);var d=read(r);assertEquals(1,((List<?>)d.get("nodes")).size());assertEquals(0,d.get("total_edges"));}
+ @Test void focusFiltersBothDirectionsAndDoesNotExposeOtherNodes(){allow(A);allow(B);when(deps.current(TENANT,ACTOR)).thenReturn(new Draft(TENANT,2,Instant.now(),List.of(edge(A,B),edge(id(30),id(31)))));var r=request();r.addParameter("asset_id",B);var d=read(r);assertEquals(1,d.get("total_edges"));verify(platform,never()).authorizedAsset(TENANT,ACTOR,7,id(30));}
+ @Test void stalePageVersionFailsInsteadOfMixingGraphVersions(){var r=request();r.addParameter("graph_version","1");assertEquals(409,assertThrows(DomainException.class,()->read(r)).status);}
+ @Test void forgedTenantHeaderCannotSelectAnotherCustomer(){var r=request();r.addHeader("X-Tenant-ID",id(999));assertEquals(TENANT,read(r).get("tenant_id"));verify(deps).current(TENANT,ACTOR);}
+ @Test void unknownDuplicateOutOfRangeAndUnpinnedQueriesAreRejected(){for(var pair:List.of(new String[]{"tenant_id",TENANT},new String[]{"offset","50"},new String[]{"offset","-1"},new String[]{"offset","10001"},new String[]{"offset","01"},new String[]{"graph_version","9007199254740992"},new String[]{"asset_id","bad"})){var r=request();r.addParameter(pair[0],pair[1]);assertEquals(400,assertThrows(DomainException.class,()->read(r)).status);}var r=request();r.addParameter("offset","0","0");assertEquals(400,assertThrows(DomainException.class,()->read(r)).status);verifyNoInteractions(deps);}
+ @Test void missingForeignOrUnreturnedAssetFailsClosed(){var r=request();r.addParameter("asset_id",A);assertEquals(404,assertThrows(DomainException.class,()->read(r)).status);verifyNoInteractions(deps);}
+ @Test void rejectedReferenceDoesNotReturnPartialGraph(){allow(A);when(deps.current(TENANT,ACTOR)).thenReturn(new Draft(TENANT,1,Instant.now(),List.of(edge(A,B))));assertEquals(404,assertThrows(DomainException.class,()->read(request())).status);}
+ @Test void sourceTenantMismatchFailsClosed(){when(deps.current(TENANT,ACTOR)).thenReturn(new Draft(id(99),0,null,List.of()));assertEquals(502,assertThrows(DomainException.class,()->read(request())).status);}
+ @Test void changedPermissionVersionDuringReadDiscardsResponse(){when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"viewer",7,true)),Optional.of(new Membership(ACTOR,TENANT,"viewer",8,true)));assertEquals(401,assertThrows(DomainException.class,()->read(request())).status);}
+ @Test void revokedMembershipDuringReadDiscardsResponse(){when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"viewer",7,true)),Optional.empty());assertEquals(401,assertThrows(DomainException.class,()->read(request())).status);}
+ @Test void anonymousInactiveAndCapabilitylessFailBeforeRepository(){var r=request();r.setUserPrincipal(null);assertEquals(401,assertThrows(DomainException.class,()->read(r)).status);when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"viewer",7,false)));assertEquals(401,assertThrows(DomainException.class,()->read(request())).status);verifyNoInteractions(deps);}
+}

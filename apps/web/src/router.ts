@@ -16,6 +16,7 @@ export const router = createRouter({
     { path: '/email', name: 'email', component: () => import('./pages/EmailPage.vue'), meta: { title: '邮件通知', group: '管理', capability: 'users:read' } },
     { path: '/identity/settings', name: 'identity-settings', component: () => import('./pages/IdentitySettingsPage.vue'), meta: { title: '身份认证设置', group: '管理', capability: 'roles:read' } },
     { path: '/dashboard', name: 'dashboard', component: () => import('./pages/DashboardPage.vue'), meta: { title: '运营总览', group: '资源', capability: 'dashboard:read' } },
+    { path: '/customer-topology', name: 'customer-topology', component: () => import('./pages/CustomerTopologyPage.vue'), meta: { title: '客户拓扑', group: '资源', capability: 'assets:read' } },
     { path: '/assets', name: 'assets', component: () => import('./pages/AssetsPage.vue'), meta: { title: '资产管理', group: '资源', capability: 'assets:read' } },
     { path: '/monitoring-onboarding', name: 'monitoring-onboarding', component: () => import('./pages/MonitoringOnboardingPage.vue'), meta: { title: '监控接入配置', group: '资源', capability: 'configurations:read', capabilities: ['assets:read'] } },
     { path: '/network-monitoring', name: 'network-monitoring', component: () => import('./pages/NetworkMonitoringPage.vue'), meta: { title: '基础网络监控', group: '资源', capability: 'assets:read' } },

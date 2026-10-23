@@ -5,11 +5,11 @@
   "namespace_id": "79000000-0000-4000-8000-000000000090",
   "username": "demo",
   "anchor_time": "2026-10-22T12:00:00Z",
-  "catalog_sha256": "04ad626266e2aa1f2e4a18c4d9ad4ec014ffd0144feb8785004546f75c782122",
+  "catalog_sha256": "9a335d0074d703df1486d3e4b444b2877cb9a892bbb774b977beba1b7d862039",
   "source_sha256": {
-    "apps/web/src/router.ts": "4b2ec126995aad03d296b1a095ad19c6342b67fce315682476dfb330f51dc640",
+    "apps/web/src/router.ts": "321814522d7e573562693588f77cb372bd9cf9d8e6a8fe194db5727e7e47868e",
     "server/domain/src/main/java/cn/mop/domain/Capabilities.java": "6f97ea30fd15e067db3eb6fe72d55c2dedf12a07b5e09678164384c04b366d1f",
-    "contracts/local-api.openapi.json": "ac0a2678b96ff81361a8968a14ed39d2a7511b5caeadae85491ea36664968f2c"
+    "contracts/local-api.openapi.json": "12410b3db00853f1d0657a7f3e379ccdb2f8fe6ab665347575f1f7dbbe4c4e64"
   },
   "contexts": [
     {
@@ -977,6 +977,27 @@
       "acceptance_status": "NOT_RUN",
       "proposed_contexts": [
         "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/customer-topology",
+      "title": "客户拓扑",
+      "required_capabilities": [
+        "assets:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "当前客户登记依赖图与分页列表",
+        "切换客户及撤权后的数据隔离",
+        "无关系空态与版本变化恢复"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp",
+        "tadmin"
       ],
       "data_initialized": false,
       "interaction_verified": false
@@ -2136,7 +2157,7 @@
     }
   ],
   "coverage": {
-    "pages_declared": 42,
+    "pages_declared": 43,
     "capability_union_count": 48,
     "pages_accepted": 0,
     "all_functions_ready": false
@@ -2160,5 +2181,5 @@
     "ADVANCED_SCENARIOS_NOT_INITIALIZED",
     "GLOBAL_POLICY_SCOPE_UNRESOLVED"
   ],
-  "plan_sha256": "23db622c6cf51368e7066892b54b169aaf3367bbbd11826c78b79fdc652d3a90"
+  "plan_sha256": "b74a507eda58e14d1ce21052f2664703059152147bc8e60cd491a88e69de832b"
 }

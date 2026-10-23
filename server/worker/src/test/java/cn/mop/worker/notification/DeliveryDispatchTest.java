@@ -234,6 +234,17 @@ class DeliveryDispatchTest {
     }
 
     @Test
+    void unknownCommandCannotBorrowAnotherCommandsAcceptedResult() {
+        gateway.submitted = Optional.of(receipt(ReceiptStatus.ACCEPTED));
+        dispatch(true).once(original);
+        var replacement = new Original(access, scope, new Command(0, UUID.randomUUID(), access.actorId(), 1,
+                start.traceId(), new Started(UUID.randomUUID(), at.plusSeconds(1))));
+        assertEquals(409, assertThrows(DomainException.class, () -> dispatch(true).once(replacement)).status);
+        assertEquals(Outcome.ACCEPTED, dispatch(true).once(original).outcome());
+        assertEquals(1, gateway.sends);
+    }
+
+    @Test
     void authorizationRevokedBeforeSubmitPreventsNetworkAndDoesNotReturnPrivateDetails() {
         denied = Step.SUBMIT;
         var failure = assertThrows(DomainException.class, () -> dispatch(true).once(original));

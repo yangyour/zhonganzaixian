@@ -114,7 +114,8 @@ public final class DeliveryDispatch {
         }
         // Failed/dead-letter work needs a separately authorized disposition; this worker never spends a retry budget.
         if (current.journal().state().status() != Status.QUEUED) {
-            return result(original, current.journal().state(), false, false);
+            // Another command owns the attempt; its success must not be presented as this command's result.
+            throw conflict();
         }
         check(original, Step.START);
         Receipt started;

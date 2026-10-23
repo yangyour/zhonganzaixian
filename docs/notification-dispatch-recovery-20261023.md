@@ -11,6 +11,7 @@
 `DeliveryDispatch` 的公开构造路径绑定真实 `PostgresDeliveryReceiptRepository`；用于单元测试的 Journal 替身只在包内可见，不提供 runtime fixture 选项。
 
 - `once(Original)` 要求调用方保留完整原 Started 命令。先读当前日志，已有相同原命令只返回当前状态；相同 ID 更改正文拒绝。仅 QUEUED 可尝试原 Started 的落库。
+- 已经由另一命令创建尝试时，未知命令 ID 返回 409，不借用其他命令的受理/送达结果；调用方须恢复原命令。
 - 只有首次、非 replay、明确成功的 Started 提交结果才可能调用 `Provider.submit(scope, originalRequestId)`。提交结果不明先返回 RECONCILIATION_REQUIRED，不尝试发送。
 - 已记录 UNKNOWN、ACCEPTED、FAILED、DEAD_LETTER 或 DELIVERED 的投递不由 `once` 再发送。失败/死信转为 MANUAL_REVIEW，不凭空配置重试预算。
 - `reconcile(Original)` 核对完整原命令及当前最新 request ID，只对 UNKNOWN/ACCEPTED 调用 `Provider.lookup`。查无结果继续保持原状态；没有“查不到就重发”的分支。

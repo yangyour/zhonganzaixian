@@ -209,6 +209,25 @@ class BackupTaskSchedulerTest {
     }
 
     @Test
+    void stopDuringPagePreventsAnotherDispatchAndKeepsOriginalCursor() throws Exception {
+        var stop = new AtomicBoolean();
+        var positions = new ArrayList<Cursor>();
+        var page = new Page(List.of(task(Phase.STAGED, 0, false), task(Phase.STAGED, 0, false)),
+                new Cursor(assetScope, at, scope.versionId()));
+        var scheduler = new BackupTaskScheduler(schedule(), (a, s, cursor, n) -> {
+            positions.add(cursor);
+            return page;
+        }, proofs, command -> {
+            stop.set(true);
+            return archive(command);
+        }, this::registration);
+        scheduler.run(stop::get, cycle -> assertEquals(1, cycle.discovered()));
+        assertEquals(1, archiveCommands.size());
+        scheduler.tick();
+        assertNull(positions.get(1));
+    }
+
+    @Test
     void scheduleRejectsMissingBindingDuplicateScopesAndUnboundedPoll() {
         var targets = List.of(new Target(access, assetScope));
         assertThrows(IllegalArgumentException.class, () -> new BackupTaskSchedule(true, null, targets, 10, 1000));

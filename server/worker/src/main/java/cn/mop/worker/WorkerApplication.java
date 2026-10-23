@@ -20,6 +20,13 @@ import org.springframework.core.env.Environment;
 })
 public class WorkerApplication {
     public static void main(String[] args) {
+        if (java.util.Arrays.stream(args).anyMatch(argument -> argument.startsWith("--backup-"))) {
+            if (args.length != 1 || !java.util.Set.of("--backup-postprocess", "--backup-postprocess-check").contains(args[0])) {
+                throw new IllegalArgumentException("Backup postprocessing accepts exactly one explicit mode");
+            }
+            cn.mop.worker.backup.BackupWorkerMain.run("--backup-postprocess-check".equals(args[0]));
+            return;
+        }
         if (java.util.Arrays.asList(args).contains("--notification-relay")) {
             if (args.length != 1) {
                 throw new IllegalArgumentException("Notification relay mode accepts no other arguments");

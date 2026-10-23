@@ -1,0 +1,37 @@
+{
+  "scope": "packaged CLI missing configuration and invalid modes only",
+  "checks": [
+    {
+      "args": [
+        "--backup-postprocess"
+      ],
+      "exit_code": 1,
+      "safe_rejection": true
+    },
+    {
+      "args": [
+        "--backup-postprocess-check"
+      ],
+      "exit_code": 1,
+      "safe_rejection": true
+    },
+    {
+      "args": [
+        "--backup-invalid"
+      ],
+      "exit_code": 1,
+      "safe_rejection": true
+    },
+    {
+      "args": [
+        "--backup-postprocess",
+        "--notification-relay"
+      ],
+      "exit_code": 1,
+      "safe_rejection": true
+    }
+  ],
+  "passed": true,
+  "database_or_storage_access": false,
+  "device_operations": 0
+}

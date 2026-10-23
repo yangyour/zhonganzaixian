@@ -12,10 +12,12 @@ import {displayTime} from '../utils/display'
 import ReadRecoveryActions from '../components/ReadRecoveryActions.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import OwnPreferenceFacts from '../components/OwnPreferenceFacts.vue'
+import NotificationPreferencePublication from '../components/NotificationPreferencePublication.vue'
 const fresh=()=>({level:'',channelsMode:'unknown',channels:[] as OwnPreferenceChannel[],quietMode:'absent',start:'',end:''})
 const form=reactive(fresh()),editing=ref(false),dirty=ref(false),acknowledge=ref(false),confirming=ref(false),validation=ref(''),expanded=ref<number|null>(null)
 const baseline=shallowRef<OwnPreferenceSnapshot|null>(null),state=shallowRef<OwnPreferenceState>(emptyOwnPreferenceState()),workspace=createOwnPreferenceWorkspace(api,s=>{state.value=s})
 const readScope=ref(0)
+const publicationOpen=ref(false)
 let disposed=false
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&['viewer','tadmin','msp','padmin'].includes(session.value.user.role)&&can('notification_preferences:read_own')&&!switchingTenant.value))
 const writable=computed(()=>permitted.value&&can('notification_preferences:write_own'))
@@ -79,6 +81,8 @@ defineExpose({form,state,baseline,editing,dirty,acknowledge,locked,change,toggle
   </section>
   <section class="panel preference-history"><div class="actions"><h2>偏好修订历史 <small class="history-note">不是通知发送或供应商送达记录</small></h2><button type="button" :disabled="busy||!historyId" @click="loadHistory()">加载历史记录</button></div><p v-if="!state.history">尚未加载修订历史</p><template v-else><p>当前页共 {{state.history.items.length}} 条记录</p><ul><li v-for="item in state.history.items" :key="item.version"><button type="button" class="history-toggle" :aria-expanded="expanded===item.version" @click="expand(item.version)">v{{item.version}} · {{item.action==='CREATE'?'创建请求':'更新请求'}} · {{displayTime(item.recorded_at)}}</button><OwnPreferenceFacts v-if="expanded===item.version" :value="item" /></li></ul><button type="button" :disabled="busy||!state.history.has_more" @click="loadHistory(true)">下一页本人历史</button></template></section>
   </div>
+  <button v-if="!publicationOpen" type="button" :disabled="busy||dirty||workspace.unresolved()" @click="publicationOpen=true">管理本人偏好的内部发布</button>
+  <NotificationPreferencePublication v-if="publicationOpen" :draft-id="currentPreference?.id??null" :draft-version="currentPreference?.version??null" :blocked="busy||dirty||editing||workspace.unresolved()" />
  </template></section>
 </template>
 <style scoped>

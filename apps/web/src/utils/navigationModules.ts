@@ -50,6 +50,7 @@ export const contractNavigationModules: readonly NavigationModule[] = [
   { id: 'M7', title: '远程处置与审计', items: [] },
   { id: 'M8', title: '客户门户与通知', items: entries([
     ['ticket-notifications', '工单通知', '通知记录'], ['my-export-messages', '我的导出消息', '通知记录'],
+    ['notification-routing', '通知路由与处理', '通知记录'],
     ['my-notification-preferences', '通知偏好设置', '通知设置'],
     ['wecom', '企业微信', '通知渠道'], ['email', '邮件通知', '通知渠道'],
   ]) },

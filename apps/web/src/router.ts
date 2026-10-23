@@ -14,6 +14,7 @@ export const router = createRouter({
     { path: '/identity/roles', name: 'identity-roles', component: () => import('./pages/IdentityRolesPage.vue'), meta: { title: '角色与权限', group: '管理', capability: 'roles:read' } },
     { path: '/wecom', name: 'wecom', component: () => import('./pages/WeComPage.vue'), meta: { title: '企业微信', group: '管理', capability: 'users:read' } },
     { path: '/email', name: 'email', component: () => import('./pages/EmailPage.vue'), meta: { title: '邮件通知', group: '管理', capability: 'users:read' } },
+    { path: '/notification-routing', name: 'notification-routing', component: () => import('./pages/NotificationRoutingPage.vue'), meta: { title: '通知路由与处理', group: '服务', capability: 'ticket_notes:read_internal', roles: ['padmin','msp'] } },
     { path: '/identity/settings', name: 'identity-settings', component: () => import('./pages/IdentitySettingsPage.vue'), meta: { title: '身份认证设置', group: '管理', capability: 'roles:read' } },
     { path: '/dashboard', name: 'dashboard', component: () => import('./pages/DashboardPage.vue'), meta: { title: '运营总览', group: '资源', capability: 'dashboard:read' } },
     { path: '/customer-topology', name: 'customer-topology', component: () => import('./pages/CustomerTopologyPage.vue'), meta: { title: '客户拓扑', group: '资源', capability: 'assets:read' } },

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.84.0",
+    "version": "0.85.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -42860,6 +42860,1307 @@
             }
           }
         }
+      }
+    },
+    "/notification-routing/policy": {
+      "get": {
+        "operationId": "readNotificationRoutingPolicy",
+        "summary": "Read the current tenant routing policy; missing publication remains null.",
+        "x-mop-capability": "ticket_notes:read_internal",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-external-dispatch": "DISABLED",
+        "x-mop-feature-gate": "MOP_NOTIFICATION_ROUTING_ENABLED=true plus explicit V51 migration",
+        "responses": {
+          "200": {
+            "description": "Read the current tenant routing policy; missing publication remains null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "record": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "POLICY",
+                                    "PREFERENCE",
+                                    "BINDING",
+                                    "REQUEST",
+                                    "ROUTE",
+                                    "RECEIPT"
+                                  ]
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "version": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 100000
+                                },
+                                "command_id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "state": {
+                                  "type": "object",
+                                  "properties": {
+                                    "external_dispatch_enabled": {
+                                      "const": false
+                                    },
+                                    "customer_production_approved": {
+                                      "const": false
+                                    }
+                                  },
+                                  "description": "Versioned internal routing state. No secrets, raw provider payloads or external-send permission. REQUEST/ROUTE states retain source identity, current decision and original attempt metadata."
+                                },
+                                "recorded_at": {
+                                  "type": "string",
+                                  "format": "date-time"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "id",
+                                "version",
+                                "command_id",
+                                "state",
+                                "recorded_at"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "external_dispatch_enabled": {
+                          "const": false
+                        },
+                        "customer_production_approved": {
+                          "const": false
+                        }
+                      },
+                      "required": [
+                        "record",
+                        "external_dispatch_enabled",
+                        "customer_production_approved"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "trace_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "trace_id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "saveNotificationRoutingPolicy",
+        "summary": "Save or explicitly publish internal routing values; incomplete drafts cannot be published.",
+        "x-mop-capability": "configurations:write",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-external-dispatch": "DISABLED",
+        "x-mop-feature-gate": "MOP_NOTIFICATION_ROUTING_ENABLED=true plus explicit V51 migration",
+        "responses": {
+          "200": {
+            "description": "Save or explicitly publish internal routing values; incomplete drafts cannot be published.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationControlResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationPolicyWrite"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/my/notification-preferences/publication": {
+      "get": {
+        "operationId": "readOwnNotificationPublication",
+        "summary": "Read the current owner preference publication.",
+        "x-mop-capability": "notification_preferences:read_own",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-external-dispatch": "DISABLED",
+        "x-mop-feature-gate": "MOP_NOTIFICATION_ROUTING_ENABLED=true plus explicit V51 migration",
+        "responses": {
+          "200": {
+            "description": "Read the current owner preference publication.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "record": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "POLICY",
+                                    "PREFERENCE",
+                                    "BINDING",
+                                    "REQUEST",
+                                    "ROUTE",
+                                    "RECEIPT"
+                                  ]
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "version": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 100000
+                                },
+                                "command_id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "state": {
+                                  "type": "object",
+                                  "properties": {
+                                    "external_dispatch_enabled": {
+                                      "const": false
+                                    },
+                                    "customer_production_approved": {
+                                      "const": false
+                                    }
+                                  },
+                                  "description": "Versioned internal routing state. No secrets, raw provider payloads or external-send permission. REQUEST/ROUTE states retain source identity, current decision and original attempt metadata."
+                                },
+                                "recorded_at": {
+                                  "type": "string",
+                                  "format": "date-time"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "id",
+                                "version",
+                                "command_id",
+                                "state",
+                                "recorded_at"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "external_dispatch_enabled": {
+                          "const": false
+                        }
+                      },
+                      "required": [
+                        "record",
+                        "external_dispatch_enabled"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "trace_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "trace_id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "publishOwnNotificationPreference",
+        "summary": "Publish or withdraw the exact current V26 owner revision without rewriting its draft history.",
+        "x-mop-capability": "notification_preferences:write_own",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-external-dispatch": "DISABLED",
+        "x-mop-feature-gate": "MOP_NOTIFICATION_ROUTING_ENABLED=true plus explicit V51 migration",
+        "responses": {
+          "200": {
+            "description": "Publish or withdraw the exact current V26 owner revision without rewriting its draft history.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationControlResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationPreferencePublicationWrite"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notification-routing/bindings": {
+      "post": {
+        "operationId": "saveNotificationRoutingBinding",
+        "summary": "Reference an existing verified scoped channel binding; disabled demo bindings cannot authorize routing.",
+        "x-mop-capability": "configurations:write",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-external-dispatch": "DISABLED",
+        "x-mop-feature-gate": "MOP_NOTIFICATION_ROUTING_ENABLED=true plus explicit V51 migration",
+        "responses": {
+          "200": {
+            "description": "Reference an existing verified scoped channel binding; disabled demo bindings cannot authorize routing.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationControlResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationRoutingBindingWrite"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notification-routing/bindings/{receiver}/{channel}": {
+      "get": {
+        "operationId": "readNotificationRoutingBinding",
+        "summary": "Read the scoped receiver/channel routing reference.",
+        "x-mop-capability": "ticket_notes:read_internal",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-external-dispatch": "DISABLED",
+        "x-mop-feature-gate": "MOP_NOTIFICATION_ROUTING_ENABLED=true plus explicit V51 migration",
+        "responses": {
+          "200": {
+            "description": "Read the scoped receiver/channel routing reference.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "record": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "POLICY",
+                                    "PREFERENCE",
+                                    "BINDING",
+                                    "REQUEST",
+                                    "ROUTE",
+                                    "RECEIPT"
+                                  ]
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "version": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 100000
+                                },
+                                "command_id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "state": {
+                                  "type": "object",
+                                  "properties": {
+                                    "external_dispatch_enabled": {
+                                      "const": false
+                                    },
+                                    "customer_production_approved": {
+                                      "const": false
+                                    }
+                                  },
+                                  "description": "Versioned internal routing state. No secrets, raw provider payloads or external-send permission. REQUEST/ROUTE states retain source identity, current decision and original attempt metadata."
+                                },
+                                "recorded_at": {
+                                  "type": "string",
+                                  "format": "date-time"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "id",
+                                "version",
+                                "command_id",
+                                "state",
+                                "recorded_at"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "record"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "trace_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "trace_id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "receiver",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "channel",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "EMAIL",
+                "WECHAT_WORK",
+                "SMS",
+                "DINGTALK",
+                "WEBHOOK",
+                "VOICE"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/notification-routing/entries": {
+      "get": {
+        "operationId": "listNotificationControlEntries",
+        "summary": "Read a bounded page of current durable control states in root creation order.",
+        "x-mop-capability": "ticket_notes:read_internal",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-external-dispatch": "DISABLED",
+        "x-mop-feature-gate": "MOP_NOTIFICATION_ROUTING_ENABLED=true plus explicit V51 migration",
+        "responses": {
+          "200": {
+            "description": "Read a bounded page of current durable control states in root creation order.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationControlPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "REQUEST",
+                "ROUTE",
+                "BINDING"
+              ]
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "name": "before_time",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/notification-routing/entries/{kind}/{id}": {
+      "get": {
+        "operationId": "readNotificationControlEntry",
+        "summary": "Read a current tenant control record; foreign objects return 404.",
+        "x-mop-capability": "ticket_notes:read_internal",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-external-dispatch": "DISABLED",
+        "x-mop-feature-gate": "MOP_NOTIFICATION_ROUTING_ENABLED=true plus explicit V51 migration",
+        "responses": {
+          "200": {
+            "description": "Read a current tenant control record; foreign objects return 404.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationControlResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "REQUEST",
+                "ROUTE",
+                "BINDING"
+              ]
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/notification-routing/requests/{id}/plan": {
+      "post": {
+        "operationId": "planNotificationRoutingRequest",
+        "summary": "Recheck the saved source against current publications, bindings and exact receipt history. No change is an explicit 409.",
+        "x-mop-capability": "configurations:write",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-external-dispatch": "DISABLED",
+        "x-mop-feature-gate": "MOP_NOTIFICATION_ROUTING_ENABLED=true plus explicit V51 migration",
+        "responses": {
+          "200": {
+            "description": "Recheck the saved source against current publications, bindings and exact receipt history. No change is an explicit 409.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationControlResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expected_version": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 99999
+                  }
+                },
+                "required": [
+                  "expected_version"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notification-routing/commands/{id}": {
+      "get": {
+        "operationId": "recoverNotificationControlCommand",
+        "summary": "Recover this actor original command receipt under current authority; missing does not prove cancellation.",
+        "x-mop-capability": "notification_preferences:read_own",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-external-dispatch": "DISABLED",
+        "x-mop-feature-gate": "MOP_NOTIFICATION_ROUTING_ENABLED=true plus explicit V51 migration",
+        "responses": {
+          "200": {
+            "description": "Recover this actor original command receipt under current authority; missing does not prove cancellation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationControlResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Current scope, configuration, command, version or dependency rejection; unknown outcomes retain the original command.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
       }
     }
   },
@@ -86816,6 +88117,861 @@
             "type": "string"
           }
         }
+      },
+      "NotificationRoutingPolicy": {
+        "type": "object",
+        "properties": {
+          "published": {
+            "type": "boolean"
+          },
+          "resource_pool_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "matrix": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "P1": {
+                    "type": "array",
+                    "items": {
+                      "enum": [
+                        "EMAIL",
+                        "WECHAT_WORK",
+                        "SMS",
+                        "DINGTALK",
+                        "WEBHOOK",
+                        "VOICE"
+                      ]
+                    },
+                    "uniqueItems": true,
+                    "maxItems": 6
+                  },
+                  "P2": {
+                    "type": "array",
+                    "items": {
+                      "enum": [
+                        "EMAIL",
+                        "WECHAT_WORK",
+                        "SMS",
+                        "DINGTALK",
+                        "WEBHOOK",
+                        "VOICE"
+                      ]
+                    },
+                    "uniqueItems": true,
+                    "maxItems": 6
+                  },
+                  "P3": {
+                    "type": "array",
+                    "items": {
+                      "enum": [
+                        "EMAIL",
+                        "WECHAT_WORK",
+                        "SMS",
+                        "DINGTALK",
+                        "WEBHOOK",
+                        "VOICE"
+                      ]
+                    },
+                    "uniqueItems": true,
+                    "maxItems": 6
+                  },
+                  "P4": {
+                    "type": "array",
+                    "items": {
+                      "enum": [
+                        "EMAIL",
+                        "WECHAT_WORK",
+                        "SMS",
+                        "DINGTALK",
+                        "WEBHOOK",
+                        "VOICE"
+                      ]
+                    },
+                    "uniqueItems": true,
+                    "maxItems": 6
+                  }
+                },
+                "required": [
+                  "P1",
+                  "P2",
+                  "P3",
+                  "P4"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "aggregate_seconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 86400
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "precedence": {
+            "anyOf": [
+              {
+                "const": "MATRIX_THEN_PREFERENCE_WITH_P1_QUIET_BYPASS"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "retry_budget": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "retry_delay_seconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 86400
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "published",
+          "resource_pool_id",
+          "matrix",
+          "aggregate_seconds",
+          "precedence",
+          "retry_budget",
+          "retry_delay_seconds"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "published": {
+                  "const": true
+                }
+              },
+              "required": [
+                "published"
+              ]
+            },
+            "then": {
+              "properties": {
+                "resource_pool_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "matrix": {
+                  "type": "object",
+                  "properties": {
+                    "P1": {
+                      "type": "array",
+                      "items": {
+                        "enum": [
+                          "EMAIL",
+                          "WECHAT_WORK",
+                          "SMS",
+                          "DINGTALK",
+                          "WEBHOOK",
+                          "VOICE"
+                        ]
+                      },
+                      "uniqueItems": true,
+                      "maxItems": 6
+                    },
+                    "P2": {
+                      "type": "array",
+                      "items": {
+                        "enum": [
+                          "EMAIL",
+                          "WECHAT_WORK",
+                          "SMS",
+                          "DINGTALK",
+                          "WEBHOOK",
+                          "VOICE"
+                        ]
+                      },
+                      "uniqueItems": true,
+                      "maxItems": 6
+                    },
+                    "P3": {
+                      "type": "array",
+                      "items": {
+                        "enum": [
+                          "EMAIL",
+                          "WECHAT_WORK",
+                          "SMS",
+                          "DINGTALK",
+                          "WEBHOOK",
+                          "VOICE"
+                        ]
+                      },
+                      "uniqueItems": true,
+                      "maxItems": 6
+                    },
+                    "P4": {
+                      "type": "array",
+                      "items": {
+                        "enum": [
+                          "EMAIL",
+                          "WECHAT_WORK",
+                          "SMS",
+                          "DINGTALK",
+                          "WEBHOOK",
+                          "VOICE"
+                        ]
+                      },
+                      "uniqueItems": true,
+                      "maxItems": 6
+                    }
+                  },
+                  "required": [
+                    "P1",
+                    "P2",
+                    "P3",
+                    "P4"
+                  ],
+                  "additionalProperties": false
+                },
+                "aggregate_seconds": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 86400
+                },
+                "precedence": {
+                  "const": "MATRIX_THEN_PREFERENCE_WITH_P1_QUIET_BYPASS"
+                },
+                "retry_budget": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "retry_delay_seconds": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 86400
+                }
+              }
+            }
+          }
+        ]
+      },
+      "NotificationControlEntry": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "enum": [
+              "POLICY",
+              "PREFERENCE",
+              "BINDING",
+              "REQUEST",
+              "ROUTE",
+              "RECEIPT"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "command_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "object",
+            "properties": {
+              "external_dispatch_enabled": {
+                "const": false
+              },
+              "customer_production_approved": {
+                "const": false
+              }
+            },
+            "description": "Versioned internal routing state. No secrets, raw provider payloads or external-send permission. REQUEST/ROUTE states retain source identity, current decision and original attempt metadata."
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "version",
+          "command_id",
+          "state",
+          "recorded_at"
+        ],
+        "additionalProperties": false
+      },
+      "NotificationControlResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "POLICY",
+                  "PREFERENCE",
+                  "BINDING",
+                  "REQUEST",
+                  "ROUTE",
+                  "RECEIPT"
+                ]
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100000
+              },
+              "command_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "state": {
+                "type": "object",
+                "properties": {
+                  "external_dispatch_enabled": {
+                    "const": false
+                  },
+                  "customer_production_approved": {
+                    "const": false
+                  }
+                },
+                "description": "Versioned internal routing state. No secrets, raw provider payloads or external-send permission. REQUEST/ROUTE states retain source identity, current decision and original attempt metadata."
+              },
+              "recorded_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "kind",
+              "id",
+              "version",
+              "command_id",
+              "state",
+              "recorded_at"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "NotificationPolicyWrite": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": -1,
+            "maximum": 99999
+          },
+          "policy": {
+            "type": "object",
+            "properties": {
+              "published": {
+                "type": "boolean"
+              },
+              "resource_pool_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "matrix": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "P1": {
+                        "type": "array",
+                        "items": {
+                          "enum": [
+                            "EMAIL",
+                            "WECHAT_WORK",
+                            "SMS",
+                            "DINGTALK",
+                            "WEBHOOK",
+                            "VOICE"
+                          ]
+                        },
+                        "uniqueItems": true,
+                        "maxItems": 6
+                      },
+                      "P2": {
+                        "type": "array",
+                        "items": {
+                          "enum": [
+                            "EMAIL",
+                            "WECHAT_WORK",
+                            "SMS",
+                            "DINGTALK",
+                            "WEBHOOK",
+                            "VOICE"
+                          ]
+                        },
+                        "uniqueItems": true,
+                        "maxItems": 6
+                      },
+                      "P3": {
+                        "type": "array",
+                        "items": {
+                          "enum": [
+                            "EMAIL",
+                            "WECHAT_WORK",
+                            "SMS",
+                            "DINGTALK",
+                            "WEBHOOK",
+                            "VOICE"
+                          ]
+                        },
+                        "uniqueItems": true,
+                        "maxItems": 6
+                      },
+                      "P4": {
+                        "type": "array",
+                        "items": {
+                          "enum": [
+                            "EMAIL",
+                            "WECHAT_WORK",
+                            "SMS",
+                            "DINGTALK",
+                            "WEBHOOK",
+                            "VOICE"
+                          ]
+                        },
+                        "uniqueItems": true,
+                        "maxItems": 6
+                      }
+                    },
+                    "required": [
+                      "P1",
+                      "P2",
+                      "P3",
+                      "P4"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "aggregate_seconds": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 86400
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "precedence": {
+                "anyOf": [
+                  {
+                    "const": "MATRIX_THEN_PREFERENCE_WITH_P1_QUIET_BYPASS"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "retry_budget": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "retry_delay_seconds": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 86400
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "published",
+              "resource_pool_id",
+              "matrix",
+              "aggregate_seconds",
+              "precedence",
+              "retry_budget",
+              "retry_delay_seconds"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "published": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "published"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "resource_pool_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "matrix": {
+                      "type": "object",
+                      "properties": {
+                        "P1": {
+                          "type": "array",
+                          "items": {
+                            "enum": [
+                              "EMAIL",
+                              "WECHAT_WORK",
+                              "SMS",
+                              "DINGTALK",
+                              "WEBHOOK",
+                              "VOICE"
+                            ]
+                          },
+                          "uniqueItems": true,
+                          "maxItems": 6
+                        },
+                        "P2": {
+                          "type": "array",
+                          "items": {
+                            "enum": [
+                              "EMAIL",
+                              "WECHAT_WORK",
+                              "SMS",
+                              "DINGTALK",
+                              "WEBHOOK",
+                              "VOICE"
+                            ]
+                          },
+                          "uniqueItems": true,
+                          "maxItems": 6
+                        },
+                        "P3": {
+                          "type": "array",
+                          "items": {
+                            "enum": [
+                              "EMAIL",
+                              "WECHAT_WORK",
+                              "SMS",
+                              "DINGTALK",
+                              "WEBHOOK",
+                              "VOICE"
+                            ]
+                          },
+                          "uniqueItems": true,
+                          "maxItems": 6
+                        },
+                        "P4": {
+                          "type": "array",
+                          "items": {
+                            "enum": [
+                              "EMAIL",
+                              "WECHAT_WORK",
+                              "SMS",
+                              "DINGTALK",
+                              "WEBHOOK",
+                              "VOICE"
+                            ]
+                          },
+                          "uniqueItems": true,
+                          "maxItems": 6
+                        }
+                      },
+                      "required": [
+                        "P1",
+                        "P2",
+                        "P3",
+                        "P4"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "aggregate_seconds": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 86400
+                    },
+                    "precedence": {
+                      "const": "MATRIX_THEN_PREFERENCE_WITH_P1_QUIET_BYPASS"
+                    },
+                    "retry_budget": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "retry_delay_seconds": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 86400
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "required": [
+          "expected_version",
+          "policy"
+        ],
+        "additionalProperties": false
+      },
+      "NotificationPreferencePublicationWrite": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": -1,
+            "maximum": 99999
+          },
+          "draft_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "draft_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "published": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expected_version",
+          "draft_id",
+          "draft_version",
+          "published"
+        ],
+        "additionalProperties": false
+      },
+      "NotificationRoutingBindingWrite": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": -1,
+            "maximum": 99999
+          },
+          "binding": {
+            "type": "object",
+            "properties": {
+              "receiver_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "channel": {
+                "enum": [
+                  "EMAIL",
+                  "WECHAT_WORK",
+                  "SMS",
+                  "DINGTALK",
+                  "WEBHOOK",
+                  "VOICE"
+                ]
+              },
+              "binding_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "valid_until": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "active": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "receiver_id",
+              "channel",
+              "binding_id",
+              "valid_until",
+              "active"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "expected_version",
+          "binding"
+        ],
+        "additionalProperties": false
+      },
+      "NotificationControlPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "POLICY",
+                        "PREFERENCE",
+                        "BINDING",
+                        "REQUEST",
+                        "ROUTE",
+                        "RECEIPT"
+                      ]
+                    },
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100000
+                    },
+                    "command_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "state": {
+                      "type": "object",
+                      "properties": {
+                        "external_dispatch_enabled": {
+                          "const": false
+                        },
+                        "customer_production_approved": {
+                          "const": false
+                        }
+                      },
+                      "description": "Versioned internal routing state. No secrets, raw provider payloads or external-send permission. REQUEST/ROUTE states retain source identity, current decision and original attempt metadata."
+                    },
+                    "recorded_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "id",
+                    "version",
+                    "command_id",
+                    "state",
+                    "recorded_at"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 100
+              },
+              "next_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "next_time": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "items",
+              "next_id",
+              "next_time",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
       }
     }
   },

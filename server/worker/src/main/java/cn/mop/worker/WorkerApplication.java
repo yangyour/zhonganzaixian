@@ -20,6 +20,13 @@ import org.springframework.core.env.Environment;
 })
 public class WorkerApplication {
     public static void main(String[] args) {
+        if (java.util.Arrays.asList(args).contains("--notification-routing")) {
+            if (args.length != 1) {
+                throw new IllegalArgumentException("Notification routing mode accepts no other arguments");
+            }
+            cn.mop.worker.notification.NotificationRoutingMain.run();
+            return;
+        }
         if (java.util.Arrays.asList(args).contains("--notification-relay")) {
             if (args.length != 1) {
                 throw new IllegalArgumentException("Notification relay mode accepts no other arguments");

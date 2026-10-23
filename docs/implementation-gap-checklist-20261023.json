@@ -26,6 +26,7 @@
         "Cross-state top five, permissions/cancellation/retry, actual desktop verification"
       ],
       "remaining_subitems": [
+        "M1-6 exact unresolved predicate: exclude RESOLVED at database level for counts and complete top five; current V1/V2 include it",
         "SLA timing and overdue count V2",
         "Complete pending-only drilldown across both models",
         "Real nonempty V42 browser flow",
@@ -63,19 +64,22 @@
       "completion_criterion": "核对已有功能并补真实缺口；无权菜单与未实现M7脚本搜索维持明确边界，不重设计菜单。",
       "evidence": [
         "docs/dashboard-alert-bell-20261023.md",
-        "docs/evidence/gap-ui03-bell-20261023/validation.json"
+        "docs/evidence/gap-ui03-bell-20261023/validation.json",
+        "docs/evidence/gap-ui03-search-20261023/validation.json"
       ],
       "commits": [
         "1e4431b5"
       ],
       "completed_subitems": [
-        "M1-8 current-tenant PROBLEM/NEW exact bell reader and header, permissions/recovery and designated PG/HTTP/browser verification"
+        "M1-8 current-tenant PROBLEM/NEW exact bell reader and header, permissions/recovery and designated PG/HTTP/browser verification",
+        "M1-8 slash shortcut, local opt-out and account-version invalidation; 65 targeted tests and real browser interaction"
       ],
       "remaining_subitems": [
         "Review M1-5 recent events, M1-7 tenant switching, remaining M1-8 search groups and M7 gate",
         "Complete filter inheritance and M1-9 refresh coverage",
         "Review M1-11 fixed dashboard layout contract",
-        "Formal contract acceptance"
+        "Formal contract acceptance",
+        "Search dialog duplicate banner landmark accessibility finding"
       ]
     },
     {

@@ -1,0 +1,14 @@
+{
+  "status": "FUNCTIONAL_PASS_WITH_A11Y_FINDING",
+  "frontend_targeted": 65,
+  "typecheck": "PASSED",
+  "build": "PASSED",
+  "business_writes": 0,
+  "api_changes": 0,
+  "deployment": "NOT_RUN",
+  "formal_acceptance": "NOT_RUN",
+  "remaining": [
+    "M7 automation script search",
+    "Element Plus search dialog duplicate banner landmark"
+  ]
+}

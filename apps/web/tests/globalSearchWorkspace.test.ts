@@ -49,10 +49,13 @@ describe('minimal grouped search workspace',()=>{
  it('disposal cancels requests and invalid context makes no query',async()=>{const {workspace,client}=setup();workspace.dispose();workspace.reset(context);workspace.change('literal');expect(await workspace.search()).toBe(false);expect(client.request).not.toHaveBeenCalled();const second=setup();second.workspace.reset({...context,role:'unknown'});second.workspace.change('literal');expect(await second.workspace.search()).toBe(false)})
  it('state copies cannot mutate displayed authorized data',async()=>{const {workspace}=setup();await workspace.search();workspace.state().result!.groups[0].items[0]!.name='changed';expect(workspace.state().result!.groups[0].items[0]!.name).toBe('literal')})
  it('destinations are only typed in-app asset, event or ticket IDs',()=>{expect(searchDestination('assets',id(3))).toEqual({name:'assets',query:{asset_id:id(3)}});expect(searchDestination('events',id(5))).toEqual({name:'monitoring-events',query:{event_id:id(5)}});expect(searchDestination('tickets',id(4))).toEqual({name:'tickets',query:{ticket_id:id(4)}});expect(()=>searchDestination('assets','https://example.com')).toThrow();expect(()=>searchDestination('scripts' as 'assets',id(3))).toThrow()})
- it('requires Control or Meta K and never consumes a bare character shortcut',()=>{
+ it('supports the contract slash shortcut with a user opt-out and retains Control or Meta K',()=>{
   expect(shouldFocusGlobalSearch({key:'k',ctrlKey:true})).toBe(true)
   expect(shouldFocusGlobalSearch({key:'K',metaKey:true})).toBe(true)
-  for(const key of ['/','k','a'])expect(shouldFocusGlobalSearch({key})).toBe(false)
+  expect(shouldFocusGlobalSearch({key:'/'})).toBe(true)
+  expect(shouldFocusGlobalSearch({key:'/'},false)).toBe(false)
+  expect(shouldFocusGlobalSearch({key:'k',ctrlKey:true},false)).toBe(true)
+  for(const key of ['k','a'])expect(shouldFocusGlobalSearch({key})).toBe(false)
   expect(shouldFocusGlobalSearch({key:'k',ctrlKey:true,metaKey:true})).toBe(false)
  })
  it('keeps editing, IME and already-handled keyboard input in its original control',()=>{

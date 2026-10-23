@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.84.0",
+    "version": "0.85.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -42861,6 +42861,77 @@
           }
         }
       }
+    },
+    "/dashboard/alert-bell": {
+      "get": {
+        "operationId": "readDashboardAlertBell",
+        "summary": "当前租户PROBLEM且NEW事件的精确数量及最近五条",
+        "x-mop-capabilities": [
+          "dashboard:read",
+          "tickets:read"
+        ],
+        "x-mop-roles": [
+          "padmin",
+          "msp"
+        ],
+        "x-mop-read-only": true,
+        "x-mop-allowed-query-keys": [],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-snapshot-isolation": "REPEATABLE_READ",
+        "x-mop-suppression-excluded": false,
+        "responses": {
+          "200": {
+            "description": "Exact filter count and latest five from the same authorized snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardAlertBellResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Rejected scope, membership, input or unavailable dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Rejected scope, membership, input or unavailable dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Rejected scope, membership, input or unavailable dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Rejected scope, membership, input or unavailable dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -46629,7 +46700,9 @@
             "const": "postgresql_supported_groups"
           },
           "notification_bell_status": {
-            "const": "NOT_IMPLEMENTED"
+            "const": "NOT_IMPLEMENTED",
+            "deprecated": true,
+            "description": "Legacy inline-search indicator. The dedicated /dashboard/alert-bell endpoint is authoritative for the header bell."
           },
           "groups": {
             "type": "array",
@@ -86816,6 +86889,172 @@
             "type": "string"
           }
         }
+      },
+      "DashboardAlertBell": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "permission_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT_INTERNAL"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "metric_version": {
+            "const": "MOP_UNACKNOWLEDGED_PROBLEM_EVENTS_V1"
+          },
+          "filter": {
+            "type": "object",
+            "properties": {
+              "monitor_state": {
+                "const": "PROBLEM"
+              },
+              "handling_state": {
+                "const": "NEW"
+              }
+            },
+            "required": [
+              "monitor_state",
+              "handling_state"
+            ],
+            "additionalProperties": false
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "item_limit": {
+            "const": 5
+          },
+          "sort": {
+            "const": "LAST_OCCURRED_AT_DESC_ID_DESC"
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "type": "object",
+              "properties": {
+                "event_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "asset_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "rule_name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "severity": {
+                  "enum": [
+                    "INFO",
+                    "WARNING",
+                    "AVERAGE",
+                    "HIGH",
+                    "DISASTER"
+                  ]
+                },
+                "monitor_state": {
+                  "const": "PROBLEM"
+                },
+                "handling_state": {
+                  "const": "NEW"
+                },
+                "suppression_state": {
+                  "enum": [
+                    "NONE",
+                    "FLAP_SILENCED",
+                    "DEPENDENCY_SUPPRESSED",
+                    "MAINTENANCE_SILENCED",
+                    "INFO_DEFAULT_SILENT"
+                  ]
+                },
+                "occurrence_count": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 2147483647
+                },
+                "last_occurred_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740990
+                }
+              },
+              "required": [
+                "event_id",
+                "asset_id",
+                "rule_name",
+                "severity",
+                "monitor_state",
+                "handling_state",
+                "suppression_state",
+                "occurrence_count",
+                "last_occurred_at",
+                "version"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "writes_performed": {
+            "const": false
+          }
+        },
+        "required": [
+          "tenant_id",
+          "actor_id",
+          "permission_version",
+          "observed_at",
+          "scope",
+          "source",
+          "metric_version",
+          "filter",
+          "total",
+          "item_limit",
+          "sort",
+          "items",
+          "writes_performed"
+        ],
+        "additionalProperties": false
+      },
+      "DashboardAlertBellResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DashboardAlertBell"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
       }
     }
   },

@@ -255,8 +255,8 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.84.0');
-  assert.equal(contract.info.version, '0.84.0');
+  assert.equal(contract.info.version, '0.85.0');
+  assert.equal(contract.info.version, '0.85.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -951,7 +951,7 @@ test('补充SLA口径只能绑定明确发布版本，不接收策略或身份�
 
 test('SLA提醒记录不等于路由或送达，读取无业务写入',()=>{const p=contract.paths['/tickets/{ticketId}/sla/reminders'];assert.equal(p.get['x-mop-read-only'],true);assert.equal(p.post,undefined);const s=contract.components.schemas.TicketSlaReminder;assert.equal(s.properties.notification_status.const,'NOT_ROUTED');assert.equal(s.properties.delivered.const,false);assert.deepEqual(s.properties.progress.enum,[0.5,0.8,1]);});
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.84.0');
+  assert.equal(contract.info.version, '0.85.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/workflow/sla'].get;
@@ -1015,7 +1015,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.84.0');
+  assert.equal(contract.info.version, '0.85.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1597,4 +1597,22 @@ test('explicit demo samples are tenant-bound inputs and unavailable sessions can
   for(const patch of [{input:{hosts:7}},{business_data_written:true},{provider_accessed:true}]) assert.equal(validates('DemoPageExampleResult',{data:{...data,...patch},trace_id:'demo'}),false);
   assert.ok(validates('DemoPageExampleResult',{data:{...data,available:true,input:{hosts:'7'}},trace_id:'demo'}));
   assert.equal(contract.paths['/demo/examples/{page}'].get['x-mop-current-membership-recheck'],true);
+});
+
+test('header bell is an internal read-only exact filter and cannot acknowledge events', () => {
+  const path = contract.paths['/dashboard/alert-bell'];
+  assert.deepEqual(Object.keys(path), ['get']);
+  assert.deepEqual(path.get['x-mop-capabilities'], ['dashboard:read', 'tickets:read']);
+  assert.deepEqual(path.get['x-mop-roles'], ['padmin', 'msp']);
+  assert.equal(path.get['x-mop-snapshot-isolation'], 'REPEATABLE_READ');
+  assert.equal(path.get['x-mop-suppression-excluded'], false);
+  const data = { tenant_id:id('1'), actor_id:id('2'), permission_version:1, observed_at:'2026-10-23T12:00:00Z',
+    scope:'CURRENT_TENANT_INTERNAL', source:'postgresql', metric_version:'MOP_UNACKNOWLEDGED_PROBLEM_EVENTS_V1',
+    filter:{monitor_state:'PROBLEM',handling_state:'NEW'}, total:0, item_limit:5,
+    sort:'LAST_OCCURRED_AT_DESC_ID_DESC',items:[],writes_performed:false };
+  assert.ok(validates('DashboardAlertBell',data));
+  for (const patch of [{total:-1},{item_limit:6},{writes_performed:true},{scope:'ALL_TENANTS'},
+    {filter:{monitor_state:'RECOVERED',handling_state:'NEW'}}]) {
+    assert.equal(validates('DashboardAlertBell',{...data,...patch}), false);
+  }
 });

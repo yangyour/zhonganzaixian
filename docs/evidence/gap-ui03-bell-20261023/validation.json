@@ -1,0 +1,23 @@
+{
+  "status": "PASSED",
+  "requirements": [
+    "M1-8"
+  ],
+  "gap_id": "UI03",
+  "java_unit_http": 16,
+  "postgresql_readonly": 3,
+  "frontend_full_before_final_focus_regression": 5071,
+  "frontend_final_targeted": 60,
+  "root_contracts": 201,
+  "typecheck": "PASSED",
+  "build": "PASSED",
+  "browser_role_width_cases": 4,
+  "browser_axe_violations": 0,
+  "business_writes": 0,
+  "external_messages": 0,
+  "migrations": 0,
+  "deployment": "NOT_RUN",
+  "formal_acceptance": "NOT_RUN",
+  "large_scale_load": "NOT_RUN",
+  "implementation_scope": "Dedicated alert bell only; UI03 overall remains IN_PROGRESS"
+}

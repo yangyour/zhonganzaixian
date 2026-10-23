@@ -5,6 +5,7 @@ import { addCmdbSourcePreflightContract } from './cmdb-source-preflight-contract
 import { addCmdbImportExecutionContract } from './cmdb-import-execution-contract.mjs';
 import { addDashboardPendingTicketsContract } from './dashboard-pending-tickets-contract.mjs';
 import { addDemoApiContract } from './demo-api-contract.mjs';
+import { addDashboardAlertBellContract } from './dashboard-alert-bell-contract.mjs';
 import { addCmdbTypeCatalogContract } from './cmdb-type-catalog-contract.mjs';
 import { addTicketLifecycleContract } from './ticket-lifecycle-contract.mjs';
 import { addInspectionQuarterlyReportContract } from './inspection-quarterly-report-contract.mjs';
@@ -258,7 +259,7 @@ const searchAvailable = (kind, limit, hit, scope, fields) => {
   result.oneOf = Array.from({ length: limit + 1 }, (_, n) => ({ properties: { returned: { const: n }, items: { minItems: n, maxItems: n }, ...(n < limit ? { has_more: { const: false } } : {}) } })); return result;
 };
 const searchUnavailable = (kind, limit, status = 'NOT_IMPLEMENTED', reason = 'SOURCE_NOT_IMPLEMENTED') => object({ kind: { const: kind }, status: { const: status }, limit: { const: limit }, returned: { type: 'null' }, has_more: { type: 'null' }, items: { type: 'null' }, source_scope: { type: 'null' }, matched_fields: { type: 'null' }, reason: { const: reason } });
-const groupedSearch = object({ query: { type: 'string', minLength: 1, maxLength: 100 }, tenant_id: uuid, observed_at: calendarTime, scope: { const: 'CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH' }, coverage: { const: 'PARTIAL' }, coverage_reason: { enum: ['AUTOMATION_SOURCE_NOT_IMPLEMENTED', 'AUTOMATION_SOURCE_NOT_IMPLEMENTED_AND_EVENT_NOT_AUTHORIZED'] }, query_semantics: { const: 'LITERAL_UNICODE_CASE_INSENSITIVE' }, snapshot_consistency: { const: 'ONE_READONLY_TRANSACTION' }, source: { const: 'postgresql_supported_groups' }, notification_bell_status: { const: 'NOT_IMPLEMENTED' }, groups: { type: 'array', minItems: 4, maxItems: 4, prefixItems: [searchAvailable('assets', 5, searchAssetHit, { const: 'CURRENT_TENANT' }, ['name']), { oneOf: [searchAvailable('events', 4, searchEventHit, { const: 'CURRENT_TENANT_INTERNAL' }, ['rule_name', 'rule_code']), searchUnavailable('events', 4, 'NOT_AUTHORIZED', 'INTERNAL_EVENT_READ_REQUIRED')] }, searchAvailable('tickets', 3, searchTicketHit, { enum: ['OWN_REPORT_REGISTRATIONS', 'CURRENT_TENANT_INTERNAL'] }, ['title', 'receipt_no']), searchUnavailable('automation_scripts', 3)], items: false } });
+const groupedSearch = object({ query: { type: 'string', minLength: 1, maxLength: 100 }, tenant_id: uuid, observed_at: calendarTime, scope: { const: 'CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH' }, coverage: { const: 'PARTIAL' }, coverage_reason: { enum: ['AUTOMATION_SOURCE_NOT_IMPLEMENTED', 'AUTOMATION_SOURCE_NOT_IMPLEMENTED_AND_EVENT_NOT_AUTHORIZED'] }, query_semantics: { const: 'LITERAL_UNICODE_CASE_INSENSITIVE' }, snapshot_consistency: { const: 'ONE_READONLY_TRANSACTION' }, source: { const: 'postgresql_supported_groups' }, notification_bell_status: { const: 'NOT_IMPLEMENTED', deprecated: true, description: 'Legacy inline-search indicator. The dedicated /dashboard/alert-bell endpoint is authoritative for the header bell.' }, groups: { type: 'array', minItems: 4, maxItems: 4, prefixItems: [searchAvailable('assets', 5, searchAssetHit, { const: 'CURRENT_TENANT' }, ['name']), { oneOf: [searchAvailable('events', 4, searchEventHit, { const: 'CURRENT_TENANT_INTERNAL' }, ['rule_name', 'rule_code']), searchUnavailable('events', 4, 'NOT_AUTHORIZED', 'INTERNAL_EVENT_READ_REQUIRED')] }, searchAvailable('tickets', 3, searchTicketHit, { enum: ['OWN_REPORT_REGISTRATIONS', 'CURRENT_TENANT_INTERNAL'] }, ['title', 'receipt_no']), searchUnavailable('automation_scripts', 3)], items: false } });
 // Coverage and existing report visibility must describe the same transaction's authorization.
 groupedSearch.oneOf = [
   { properties: { coverage_reason: { const: 'AUTOMATION_SOURCE_NOT_IMPLEMENTED' }, groups: { prefixItems: [{}, { properties: { status: { const: 'AVAILABLE' } } }, { properties: { source_scope: { const: 'CURRENT_TENANT_INTERNAL' } } }] } } },
@@ -981,7 +982,7 @@ addMonitoringOnboardingContract(contract);
 addMonitoringPlanningContract(contract);
 addMonitoringObservationContract(contract);
 addMonitoringServiceObservationContract(contract);
-contract.info.version = '0.84.0';
+contract.info.version = '0.85.0';
 contract['x-mop-secure-session-transport'] = {
   enabled_by: 'mop.security.require-https=true',
   default_enabled: false,
@@ -995,6 +996,7 @@ contract['x-mop-secure-session-transport'] = {
 addCmdbImportExecutionContract(contract);
 addDashboardPendingTicketsContract(contract);
 addDemoApiContract(contract);
+addDashboardAlertBellContract(contract);
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

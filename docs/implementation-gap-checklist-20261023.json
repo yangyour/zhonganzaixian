@@ -59,10 +59,22 @@
         "M1-9",
         "M1-11"
       ],
-      "status": "OPEN",
+      "status": "IN_PROGRESS",
       "completion_criterion": "核对已有功能并补真实缺口；无权菜单与未实现M7脚本搜索维持明确边界，不重设计菜单。",
-      "evidence": [],
-      "commits": []
+      "evidence": [
+        "docs/dashboard-alert-bell-20261023.md",
+        "docs/evidence/gap-ui03-bell-20261023/validation.json"
+      ],
+      "commits": [],
+      "completed_subitems": [
+        "M1-8 current-tenant PROBLEM/NEW exact bell reader and header, permissions/recovery and designated PG/HTTP/browser verification"
+      ],
+      "remaining_subitems": [
+        "Review M1-5 recent events, M1-7 search groups and M7 gate",
+        "Complete filter inheritance and M1-9 refresh coverage",
+        "Review M1-11 fixed dashboard layout contract",
+        "Formal contract acceptance"
+      ]
     },
     {
       "id": "A01",

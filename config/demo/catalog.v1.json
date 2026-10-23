@@ -1,11 +1,11 @@
 {
   "version": 1,
   "scope": "DEMO_PREPARATION_ONLY",
-  "reference_api_version": "0.84.0",
+  "reference_api_version": "0.85.0",
   "source_sha256": {
     "apps/web/src/router.ts": "321814522d7e573562693588f77cb372bd9cf9d8e6a8fe194db5727e7e47868e",
     "server/domain/src/main/java/cn/mop/domain/Capabilities.java": "6f97ea30fd15e067db3eb6fe72d55c2dedf12a07b5e09678164384c04b366d1f",
-    "contracts/local-api.openapi.json": "138edfbf85a6c44efd1bc0c9e15c62279fdeb6268d23ceaea6c365f6cebd7168"
+    "contracts/local-api.openapi.json": "497e5623d6193f966d26cd207cf497204545560c876e80954346398ac0d8319e"
   },
   "protected_tenant_ids": [
     "55000000-0000-4000-8000-000000000001",

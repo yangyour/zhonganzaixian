@@ -1,0 +1,21 @@
+{
+  "status": "PASSED",
+  "environment": "lan-test-20261008",
+  "business_writes": 0,
+  "schema_migrations": 0,
+  "new_components": 0,
+  "external_messages": 0,
+  "scope": "EXISTING_DEMO_READ_ONLY",
+  "credentials_recorded": false,
+  "postgresql": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "maven_exit_code": 0,
+  "tests": 3,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/dashboard/DashboardAlertBellReader.java": "843c3e86dfa120258d4f1d0659ee435effc58174a0a16536d996bef322ba4373",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresDashboardAlertBellReader.java": "855e4fd7352bcfa5aa40ea567de292b8c7f2f6eb2dc56cd44b00844a18693404"
+  },
+  "verified_at": "2026-10-23T15:29:38.782210+00:00"
+}

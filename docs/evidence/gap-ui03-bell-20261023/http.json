@@ -1,0 +1,37 @@
+{
+  "environment": "lan-test-20261008",
+  "api_origin": "http://127.0.0.1:18217",
+  "status": "PASSED",
+  "business_writes": 0,
+  "migrations": 0,
+  "external_messages": 0,
+  "new_local_components": 0,
+  "local_application_candidate": true,
+  "full_readiness_claimed": false,
+  "checks": [
+    {
+      "role": "padmin",
+      "status": "PASSED",
+      "total": 2,
+      "visible_items": 2,
+      "scope_override_rejected": true
+    },
+    {
+      "role": "msp",
+      "status": "PASSED",
+      "total": 2,
+      "visible_items": 2,
+      "scope_override_rejected": true
+    },
+    {
+      "role": "tadmin",
+      "status": "PASSED",
+      "http_status": 403
+    }
+  ],
+  "formal_tc": "NOT_RUN",
+  "jar_sha256": "c93b6e4378413167e6319e6a0cefed8d468144433d1acaacfeb5d0181be62acb",
+  "anonymous_read_denied": true,
+  "candidate_stopped": true,
+  "finished_at": "2026-10-23T15:40:09.298974+00:00"
+}

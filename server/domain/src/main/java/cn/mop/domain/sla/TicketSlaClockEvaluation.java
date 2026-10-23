@@ -42,8 +42,9 @@ public final class TicketSlaClockEvaluation {
         boolean tierChanged = currentTenantTier != null && currentTenantTier != frozen;
 
         ClockStatus response = evaluateResponse(workflow, sla, observedAt);
-        if(confirmedRecoveryAt!=null&&(confirmedRecoveryAt.isAfter(observedAt)||confirmedRecoveryAt.isBefore(sla.startedAt())))
-            throw new DomainException(503,"RECOVERY_EVIDENCE_INVALID","监控恢复时点不在工单有效时间范围");
+        MonitoringRecoveryClockEvidence.requireConsistent(
+            sla.startedAt(), observedAt, hasMonitoringEvents, confirmedRecoveryAt
+        );
         ClockStatus recovery = hasMonitoringEvents
             ? evaluateMonitoringRecovery(workflow,sla,observedAt,confirmedRecoveryAt)
             : evaluateRecovery(workflow, sla, observedAt);

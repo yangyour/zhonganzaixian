@@ -32,3 +32,17 @@
 4 项新隔离命名空间真实 PG 通过，覆盖混合状态、客户/租户隔离及查询期间并发插入的快照一致性；新增测试主体均停用，实际客户十表/迁移历史不变。最终 128 项首页/季度报告/PDF 聚焦 Java、197 项契约通过。V42 状态分类已单元验证，本次 PG 未构造 V42 业务流转，TCP HTTP/浏览器/正式 TC 未执行。
 
 第一项功能提交 `056abff7` 已经顺序合入 main `cdcd45c3`，合并后额外 PDF 9 项回归通过；本分支同步吸收同期其他五条线的提交。第二项按相同锁流程独立提交集成，具体提交以 Git 历史为准。
+
+## 2026-10-23 接续清单（R01–R03）
+
+最新归属复核：独立 reports 检出与 origin 保持规范；从干净的 `a4853f0b` 正常快进至 `origin/main 9cdccdc8`。已读最新 AGENTS、MD/JSON 清单，`py -3 tools/check_implementation_gaps.py` 返回128条、25组、0遗漏，completion_verified=false。总清单由集成会话维护，本线不改状态JSON。
+
+- **R01 进行中，原子捕获页面子项已验证**：新增季度页原子来源方式，复用执行单选择/版本摘要核对；相同命令恢复后单独回读正文。105项前端测试、类型/构建校验通过；真实DEMO浏览器已验证一次服务端提交后响应丢失、GET不能确认成功、同path/body/key重放与原报告回读；HTML包含同一冻结摘要。最终1440/1024桌面报告区axe0违规，无页面横向溢出。PDF在当前测试站503 REPORT_PDF_UNCONFIGURED，字体或摘要配置未就绪，保留明确门禁，不伪称PDF交付通过。跨业务同版本来源及正式批准/发布仍待补。见 [R01页面与恢复证据](../report-capture-ui-20261023.md)。
+- **R02 OPEN**：月报/体检、正式报告中心、审核发布、阅读与交付意图尚待实现；年度二期条件单列。未知评分、重生成和品牌配置保持null。
+- **R03 进行中**：在既有V1聚合基础上补独立SLA增强读取；成本/FTE、经营时间维度/导出仍未核销，不能把首页切片当整个R03完成。
+
+### UI01 依赖：待办SLA增强方案（代码实现中，尚未完成验证）
+
+保留严格V1 `GET /dashboard/pending-tickets`。新增独立 `GET /dashboard/pending-tickets/sla`，`projection_version=MOP_PENDING_TICKETS_SLA_V2`；相同只读REPEATABLE_READ事务内读取权限、当前流程版本、前五条与SLA。逐行提供 `priority`、`frozen_service_tier`、`sla_metric_version`、`sla_version`、`overdue`、`response_clock/recovery_clock`；时钟含状态、breached、缺失原因、deadline_at/completed_at、服务时段剩余毫秒及remaining_basis。前端不自行计时或判定超时。
+
+复用已有V33 `TicketSlaClockEvaluation` 与V42 `SlaClockState`，不更改SLA基础规则。缺配置、停用V42消费者、未确认重开规则及尚未连接的V42监控t2消费保持unknown。全量已超时计数 `overdue_sla` 仅在全部可见登记可判断时返回；另给 `known_overdue/unknown_sla/evaluated_pending/unevaluated_pending/evaluation_limit`。单次最多100张非终态工单是明确技术预算，超出时返回部分证据与null总计，不静默把前五条当总数。集成会话负责DashboardPage、DashboardWorkflowsPanel与客户端，本线不修改。

@@ -1,0 +1,58 @@
+{
+  "scope": "R01_CAPTURE_UI_INCREMENT",
+  "browser": "156.0.4314.42",
+  "local_artifact_on_existing_origin": true,
+  "server_origin": "http://mop.all-online.com.cn",
+  "tenant_id": "0e58bebe-1628-55b6-848a-70d57cb7c8cf",
+  "report_id": "4bd4f729-6434-4f0f-951a-4ce2affbca4c",
+  "source_collection_id": "60a607c9-b7cf-49c9-98b8-b3b1afb9dac8",
+  "document_sha256": "c6f6ae7aa11ec9a55d1af6ca787daf6c3f19c8ec9880fa1a2019783edf523800",
+  "capture_posts": 2,
+  "same_original_request": true,
+  "request_sha256": "83702c3e1c0e3ae50192fe1e3d7c2ee6fb0d52e3f4501c42f871cbc7282c52ce",
+  "captured_status": "DRAFT",
+  "published": false,
+  "response_loss_after_commit_recovered": true,
+  "get_did_not_resolve_unknown": true,
+  "html_download": {
+    "filename": "quarterly-draft-4bd4f729-6434-4f0f-951a-4ce2affbca4c.html",
+    "same_document_sha256": true
+  },
+  "pdf": {
+    "status": "NOT_CONFIGURED",
+    "http_status": 503,
+    "reason": "REPORT_PDF_FONT_OR_HASH_NOT_READY"
+  },
+  "axe": [
+    {
+      "width": 1440,
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "violations": []
+    }
+  ],
+  "errors": [],
+  "formal_tc": "NOT_RUN",
+  "deployment": "NOT_RUN",
+  "final_build_id": "81cc2700c84fef73fc25f91f5ced9c6237dcc30de516894c33f273ecee39a1a3",
+  "final_axe": [
+    {
+      "width": 1024,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "final_exploratory": [
+    "new editor stays open after last source removal",
+    "source add/remove",
+    "explicit empty choice toggled both ways",
+    "collection/capture round trip"
+  ]
+}

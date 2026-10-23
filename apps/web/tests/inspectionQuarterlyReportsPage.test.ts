@@ -15,7 +15,7 @@ import {api,ApiError} from '../src/api/client'
 import {session,switchingTenant,contextGeneration} from '../src/stores/session'
 import type {Session} from '../src/api/types'
 import {page as collectionPage,summary as collectionSummary} from './inspectionSourceCollection.fixture'
-import {report,summary,page,payload,scope,id,collection} from './inspectionQuarterlyReport.fixture'
+import {report,summary,page,payload,scope,id,collection,sourceRevision} from './inspectionQuarterlyReport.fixture'
 let app:App|undefined,host:HTMLElement,vm:any
 const auth:Session={user:{id:scope.actorId,role:'padmin',display_name:'合成管理员'},tenant:{id:scope.tenantId,name:'合成租户'},allowed_tenants:[],permission_version:7,csrf_token:'SYNTHETIC_NOT_CREDENTIAL',capabilities:['inspection_quarterly_reports:read','inspection_quarterly_reports:write','inspection_source_collections:read'],mode:'remote_test',identity_source:'synthetic-unit-only'}
 const deferred=<T,>()=>{let resolve!:(v:T)=>void,reject!:(e:unknown)=>void;const promise=new Promise<T>((yes,no)=>{resolve=yes;reject=no});return{promise,resolve,reject}}
@@ -91,3 +91,38 @@ it('old candidate row and account scope cannot initiate a new source request',as
 it('candidate selected during discard confirmation invalidates old clear approval',async()=>{const mock=request();mount();await settle();input('季度报告标签','原输入');mock.mockResolvedValueOnce(collectionPage());await vm.browseSourceCandidates();const wait=deferred<string>();mocks.confirm.mockReturnValueOnce(wait.promise);const pending=vm.begin();expect(await vm.chooseSourceCandidate(vm.sourceCandidates.page.items[0])).toBe(true);wait.resolve('confirm');expect(await pending).toBe(false);expect(vm.sourceId).toBe(id(50));expect(vm.label).toBe('原输入');expect(vm.sourceState.selected).not.toBeNull();expect(writes(mock)).toHaveLength(0)})
 it('empty collection candidate remains explicit empty source without inventing population or configuration',async()=>{const mock=request();mount();await settle();const empty=collection([]);mock.mockResolvedValueOnce(collectionPage([collectionSummary(empty)]));await vm.browseSourceCandidates();mock.mockResolvedValueOnce(empty);expect(await vm.chooseSourceCandidate(vm.sourceCandidates.page.items[0])).toBe(true);await settle();expect(host.textContent).toContain('空集合只表示明确空选择');expect(vm.sourceState.selected.tenant_asset_population).toBeNull();expect(Object.values(vm.configuration).every(v=>v===null)).toBe(true);expect(writes(mock)).toHaveLength(0)})
 it('report unknown write blocks candidate selection and both recovery paths without changing original request',async()=>{const mock=request();mount();await settle();mock.mockResolvedValueOnce(collectionPage());await vm.browseSourceCandidates();const old=vm.sourceCandidates.page.items[0];await fill();mock.mockRejectedValueOnce(new TypeError('lost report save'));expect(await vm.save()).toBe(false);const original=structuredClone(vm.state.attempt),count=mock.mock.calls.length;expect(vm.hasUnresolved()).toBe(true);expect(await vm.browseSourceCandidates()).toBe(false);expect(await vm.chooseSourceCandidate(old)).toBe(false);expect(await vm.retryCandidateRead()).toBe(false);expect(await vm.retrySourceRead()).toBe(false);expect(vm.state.attempt).toEqual(original);expect(mock).toHaveBeenCalledTimes(count)})
+
+const enableCapture=()=>{session.value={...auth,capabilities:[...auth.capabilities,'inspection_source_collections:write','inspection_worksheets:write','inspection_worksheets:read']}}
+it('atomic capture page uses verified worksheet revisions without an intermediate collection POST',async()=>{
+ enableCapture();const mock=request();mock.mockImplementation(async(path,options)=>options?.method==='POST'?{...summary(),capture_mode:'ATOMIC_EXPLICIT_WORKSHEET_REVISIONS'}:page())
+ mount();await settle();vm.sourceMode='capture';await settle();expect(await vm.addCaptureSource(sourceRevision())).toBe(true)
+ input('季度报告标签',payload().label);input('报告年','2026');vm.quarter='4';await settle()
+ expect(await vm.save()).toBe(true);expect(writes(mock)).toHaveLength(1);expect(writes(mock)[0]![0]).toBe('/inspection-quarterly-reports/capture')
+ expect(writes(mock)[0]![1]!.body).toMatchObject({sources:[{worksheet_id:sourceRevision().worksheet_id,version:sourceRevision().version,expected_source_sha256:sourceRevision().source_snapshot_sha256}]})
+ expect(vm.state.attempt.state).toBe('accepted');expect(vm.state.selected).toBeNull();expect(vm.state.receipt.report_published).toBe(false)
+})
+it('capture page denies empty selection unless explicitly confirmed and preserves unknown result identity',async()=>{
+ enableCapture();const mock=request();mock.mockImplementation(async(path,options)=>{if(options?.method==='POST')throw new TypeError('lost');return page()})
+ mount();await settle();vm.sourceMode='capture';input('季度报告标签',payload().label);input('报告年','2026');vm.quarter='4';await settle()
+ expect(await vm.save()).toBe(false);expect(writes(mock)).toHaveLength(0);vm.allowEmptyCapture=true;expect(await vm.save()).toBe(false)
+ expect(vm.state.attempt.state).toBe('uncertain');expect(await vm.begin()).toBe(false);expect(await mocks.leave!()).toBe(false)
+ expect(await vm.retry()).toBe(false);expect(writes(mock)[1]![1]!.body).toEqual(writes(mock)[0]![1]!.body);expect(writes(mock)[1]![1]!.idempotencyKey).toBe(writes(mock)[0]![1]!.idempotencyKey)
+})
+it('capture removal and same-version capability revocation clear selected sources',async()=>{
+ enableCapture();request();mount();await settle();vm.sourceMode='capture';await settle();const source=sourceRevision()
+ expect(await vm.addCaptureSource(source)).toBe(true);expect(await vm.addCaptureSource(source)).toBe(false)
+ expect(vm.removeCaptureSource(source.worksheet_id+'/'+source.version)).toBe(true);expect(vm.captureSources).toHaveLength(0)
+ expect(await vm.addCaptureSource(source)).toBe(true);session.value={...session.value!,capabilities:auth.capabilities};await settle()
+ expect(vm.captureWritable).toBe(false);expect(vm.captureSources).toHaveLength(0);expect(vm.sourceMode).toBe('collection')
+})
+it('capture source edits invalidate an outstanding discard confirmation',async()=>{
+ enableCapture();request();mount();await settle();vm.sourceMode='capture';await settle();expect(await vm.addCaptureSource(sourceRevision())).toBe(true)
+ const wait=deferred<unknown>();mocks.confirm.mockReturnValue(wait.promise);const pending=vm.begin();vm.allowEmptyCapture=true;wait.resolve('confirm')
+ expect(await pending).toBe(false);expect(vm.captureSources).toHaveLength(1)
+})
+
+it('removing the last captured source keeps the explicitly opened editor visible',async()=>{
+ enableCapture();request();mount();await settle();const editor=host.querySelector<HTMLDetailsElement>('.report-editor')!;editor.open=true;editor.dispatchEvent(new Event('toggle'));vm.sourceMode='capture';await settle()
+ const source=sourceRevision();expect(await vm.addCaptureSource(source)).toBe(true);await settle();expect(vm.removeCaptureSource(source.worksheet_id+'/'+source.version)).toBe(true);await settle()
+ expect(editor.open).toBe(true);expect(host.querySelector('[aria-label="明确保存空选择草稿"]')).not.toBeNull()
+})

@@ -4,7 +4,8 @@ import {detachedWorkspaceState} from './detachedWorkspaceState'
 import {writeFailureUncertain} from './writeFailure'
 import {inspectionUuid,validInspectionContext} from './inspectionTemplates'
 import {readReportPayload,readReportSummary,readReportPage,readReportDetail,reportBad,reportInputSha,type ReportContext,type ReportSummary,type ReportDetail,type ReportPage,type ReportCursor} from './inspectionQuarterlyReports'
-export interface ReportAttempt {payload:string;key:string;state:'uncertain'|'accepted'|'rejected'}
+import {readReportCapturePayload,readCaptureReceipt} from './inspectionReportCapture'
+export interface ReportAttempt {payload:string;key:string;state:'uncertain'|'accepted'|'rejected';mode?:'capture'}
 export interface ReportState {page:ReportPage|null;selected:ReportDetail|null;receipt:ReportSummary|null;attempt:ReportAttempt|null;paged:boolean;busy:'read'|'write'|null;error:unknown}
 export const emptyReportState=():ReportState=>({page:null,selected:null,receipt:null,attempt:null,paged:false,busy:null,error:null})
 const same=(a:unknown,b:unknown):boolean=>{if(a===b)return true;if(Array.isArray(a)&&Array.isArray(b))return a.length===b.length&&a.every((v,i)=>same(v,b[i]));if(a&&b&&typeof a==='object'&&typeof b==='object'&&!Array.isArray(a)&&!Array.isArray(b)){const x=a as Record<string,unknown>,y=b as Record<string,unknown>;return Object.keys(x).length===Object.keys(y).length&&Object.keys(x).every(k=>Object.hasOwn(y,k)&&same(x[k],y[k]))}return false}
@@ -51,6 +52,12 @@ export function createReportWorkspace(client:Pick<ApiClient,'request'>,changed:(
     const attempt=structuredClone(original),scope={...context},turn=++epoch,controller=new AbortController();abort=controller;const current=()=>turn===epoch&&!disposed&&!controller.signal.aborted;let dispatched=false
     state={...state,attempt:{...attempt,state:'uncertain'},receipt:null,page:null,selected:null,busy:'write',error:null};emit()
     try{
+      if(attempt.mode==='capture'){
+        const payload=readReportCapturePayload(JSON.parse(attempt.payload));if(!current())return false
+        dispatched=true;const raw=await client.request('/inspection-quarterly-reports/capture',{method:'POST',body:structuredClone(payload),idempotencyKey:attempt.key,signal:controller.signal});if(!current())return false
+        const receipt=await readCaptureReceipt(raw,scope,payload);if(!current())return false
+        state={...state,receipt,attempt:{...attempt,state:'accepted'}};return true
+      }
       const payload=readReportPayload(JSON.parse(attempt.payload)),expectedReport=await reportInputSha(payload);if(!current())return false
       dispatched=true;const raw=await client.request('/inspection-quarterly-reports',{method:'POST',body:structuredClone(payload),idempotencyKey:attempt.key,signal:controller.signal});if(!current())return false
       const receipt=readReportSummary(raw,scope)
@@ -59,11 +66,11 @@ export function createReportWorkspace(client:Pick<ApiClient,'request'>,changed:(
     }catch(error){if(current())state={...state,error,attempt:{...attempt,state:retry||dispatched&&writeFailureUncertain(false,error)?'uncertain':'rejected'}};return false}
     finally{if(turn===epoch&&!disposed){state.busy=null;abort=null;emit()}}
   }
-  async function submit(input:unknown){
+  async function submit(input:unknown,mode?:'capture'){
     if(!context?.canWrite||disposed||state.busy||state.attempt)return false
     const generation=epoch
-    try{const payload=readReportPayload(input),key=newKey();if(generation!==epoch||disposed||!context?.canWrite||state.busy||state.attempt)return false;if(typeof key!=='string'||! /^[A-Za-z0-9._:-]{1,128}$/.test(key))throw reportBad();return send({payload:JSON.stringify(payload),key,state:'uncertain'},false)}catch(error){if(generation===epoch&&!disposed){state.error=error;emit()}return false}
+    try{const payload=mode==='capture'?readReportCapturePayload(input):readReportPayload(input),key=newKey();if(generation!==epoch||disposed||!context?.canWrite||state.busy||state.attempt)return false;if(typeof key!=='string'||! /^[A-Za-z0-9._:-]{1,128}$/.test(key))throw reportBad();return send({payload:JSON.stringify(payload),key,state:'uncertain',...(mode?{mode}:{} )},false)}catch(error){if(generation===epoch&&!disposed){state.error=error;emit()}return false}
   }
   function cancelRead(){if(disposed||state.busy!=='read')return false;epoch++;abort?.abort();abort=null;readRetryable=lastRead!==null;state={...state,busy:null,error:null};emit();return true}
-  emit();return {reset,cancelRead,canRetryRead:()=>!disposed&&readRetryable&&lastRead!==null&&!state.busy,retryRead:()=>readRetryable&&lastRead?readRequest(structuredClone(lastRead)):Promise.resolve(false),state:snapshot,unresolved,list:(next=false)=>read('list',next),select:(id:string)=>read('detail',false,id),submit,retry:()=>state.attempt?.state==='uncertain'?send(state.attempt,true):Promise.resolve(false),begin:()=>{if(!context?.canWrite||disposed||state.busy||unresolved())return false;lastRead=null;readRetryable=false;state={...state,attempt:null,receipt:null,error:null};emit();return true},dispose:()=>{if(disposed)return;disposed=true;reset(null)}}
+  emit();return {reset,cancelRead,canRetryRead:()=>!disposed&&readRetryable&&lastRead!==null&&!state.busy,retryRead:()=>readRetryable&&lastRead?readRequest(structuredClone(lastRead)):Promise.resolve(false),state:snapshot,unresolved,list:(next=false)=>read('list',next),select:(id:string)=>read('detail',false,id),submit,submitCapture:(input:unknown)=>submit(input,'capture'),retry:()=>state.attempt?.state==='uncertain'?send(state.attempt,true):Promise.resolve(false),begin:()=>{if(!context?.canWrite||disposed||state.busy||unresolved())return false;lastRead=null;readRetryable=false;state={...state,attempt:null,receipt:null,error:null};emit();return true},dispose:()=>{if(disposed)return;disposed=true;reset(null)}}
 }

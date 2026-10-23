@@ -1,0 +1,15 @@
+{
+  "name": "cn.mop.worker.notification.DeliveryDispatchPostgresTest",
+  "tests": 6,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "cases": [
+    "concurrentConsumersSubmitOnlyForTheFirstAcknowledgedStart",
+    "actualStartCommitResponseLossIsRecoveredByOriginalCommandWithoutSend",
+    "failedDeliveryCannotAcquireAnotherAutomaticAttempt",
+    "responseLossThenTrustedLookupRecordsCurrentDeliveryAndOriginalStart",
+    "duplicateAcceptedObservationReplaysOriginalCommandWithoutNewJournalRow",
+    "untrustedObservationCannotAdvanceJournalAndRevocationBlocksRecovery"
+  ]
+}

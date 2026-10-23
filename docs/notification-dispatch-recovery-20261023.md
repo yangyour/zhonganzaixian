@@ -32,3 +32,15 @@
 消费者测试明确使用隔离的 Journal/Provider 替身，并使用真实 V50 编解码恢复每次读取，覆盖提交响应丢失、重复消费者、网络结果不明、回执响应丢失、受理/送达区别、失败与死信、跨租户/原命令冲突、撤权和伪造回执。未把这些测试计为真实 PostgreSQL 并发、签名认证或供应商集成。
 
 指定服务器的只读盘点沿用同日 [notification-relay inventory](evidence/notification-relay-20261023/inventory.json)，PG17.9／V50。无独立写测试命名空间核验，本批真实队列/回执写联调 NOT_RUN；未运行旧实际租户合成测试、未发送消息、未部署。正式 TC、客户渠道批准和 128 项总验收状态不变。
+
+## 指定 PostgreSQL 隔离验证补充（2026-10-23 03:17 EDT）
+
+上述 NOT_RUN 为首次代码提交时边界。随后按项目测试命名空间授权取得 `environment.lock`，在同一指定数据库新建并核验 `SYNTHETIC_NOTIFICATION_DISPATCH_412ac4c42a7d` 专用租户，用现有受限 `mop_test_runtime` 经临时回环 SSH 隧道验证；未恢复旧身份，未写实际业务租户。测试采用专用合成 actor 与明确的测试授权器，不代表真实成员权限或生产授权接线已验证。
+
+新增 `DeliveryDispatchPostgresTest` 6 项真实数据库检查全部通过：6 个并发消费者仅首次确认 START 调用一次测试适配器；真实 COMMIT 完成后注入响应丢失仍能恢复原命令；查询原 request 推进到 DELIVERED 观察；重复 ACCEPTED 不增加日志行；未登记观察被 CommandVerifier 拒绝；撤权后恢复拒绝；FAILED 不自动生成新尝试。
+
+首轮测试授权器误对只有 SELECT 权限的租户目录使用 FOR SHARE，6 项在 queue 前报错，日志行 0。修正测试为只读 namespace 核验后重跑成功，未扩大角色权限。保留 [首轮记录](evidence/notification-dispatch-20261023/designated-postgres-attempt1.json)、[成功记录](evidence/notification-dispatch-20261023/designated-postgres.json) 和 [6 项用例结果](evidence/notification-dispatch-20261023/designated-postgres-tests.json)。
+
+专用租户保留 15 行不可变合成回执日志作为证据，其他租户 V50 日志前后均 0 行。V50、0 迁移、既有组件生命周期与端口保持；临时 JDBC 连接池和隧道已关闭，环境锁已释放。供应商为明确的隔离测试适配器，外发 0；这是真实 PostgreSQL 恢复/并发证据，不是供应商签名、送达、完整路由调度或正式 TC 验收。
+
+复验须先取得环境锁、核验专用合成 namespace 和角色，再通过私有环境提供 `SPRING_DATASOURCE_URL`、`SPRING_DATASOURCE_PASSWORD`、`MOP_NOTIFICATION_TEST_TENANT`、`MOP_NOTIFICATION_TEST_ACTOR`、`MOP_NOTIFICATION_TEST_NAMESPACE` 及门禁 `MOP_NOTIFICATION_DISPATCH_TEST_ENVIRONMENT=designated-isolated`。仅运行 `mvn -B -pl server/worker -am test -Dtest=DeliveryDispatchPostgresTest -Dsurefire.failIfNoSpecifiedTests=false`；测试不自行创建 namespace、不自动迁移或删除历史。不要改用业务租户或启用旧合成测试。

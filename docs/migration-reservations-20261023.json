@@ -1,14 +1,21 @@
 {
   "version": 1,
   "scope": "Candidate version coordination only; not a cross-host execution lock or deployment approval",
-  "observed_main": "84d6d4e68613ccfe8407017765b66b10e9664f81",
-  "remote_branches_inspected": 47,
-  "existing_latest_reserved_version": 51,
+  "observed_main": "919969738a3530a988a51265d5fd51a4b62602ce",
+  "remote_branches_inspected": 48,
+  "existing_latest_reserved_version": 52,
   "existing_v51_sha256": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b",
   "reservations": [
     {
       "version": 52,
       "purpose": "P02 immutable attachment quarantine and scanner release journal",
+      "owner": "current dot continuation",
+      "status": "RESERVED_NOT_APPLIED",
+      "first_application_sha256": null
+    },
+    {
+      "version": 53,
+      "purpose": "R02 immutable report publication, artifacts, read receipts and delivery intents",
       "owner": "current dot continuation",
       "status": "RESERVED_NOT_APPLIED",
       "first_application_sha256": null

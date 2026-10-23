@@ -1937,7 +1937,11 @@
         "A05"
       ],
       "stash": "1c26740136a7b3bea1a595ebe8dce7a69ebce1a1",
-      "remote_backed_up": false
+      "remote_backed_up": true,
+      "remote_branch": "wip/20261023-assets-a05",
+      "remote_commit": "3b219461665781b2a492d8f82a96d495701d768d",
+      "original_base": "a8ec4523f26da6b98c0a133f45285b7b7b0373dc",
+      "state": "WIP_NOT_RELEASE_READY"
     },
     {
       "owner": "monitoring",
@@ -1945,7 +1949,11 @@
         "M01"
       ],
       "stash": "61135c687be73bf2decaadc81d438268141f661d",
-      "remote_backed_up": false
+      "remote_backed_up": true,
+      "remote_branch": "wip/20261023-monitoring-m01",
+      "remote_commit": "1b7211190039af081ce87a19ab8adca3c9be5280",
+      "original_base": "8701670229d24338f143d009672ac71a1bc370d1",
+      "state": "WIP_NOT_RELEASE_READY"
     },
     {
       "owner": "notifications",
@@ -1954,7 +1962,11 @@
         "N02"
       ],
       "stash": "bbe6e5d11225e6f6615e2152abe805f48a0a10fb",
-      "remote_backed_up": false
+      "remote_backed_up": true,
+      "remote_branch": "wip/20261023-notifications-n01-n02",
+      "remote_commit": "e7fa879aa52004d311d29367efa878ec6875c459",
+      "original_base": "b122896b84fc18fc09a3410f66e08676b22cbbd9",
+      "state": "WIP_NOT_RELEASE_READY"
     },
     {
       "owner": "reports",
@@ -1962,7 +1974,11 @@
         "R02"
       ],
       "stash": "19bad6b758e9c3ba5c3e9380359dd9cb73dffdf7",
-      "remote_backed_up": false
+      "remote_backed_up": true,
+      "remote_branch": "wip/20261023-reports-r02",
+      "remote_commit": "ad7a2fc3ee0fa899b73fe03217049fc7264b29d6",
+      "original_base": "b5b9d7653c8aae6382d59bf85276c7777734eec3",
+      "state": "WIP_NOT_RELEASE_READY"
     },
     {
       "owner": "production",
@@ -1970,7 +1986,11 @@
         "P01"
       ],
       "stash": "b97f437af8875a51323bcfd26f0c07bd8b30fbd2",
-      "remote_backed_up": false
+      "remote_backed_up": true,
+      "remote_branch": "wip/20261023-production-p01",
+      "remote_commit": "db3d58ca93bdacea1ed7b93c703c9718fff641e8",
+      "original_base": "b122896b84fc18fc09a3410f66e08676b22cbbd9",
+      "state": "WIP_NOT_RELEASE_READY"
     },
     {
       "owner": "production",
@@ -1978,8 +1998,20 @@
         "P02"
       ],
       "stash": "88cf0e3f311181e590a6dc77714018bd3e2f9c27",
-      "remote_backed_up": false
+      "remote_backed_up": true,
+      "remote_branch": "wip/20261023-production-p02",
+      "remote_commit": "678a5a16be0cb784662b5abf62225a597e0c61b3",
+      "original_base": "b122896b84fc18fc09a3410f66e08676b22cbbd9",
+      "state": "WIP_NOT_RELEASE_READY"
     }
   ],
-  "closeout_code_commit": "37337032eeef9a55d0350e9206447a4eb7913874"
+  "closeout_code_commit": "37337032eeef9a55d0350e9206447a4eb7913874",
+  "cloud_handoff": {
+    "authorized": true,
+    "repository": "https://github.com/yangyour/zhonganzaixian.git",
+    "resume_base": "latest origin/main",
+    "wip_export_manifest": "docs/evidence/cloud-wip-handoff-20261023.json",
+    "local_development": "STOPPED",
+    "cloud_session": "NOT_STARTED_BY_LOCAL_THREAD"
+  }
 }

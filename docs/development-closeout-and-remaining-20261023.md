@@ -81,7 +81,7 @@
 
 各工作组的精确提交、未完成代码保存点、验证范围和资源清理结果见下方收尾台账；后续恢复必须先核对分支与保存点，不能直接对活动测试库重跑迁移或DEMO初始化。
 
-未完成代码均保存于各自独立检出，**未混入可发布代码，保存点仅在本机**。检出前缀为`E:\work\wxw9\zhonganzaixian\.parallel\launch-20261023\`：
+未完成代码的原stash继续保留在各自独立检出。用户后续明确要求“未完成的也推送，由云端继续完成”，六份完整快照现已推送到下方独立WIP分支，**未合入main、未验证为可发布代码**。本机检出前缀为`E:\work\wxw9\zhonganzaixian\.parallel\launch-20261023\`：
 
 | 检出/清单 | 保存点（完整stash提交） | 未完成或未通过的边界 |
 | --- | --- | --- |
@@ -92,7 +92,7 @@
 | production / P01 | `b97f437af8875a51323bcfd26f0c07bd8b30fbd2` | 生产检查诊断API和管理面板，缺实际页面联调；与已验证运行账号守卫分开保存。 |
 | production / P02 | `88cf0e3f311181e590a6dc77714018bd3e2f9c27` | 附件隔离业务接线，缺迁移/真实事务及扫描验证。 |
 
-恢复时进入对应检出，先核对origin、分支和工作树，再对上表精确SHA执行`git stash apply <SHA>`；保留原stash，重新验证后才提交。旧协调stash不是本次恢复入口。
+本地恢复可进入对应检出，对上表精确SHA执行`git stash apply <SHA>`并保留原stash。云端使用下方普通Git提交，不尝试读取本机stash。两种恢复方式均须先核对分支与最新main，处理冲突并重新验证；旧协调stash不是本次恢复入口。
 
 通知V51只在指定服务器的临时隔离验证库应用过，活动`mop_test`和本次合入主干的迁移仍为V50。V51草稿SHA256为`51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b`；未来恢复先核对已应用谱系和冻结记录，不改写已执行版本，也不因主干尚无V51就忽略这份保留记录。
 
@@ -115,3 +115,22 @@
 这些数字是代码回归结果；真实组件证据按功能独立留存，不能换算为合同验收通过率。清单核对为128项、25组、漏分配0；正式TC、生产批准及本批部署均未据此标为完成。汇总见[最终验证记录](evidence/development-closeout-20261023/validation.json)。
 
 六个开发检出的最终HEAD均已纳入集成，标准工作树均干净；六份未完成stash对象已逐一核对存在。候选API/Web和浏览器调试端口已无监听，临时隧道/浏览器按各会话归属关闭，开发会话的迁移/环境锁已释放。总集成锁在最终推送成功后按归属释放。原主目录的三处在编前端改动保留，本轮不会自动恢复开发。
+
+**云端可直接获取的未完成分支**
+
+以下均为有明确父提交的普通WIP提交，已包含原快照的未跟踪文件，并逐文件核对Git对象一致。它们起点早于最新main，不能直接用整个分支覆盖主干。
+
+| 清单 | GitHub分支 | WIP提交 | 变更文件数 |
+| --- | --- | --- | --- |
+| A05 | [wip/20261023-assets-a05](https://github.com/yangyour/zhonganzaixian/tree/wip/20261023-assets-a05) | `3b219461` | 17 |
+| M01 | [wip/20261023-monitoring-m01](https://github.com/yangyour/zhonganzaixian/tree/wip/20261023-monitoring-m01) | `1b721119` | 28 |
+| N01,N02 | [wip/20261023-notifications-n01-n02](https://github.com/yangyour/zhonganzaixian/tree/wip/20261023-notifications-n01-n02) | `e7fa879a` | 33 |
+| R02 | [wip/20261023-reports-r02](https://github.com/yangyour/zhonganzaixian/tree/wip/20261023-reports-r02) | `ad7a2fc3` | 2 |
+| P01 | [wip/20261023-production-p01](https://github.com/yangyour/zhonganzaixian/tree/wip/20261023-production-p01) | `db3d58ca` | 9 |
+| P02 | [wip/20261023-production-p02](https://github.com/yangyour/zhonganzaixian/tree/wip/20261023-production-p02) | `678a5a16` | 21 |
+
+云端从最新`origin/main`建立工作分支，先审阅对应WIP提交，再按功能逐一cherry-pick并解决冲突；特别保留新版数据库守卫、DEMO隔离、契约生成器和已提交前端。公共OpenAPI从最终生成器再生成，并同步离线DEMO引用；不要用旧生成物覆盖新增接口。验证和后续修复必须基于合并后的代码。
+
+六份草稿仍保留前文的失败/未验状态，本次推送只保证快照完整与可从GitHub读取，不代表开发或验收通过。原始连接资料、密码、会话与构建缓存没有加入这些分支。云端若缺指定环境的秘密/网络，只记录该项联调阻塞并继续无依赖代码，不创建替代组件或伪造通过。
+
+分支、完整提交/父提交、路径清单及精确树校验见[WIP交接记录](evidence/cloud-wip-handoff-20261023.json)。本机开发保持停止；云端新的继续开发指令覆盖此前停止安排，仅在新会话执行。

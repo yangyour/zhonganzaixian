@@ -74,7 +74,29 @@ public class ProjectIdentityController {
         var a=access(request,"users:write");var body=body(bytes,Set.of("expected_version","role_id","active"));
         return success(command(a,body,request,"users:write",()->accounts.requireTarget(a,id),()->accounts.setMembership(a,id,tenant,version(body),text(body,"role_id",36),bool(body,"active"))),request);
     }
-    @GetMapping("/api/v1/identity/roles") Object roles(@RequestParam(required=false) String tenant_id,HttpServletRequest request){rejectQuery(request,Set.of("tenant_id"));var a=access(request,"roles:read");if(tenant_id!=null&&!tenant_id.equals(a.tenant())){var member=platform.membership(a.actor(),tenant_id).orElseThrow(()->new DomainException(404,"NOT_FOUND","对象不存在或不在授权范围"));if(!member.active()||!member.capabilities().contains("roles:read"))throw new DomainException(404,"NOT_FOUND","对象不存在或不在授权范围");a=new ProjectIdentityRepository.Access(a.actor(),tenant_id,member.permissionVersion(),a.trace());}return success(ProjectIdentityRepository.result("items",accounts.roles(a),"tenant_id",a.tenant(),"permission_catalog",CapabilityCatalog.current()),request);}
+    @GetMapping("/api/v1/identity/roles") Object roles(@RequestParam(required=false) String tenant_id,HttpServletRequest request){
+        rejectQuery(request,Set.of("tenant_id"));
+        if(request.getUserPrincipal()==null||request.getSession(false)==null
+                ||!(request.getSession(false).getAttribute("mop.tenant_id") instanceof String selected))throw roleReadExpired();
+        String actor=request.getUserPrincipal().getName();
+        if(!canonicalIdentity(actor)||!canonicalIdentity(selected))throw roleReadExpired();
+        if(tenant_id!=null&&!canonicalIdentity(tenant_id))throw invalid("租户标识无效");
+        var source=platform.membership(actor,selected).orElseThrow(ProjectIdentityController::roleReadExpired);
+        if(!source.active()||source.permissionVersion()<1||!source.userId().equals(actor)||!source.tenantId().equals(selected))throw roleReadExpired();
+        if(!source.capabilities().contains("roles:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前身份没有此管理权限");
+        String target=tenant_id==null?selected:tenant_id;
+        var destination=target.equals(selected)?source:platform.membership(actor,target).orElseThrow(ProjectIdentityController::roleReadMissing);
+        if(!destination.active()||destination.permissionVersion()<1||!destination.userId().equals(actor)||!destination.tenantId().equals(target)||!destination.capabilities().contains("roles:read"))throw roleReadMissing();
+        var rows=accounts.roles(new ProjectIdentityRepository.Access(actor,target,destination.permissionVersion(),trace(request)));
+        if(rows==null||rows.size()>201||rows.stream().anyMatch(row->row==null||!target.equals(row.get("tenant_id"))))throw new DomainException(503,"IDENTITY_UNAVAILABLE","角色列表范围未通过核对");
+        DashboardReadAuthorization.recheck(request,platform,source);
+        if(!target.equals(selected)&&!platform.membership(actor,target).filter(destination::equals).isPresent())throw roleReadMissing();
+        return success(ProjectIdentityRepository.result("items",rows,"tenant_id",target,"permission_catalog",CapabilityCatalog.current()),request);
+    }
+    private static boolean canonicalIdentity(String id){return id!=null&&id.matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}");}
+    private static DomainException roleReadExpired(){return new DomainException(401,"SESSION_EXPIRED","读取角色期间会话或成员权限已变化");}
+    private static DomainException roleReadMissing(){return new DomainException(404,"NOT_FOUND","对象不存在或不在授权范围");}
+
     @PostMapping("/api/v1/identity/roles") Object createRole(@RequestBody byte[] bytes,HttpServletRequest request){
         var a=access(request,"roles:write");var body=body(bytes,Set.of("expected_version","name","description","base_role","permissions","enabled"));if(version(body)!=0)throw invalid("新建角色版本须为0");var role=role(body);
         return success(command(a,body,request,"roles:write",()->{},()->accounts.createRole(a,role)),request);

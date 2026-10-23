@@ -1,0 +1,15 @@
+import {it,expect} from 'vitest'
+import {buildRoleMatrixPrint} from '../src/utils/roleMatrixPrint'
+import {matrixFixture,matrixTenant} from './roleMatrixFixtures'
+const context={tenantId:matrixTenant,tenantName:'合成租户',generatedAt:'2026-10-23T20:00:00Z'}
+it('prints all configured roles in five dimensions with unsigned review fields',async()=>{
+ const page=matrixFixture();page.items.push({...page.items[0]!,id:'79000000-0000-4000-8000-000000000099',name:'停用自定义角色',builtin:false,enabled:false})
+ const file=await buildRoleMatrixPrint(page,context);expect(file.roleCount).toBe(5);expect(file.html).toContain('配置角色 5–5 / 5');expect(file.html).toContain('停用（配置保留）');expect(file.html).toContain('双方核对签字（待完成）');expect(file.html).toContain('未经双方签字确认')
+ for(const dimension of page.permission_catalog.dimensions)expect(file.html).toContain(dimension.label)
+ expect(file.html).not.toContain('Not exported private description');expect(file.filename).toMatch(/^role-matrix-[a-f0-9-]{36}-[a-f0-9]{12}\.html$/)
+})
+it('escapes tenant and role labels and contains no executable content or external assets',async()=>{const page=matrixFixture();page.items[0]!.name='<script>alert(1)</script>';const file=await buildRoleMatrixPrint(page,{...context,tenantName:'<img src=x onerror=alert(1)>'});expect(file.html).toContain('&lt;script&gt;');expect(file.html).toContain('&lt;img');expect(file.html).not.toContain('<script');expect(file.html).not.toContain('<img');expect(file.html).not.toContain('Not exported private description');expect(file.html).toContain("default-src 'none'")})
+it('rejects the 201-row truncation sentinel rather than claiming a complete matrix',async()=>{const page=matrixFixture();while(page.items.length<201)page.items.push({...page.items[0]!});await expect(buildRoleMatrixPrint(page,context)).rejects.toThrow('截断哨兵')})
+it('rejects missing builtin categories, unknown permissions and foreign scope',async()=>{const missing=matrixFixture();missing.items.pop();await expect(buildRoleMatrixPrint(missing,context)).rejects.toThrow();const unsafe=matrixFixture();unsafe.items[0]!.permissions.push('roles:read');await expect(buildRoleMatrixPrint(unsafe,context)).rejects.toThrow();await expect(buildRoleMatrixPrint(matrixFixture(),{...context,tenantId:'79000000-0000-4000-8000-000000000002'})).rejects.toThrow()})
+it('rejects changed declaration fingerprints and duplicate role IDs',async()=>{const bad=matrixFixture();bad.permission_catalog.declaration_hash='0'.repeat(64);await expect(buildRoleMatrixPrint(bad,context)).rejects.toThrow();const duplicate=matrixFixture();duplicate.items[1]!.id=duplicate.items[0]!.id;await expect(buildRoleMatrixPrint(duplicate,context)).rejects.toThrow()})
+it('snapshot fingerprint is stable for the same saved configuration but binds changed labels and grants',async()=>{const page=matrixFixture();const before=await buildRoleMatrixPrint(page,context);page.items.reverse();const reordered=await buildRoleMatrixPrint(page,{...context,generatedAt:'2026-10-23T21:00:00Z'});expect(reordered.sha256).toBe(before.sha256);page.items[0]!.name='new label';expect((await buildRoleMatrixPrint(page,context)).sha256).not.toBe(before.sha256)})

@@ -2,6 +2,7 @@
 import { displayTenantName } from '../utils/displayTenantName'
 import '../styles/adminPrototype.css'
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { buildRoleMatrixPrint } from '../utils/roleMatrixPrint'
 import { api, isCancelled } from '../api/client'
 import { can, session, contextGeneration, switchingTenant } from '../stores/session'
 import { baseRoleLabels, readRolePage, type BaseRole, type ProjectRole, type RolePage } from '../utils/projectIdentity'
@@ -10,6 +11,8 @@ import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import ReadRecoveryActions from '../components/ReadRecoveryActions.vue'
 import IdentityCommandNotice from '../components/IdentityCommandNotice.vue'
 const data = ref<RolePage | null>(null), error = ref<unknown>(null), loading = ref(false), selected = ref<ProjectRole | null>(null), opened = ref(false)
+const printing=ref(false),printError=ref<unknown>(null),printNotice=ref('')
+let printController:AbortController|null=null,printEpoch=0
 let controller: AbortController | null = null, readGeneration = 0, disposed = false
 const form = reactive({ name: '', description: '', base_role: 'viewer' as BaseRole, enabled: true, permissions: [] as string[] })
 const editor = useIdentityEditor(load, {snapshot:inputSnapshot,preserveUnknown:true}), command = editor.command, message = editor.message
@@ -24,6 +27,7 @@ async function retryRead(){if(!canRetryRead())return false;const turn=++recovery
 async function focusRead(owner:string,ok:boolean){if(!ok&&!error.value)return;await nextTick();if(disposed||owner!==scope.value||loading.value)return;(error.value?readFeedback.value:pageHeading.value)?.focus()}
 function inputSnapshot(){return JSON.stringify([scope.value,opened.value,selected.value,form])}
 function clearView() {
+  printEpoch++;printController?.abort();printController=null;printing.value=false;printError.value=null;printNotice.value=''
   recoveryEpoch++;retrying.value=false;retryable.value=false
   readGeneration++; controller?.abort(); controller = null
   data.value = null; selected.value = null; opened.value = false; loading.value = false; error.value = null
@@ -52,6 +56,19 @@ async function refresh() {
   if (editor.busy() || !await editor.leave() || owner !== scope.value || before!==inputSnapshot()) return false
   editor.clear(); const ok=await load();await focusRead(owner,ok);return ok
 }
+async function printMatrix() {
+  if(disposed||printing.value||loading.value||editor.busy()||editor.dirty.value||switchingTenant.value||!can('roles:read')||!session.value)return
+  const owner=scope.value,intent=inputSnapshot(),readTurn=readGeneration,turn=++printEpoch,current=session.value,request=new AbortController();printController=request;printing.value=true;printError.value=null;printNotice.value=''
+  try {
+    const raw=await api.request('/identity/roles',{signal:request.signal})
+    if(disposed||turn!==printEpoch||owner!==scope.value||request.signal.aborted||intent!==inputSnapshot()||readTurn!==readGeneration||editor.busy()||editor.dirty.value)return
+    const file=await buildRoleMatrixPrint(raw,{tenantId:current.tenant.id,tenantName:current.tenant.name,generatedAt:new Date().toISOString()})
+    if(disposed||turn!==printEpoch||owner!==scope.value||request.signal.aborted||!can('roles:read')||intent!==inputSnapshot()||readTurn!==readGeneration||editor.busy()||editor.dirty.value)return
+    const url=URL.createObjectURL(file.blob),anchor=document.createElement('a');try{anchor.href=url;anchor.download=file.filename;anchor.hidden=true;document.body.append(anchor);anchor.click()}finally{anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+    printNotice.value=`已下载 ${file.roleCount} 个已保存角色的完整配置矩阵，待双方核对签字；不含未保存编辑。`
+  } catch(e) {if(!disposed&&turn===printEpoch&&!isCancelled(e))printError.value=e}
+  finally {if(turn===printEpoch){printing.value=false;printController=null}}
+}
 async function edit(role?: ProjectRole, copy = false) {
   const owner = scope.value, before=inputSnapshot()
   if(role&&!data.value?.items.some(item=>item===role))return
@@ -73,7 +90,8 @@ async function closeEditor() { const owner = scope.value, before=inputSnapshot()
     <p v-if="!can('roles:read')" class="admin-empty">当前账号无角色查看权限。</p>
     <ReadRecoveryActions :busy="loading?'read':null" :can-retry="showReadRetry()" :scope-key="scope" label="角色列表" :cancel="cancelRead" :retry="retryRead" /><p v-if="loading" role="status">正在读取角色列表…</p><div ref="readFeedback" tabindex="-1" role="group" aria-label="角色列表读取结果"><ApiErrorNotice :error="error" /></div><IdentityCommandNotice :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" />
     
-    <section class="admin-card"><div class="admin-card-head content-toolbar"><h2>角色矩阵</h2><span class="muted">{{ displayTenantName(session?.tenant.name ?? '') }} · 按基础业务类别授权</span><div class="content-actions"><div class="heading-actions"><el-button v-if="can('roles:read')" :disabled="editor.busy() || switchingTenant" @click="refresh">刷新角色列表</el-button><el-button v-if="can('roles:write')" type="primary" :disabled="editor.busy()" @click="edit()">新建角色</el-button></div></div></div><div class="admin-table-scroll"><table class="admin-table"><thead><tr><th>角色 / 说明</th><th>基础类别</th><th>权限</th><th>成员</th><th>状态</th><th>操作</th></tr></thead><tbody><tr v-for="role in data?.items" :key="role.id"><td><strong>{{ role.name }}</strong><small>{{ role.description || '未填写说明' }}</small></td><td>{{ baseRoleLabels[role.base_role] }}<small v-if="role.builtin">系统内置</small></td><td>{{ role.permissions.length }} 项</td><td>{{ role.assigned_members }} 位</td><td><el-tag :type="role.enabled ? 'success' : 'info'">{{ role.enabled ? '启用' : '停用' }}</el-tag></td><td><div class="admin-row-actions"><el-button @click="edit(role)">{{ can('roles:write') && !role.builtin ? '查看 / 编辑' : '查看权限' }}</el-button><el-button v-if="can('roles:write')" @click="edit(role, true)">复制为新角色</el-button></div></td></tr></tbody></table><p v-if="data && !data.items.length" class="admin-empty">当前租户暂无角色记录。</p></div></section>
+    <section class="admin-card"><div class="admin-card-head content-toolbar"><h2>角色矩阵</h2><span class="muted">{{ displayTenantName(session?.tenant.name ?? '') }} · 按基础业务类别授权</span><div class="content-actions"><div class="heading-actions"><el-button v-if="can('roles:read')" :disabled="editor.busy() || switchingTenant" @click="refresh">刷新角色列表</el-button><el-button v-if="can('roles:read')" :loading="printing" :disabled="loading||editor.busy()||editor.dirty.value||switchingTenant" @click="printMatrix">下载打印权限矩阵</el-button><el-button v-if="can('roles:write')" type="primary" :disabled="editor.busy()" @click="edit()">新建角色</el-button></div></div></div><div class="admin-table-scroll"><table class="admin-table"><thead><tr><th>角色 / 说明</th><th>基础类别</th><th>权限</th><th>成员</th><th>状态</th><th>操作</th></tr></thead><tbody><tr v-for="role in data?.items" :key="role.id"><td><strong>{{ role.name }}</strong><small>{{ role.description || '未填写说明' }}</small></td><td>{{ baseRoleLabels[role.base_role] }}<small v-if="role.builtin">系统内置</small></td><td>{{ role.permissions.length }} 项</td><td>{{ role.assigned_members }} 位</td><td><el-tag :type="role.enabled ? 'success' : 'info'">{{ role.enabled ? '启用' : '停用' }}</el-tag></td><td><div class="admin-row-actions"><el-button @click="edit(role)">{{ can('roles:write') && !role.builtin ? '查看 / 编辑' : '查看权限' }}</el-button><el-button v-if="can('roles:write')" @click="edit(role, true)">复制为新角色</el-button></div></td></tr></tbody></table><p v-if="data && !data.items.length" class="admin-empty">当前租户暂无角色记录。</p></div></section>
+    <ApiErrorNotice :error="printError"/><p v-if="printNotice" role="status">{{printNotice}}</p>
     <form v-form-feedback v-if="opened" class="identity-card identity-form admin-editor-panel" @submit.prevent="save" @input="editor.dirty.value = true" @change="editor.dirty.value = true">
       <div class="admin-editor-title"><h2>{{ selected ? selected.name : '新建自定义角色' }}</h2><el-button :disabled="editor.busy()" @click="closeEditor">关闭</el-button></div><IdentityCommandNotice :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" /><p v-if="selected?.builtin">系统内置角色不可直接修改，可通过“复制为新角色”创建自定义角色。</p>
       <fieldset :disabled="editor.busy() || !can('roles:write') || selected?.builtin"><label>角色名称<input v-model="form.name" required maxlength="100" placeholder="请输入角色名称" /></label><label>角色说明<textarea v-model="form.description" maxlength="1000" placeholder="选填，描述该角色的职责范围与适用人员" /></label><label>基础业务类别<select v-model="form.base_role" :disabled="!!selected" @change="category"><option v-for="(label, id) in baseRoleLabels" :key="id" :value="id">{{ label }}</option></select></label><label class="check"><input v-model="form.enabled" type="checkbox" />启用角色</label>

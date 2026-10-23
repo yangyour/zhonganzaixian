@@ -1,0 +1,31 @@
+{
+  "status": "CURRENT_ROLE_MATRIX_PRINT_CODE_VALIDATED_CUSTOMER_SIGNATURE_PENDING",
+  "continuation_tree": {
+    "java_discovered": 4869,
+    "java_executed": 3751,
+    "java_skipped": 1118,
+    "java_failures": 0,
+    "java_errors": 0,
+    "web_files": 327,
+    "web_tests": 5277,
+    "web_failures": 0,
+    "node_contract_tests": 249
+  },
+  "independent_main_verification": {
+    "baseline": "31b92d2bc6f2da06af8008eb7cf642f5d6f11134",
+    "java_executed": 15,
+    "web_tests": 74,
+    "failures": 0,
+    "typecheck": "PASSED",
+    "build": "PASSED_WITH_EXISTING_CHUNK_WARNING"
+  },
+  "actual_database": "NOT_RUN_MISSING_PRIVATE_CONFIGURATION",
+  "browser_print": "NOT_RUN",
+  "customer_signature": null,
+  "supplier_signature": null,
+  "formal_acceptance": "NOT_RUN",
+  "api_shape_changes": 0,
+  "permission_writes": 0,
+  "migrations": 0,
+  "deployed": false
+}

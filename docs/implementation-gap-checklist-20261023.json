@@ -131,10 +131,24 @@
         "M2-10",
         "M2-14"
       ],
-      "status": "OPEN",
+      "status": "IN_PROGRESS",
       "completion_criterion": "先核销已有实现，再补合同遗漏，保持身份与授权变更即时失效、双主体审批和审计；不修改原主目录在编前端。",
-      "evidence": [],
-      "commits": []
+      "evidence": [
+        "docs/project-identity-authorization.md",
+        "docs/role-matrix-print-and-read-guard-20261023.md",
+        "docs/evidence/dot-continuation-20261023/a03-role-matrix.json"
+      ],
+      "commits": [],
+      "completed_subitems": [
+        "Reuse existing custom project roles and capability-version invalidation; saved current-tenant role matrix printable snapshot with four-role/five-dimension verification, no invented signatures",
+        "Role-list return-time source/target membership and tenant-scope revalidation"
+      ],
+      "remaining_subitems": [
+        "Customer/supplier signed permission matrix and actual browser print acceptance",
+        "Large role-set pagination/partitioning beyond complete-print technical limit",
+        "Review tenant inventory/quota, invitation/MFA and menu badge contract gaps",
+        "Contact delivery and remaining A03 contract acceptance"
+      ]
     },
     {
       "id": "A04",

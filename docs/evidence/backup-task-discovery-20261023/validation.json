@@ -1,0 +1,50 @@
+{
+  "verified_at_utc": "2026-10-23T07:06:28.9334896Z",
+  "base": "05ec77ba",
+  "environment": "lan-test-20261008",
+  "postgresql": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "ssh_pinned": true,
+  "unit_tests": 19,
+  "actual_postgresql_read_tests": 1,
+  "suites": [
+    {
+      "name": "cn.mop.persistence.BackupTaskAuthorizationTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.persistence.BackupTaskDiscoveryPostgresReadTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.persistence.BackupTaskDiscoveryTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "business_writes": 0,
+  "migrations": 0,
+  "device_operations": 0,
+  "deployment": false,
+  "formal_contract_tc": "NOT_RUN",
+  "failed_attempts": [
+    "PowerShell split unquoted Maven property before tests; corrected quoting",
+    "Runtime role denied Flyway history read during supplemental version check; removed management-table read, no privilege changes"
+  ],
+  "not_verified": [
+    "nonempty actual backup queue",
+    "concurrent database revocation",
+    "actual KMS/OSS",
+    "device backup or recovery",
+    "download/decrypt",
+    "retention cleanup",
+    "formal contract acceptance"
+  ]
+}

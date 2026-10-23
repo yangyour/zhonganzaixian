@@ -1,9 +1,9 @@
 {
   "version": 1,
   "scope": "Candidate version coordination only; not a cross-host execution lock or deployment approval",
-  "observed_main": "d8a9b7c1c45f16e437891c95d63eaa368595c796",
-  "remote_branches_inspected": 50,
-  "existing_latest_reserved_version": 53,
+  "observed_main": "1a6688a05bc45c288cac69a49f55e33642477e35",
+  "remote_branches_inspected": 56,
+  "existing_latest_reserved_version": 54,
   "existing_v51_sha256": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b",
   "reservations": [
     {
@@ -23,6 +23,13 @@
     {
       "version": 54,
       "purpose": "M02 durable monitoring target enrollment and controlled registration journal",
+      "owner": "current dot continuation",
+      "status": "RESERVED_NOT_APPLIED",
+      "first_application_sha256": null
+    },
+    {
+      "version": 55,
+      "purpose": "M02 immutable monitoring object mapping drafts, verified activation and revocation history",
       "owner": "current dot continuation",
       "status": "RESERVED_NOT_APPLIED",
       "first_application_sha256": null

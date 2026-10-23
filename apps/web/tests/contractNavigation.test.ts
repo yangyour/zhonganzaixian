@@ -22,3 +22,12 @@ it('maps every live business route exactly once, retaining detail context and al
   expect(visibleNavigationModules({ ...current, capabilities: [] }, router.getRoutes())).toEqual([])
   expect(visibleNavigationModules(current, router.getRoutes()).some(module => module.id === 'M7')).toBe(false)
 })
+
+it('places service tiers and SLA compensation under their explicit contract clauses', () => {
+  const source = JSON.parse(readFileSync(resolve('../../doc/development/evidence/contract_requirements.json'), 'utf8'))
+  for (const [route, clause] of [['service-tiers', 'M2-10'], ['sla-reports', 'M5-9'], ['sla-reports', 'M5-10'], ['sla-reports', 'M5-19']]) {
+    const requirement = source.requirements.find((entry: {id:string}) => entry.id === clause)
+    const module = contractNavigationModules.find(module => module.items.some(item => item.name === route))
+    expect(module!.id + module!.title).toBe(requirement.module)
+  }
+})

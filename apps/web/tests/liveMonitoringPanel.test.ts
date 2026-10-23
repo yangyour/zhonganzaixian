@@ -31,6 +31,7 @@ it('contract Top5 switches CPU, memory and unconnected disk without inventing a 
  const raw=snapshot();raw.devices[0]!.vendor_metrics_status='PARTIAL_API'
  const calls=vi.spyOn(api,'request').mockImplementation(async path=>(path.endsWith('/resources')?resource():raw) as any)
  mount({mode:'ranking'});await settle()
+ expect(host.querySelector('.live-history')).toBeNull()
  expect(host.querySelector('.contract-ranking')?.textContent).toContain('12.5%')
  expect(host.querySelector('meter')?.getAttribute('max')).toBe('100')
  const selector=host.querySelector<HTMLSelectElement>('[aria-label="资源排行指标"]')!

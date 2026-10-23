@@ -21,6 +21,7 @@ export const contractNavigationModules: readonly NavigationModule[] = [
     ['tenant-inventory', '租户资源台账', '租户与联系人'],
     ['customer-contacts', '客户联系人', '租户与联系人'],
     ['contact-imports', '联系人批量导入', '租户与联系人'],
+    ['service-tiers', '服务档位与SLA台账', '服务档位'],
     ['identity-users', '用户与成员授权', '身份与权限'],
     ['identity-roles', '角色与权限', '身份与权限'],
     ['identity-settings', '身份认证设置', '身份与权限'],
@@ -40,7 +41,7 @@ export const contractNavigationModules: readonly NavigationModule[] = [
   { id: 'M5', title: '工单与SLA', items: entries([
     ['tickets', '报障与受理', '工单处理'], ['ticket-workflows', '工单处理', '工单处理'],
     ['oncall-board', '值班看板与升级链', '值班与工时'], ['my-worklogs', '我的工时记录', '值班与工时'],
-    ['service-tiers', '服务档位与SLA台账', '服务等级'], ['sla-scenarios', 'SLA 场景测算', '服务等级'],
+    ['sla-scenarios', 'SLA 场景测算', '服务等级'], ['sla-reports', 'SLA月报与赔付', '服务等级'],
   ]) },
   { id: 'M6', title: '配置备份', items: entries([
     ['backup-plan-drafts', '备份计划草稿'], ['change-notice-drafts', '变更报备草稿'],
@@ -53,7 +54,7 @@ export const contractNavigationModules: readonly NavigationModule[] = [
     ['wecom', '企业微信', '通知渠道'], ['email', '邮件通知', '通知渠道'],
   ]) },
   { id: 'M9', title: '月报与体检报告', items: entries([
-    ['sla-reports', 'SLA月报与赔付', '服务报告'], ['inspection-quarterly-reports', '季度巡检报告草稿', '服务报告'],
+    ['inspection-quarterly-reports', '季度巡检报告草稿', '服务报告'],
     ['inspection-templates', '巡检模板管理', '巡检管理'], ['inspection-worksheets', '人工巡检工单', '巡检管理'],
     ['inspection-source-collections', '巡检来源集合', '巡检管理'],
   ]) },

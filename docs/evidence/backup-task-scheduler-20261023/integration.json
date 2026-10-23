@@ -1,0 +1,19 @@
+{
+  "verified_at_utc": "2026-10-23T07:36:52.5580669Z",
+  "integration_base": "ecce9434ff7aa44e2e1d233cba4ca4fc33a5d00b",
+  "validated_merge": "df7ef1c4c8aca6b8e49ab8bb586e70ce72045f5a",
+  "logic_tests_executed": 91,
+  "failures": 0,
+  "errors": 0,
+  "actual_postgres_test_skipped_in_default_reactor": 1,
+  "explicit_designated_postgres_read_tests_passed": 1,
+  "read_evidence": "validation.json",
+  "new_logic_tests_across_both_features": 37,
+  "existing_consumer_regression_tests": 54,
+  "business_writes": 0,
+  "migrations": 0,
+  "external_storage_operations": 0,
+  "deployed": false,
+  "enabled": false,
+  "formal_tc": "NOT_RUN"
+}

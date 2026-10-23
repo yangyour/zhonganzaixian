@@ -515,3 +515,5 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 资产并行检出通过固定SSH主机信任、原主目录Git忽略私有资料及临时回环隧道复用 `lan-test-20261008` 既有 PostgreSQL 17.9，核验容器项目归属和运行状态。`environment.lock` 内用全新UUID隔离租户进行外层回滚测试，业务SQL使用既有受限运行角色；结束确认租户不存在。未安装/升级/停服/改变端口/执行迁移，未恢复旧测试身份或向真实业务租户写合成数据。
 
 用途是33列来源导入的授权、引用、配额检查、事务回滚和回执；原始来源种子明确为隔离合成解析产物，未将对象存储/独立解析Worker作为本批已联调组件。真提交并发、崩溃恢复、500行60秒和正式HTTP/浏览器TC仍未验，无新增替代组件候选。详细边界和复验结果见 [资产导入说明](../cmdb-import-execution-20261023.md)、[资产进度](../parallel/assets-progress.md)。
+
+2026-10-23 备份后处理调度增量只复用以上 PostgreSQL 原日志和原运行租约，不增加组件。代码已提供显式授权装配与有界轮询；当前 grant/真实证明来源/对象与密钥适配未启用，非空实库写调度和真实 OSS/KMS 仍 NOT_RUN。指定 PG 17.9 仅复验发现查询，不把组件连接或合成故障测试当成真实备份成功。见 [调度契约](../backup-task-scheduler-20261023.md) 与 [集成证据](../evidence/backup-task-scheduler-20261023/integration.json)。

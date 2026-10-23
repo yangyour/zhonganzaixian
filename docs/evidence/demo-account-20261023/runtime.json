@@ -1,0 +1,17 @@
+{
+  "verified_at": "2026-10-23T09:44:00.141884+00:00",
+  "scope": "Designated server; actual demo tenants only",
+  "runtime": {
+    "previous_source_preserved": true,
+    "existing_bindings_preserved": 4,
+    "demo_bindings_added": 3,
+    "external_dispatch_changes": 0,
+    "schema_unchanged": true,
+    "other_13_containers_unchanged": true
+  },
+  "protected_rows_unchanged": true,
+  "schema_version": 50,
+  "migrations": 0,
+  "offline_plan_tests": 18,
+  "credentials_recorded": false
+}

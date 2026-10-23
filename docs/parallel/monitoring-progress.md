@@ -47,3 +47,54 @@ M01复发切片已提交并推送 `4a62c0a3`。指定PG隔离 attempt5 执行7�
 契约再生成发现上游聚合生成器未保留已发布DEMO schema、session可选标记与停用渠道说明，首轮199项中4项失败；已从本次HEAD的规范契约恢复到独立生成模块，重新生成仅保留预期复发元数据增量，199项全部通过。DEMO隔离边界未删减。恢复观察窗属于后续独立变更，当前切片不将其标为完成。
 
 复发周期集成基线 5d3ecb66 已吸收最新主干 b122896b，并在干净的集成源码上再次通过指定PG7项、Java74项和契约200项。集成时采用上游已新增的 demo-api-contract 单一生成模块，删除本线重复生成模块，DEMO结构和停用外发说明保持。第二次独立租户测试身份已停用，保护摘要和V50历史保持，见 evidence/monitoring-recurrence-cycles-20261023/integration-postgresql.json。
+
+## 用户停止开发后的收尾状态（2026-10-23）
+
+用户最新明确要求结束现有开发、整理进度并提交，剩余部分由总会话归入单一文档；随后再次要求不增加测试场景、接口字段或修复。本线已停止新增工作，不再申请main集成锁、不再启动联调或自动继续。以下为当前最终交接，覆盖上文“继续/正在接线”的阶段性描述；M01–M05均未整项标为VERIFIED。
+
+### 已提交并进入main的本轮增量
+
+- `4a62c0a3`：复发周期任务、原SLA截止不重置、旧周期过时、耐久复发意图、终态工单保护及页面标签。
+- `829d3f94`：首轮7项指定PG验证证据。
+- `5d3ecb66`：吸收当时最新main后的正常合并。
+- `87016702`：干净集成源码上再次完成7项真实指定PG验证，已推送main和监控分支。
+- 验证：74项相关Java回归、47项Web、类型检查通过；集成契约200项通过。两次独立PG测试均7/7通过，包含并发信号、并发Worker、事务失败回滚、终态隔离和实际站内relay消费。V50、0迁移；未部署、未发送供应商消息。
+
+### 尚未提交的M01恢复观察草稿
+
+**状态：WIP_NOT_RELEASE_READY，未合入main，不属于可发布提交。** 已尝试实现服务端绑定来源采样、精确发布策略、不可变证据、确认t2与待复核、SLA证据门禁、原回执查询及事件详情面板，但验证仍未收敛。全部25个源文件路径见 [草稿状态与文件清单](../evidence/monitoring-stop-20261023/wip-status.json)。
+
+- 最新指定PG attempt3：10项，9通过、1失败、0错误、0跳过。通过项包含真实指定测试服务器采样、至少2个点且跨度达到显式测试观察时长、租户隔离、并发确认、CAS回滚、策略到期及旧恢复标记门禁。**整个测试组仍FAILED，不能把单个真实来源用例通过解释为功能验收通过。**
+- 未解决失败：`MonitoringRecoveryDesignatedIntegrationTest.confirmedEvidenceCommitsWithEventAndSlaAndOriginalReplayDoesNotResample` 第225行的回执JSON树比较断言。两份JSON字段值表面一致，数字节点类型需进一步核查；未修复/复验。首轮attempt1的Map强转辅助函数错误及失败摘要保留，不覆盖失败记录。
+- 最新Web回归52项通过；TypeScript检查有2处 `MessageBoxData` 测试mock类型错误，位于 `apps/web/tests/monitoringRecoveryPanel.test.ts`。未再修复或扩展。
+- 尚未完成：最终全量契约/构建收敛、桌面真实浏览器验证、完整观察窗/复发连续链回归和正式TC。对应新API及旧信号拦截改动均在stash，当前main不包含这些草稿门禁。
+- 两次观察测试的新增无登录执行身份及审核身份均已停用；已有实际/DEMO/其他租户相关表摘要、Flyway历史保持；供应商写入0、外部消息0、迁移0。完整摘要：[attempt1失败](../evidence/monitoring-stop-20261023/observation-attempt1.json)、[attempt3失败](../evidence/monitoring-stop-20261023/observation-attempt3.json)。原始日志仅在本检出忽略目录 `.local/monitoring-observation-20261023/`。
+
+**恢复方式仅供用户以后明确恢复开发时使用，本轮不执行：**
+
+```powershell
+git -C 'E:\work\wxw9\zhonganzaixian\.parallel\launch-20261023\monitoring' stash show --include-untracked --stat 61135c687be73bf2decaadc81d438268141f661d
+git -C 'E:\work\wxw9\zhonganzaixian\.parallel\launch-20261023\monitoring' stash apply 61135c687be73bf2decaadc81d438268141f661d
+```
+
+最新stash名称：`monitoring-stop-M01-recovery-observation-WIP-20261023`；基线`87016702`，包含未跟踪的新源文件、测试及生成契约。应用前先检查工作树和最新main，若冲突逐项保留上游，不使用reset覆盖。旧stash `11546d45c48e0298c1a6bce252d49160ab57a063` 是较早的部分备份，已被新stash覆盖，不应叠加应用。保留两份stash，不将草稿偷偷转成可发布commit。
+
+### M01–M05真正剩余项（供总单文档汇总）
+
+| ID | 可独立开发/验证的剩余工作 | 客户、组件或启用依赖 |
+| --- | --- | --- |
+| M01 | 恢复上述观察草稿，处理已登记验证失败、完成接口/页面/原请求恢复和真实浏览器收敛，再核对观察确认→t2→复发周期→复核/关单全链；真实来源通过的单用例仍不能核销整个编号。 | 其他设备的真实参数/来源授权、正式阈值/保持时长/最大间隔/采样数等未确认值仍为null；生产启用与正式TC另需授权。已有指定测试源可继续用于隔离验证。 |
+| M02 | 持久注册任务、参数/OID/模板消费、显式应用/首值读取、失败重试及页面恢复；234目录仅为目录，不能视作接通。 | 对应设备只读凭据、OID/API资料和网络/证书许可；真实采集启用仍未授权。 |
+| M03 | 模板版本/摘要、灰度批次/观察/回退；Proxy、站点、资源池生命周期和容量校验及相关API/页面。 | 实际Proxy/资源池清单、容量/选型待确认值、真实发布/回退操作授权。 |
+| M04 | 复核现有正式激活/流转后，补自动激活、外部ITSM同步与补偿、升级/重开/工时遗漏及端到端调用方；通知只生成耐久意图。 | ITSM权威系统/接口与账号、未定服务日历和时限、值班及升级人员/规则；外发由通知线受控处理。 |
+| M05 | 统一SLA快照、正式导出、冻结对账、补偿审批和舍入证据；不自动支付。 | 月费/价格矩阵、月份服务档位、未确认补偿与对账口径、正式审批人员与签收。 |
+
+以上依赖只限制对应真实验证/启用，不应在未来恢复开发时用来停止通用可配置流程。A/N/B/R/P及总JSON仍由各线/集成会话负责，本线不改写其他责任范围或总完成状态。
+
+### 拥有资源与工作区
+
+- 无本线候选API/Web进程；18212/15212检查无监听。未创建本线浏览器标签页或浏览器会话。
+- 所有本线验证Python/Maven/Vitest调用已结束；验证工具的SSH及回环隧道已在finally关闭。无本线持有的environment/integration/migration锁；其他会话的锁未触碰。
+- 为防止将WIP字节码混入未来发布，domain/persistence/adapters/api的`target`链接已从标准构建位置移到本检出 `.local/stopped-wip-target-links/`；实际文件仍在 `D:\CodexData\workspace-builds\monitoring-launch-20261023`。这些是草稿构建产物，不得部署；以后须按恢复后的源码重新构建。
+- Web依赖仍为本线独立D盘目录的junction，仅为文件，不是运行服务。测试数据按不可变证据保留，仅本次新身份已停用；未清除其他项目/租户数据。
+- 本次收尾只提交本进度及已审查的脱敏失败摘要，未提交任何观察草稿源码。总会话已接管main归档；本线只推送自己的功能分支，随后结束。

@@ -1,0 +1,39 @@
+{
+  "verified_at_utc": "2026-10-23T16:01:26.1256425Z",
+  "checklist_id": "B01.3",
+  "status": "CODE_COMPLETE_NEEDS_VERIFICATION",
+  "base": "47b32aae",
+  "java_logic_tests": 47,
+  "actual_postgres_read_tests": 1,
+  "postgres_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "web_tests": 123,
+  "contract_tests": 209,
+  "typecheck": "PASSED",
+  "web_build": "PASSED",
+  "web_build_id": "4fdfacc6ceb560d6885f1d50b4d3bdfe1b5850b5f11c987f0ced28415f185df4",
+  "browser_tests": 4,
+  "browser_scope": "Actual Chromium with labelled synthetic API and file responses; not provider integration",
+  "viewports": [
+    1024,
+    1440
+  ],
+  "axe_violations": 0,
+  "actual_object_access": 0,
+  "actual_device_operations": 0,
+  "database_business_writes": 0,
+  "migrations": 0,
+  "deployed": false,
+  "formal_tc": "NOT_RUN",
+  "previous_attempts": [
+    "HTTP test context lacked ObjectMapper: 4 HTTP tests did not initialize; corrected test wiring",
+    "Browser first pass: 3 passed / 1 failed due assertion of collapsed error details; corrected actual expand interaction",
+    "Full contract first pass: 199 passed / 1 failed for POST idempotency declaration; final endpoint uses original-design GET read computation"
+  ],
+  "remaining": [
+    "actual nonempty registered version -> OSS -> approved KMS -> real browser path",
+    "concurrent live revocation and failure recovery",
+    "B02 durable failure/restore/drill/retention/change flows"
+  ],
+  "own_resources_closed": true,
+  "main_integration": "Deferred to coordinating chat per user stop instruction"
+}

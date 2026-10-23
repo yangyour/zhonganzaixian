@@ -5,6 +5,7 @@ import type { Asset } from '../api/types'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { createBackupInventoryReader, type BackupInventoryState } from '../utils/backupVersionInventory'
 import ApiErrorNotice from './ApiErrorNotice.vue'
+import BackupVersionAccessPanel from './BackupVersionAccessPanel.vue'
 const props = defineProps<{ asset: Asset }>()
 const headingId = useId(), resultId = useId()
 const root = ref<HTMLElement>(), heading = ref<HTMLElement>(), result = ref<HTMLElement>(), failure = ref<HTMLElement>()
@@ -55,6 +56,7 @@ const guidance = computed(() => problem.value?.code === 'BACKUP_VERSION_INVENTOR
         </table>
       </div>
       <p>不能将本列表作为可恢复性证明。</p>
+      <BackupVersionAccessPanel v-if="state.current.items.length" :asset-id="asset.id" :tenant-id="asset.tenant_id" :versions="state.current.items" />
     </section>
   </section>
 </template>

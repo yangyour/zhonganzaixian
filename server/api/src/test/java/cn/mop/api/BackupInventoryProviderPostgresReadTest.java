@@ -53,7 +53,7 @@ class BackupInventoryProviderPostgresReadTest {
             var grant = Map.of("binding_reference", "backup-task-binding:read-verification", "tenant_id", access.tenantId().toString(),
                     "asset_id", scope.assetId().toString(), "actor_id", access.actorId().toString(),
                     "permission_version", access.permissionVersion(), "expires_at", Instant.now().plusSeconds(120).toString(),
-                    "operations", List.of("VERSION_INVENTORY", "VERSION_READ"));
+                    "operations", List.of("VERSION_INVENTORY", "VERSION_READ", "VERSION_DOWNLOAD"));
             mapper.writeValue(file.toFile(), Map.of("schema_version", 1, "grants", List.of(grant)));
             var reader = BackupVersionInventoryConfiguration.configured(source, Map.of(
                     "MOP_BACKUP_ACCESS_GRANTS_FILE", file.toString(),
@@ -61,6 +61,16 @@ class BackupInventoryProviderPostgresReadTest {
             var page = reader.inventory(access, scope, null, 5);
             assertTrue(page.items().size() <= 5);
             assertTrue(page.items().stream().noneMatch(item -> item.downloadAuthorized()));
+            var authority = new cn.mop.persistence.PostgresBackupTaskAuthorization("backup-task-binding:read-verification",
+                    new cn.mop.persistence.BackupGrantFile(file), java.time.Clock.systemUTC());
+            var versions = cn.mop.persistence.PostgresBackupVersionRepository.readOnly(source, authority.versionAuthorizer());
+            cn.mop.persistence.PostgresBackupVersionRepository.InventoryAuthorizer download = (connection, member, target) ->
+                    authority.require(connection, new cn.mop.persistence.PostgresBackupArchiveRepository.Access(
+                            member.tenantId(), member.actorId(), member.permissionVersion()), target.tenantId(), target.assetId(),
+                            cn.mop.persistence.BackupTaskGrant.Operation.VERSION_DOWNLOAD);
+            assertTrue(versions.findVersion(access, scope, UUID.randomUUID(), download).isEmpty());
+            assertEquals(404, assertThrows(DomainException.class, () -> versions.findVersion(access,
+                    new InventoryScope(access.tenantId(), UUID.randomUUID()), UUID.randomUUID(), download)).status);
             var foreign = new InventoryScope(UUID.randomUUID(), scope.assetId());
             assertEquals(404, assertThrows(DomainException.class, () -> reader.inventory(access, foreign, null, 5)).status);
             var onlyVersionRead = new java.util.HashMap<>(grant);

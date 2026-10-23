@@ -28,6 +28,63 @@ public final class PostgresBackupVersionRepository {
  }
  public record Receipt(Registration registration,boolean replay){}
  public static final int MAX_INVENTORY_PAGE_SIZE=50;
+ /** Select one immutable registered version without granting asset-wide enumeration or exposing an unverified row. */
+ public Optional<Receipt> findVersion(Access access, InventoryScope scope, UUID versionId,
+         InventoryAuthorizer lookupAuthorizer) {
+     if (access == null || scope == null || versionId == null || lookupAuthorizer == null) {
+         throw invalid();
+     }
+     if (!access.tenantId().equals(scope.tenantId())) {
+         throw new DomainException(404, "BACKUP_VERSION_NOT_FOUND", "当前范围未找到版本登记");
+     }
+     try (Connection connection = source.getConnection()) {
+         connection.setAutoCommit(false);
+         try {
+             try (var statement = connection.createStatement()) {
+                 statement.execute("SET LOCAL lock_timeout='5s'");
+                 statement.execute("SET LOCAL statement_timeout='10s'");
+             }
+             // The caller already has asset visibility; hide foreign IDs before the independent content grant check.
+             try (var query = query(connection, "SELECT 1 FROM public.mop_asset WHERE tenant_id=? AND id=?")) {
+                 query.setObject(1, scope.tenantId());
+                 query.setObject(2, scope.assetId());
+                 try (var rows = query.executeQuery()) {
+                     if (!rows.next()) {
+                         throw new DomainException(404, "BACKUP_VERSION_NOT_FOUND", "当前范围未找到版本登记");
+                     }
+                 }
+             }
+             authorizeInventory(connection, access, scope, lookupAuthorizer);
+             lockAsset(connection, scope.tenantId(), scope.assetId());
+             Registration registration = null;
+             try (var query = query(connection,
+                     "SELECT * FROM public.mop_backup_version_registration WHERE tenant_id=? AND asset_id=? AND version_id=?")) {
+                 query.setObject(1, scope.tenantId());
+                 query.setObject(2, scope.assetId());
+                 query.setObject(3, versionId);
+                 try (var rows = query.executeQuery()) {
+                     if (rows.next()) {
+                         registration = row(rows);
+                         authorize(connection, access, registration.candidate().scope(), Operation.READ);
+                         verifyRegistration(connection, registration);
+                     }
+                 }
+             }
+             authorizeInventory(connection, access, scope, lookupAuthorizer);
+             connection.commit();
+             return registration == null ? Optional.empty() : Optional.of(new Receipt(registration, false));
+         } catch (SQLException | RuntimeException failure) {
+             try {
+                 connection.rollback();
+             } catch (SQLException ignored) {
+                 // No result is returned when read verification or transaction completion is uncertain.
+             }
+             throw failure;
+         }
+     } catch (SQLException failure) {
+         throw unavailable();
+     }
+ }
  public record InventoryScope(UUID tenantId,UUID assetId){public InventoryScope{if(tenantId==null||assetId==null)throw invalid();}}
  /** Separate asset-wide enumeration authority, not draft editing or permission to download. Hold revocation locks; no external IO. */
  @FunctionalInterface public interface InventoryAuthorizer{void authorize(Connection connection,Access access,InventoryScope scope)throws SQLException;}

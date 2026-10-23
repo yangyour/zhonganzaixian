@@ -7,6 +7,14 @@ import { createMemoryHistory, createRouter, RouterView, type Router } from 'vue-
 import ElementPlus from 'element-plus'
 import type { Asset, AssetPage, Session } from '../src/api/types'
 
+// This suite isolates primary pagination/filter traffic. The independent facts reader and its
+// page wiring are covered by assetLedgerFacts.test and assetsLedgerFactsPage.test.
+vi.mock('../src/utils/assetLedgerFacts', async () => {
+  const { ref } = await import('vue')
+  return { useAssetLedgerFacts: () => ({ items: ref({}), stale: ref([]), observedAt: ref(null), cancelled: ref(false),
+    error: ref(null), busy: ref(false), refresh: vi.fn(), cancel: vi.fn(), dispose: vi.fn(), find: () => null }) }
+})
+
 vi.mock('../src/components/AppTable.vue', () => ({ default: { render: () => null } }))
 vi.mock('../src/components/AssetImportWorkspace.vue', () => ({ default: { render: () => null } }))
 vi.mock('../src/components/AssetDateQuery.vue', () => ({ default: { render: () => null } }))

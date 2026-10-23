@@ -45,3 +45,5 @@
 M01复发切片已提交并推送 `4a62c0a3`。指定PG隔离 attempt5 执行7项全部通过，实际租户相关14表摘要与Flyway历史保持，V50/0迁移，本次无登录身份已停用；包含真实事务中注入一次任务写失败并验证回滚、两个并发来源、两个并发Worker，以及实际站内relay消费；未发供应商消息。证据见 [PG摘要](../evidence/monitoring-recurrence-cycles-20261023/postgresql.json)。
 
 契约再生成发现上游聚合生成器未保留已发布DEMO schema、session可选标记与停用渠道说明，首轮199项中4项失败；已从本次HEAD的规范契约恢复到独立生成模块，重新生成仅保留预期复发元数据增量，199项全部通过。DEMO隔离边界未删减。恢复观察窗属于后续独立变更，当前切片不将其标为完成。
+
+复发周期集成基线 5d3ecb66 已吸收最新主干 b122896b，并在干净的集成源码上再次通过指定PG7项、Java74项和契约200项。集成时采用上游已新增的 demo-api-contract 单一生成模块，删除本线重复生成模块，DEMO结构和停用外发说明保持。第二次独立租户测试身份已停用，保护摘要和V50历史保持，见 evidence/monitoring-recurrence-cycles-20261023/integration-postgresql.json。

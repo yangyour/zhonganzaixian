@@ -42722,6 +42722,213 @@
             "description": "Database or trusted artifact unavailable; entire batch rolled back."
           }
         }
+      },
+      "get": {
+        "operationId": "readCmdbSourceImportReceipt",
+        "summary": "Read the current creator-authorized committed import receipt",
+        "description": "Read-only repeatable snapshot rechecks current membership, assets:write, internal role and source creator. NO_COMMITTED_RECEIPT does not prove failure of an in-flight request and does not authorize changing an uncertain original idempotency key.",
+        "x-mop-read-only": true,
+        "x-mop-capabilities": [
+          "assets:write"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Completed immutable receipt or explicitly unknown absence.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "trace_id"
+                  ],
+                  "properties": {
+                    "trace_id": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "tenant_id",
+                        "source_id",
+                        "status",
+                        "receipt",
+                        "absence_proves_failure"
+                      ],
+                      "properties": {
+                        "tenant_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "source_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "status": {
+                          "enum": [
+                            "COMPLETED",
+                            "NO_COMMITTED_RECEIPT"
+                          ]
+                        },
+                        "absence_proves_failure": {
+                          "const": false
+                        },
+                        "receipt": {
+                          "anyOf": [
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "source_id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "source_version": {
+                                  "type": "integer",
+                                  "minimum": 0
+                                },
+                                "artifact_id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "parse_hash": {
+                                  "type": "string"
+                                },
+                                "tenant_id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "status": {
+                                  "const": "IMPORTED_DRAFTS"
+                                },
+                                "assets": {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "maxItems": 500,
+                                  "items": {
+                                    "type": "object",
+                                    "required": [
+                                      "record",
+                                      "source_row",
+                                      "asset_id",
+                                      "asset_version"
+                                    ],
+                                    "properties": {
+                                      "record": {
+                                        "type": "integer",
+                                        "minimum": 0
+                                      },
+                                      "source_row": {
+                                        "type": "integer",
+                                        "minimum": 0
+                                      },
+                                      "asset_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                      },
+                                      "asset_version": {
+                                        "type": "integer",
+                                        "minimum": 0
+                                      }
+                                    }
+                                  }
+                                },
+                                "imported_count": {
+                                  "type": "integer",
+                                  "minimum": 1,
+                                  "maximum": 500
+                                },
+                                "configuration_releases": {
+                                  "type": "object",
+                                  "description": "Current tenant publication IDs and versions for all three rules."
+                                },
+                                "quota": {
+                                  "type": "object",
+                                  "required": [
+                                    "limit",
+                                    "before",
+                                    "after"
+                                  ],
+                                  "properties": {
+                                    "limit": {
+                                      "type": "integer",
+                                      "minimum": 0
+                                    },
+                                    "before": {
+                                      "type": "integer",
+                                      "minimum": 0
+                                    },
+                                    "after": {
+                                      "type": "integer",
+                                      "minimum": 0
+                                    }
+                                  }
+                                },
+                                "extended_attributes": {
+                                  "const": "RETAINED_IN_IMMUTABLE_SOURCE"
+                                },
+                                "monitoring_started": {
+                                  "const": false
+                                },
+                                "production_approved": {
+                                  "const": false
+                                }
+                              },
+                              "required": [
+                                "source_id",
+                                "source_version",
+                                "artifact_id",
+                                "parse_hash",
+                                "tenant_id",
+                                "status",
+                                "assets",
+                                "imported_count",
+                                "configuration_releases",
+                                "quota",
+                                "extended_attributes",
+                                "monitoring_started",
+                                "production_approved"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed, duplicate, oversized or unknown input; query overrides rejected."
+          },
+          "401": {
+            "description": "Session or membership version expired."
+          },
+          "403": {
+            "description": "CSRF, current capability or internal role denied."
+          },
+          "404": {
+            "description": "Source or referenced site/member does not exist or is not visible."
+          },
+          "503": {
+            "description": "Database or trusted artifact unavailable; entire batch rolled back."
+          }
+        }
       }
     },
     "/dashboard/pending-tickets": {

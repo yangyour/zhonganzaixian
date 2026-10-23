@@ -20,6 +20,7 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
   const policy = shallowRef<AssetImportPolicy | null>(null), policyLoading = ref(false), policyError = ref<unknown>(null)
   const error = ref<unknown>(null), uploadError = ref<unknown>(null), parseError = ref<unknown>(null), mappingError = ref<unknown>(null)
   const resumeError = ref<unknown>(null)
+  const executionPending = ref(false)
   const busy = ref<'upload' | 'parse' | 'mapping' | 'read' | 'resume' | null>(null), selectionMessage = ref(''), fields = ref<Record<string, string>>({})
   const uploadAttempt = ref<UploadAttempt | null>(null), parseAttempt = ref<ParseAttempt | null>(null), mappingAttempt = ref<MappingAttempt | null>(null)
   const selection = ref<{ encoding: string | null; delimiter: string | null; sheetIndex: number | null; headerRow: number | null }>({ encoding: null, delimiter: null, sheetIndex: null, headerRow: null })
@@ -27,18 +28,19 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
   const disposed = ref(false)
   let controller: AbortController | undefined, policyController: AbortController | undefined, epoch = 0
   const permitted = computed(() => !disposed.value && !switchingTenant.value && session.value?.mode === 'remote_test' && can('assets:write') && ['padmin', 'msp', 'tadmin'].includes(session.value?.user.role || ''))
-  const hasUnresolved = computed(() => Boolean(busy.value || unresolved(uploadAttempt.value) || unresolved(parseAttempt.value) || unresolved(mappingAttempt.value)))
+  const hasUnresolved = computed(() => Boolean(busy.value || executionPending.value || unresolved(uploadAttempt.value) || unresolved(parseAttempt.value) || unresolved(mappingAttempt.value)))
   const hasConflict = computed(() => parseAttempt.value?.state === 'CONFLICT' || mappingAttempt.value?.state === 'CONFLICT')
   const canReset = computed(() => !hasUnresolved.value)
   const artifact = computed(() => source.value?.parsed_artifact || null)
   const isParsed = computed(() => source.value?.parse_status === 'PARSED' && artifact.value?.state === 'PARSED')
-  const selectionLocked = computed(() => Boolean(busy.value || hasConflict.value || unresolved(parseAttempt.value) || source.value?.parse_status === 'PENDING' || mappingAttempt.value?.state === 'ACCEPTED' || source.value?.mapping))
-  const mappingLocked = computed(() => Boolean(busy.value || hasConflict.value || unresolved(mappingAttempt.value) || source.value?.mapping))
+  const selectionLocked = computed(() => Boolean(busy.value || executionPending.value || hasConflict.value || unresolved(parseAttempt.value) || source.value?.parse_status === 'PENDING' || mappingAttempt.value?.state === 'ACCEPTED' || source.value?.mapping))
+  const mappingLocked = computed(() => Boolean(busy.value || executionPending.value || hasConflict.value || unresolved(mappingAttempt.value) || source.value?.mapping))
   const context = (): ImportReadContext => ({ tenantId: session.value?.tenant.id || '', actorId: session.value?.user.id || '' })
   const original = () => file.value && format.value ? { name: file.value.name, size: file.value.size, format: format.value, sha256: uploadAttempt.value?.sha256 } : undefined
   const alive = (expected: number) => { if (disposed.value || expected !== epoch || controller?.signal.aborted) throw new StaleRequestError() }
   function begin(kind: NonNullable<typeof busy.value>) { controller?.abort(); controller = new AbortController(); busy.value = kind; error.value = null; return { expected: epoch, signal: controller.signal, context: context() } }
   function clear() {
+    executionPending.value = false
     controller?.abort(); policyController?.abort(); ++epoch; busy.value = null; policyLoading.value = false
     file.value = null; format.value = null; source.value = null; operation.value = null; mappingDraft.value = null; policy.value = null
     uploadAttempt.value = null; parseAttempt.value = null; mappingAttempt.value = null; error.value = null; uploadError.value = null; parseError.value = null; mappingError.value = null; policyError.value = null; resumeError.value = null
@@ -171,7 +173,7 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
     finally { if (request.expected === epoch) busy.value = null }
   }
   async function parse(inventory = false) {
-    if (!permitted.value || !policy.value || busy.value || hasConflict.value || !source.value || source.value.storage_status !== 'READY' || !format.value || source.value.mapping) return
+    if (!permitted.value || !policy.value || busy.value || executionPending.value || hasConflict.value || !source.value || source.value.storage_status !== 'READY' || !format.value || source.value.mapping) return
     if (parseAttempt.value?.state === 'ACCEPTED') { await refresh(); return }
     if (parseAttempt.value?.state === 'CONFLICT' || source.value.parse_status === 'PENDING' && parseAttempt.value?.state !== 'UNCERTAIN') return
     const retry = parseAttempt.value?.state === 'UNCERTAIN'
@@ -205,7 +207,7 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
     attempt.state = 'COMPLETE'
   }
   async function saveMapping() {
-    if (!permitted.value || !policy.value || busy.value || hasConflict.value || !source.value || !isParsed.value || !artifact.value || !mappingDraft.value) return
+    if (!permitted.value || !policy.value || busy.value || executionPending.value || hasConflict.value || !source.value || !isParsed.value || !artifact.value || !mappingDraft.value) return
     if (mappingAttempt.value?.state === 'ACCEPTED') { await refresh(); return }
     if (mappingAttempt.value?.state === 'CONFLICT' || source.value.mapping && mappingAttempt.value?.state !== 'UNCERTAIN') return
     const retry = mappingAttempt.value?.state === 'UNCERTAIN'
@@ -250,5 +252,6 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
     () => session.value?.user.role, () => session.value?.permission_version, () => session.value?.account_version, permitted], clear, { flush: 'sync' })
   function dispose() { stop(); disposed.value = true; clear() }
   return { file: readonly(file), format: readonly(format), source: readonly(source), artifact: readonly(artifact), operation: readonly(operation), policy: readonly(policy), policyLoading: readonly(policyLoading), policyError, permitted, busy: readonly(busy), error, uploadError, parseError, mappingError, selectionMessage, fields, selection, mappingDraft,
-    uploadAttempt: readonly(uploadAttempt), parseAttempt: readonly(parseAttempt), mappingAttempt: readonly(mappingAttempt), hasUnresolved, canReset, canResume, resumeError, resume, cancelResume, isParsed, selectionLocked, mappingLocked, chooseFile, upload, parse, saveMapping, refresh, reviseConflict, loadPolicy, reset, dispose }
+    uploadAttempt: readonly(uploadAttempt), parseAttempt: readonly(parseAttempt), mappingAttempt: readonly(mappingAttempt), hasUnresolved, canReset, canResume, resumeError, resume, cancelResume, isParsed, selectionLocked, mappingLocked, chooseFile, upload, parse, saveMapping, refresh, reviseConflict, loadPolicy, reset, dispose,
+    setExecutionPending: (value: boolean) => { executionPending.value = value } }
 }

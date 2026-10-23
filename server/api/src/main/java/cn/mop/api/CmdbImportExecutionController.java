@@ -38,6 +38,20 @@ public final class CmdbImportExecutionController {
         this.imports = imports;
     }
 
+    @GetMapping("/{id}/cmdb-imports")
+    Object receipt(@PathVariable String id, HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Cache-Control", "no-store");
+        response.setHeader("Referrer-Policy", "no-referrer");
+        Access access = access(request);
+        if (request.getQueryString() != null || !request.getParameterMap().isEmpty()) {
+            throw invalid();
+        }
+        if (id == null || !id.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")) {
+            throw new DomainException(404, "OBJECT_NOT_FOUND", "来源不存在或不可见");
+        }
+        return success(imports.receipt(access, id), request);
+    }
+
     @PostMapping(value = "/{id}/cmdb-imports", consumes = MediaType.APPLICATION_JSON_VALUE)
     Object execute(@PathVariable String id, HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Cache-Control", "no-store");

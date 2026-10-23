@@ -4,6 +4,8 @@ import AssetImportTemplateDownload from './AssetImportTemplateDownload.vue'
 import AssetImportSourcesPanel from './AssetImportSourcesPanel.vue'
 import AssetImportRawPreview from './AssetImportRawPreview.vue'
 import CmdbSourcePreflightPanel from './CmdbSourcePreflightPanel.vue'
+import CmdbImportExecutionPanel from './CmdbImportExecutionPanel.vue'
+import { isCmdbExecutionSource } from '../utils/cmdbImportExecution'
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { feedback as ElMessage } from '../utils/feedback'
@@ -16,15 +18,18 @@ import AppTable from './AppTable.vue'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 
 const props = defineProps<{ modelValue: boolean }>()
-const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
+const emit = defineEmits<{ 'update:modelValue': [value: boolean]; imported: [] }>()
 const open = computed({ get: () => props.modelValue, set: value => emit('update:modelValue', value) })
 const workspace = createAssetImportWorkspace()
 const { file, format, source, artifact, operation, policy, policyLoading, policyError, permitted, busy, error, uploadError, parseError, mappingError, fields, selectionMessage, selection, mappingDraft,
   uploadAttempt, parseAttempt, mappingAttempt, hasUnresolved, canReset, isParsed, selectionLocked, mappingLocked } = workspace
 const unaddressed = computed(() => artifact.value && mappingDraft.value ? assetImportUnaddressedColumns(artifact.value.columns, mappingDraft.value) : [])
 const conflict = computed(() => parseAttempt.value?.state === 'CONFLICT' ? { kind: 'parse' as const, attempt: parseAttempt.value } : mappingAttempt.value?.state === 'CONFLICT' ? { kind: 'mapping' as const, attempt: mappingAttempt.value } : null)
-const stage = computed(() => source.value?.mapping ? 4 : isParsed.value ? 3 : ['SELECTION_REQUIRED','PENDING'].includes(source.value?.parse_status||'') || parseAttempt.value?.state === 'ACCEPTED' ? 2 : source.value?.storage_status === 'READY' ? 1 : 0)
-const unsaved = computed(() => Boolean((file.value || source.value) && !source.value?.mapping))
+const executionCompleted = ref(false)
+const cmdb = computed(() => isCmdbExecutionSource(source.value))
+const stage = computed(() => executionCompleted.value ? 5 : source.value?.mapping ? 4 : isParsed.value ? 3 : ['SELECTION_REQUIRED','PENDING'].includes(source.value?.parse_status||'') || parseAttempt.value?.state === 'ACCEPTED' ? 2 : source.value?.storage_status === 'READY' ? 1 : 0)
+const unsaved = computed(() => Boolean((file.value || source.value) && !source.value?.mapping && !executionCompleted.value))
+watch(() => source.value?.id, () => { executionCompleted.value = false })
 const sourceSummary=ref<HTMLElement>()
 let disposed = false, confirming = false
 async function openExisting(id:string){const origin=document.activeElement as HTMLElement|null,scope=contextKey();const opened=await workspace.resume(id);await nextTick();if(disposed||scope!==contextKey())return;if(opened)sourceSummary.value?.focus();else if(origin?.isConnected)origin.focus()}
@@ -64,7 +69,7 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
 <template>
   <el-drawer v-model="open" title="资产台账批量导入" size="940px" class="asset-import-drawer" :close-on-click-modal="false">
     <AssetImportTemplateDownload />
-    <el-steps class="asset-import-steps" :active="stage" simple aria-label="资产来源处理阶段"><el-step title="上传源文件"/><el-step title="配置解析"/><el-step title="表头预览"/><el-step title="字段映射"/><el-step title="待策略入库"/></el-steps>
+    <el-steps class="asset-import-steps" :active="stage" simple aria-label="资产来源处理阶段"><el-step title="上传源文件"/><el-step title="配置解析"/><el-step title="表头预览"/><el-step title="字段核对"/><el-step title="导入草稿"/></el-steps>
     <el-skeleton v-if="policyLoading" :rows="3" animated aria-label="读取来源技术政策" />
     <ApiErrorNotice :error="policyError"><el-button size="small" :disabled="policyLoading" @click="workspace.loadPolicy">重新读取解析规范</el-button></ApiErrorNotice>
     <el-empty v-if="!permitted" description="当前账号无资产批量导入权限" />
@@ -139,7 +144,8 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
       </section>
 
       <CmdbSourcePreflightPanel v-if="isParsed && source && artifact" :source="source" />
-      <section v-if="isParsed && mappingDraft && source && artifact" class="asset-import-section">
+      <details v-if="cmdb && artifact" class="asset-import-section"><summary>查看33列原始数据与来源行号</summary><AssetImportRawPreview :artifact="artifact" /></details>
+      <section v-if="!cmdb && isParsed && mappingDraft && source && artifact" class="asset-import-section">
         <h3>4. 标准 15 列字段映射与数据预览</h3>
         <p class="field-help">为每个标准字段选择源列或“不映射”；“备注”必映射，同一源列不可重复绑定，其余源列请勾选“忽略源列”。</p>
         <div class="asset-import-mapping-grid">
@@ -164,10 +170,11 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
         <AssetImportRawPreview :artifact="artifact" />
       </section>
 
-      <section v-if="source" class="asset-import-section"><h3>5. 批量入库策略状态</h3>
-        <ul aria-label="当前来源实际完成情况"><li>源文件归档：{{source.storage_status==='READY'?'已完成校验':source.storage_status==='FAILED'?'失败':'处理中'}}</li><li>表头与数据解析：{{isParsed?'已解析':source.parse_status==='FAILED'?'失败':source.parse_status==='SELECTION_REQUIRED'?'待选择工作表与表头':'尚未完成'}}</li><li>旧 15 列映射：{{source.mapping?'已保存':'尚未保存'}}</li></ul>
-        <p class="field-help">正式批量入库未开放：仍需完成引用与地址策略、配额及事务入库链路；本工作区不执行正式资产入库。</p>
+      <section v-if="source" class="asset-import-section"><h3>来源准备状态</h3>
+        <ul aria-label="当前来源实际完成情况"><li>源文件归档：{{source.storage_status==='READY'?'已完成校验':source.storage_status==='FAILED'?'失败':'处理中'}}</li><li>表头与数据解析：{{isParsed?'已解析':source.parse_status==='FAILED'?'失败':source.parse_status==='SELECTION_REQUIRED'?'待选择工作表与表头':'尚未完成'}}</li><li v-if="cmdb">33列已识别，无需保存旧15列映射</li><li v-else>旧 15 列映射：{{source.mapping?'已保存':'尚未保存'}}</li></ul>
+        <p class="field-help">来源归档、解析和旧映射属于准备阶段。33列来源通过下方独立执行区创建草稿；只有已核验回执才表示写入成功，不执行监控纳管。</p>
       </section>
+      <CmdbImportExecutionPanel v-if="source" :source="source" :staging-busy="Boolean(busy)" @pending="workspace.setExecutionPending" @completed="executionCompleted = $event" @imported="emit('imported')" @navigate="open = false" />
     </template>
   </el-drawer>
 </template>

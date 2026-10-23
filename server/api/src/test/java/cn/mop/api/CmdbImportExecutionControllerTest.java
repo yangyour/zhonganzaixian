@@ -94,4 +94,24 @@ class CmdbImportExecutionControllerTest {
                 () -> controller.execute(SOURCE, request(body()), new MockHttpServletResponse())).status);
         verify(imports, never()).execute(any(), anyString(), any());
     }
+
+    @Test
+    void receiptLookupIsReadonlyCreatorScopedAndHasNoFailureInference() {
+        var response = new MockHttpServletResponse();
+        when(imports.receipt(any(), eq(SOURCE))).thenReturn(Map.of("status", "NO_COMMITTED_RECEIPT", "absence_proves_failure", false));
+        controller.receipt(SOURCE, request(""), response);
+        verify(imports).receipt(argThat(a -> a.actorId().equals(ACTOR) && a.tenantId().equals(TENANT)), eq(SOURCE));
+        verify(imports, never()).execute(any(), anyString(), any());
+        verify(platform, never()).idempotentAuthorized(any(), any(), any(), any(), any(), anyLong(), any(), any());
+        assertEquals("no-store", response.getHeader("Cache-Control"));
+    }
+
+    @Test
+    void receiptLookupRejectsTenantOverridesAndHiddenSources() {
+        var query = request("");
+        query.addParameter("tenant_id", TENANT);
+        assertEquals(400, assertThrows(DomainException.class, () -> controller.receipt(SOURCE, query, new MockHttpServletResponse())).status);
+        when(imports.receipt(any(), anyString())).thenThrow(new DomainException(404, "OBJECT_NOT_FOUND", "missing"));
+        assertEquals(404, assertThrows(DomainException.class, () -> controller.receipt(SOURCE, request(""), new MockHttpServletResponse())).status);
+    }
 }

@@ -1,0 +1,52 @@
+{
+  "checklist_id": "A01",
+  "status": "VERIFIED_SUBSET_NOT_WHOLE_A01",
+  "base_after_sync": "b122896b84fc18fc09a3410f66e08676b22cbbd9",
+  "live_candidate_base": "9cdccdc8b0380a320663812b235cc8909dcf997b",
+  "live_candidate_jar_sha256": "e1d9f266b167140705ed9adda4b4da99de9732ca48d843866807e8b8772cd80c",
+  "java": {
+    "total": 4289,
+    "executed": 3247,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1042
+  },
+  "web": {
+    "full_before_main_sync": 4983,
+    "targeted_after_main_sync": 92,
+    "typecheck": "PASSED",
+    "production_build": "PASSED",
+    "desktop_viewports": [
+      1440,
+      1024
+    ],
+    "new_region_axe_violations": 0
+  },
+  "contracts": {
+    "tests": 200,
+    "passed": 200,
+    "generator_consistency": "PASSED",
+    "upstream_demo_generator_reused": "581f4a6b"
+  },
+  "gap_checker": {
+    "requirements": 128,
+    "tasks": 25,
+    "unassigned": 0,
+    "completion_verified": false
+  },
+  "source_sha256": {
+    "apps/web/src/components/CmdbImportExecutionPanel.vue": "2e6a0de7d8bb8995d97d77b61265d2c515267a2778ee4797e4386d75615a0fdf",
+    "apps/web/src/utils/cmdbImportExecution.ts": "32ca6010a5323b16a471416a2e403e53ec23cdaf7a7673f92449f10bc17b56a0",
+    "apps/web/src/components/AssetImportWorkspace.vue": "cdf7d0527f810f02f1a2a0457f625214bcc006131260ff363576414b10f2ea19",
+    "server/api/src/main/java/cn/mop/api/CmdbImportExecutionController.java": "61685171bc4978eb0cfd50d4b7c4cb8b3401e1d032a2b5549a1443aeebf0fa95",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresAssetImportRepository.java": "92c8518deda96aa783dce62327eb0eb39d31ee0aa4c5f098743141ab12cfb093",
+    "tools/cmdb-import-live-session.py": "307152736d40ee85fcd7d0c0dfd082e9a4ca931d1f18fa81ab016b52c32e96bc"
+  },
+  "formal_tc": "NOT_RUN",
+  "known_remaining": [
+    "structured extension and trusted relationship projection",
+    "500 rows within 60 seconds",
+    "formal asynchronous import and error workbook",
+    "full A02-A05 implementation"
+  ]
+}

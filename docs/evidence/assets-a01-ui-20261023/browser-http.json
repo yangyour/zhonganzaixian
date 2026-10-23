@@ -1,0 +1,564 @@
+{
+  "checklist_id": "A01",
+  "status": "VERIFIED_SUBSET",
+  "environment": "lan-test-20261008",
+  "postgresql": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "source_kind": "real CSV upload, designated MinIO, existing independent parser worker",
+  "namespace_kind": "fresh SYNTHETIC isolated tenants; not existing DEMO or actual business tenants",
+  "candidate_origin": "http://127.0.0.1:15211",
+  "candidate_api": "http://127.0.0.1:18211",
+  "candidate_global_readiness": 503,
+  "unready_components": [
+    "photos"
+  ],
+  "scope": "import dependencies verified by real accepted upload/storage/parse/commit; photos not configured in candidate",
+  "imported_batches": [
+    {
+      "source_id": "1ef068ba-e323-4133-9890-953d09bc9f2b",
+      "artifact_id": "3624eec1-e7ab-4fe8-861c-1207ae2ed3f0",
+      "parse_hash": "49d4ee934344ac149c92f467a0a888c3cbed3fb1c8ac54fc7cf75b4f2aeebca4",
+      "imported_count": 2,
+      "assets": [
+        "1fca2ddf-ed0f-4784-bfaa-8243180d7ddc",
+        "c290151e-bdae-4c3f-ac4b-d191157ee193"
+      ]
+    },
+    {
+      "source_id": "398feecf-6b08-455d-b8ab-8082ffff6a71",
+      "artifact_id": "cf617fa6-0acf-4871-8655-044dfc3b43fe",
+      "parse_hash": "63b593a5a2a4e56615899583a40b66098bb8292fec9c83f911d2cebe34e4a331",
+      "imported_count": 2,
+      "assets": [
+        "1afd0e20-04ac-4e01-878c-566d707672f1",
+        "43da470f-5aff-433e-b92c-04d56c798475"
+      ]
+    },
+    {
+      "source_id": "9d5392ff-eb0a-4a79-be60-9dd520c14bc2",
+      "artifact_id": "d283d3ab-5ec1-465a-92d9-82d11a0fe304",
+      "parse_hash": "80f1f86c577a5c18cfedb417df6c0ee688afbb019b5bc2390ed623580d77f37b",
+      "imported_count": 2,
+      "assets": [
+        "2c83a575-54c6-4ce8-b4a7-30cee0a4752c",
+        "d2c4e979-cac3-468b-b9a9-1645bcda3324"
+      ]
+    }
+  ],
+  "asset_count": 6,
+  "no_duplicate_assets": true,
+  "original_retry": {
+    "same_key": true,
+    "same_body": true,
+    "same_assets": true
+  },
+  "reload_recovery": "stored original metadata restored; creator-authorized GET returned committed receipt and cleared pending metadata",
+  "stop_waiting": "server committed real response; client stopped waiting and retained uncertain original; focus returned to retry",
+  "navigation": "uncertain close/reopen retained original; route leave blocked; successful asset link closes import drawer and opens actual detail",
+  "http_checks": [
+    {
+      "case": "owner-committed-receipt",
+      "status": 200,
+      "count": 2
+    },
+    {
+      "case": "csrf-required",
+      "status": 403,
+      "code": "CSRF_INVALID"
+    },
+    {
+      "case": "body-tenant-override",
+      "status": 400
+    },
+    {
+      "case": "other-source-creator",
+      "status": 404
+    },
+    {
+      "case": "viewer-role",
+      "status": 403
+    },
+    {
+      "case": "cross-tenant-source",
+      "switchStatus": 200,
+      "status": 404
+    },
+    {
+      "case": "anonymous",
+      "status": 401
+    }
+  ],
+  "desktop_viewports": [
+    {
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "width": 1024,
+      "height": 900
+    }
+  ],
+  "execution_region_axe_violations": 0,
+  "browser_page_errors": [],
+  "api_events": [
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 401
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/options",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/local/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-policy",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/1ef068ba-e323-4133-9890-953d09bc9f2b",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/1ef068ba-e323-4133-9890-953d09bc9f2b/cmdb-imports",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assets/import-sources/1ef068ba-e323-4133-9890-953d09bc9f2b/parses",
+      "status": 202
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/asset-import-operations/45444d03-5738-484c-92ea-f547b49e8241",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/1ef068ba-e323-4133-9890-953d09bc9f2b",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/1ef068ba-e323-4133-9890-953d09bc9f2b/cmdb-imports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/asset-import-operations/45444d03-5738-484c-92ea-f547b49e8241",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/1ef068ba-e323-4133-9890-953d09bc9f2b",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/1ef068ba-e323-4133-9890-953d09bc9f2b/cmdb-imports",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assets/import-sources/1ef068ba-e323-4133-9890-953d09bc9f2b/cmdb-imports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assets/import-sources",
+      "status": 202
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/asset-import-operations/bba74c75-47ab-4c57-809b-0bc1006f7fca",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/398feecf-6b08-455d-b8ab-8082ffff6a71",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/398feecf-6b08-455d-b8ab-8082ffff6a71/cmdb-imports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/asset-import-operations/bba74c75-47ab-4c57-809b-0bc1006f7fca",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/398feecf-6b08-455d-b8ab-8082ffff6a71",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assets/import-sources/398feecf-6b08-455d-b8ab-8082ffff6a71/parses",
+      "status": 202
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/asset-import-operations/9f48d366-a944-4382-b3c7-f24afe560183",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/398feecf-6b08-455d-b8ab-8082ffff6a71",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/398feecf-6b08-455d-b8ab-8082ffff6a71/cmdb-imports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/asset-import-operations/9f48d366-a944-4382-b3c7-f24afe560183",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/398feecf-6b08-455d-b8ab-8082ffff6a71",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/asset-import-operations/9f48d366-a944-4382-b3c7-f24afe560183",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/398feecf-6b08-455d-b8ab-8082ffff6a71",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/398feecf-6b08-455d-b8ab-8082ffff6a71/cmdb-imports",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assets/import-sources/398feecf-6b08-455d-b8ab-8082ffff6a71/cmdb-imports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assets/import-sources",
+      "status": 202
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/asset-import-operations/ab767538-3aff-4879-b3f5-d648f44be249",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/9d5392ff-eb0a-4a79-be60-9dd520c14bc2",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/9d5392ff-eb0a-4a79-be60-9dd520c14bc2/cmdb-imports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/asset-import-operations/ab767538-3aff-4879-b3f5-d648f44be249",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/9d5392ff-eb0a-4a79-be60-9dd520c14bc2",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/asset-import-operations/ab767538-3aff-4879-b3f5-d648f44be249",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/9d5392ff-eb0a-4a79-be60-9dd520c14bc2",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/9d5392ff-eb0a-4a79-be60-9dd520c14bc2/cmdb-imports",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assets/import-sources/9d5392ff-eb0a-4a79-be60-9dd520c14bc2/parses",
+      "status": 202
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/asset-import-operations/2c87dfb1-cd88-4c40-ac1d-3753b2b7fcb1",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/9d5392ff-eb0a-4a79-be60-9dd520c14bc2",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/9d5392ff-eb0a-4a79-be60-9dd520c14bc2/cmdb-imports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/asset-import-operations/2c87dfb1-cd88-4c40-ac1d-3753b2b7fcb1",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/9d5392ff-eb0a-4a79-be60-9dd520c14bc2",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/asset-import-operations/2c87dfb1-cd88-4c40-ac1d-3753b2b7fcb1",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/9d5392ff-eb0a-4a79-be60-9dd520c14bc2",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/9d5392ff-eb0a-4a79-be60-9dd520c14bc2/cmdb-imports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-policy",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/9d5392ff-eb0a-4a79-be60-9dd520c14bc2",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/9d5392ff-eb0a-4a79-be60-9dd520c14bc2/cmdb-imports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/2c83a575-54c6-4ce8-b4a7-30cee0a4752c",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring",
+      "status": 503
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring/refresh-policy",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring",
+      "status": 503
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring/refresh-policy",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring/refresh-policy",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring",
+      "status": 503
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/import-sources/9d5392ff-eb0a-4a79-be60-9dd520c14bc2/cmdb-imports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets/d2c4e979-cac3-468b-b9a9-1645bcda3324",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring",
+      "status": 503
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring/refresh-policy",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring",
+      "status": 503
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring/refresh-policy",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring/refresh-policy",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring",
+      "status": 503
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring/refresh-policy",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring",
+      "status": 503
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring/refresh-policy",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring",
+      "status": 503
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring/refresh-policy",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/network-monitoring",
+      "status": 503
+    }
+  ],
+  "formal_tc": "NOT_RUN",
+  "migrations": 0,
+  "deployment": false,
+  "external_notifications": false,
+  "not_verified": [
+    "500 rows within 60 seconds",
+    "full structured extension projection",
+    "production approval"
+  ],
+  "cleanup": "recorded separately after candidate shutdown"
+}

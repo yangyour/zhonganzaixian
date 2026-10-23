@@ -221,4 +221,29 @@ export function addCmdbImportExecutionContract(contract) {
     }
   }
 };
+  const route = contract.paths['/assets/import-sources/{id}/cmdb-imports'];
+  route.get = {
+    operationId: 'readCmdbSourceImportReceipt',
+    summary: 'Read the current creator-authorized committed import receipt',
+    description: 'Read-only repeatable snapshot rechecks current membership, assets:write, internal role and source creator. NO_COMMITTED_RECEIPT does not prove failure of an in-flight request and does not authorize changing an uncertain original idempotency key.',
+    'x-mop-read-only': true,
+    'x-mop-capabilities': ['assets:write'],
+    parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+    responses: {
+      200: { description: 'Completed immutable receipt or explicitly unknown absence.', content: { 'application/json': { schema: {
+        type: 'object', required: ['data', 'trace_id'], properties: {
+          trace_id: { type: 'string' }, data: {
+            type: 'object', additionalProperties: false,
+            required: ['tenant_id', 'source_id', 'status', 'receipt', 'absence_proves_failure'],
+            properties: {
+              tenant_id: { type: 'string', format: 'uuid' }, source_id: { type: 'string', format: 'uuid' },
+              status: { enum: ['COMPLETED', 'NO_COMMITTED_RECEIPT'] }, absence_proves_failure: { const: false },
+              receipt: { anyOf: [{ type: 'null' }, route.post.responses[200].content['application/json'].schema.properties.data] },
+            },
+          },
+        },
+      } } } },
+      ...Object.fromEntries([400, 401, 403, 404, 503].map(status => [status, route.post.responses[status]])),
+    },
+  };
 }

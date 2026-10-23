@@ -151,6 +151,44 @@ public final class PostgresAssetImportRepository implements AssetImportSourceRep
     /** Execution uses this transaction-bound artifact, never an earlier read-only preview. */
     record ExecutionSource(long version, String artifactId, String parseHash, ParsedArtifact parsed) {}
 
+    /** Reads the immutable command receipt in the same read-only snapshot as current owner authorization. */
+    Map<String, Object> executionReceipt(Access access, String sourceId) {
+        if (!uuid(sourceId)) {
+            throw missing();
+        }
+        return read(access, connection -> {
+            authorize(connection, access, true, false);
+            sourceRow(connection, access, sourceId, false);
+            try (var statement = prepare(connection, "SELECT role_code FROM public.mop_membership "
+                    + "WHERE tenant_id=?::uuid AND user_id=?::uuid AND active", access.tenantId(), access.actorId());
+                    var rows = statement.executeQuery()) {
+                if (!rows.next() || !Set.of("padmin", "msp").contains(rows.getString(1))) {
+                    throw new DomainException(403, "ACTION_FORBIDDEN", "当前角色不能读取资产导入执行回执");
+                }
+            }
+            String route = "/api/v1/assets/import-sources/" + sourceId + "/cmdb-imports";
+            Map<String, Object> receipt = null;
+            try (var statement = prepare(connection, "SELECT response_json FROM public.mop_idempotency "
+                    + "WHERE tenant_id=?::uuid AND actor_id=?::uuid AND route=? ORDER BY created_at LIMIT 2",
+                    access.tenantId(), access.actorId(), route); var rows = statement.executeQuery()) {
+                if (rows.next()) {
+                    receipt = object(rows.getString("response_json"));
+                    if (!sourceId.equals(receipt.get("source_id")) || !access.tenantId().equals(receipt.get("tenant_id"))
+                            || !"IMPORTED_DRAFTS".equals(receipt.get("status")) || rows.next()) {
+                        throw unavailable();
+                    }
+                }
+            }
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("tenant_id", access.tenantId());
+            result.put("source_id", sourceId);
+            result.put("status", receipt == null ? "NO_COMMITTED_RECEIPT" : "COMPLETED");
+            result.put("receipt", receipt);
+            result.put("absence_proves_failure", false);
+            return result;
+        });
+    }
+
     void authorizeExecution(Access access, String sourceId) {
         command(access, connection -> {
             if (!uuid(sourceId)) {

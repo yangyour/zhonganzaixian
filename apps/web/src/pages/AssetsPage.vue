@@ -326,7 +326,7 @@ onUnmounted(() => { disposed=true;listGeneration++;detailGeneration++;listContro
     <el-dialog v-model="createOpen" title="创建资产草稿" width="520px" class="responsive-dialog" :close-on-click-modal="false" :before-close="beforeCloseCreate" destroy-on-close>
       <AssetDraftCreatePanel ref="createPanel" :sites="availableSites" @created="createdAsset" @close="createOpen = false" />
     </el-dialog>
-    <AssetImportWorkspace v-model="importOpen" />
+    <AssetImportWorkspace v-model="importOpen" @imported="loadAssets" />
     <AssetDateQuery v-model="dateQueryOpen" @select="openDetail" />
     <AssetMetadataQuery v-model="metadataQueryOpen" @select="openQueryMetadata" />
     <ManualWarrantyWorkspace ref="warrantyPanel" v-model="warrantyOpen" :asset="warrantyAsset" @saved="warrantySaved" />

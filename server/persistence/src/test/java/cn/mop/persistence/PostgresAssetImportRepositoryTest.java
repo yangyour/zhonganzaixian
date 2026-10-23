@@ -77,8 +77,52 @@ class PostgresAssetImportRepositoryTest {
         assertEquals(15,cells.size());assertNull(cells.get("NAME"));assertSame(date,cells.get("PURCHASE_DATE"));assertSame(note,cells.get("NOTE"));assertEquals(1L,row.get("logical_record_number"));assertEquals(2,row.get("source_row_number"));assertNull(row.get("physical_start_line"));
     }
     private static Map<String,Object> row(Object... pairs){Map<String,Object> result=new HashMap<>();for(int i=0;i<pairs.length;i+=2)result.put((String)pairs[i],pairs[i+1]);return result;}
+    @Test
+    void executionReceiptAbsenceIsUnknownAndUsesAnOwnerAuthorizedReadonlySnapshot() {
+        Jdbc jdbc = new Jdbc();
+        var receipt = jdbc.repository().executionReceipt(ACCESS, SOURCE);
+        assertEquals("NO_COMMITTED_RECEIPT", receipt.get("status"));
+        assertNull(receipt.get("receipt"));
+        assertEquals(false, receipt.get("absence_proves_failure"));
+        assertEquals(List.of("authorization", "authorization", "capabilities", "source", "role", "receipt"), jdbc.executed);
+        assertEquals(List.of(TENANT, ACTOR, "/api/v1/assets/import-sources/" + SOURCE + "/cmdb-imports"), jdbc.parameters.get("receipt"));
+        assertTrue(jdbc.readOnly);
+        assertTrue(jdbc.committed);
+    }
+
+    @Test
+    void executionReceiptCannotLeakForeignSourcesOrPassCurrentRoleDenial() {
+        Jdbc foreign = new Jdbc();
+        foreign.source = null;
+        assertEquals(404, assertThrows(DomainException.class, () -> foreign.repository().executionReceipt(ACCESS, SOURCE)).status);
+        assertFalse(foreign.executed.contains("receipt"));
+        Jdbc customer = new Jdbc();
+        customer.auth.put("role_code", "tadmin");
+        assertEquals(403, assertThrows(DomainException.class, () -> customer.repository().executionReceipt(ACCESS, SOURCE)).status);
+        assertFalse(customer.executed.contains("receipt"));
+    }
+
+    @Test
+    void executionReceiptReturnsOnlyBoundSuccessfulReceiptAndRejectsCorruption() {
+        Jdbc jdbc = new Jdbc();
+        jdbc.receipt = row("response_json", "{\"tenant_id\":\"" + TENANT + "\",\"source_id\":\"" + SOURCE + "\",\"status\":\"IMPORTED_DRAFTS\"}");
+        assertEquals("COMPLETED", jdbc.repository().executionReceipt(ACCESS, SOURCE).get("status"));
+        jdbc.receipt.put("response_json", "{\"tenant_id\":\"foreign\",\"source_id\":\"" + SOURCE + "\",\"status\":\"IMPORTED_DRAFTS\"}");
+        assertEquals(503, assertThrows(DomainException.class, () -> jdbc.repository().executionReceipt(ACCESS, SOURCE)).status);
+    }
+
+    @Test
+    void executionReceiptDatabaseFailureHasNoRawDriverContentOrFalseAbsence() {
+        Jdbc jdbc = new Jdbc();
+        jdbc.failAt = "receipt";
+        var error = assertThrows(DomainException.class, () -> jdbc.repository().executionReceipt(ACCESS, SOURCE));
+        assertEquals(503, error.status);
+        assertFalse(error.toString().contains("UNIT_ONLY_SECRET"));
+        assertTrue(jdbc.rolledBack);
+    }
     /** Enforces same-connection reads, explicit SQL ownership, read-only isolation and absence of locks/writes. */
     private static final class Jdbc {
+        Map<String,Object> receipt;
         Map<String,Object> auth=row("role_code","padmin","permission_version",7L);
         Map<String,Object> source=row("id",SOURCE,"tenant_id",TENANT,"created_by",ACTOR,"purpose","asset_import_source","original_name","MOP-FAKE.csv","declared_format","CSV","sha256","a".repeat(64),"object_key","asset-import-sources/"+TENANT+"/"+SOURCE,"storage_status","PENDING","parse_status","NOT_REQUESTED","store_operation_id",OP,"version",1L,"size_bytes",1L,"created_at",Timestamp.from(Instant.parse("2026-10-02T01:00:00Z")),"updated_at",Timestamp.from(Instant.parse("2026-10-02T01:00:00Z")));
         Map<String,Object> operation=row("id",OP,"tenant_id",TENANT,"source_id",SOURCE,"created_by",ACTOR,"kind","STORE_RAW","status","PENDING","step","RETRY_WAIT","created_at",Timestamp.from(Instant.parse("2026-10-02T01:00:00Z")),"updated_at",Timestamp.from(Instant.parse("2026-10-02T01:00:00Z")));
@@ -95,11 +139,68 @@ class PostgresAssetImportRepositoryTest {
             default->throw new AssertionError(method);
         });}
         PreparedStatement statement(String sql){
-            assertFalse(sql.contains("FOR SHARE"));assertFalse(sql.contains("FOR UPDATE"));String kind=sql.contains("FROM public.mop_membership")?"authorization":sql.contains("FROM public.mop_asset_import_source s")?"source":sql.contains("FROM public.mop_asset_import_operation o")?"operation":null;assertNotNull(kind);
-            if(!"authorization".equals(kind)){assertTrue(sql.contains("tenant_id=?::uuid"));assertTrue(sql.contains("created_by=?::uuid"));}
-            List<Object> bound=new ArrayList<>();parameters.put(kind,bound);return proxy(PreparedStatement.class,(method,args)->switch(method){case "setObject"->{assertEquals(bound.size()+1,args[0]);bound.add(args[1]);yield null;}case "executeQuery"->{executed.add(kind);fail(kind);Map<String,Object> data=switch(kind){case "authorization"->auth;case "source"->source;default->operation;};yield result(data);}case "close"->null;default->throw new AssertionError(method);});
+            assertFalse(sql.contains("FOR SHARE"));assertFalse(sql.contains("FOR UPDATE"));
+            String kind = sql.contains("public.mop_effective_capabilities") ? "capabilities"
+                    : sql.startsWith("SELECT role_code") ? "role"
+                    : sql.contains("FROM public.mop_membership") ? "authorization"
+                    : sql.contains("FROM public.mop_asset_import_source s") ? "source"
+                    : sql.contains("FROM public.mop_asset_import_operation o") ? "operation"
+                    : sql.contains("FROM public.mop_idempotency") ? "receipt" : null;
+            assertNotNull(kind);
+            if (List.of("source", "operation").contains(kind)) {
+                assertTrue(sql.contains("tenant_id=?::uuid"));assertTrue(sql.contains("created_by=?::uuid"));
+            }
+            if ("receipt".equals(kind)) {
+                assertTrue(sql.contains("tenant_id=?::uuid AND actor_id=?::uuid AND route=?"));
+            }
+            List<Object> bound = new ArrayList<>();
+            parameters.put(kind, bound);
+            return proxy(PreparedStatement.class, (method, args) -> switch (method) {
+                case "setObject", "setString" -> {
+                    assertEquals(bound.size() + 1, args[0]);bound.add(args[1]);yield null;
+                }
+                case "executeQuery" -> {
+                    executed.add(kind);fail(kind);
+                    Map<String, Object> data = switch (kind) {
+                        case "authorization" -> auth;
+                        case "source" -> source;
+                        case "role" -> row("1", auth.get("role_code"));
+                        case "capabilities" -> row("1", new String[]{"assets:write"});
+                        case "receipt" -> receipt;
+                        default -> operation;
+                    };
+                    yield result(data);
+                }
+                case "close", "setQueryTimeout" -> null;
+                default -> throw new AssertionError(method);
+            });
         }
-        ResultSet result(Map<String,Object> data){boolean[] consumed={false};return proxy(ResultSet.class,(method,args)->{if("next".equals(method)){boolean next=!consumed[0]&&data!=null;consumed[0]=true;return next;}if("close".equals(method))return null;Object value=data.get((String)args[0]);return switch(method){case "getString"->(String)value;case "getLong"->value==null?0L:((Number)value).longValue();case "getTimestamp"->value;default->throw new AssertionError(method);};});}
+        ResultSet result(Map<String, Object> data) {
+            boolean[] consumed = {false};
+            return proxy(ResultSet.class, (method, args) -> {
+                if ("next".equals(method)) {
+                    boolean next = !consumed[0] && data != null;
+                    consumed[0] = true;
+                    return next;
+                }
+                if ("close".equals(method)) {
+                    return null;
+                }
+                Object value = data.get(String.valueOf(args[0]));
+                return switch (method) {
+                    case "getString" -> (String) value;
+                    case "getLong" -> value == null ? 0L : ((Number) value).longValue();
+                    case "getTimestamp" -> value;
+                    case "getArray" -> proxy(java.sql.Array.class, (name, ignored) -> {
+                        if (name.equals("getArray")) {
+                            return value;
+                        }
+                        throw new AssertionError(name);
+                    });
+                    default -> throw new AssertionError(method);
+                };
+            });
+        }
         void fail(String stage)throws SQLException{if(stage.equals(failAt))throw new SQLException("UNIT_ONLY_SECRET raw driver detail","08006");}
     }
     @FunctionalInterface private interface Call{Object call(String method,Object[] args)throws Throwable;}

@@ -329,8 +329,52 @@ def choose(items):
     return selected
 
 
-def guarded_switch(server, new_files, old_files, verify):
-    """Configuration validation precedes mutation; every partial up is recovered."""
+def recovery_path(path):
+    """Recovery recipes and snapshots must remain under the existing project directory."""
+    return (isinstance(path, str) and path.startswith(REMOTE + '/')
+            and all(part not in ('', '.', '..') for part in path[len(REMOTE) + 1:].split('/'))
+            and re.fullmatch(r'[A-Za-z0-9/_.-]+', path) is not None)
+
+
+def validate_recovery_transaction(info, transaction):
+    require(isinstance(info, dict) and info.get('environment') == ENVIRONMENT, 'Recovery environment mismatch')
+    services = info.get('services')
+    require(isinstance(services, list) and services and all(isinstance(name, str) for name in services)
+            and len(set(services)) == len(services) and set(services) <= set(SERVICES), 'Unapproved recovery service')
+    base = info.get('base_files')
+    require(isinstance(base, list) and base and all(recovery_path(path) for path in base)
+            and len(set(base)) == len(base), 'Invalid recovery base files')
+    require(info.get('rollback_file') == transaction.removesuffix('/transaction.json') + '/rollback.json',
+            'Recovery recipe is outside its transaction')
+
+
+def validate_recovery_snapshot(server, info):
+    """No app rollback across migrations or credential/configuration changes; never echoes snapshots."""
+    expected = info.get('schema')
+    require(isinstance(expected, list) and expected
+            and all(isinstance(row, dict) and row.get('success') is True for row in expected),
+            'Recovery transaction lacks a successful schema snapshot')
+    try:
+        unchanged = json.dumps(server.schema(), sort_keys=True) == json.dumps(expected, sort_keys=True)
+    except Exception:
+        raise RuntimeError('Recovery schema could not be verified; application switch refused') from None
+    require(unchanged, 'Schema changed since release transaction; application rollback requires separate compatibility review')
+    hashes = info.get('recovery_config_sha256')
+    required = {REMOTE + '/.env', *info['base_files'], info['rollback_file']}
+    require(isinstance(hashes, dict) and required <= set(hashes)
+            and all(recovery_path(path) and isinstance(value, str) and re.fullmatch(r'[0-9a-f]{64}', value)
+                    for path, value in hashes.items()),
+            'Recovery transaction lacks pinned configuration evidence; legacy recovery requires review')
+    try:
+        unchanged = all(digest(server.read(path).encode()) == value for path, value in hashes.items())
+    except Exception:
+        raise RuntimeError('Recovery configuration could not be verified; application switch refused') from None
+    require(unchanged, 'Recovery configuration changed; credential or recipe rollback refused')
+
+
+def guarded_switch(server, new_files, old_files, verify, recovery_guard):
+    """Only restore the old applications while their recorded schema and configuration remain intact."""
+    recovery_guard()
     server.compose(new_files, 'config', '--quiet')
     try:
         server.compose(new_files, 'up', '-d', '--no-deps', '--pull', 'never', *server.selected)
@@ -338,6 +382,7 @@ def guarded_switch(server, new_files, old_files, verify):
     except Exception:
         emit('rollback', status='STARTED')
         try:
+            recovery_guard()
             server.compose(old_files, 'config', '--quiet')
             server.compose(old_files, 'up', '-d', '--no-deps', '--pull', 'never', *server.selected)
             server.ready()
@@ -429,11 +474,14 @@ def deploy(args, branch, revision, folder):
         server.run(['mkdir', release + '/.local'])
         server.run(['sha256sum', '--check', '--status'], data=''.join(sha+'  '+release+'/'+name+'\n' for name, sha in hashes.items()))
         server.write(release + '/manifest.json', json.dumps({'source_commit': revision, 'files': hashes}), 0o644)
-        server.write(private + '/rollback.json', compose_json(rollback))
+        rollback_text = compose_json(rollback)
+        server.write(private + '/rollback.json', rollback_text)
         server.write(private + '/deploy.json', compose_json(desired))
         recovery = {'environment': ENVIRONMENT, 'source_commit': revision, 'run_id': run_id, 'services': server.selected,
                     'base_files': base, 'compose_file': private + '/deploy.json', 'rollback_file': private + '/rollback.json',
-                    'previous_active': json.loads(active) if code == 0 else None, 'release': release, 'schema': history}
+                    'previous_active': json.loads(active) if code == 0 else None, 'release': release, 'schema': history,
+                    'recovery_config_sha256': {path: digest(content.encode())
+                                               for path, content in {**snapshots, private + '/rollback.json': rollback_text}.items()}}
         server.write(private + '/transaction.json', json.dumps(recovery))
         emit('staged', source_commit=revision, files_verified=len(hashes), transaction=private+'/transaction.json')
         # Validate Nginx against the exact immutable candidate, using the already installed image.
@@ -486,7 +534,7 @@ def deploy(args, branch, revision, folder):
             return ready
 
         emit('switch', services=server.selected)
-        status = guarded_switch(server, new_files, old_files, verify)
+        status = guarded_switch(server, new_files, old_files, verify, lambda: validate_recovery_snapshot(server, recovery))
         report = {'verified_at': dt.datetime.now(dt.timezone.utc).isoformat(), 'status': 'PASSED',
                   'environment': ENVIRONMENT, 'branch': branch, 'source_commit': revision, 'run_id': run_id,
                   'release': release, 'transaction': private+'/transaction.json', 'services': server.selected,
@@ -516,11 +564,11 @@ def restore(transaction):
     try:
         server.run(['mkdir', REMOTE+'/.update-lock']); locked = True
         info = json.loads(server.read(transaction))
-        require(info['environment'] == ENVIRONMENT, 'Recovery environment mismatch')
+        validate_recovery_transaction(info, transaction)
         active = json.loads(server.read(REMOTE+'/active-update.json'))
         require(active['run_id'] == info['run_id'] and not active.get('rolled_back'), 'Only the currently active transaction can be rolled back once')
         server.selected = info['services']
-        require(set(server.selected) <= set(SERVICES), 'Unapproved recovery service')
+        validate_recovery_snapshot(server, info)
         before = metadata(server.containers(), ['mop-lan-'+n for n in server.selected])
         history = server.schema()
         files = info['base_files'] + [info['rollback_file']]

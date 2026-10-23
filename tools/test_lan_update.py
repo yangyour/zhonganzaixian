@@ -44,7 +44,7 @@ class DeploymentTests(unittest.TestCase):
         server = Mock(selected=['api', 'web'])
         server.compose.side_effect = [None, RuntimeError('partial recreation'), None, None]
         with self.assertRaisesRegex(RuntimeError, 'partial recreation'):
-            update.guarded_switch(server, ['new'], ['old'], Mock())
+            update.guarded_switch(server, ['new'], ['old'], Mock(), Mock())
         self.assertEqual(server.compose.call_args_list[-1].args,
                          (['old'], 'up', '-d', '--no-deps', '--pull', 'never', 'api', 'web'))
         server.ready.assert_called_once()
@@ -52,14 +52,14 @@ class DeploymentTests(unittest.TestCase):
     def test_post_switch_verification_failure_also_rolls_back(self):
         server = Mock(selected=['api'])
         with self.assertRaisesRegex(RuntimeError, 'wrong HTML'):
-            update.guarded_switch(server, ['new'], ['old'], Mock(side_effect=RuntimeError('wrong HTML')))
+            update.guarded_switch(server, ['new'], ['old'], Mock(side_effect=RuntimeError('wrong HTML')), Mock())
         self.assertEqual(server.compose.call_count, 4)
         server.ready.assert_called_once()
 
     def test_invalid_compose_never_recreates_or_rolls_back(self):
         server = Mock(selected=['api'])
         server.compose.side_effect = RuntimeError('invalid config')
-        with self.assertRaises(RuntimeError): update.guarded_switch(server, ['new'], ['old'], Mock())
+        with self.assertRaises(RuntimeError): update.guarded_switch(server, ['new'], ['old'], Mock(), Mock())
         self.assertEqual(server.compose.call_count, 1)
         server.ready.assert_not_called()
 
@@ -67,11 +67,11 @@ class DeploymentTests(unittest.TestCase):
         server = Mock(selected=['api'])
         server.compose.side_effect = [None, RuntimeError('new failed'), None, RuntimeError('old failed')]
         with self.assertRaisesRegex(RuntimeError, 'rollback readiness is unconfirmed'):
-            update.guarded_switch(server, ['new'], ['old'], Mock())
+            update.guarded_switch(server, ['new'], ['old'], Mock(), Mock())
 
     def test_success_uses_only_selected_application_services(self):
         server = Mock(selected=['api', 'web'])
-        self.assertEqual(update.guarded_switch(server, ['new'], ['old'], lambda: 'ready'), 'ready')
+        self.assertEqual(update.guarded_switch(server, ['new'], ['old'], lambda: 'ready', Mock()), 'ready')
         self.assertEqual(server.compose.call_count, 2)
         self.assertNotIn('postgres', server.compose.call_args.args)
 
@@ -155,6 +155,104 @@ class DeploymentTests(unittest.TestCase):
     def test_compose_snapshot_preserves_literal_dollar_credentials(self):
         text = update.compose_json({'services': {'api': {'environment': {'UNIT_PASSWORD': 'test${HOME}$value$'}}}})
         self.assertIn('test$${HOME}$$value$$', text)
+
+    def recovery(self):
+        transaction = update.REMOTE + '/private/update-SYNTHETIC/transaction.json'
+        base = update.REMOTE + '/compose.yaml'
+        rollback = update.REMOTE + '/private/update-SYNTHETIC/rollback.json'
+        files = {base: 'SYNTHETIC_COMPOSE', rollback: 'SYNTHETIC_RECIPE', update.REMOTE + '/.env': 'SYNTHETIC_SECRET'}
+        info = {'environment': update.ENVIRONMENT, 'services': ['api', 'web'], 'base_files': [base],
+                'rollback_file': rollback, 'schema': [{'version': '50', 'checksum': 123, 'success': True}],
+                'recovery_config_sha256': {path: update.digest(value.encode()) for path, value in files.items()}}
+        server = Mock(selected=['api', 'web'])
+        server.schema.return_value = info['schema']
+        server.read.side_effect = files.__getitem__
+        return server, info, transaction, files
+
+    def test_matching_recovery_snapshot_allows_config_and_schema_verification_only(self):
+        server, info, transaction, _ = self.recovery()
+        update.validate_recovery_transaction(info, transaction)
+        update.validate_recovery_snapshot(server, info)
+        server.compose.assert_not_called()
+        server.atomic.assert_not_called()
+
+    def test_migration_after_release_refuses_rollback_before_reading_recipes(self):
+        server, info, _, _ = self.recovery()
+        server.schema.return_value = info['schema'] + [{'version': '51', 'checksum': 456, 'success': True}]
+        with self.assertRaisesRegex(RuntimeError, 'Schema changed since release'):
+            update.validate_recovery_snapshot(server, info)
+        server.read.assert_not_called()
+        server.compose.assert_not_called()
+
+    def test_missing_or_failed_schema_snapshot_is_not_a_safe_legacy_fallback(self):
+        for schema in (None, [], [{'success': False}], [{'success': 1}]):
+            server, info, _, _ = self.recovery()
+            info['schema'] = schema
+            with self.assertRaisesRegex(RuntimeError, 'successful schema snapshot'):
+                update.validate_recovery_snapshot(server, info)
+            server.compose.assert_not_called()
+
+    def test_rotated_credential_or_changed_recipe_blocks_restore_without_leaking_content(self):
+        server, info, _, files = self.recovery()
+        files[update.REMOTE + '/.env'] = 'ROTATED_SYNTHETIC_SECRET'
+        with self.assertRaisesRegex(RuntimeError, 'credential or recipe rollback refused') as raised:
+            update.validate_recovery_snapshot(server, info)
+        self.assertNotIn('SYNTHETIC_SECRET', str(raised.exception))
+        server.compose.assert_not_called()
+
+    def test_legacy_transaction_without_digests_requires_review(self):
+        server, info, _, _ = self.recovery()
+        del info['recovery_config_sha256']
+        with self.assertRaisesRegex(RuntimeError, 'legacy recovery requires review'):
+            update.validate_recovery_snapshot(server, info)
+        server.read.assert_not_called()
+
+    def test_read_failure_is_redacted_and_never_accepted(self):
+        server, info, _, _ = self.recovery()
+        server.read.side_effect = OSError('SYNTHETIC_SECRET')
+        with self.assertRaisesRegex(RuntimeError, 'configuration could not be verified') as raised:
+            update.validate_recovery_snapshot(server, info)
+        self.assertNotIn('SYNTHETIC_SECRET', str(raised.exception))
+
+    def test_recovery_transaction_rejects_foreign_files_empty_services_and_wrong_recipe(self):
+        for key, value in [('base_files', ['/etc/passwd']), ('base_files', [update.REMOTE + '/../other/compose.yaml']),
+                           ('services', []), ('services', ['api', 'api']), ('services', ['postgres']),
+                           ('rollback_file', update.REMOTE + '/private/update-OTHER/rollback.json')]:
+            server, info, transaction, _ = self.recovery()
+            info[key] = value
+            with self.assertRaises(RuntimeError):
+                update.validate_recovery_transaction(info, transaction)
+            server.compose.assert_not_called()
+
+    def test_switch_guard_failure_never_attempts_new_or_old_apps(self):
+        server = Mock(selected=['api'])
+        guard = Mock(side_effect=RuntimeError('incompatible'))
+        with self.assertRaisesRegex(RuntimeError, 'incompatible'):
+            update.guarded_switch(server, ['new'], ['old'], Mock(), guard)
+        server.compose.assert_not_called()
+
+    def test_schema_drift_after_failed_deploy_prevents_automatic_rollback(self):
+        server = Mock(selected=['api'])
+        server.compose.side_effect = [None, RuntimeError('partial up')]
+        guard = Mock(side_effect=[None, RuntimeError('schema drift')])
+        with self.assertRaisesRegex(RuntimeError, 'rollback readiness is unconfirmed'):
+            update.guarded_switch(server, ['new'], ['old'], Mock(), guard)
+        self.assertEqual(guard.call_count, 2)
+        self.assertEqual(server.compose.call_count, 2)
+        server.ready.assert_not_called()
+
+    def test_restore_entrypoint_runs_guard_before_compose_and_releases_only_its_lock(self):
+        server, info, transaction, _ = self.recovery()
+        info['run_id'] = 'SYNTHETIC'
+        server.read.side_effect = [__import__('json').dumps(info), __import__('json').dumps(info)]
+        server.schema.return_value = []
+        with patch.object(update, 'Server', return_value=server):
+            with self.assertRaisesRegex(RuntimeError, 'Schema changed since release'):
+                update.restore(transaction)
+        server.compose.assert_not_called()
+        server.atomic.assert_not_called()
+        server.client.close.assert_called_once()
+        self.assertEqual(server.run.call_args.args[0], ['rmdir', '--', update.REMOTE + '/.update-lock'])
 
 
 if __name__ == '__main__': unittest.main()

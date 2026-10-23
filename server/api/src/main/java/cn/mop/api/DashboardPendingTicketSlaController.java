@@ -71,6 +71,7 @@ public final class DashboardPendingTicketSlaController {
         if (result.unevaluatedPending() > 0) {
             reasons.add("EVALUATION_LIMIT_EXCEEDED");
         }
+        DashboardReadAuthorization.recheck(request, platform, member);
         return success(map("tenant_id", tenant, "actor_id", actor, "permission_version", base.permissionVersion(),
                 "observed_at", base.observedAt().toString(), "scope", base.scope(), "source", "postgresql",
                 "projection_version", DashboardPendingTicketSlaReader.VIEW_VERSION,

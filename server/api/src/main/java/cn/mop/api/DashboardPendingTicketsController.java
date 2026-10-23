@@ -54,6 +54,7 @@ public final class DashboardPendingTicketsController {
                 || member.permissionVersion() != snapshot.permissionVersion() || !expectedScope.equals(snapshot.scope())) {
             throw new DomainException(503, "UPSTREAM_UNAVAILABLE", "待办工单汇总不属于当前授权范围");
         }
+        DashboardReadAuthorization.recheck(request, platform, member);
         return success(map("tenant_id", tenant, "actor_id", actor, "permission_version", snapshot.permissionVersion(),
                 "observed_at", snapshot.observedAt().toString(), "scope", snapshot.scope(), "source", "postgresql",
                 "metric_version", DashboardPendingTicketsReader.METRIC_VERSION, "registrations", snapshot.registrations(),

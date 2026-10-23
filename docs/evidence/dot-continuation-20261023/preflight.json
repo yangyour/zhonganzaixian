@@ -1,0 +1,28 @@
+{
+  "repository": "yangyour/zhonganzaixian",
+  "workspace": "/workspace/scratch/390b70bf66c8/mop-continuation",
+  "branch": "dot/ui01-open-todos-20261023",
+  "upstream": "origin/main",
+  "baseline": "10e8de550a2e4c0dfae7e111ab5fac267cbfd6e2",
+  "coverage": {
+    "status": "PASSED",
+    "requirements": 128,
+    "tasks": 25,
+    "unassigned": 0,
+    "completion_verified": false
+  },
+  "wip_refs_verified": 6,
+  "designated_environment": {
+    "status": "BLOCKED_MISSING_PRIVATE_CONFIGURATION",
+    "missing": [
+      "deploy/private/develop.txt",
+      "deploy/private/runtime.json",
+      "deploy/private/known_hosts",
+      "deploy/private/existing-components.json"
+    ],
+    "connection_environment_variable_names": [],
+    "network_trust_credentials_permissions_verified": false
+  },
+  "deployment_performed": false,
+  "migrations_applied": 0
+}

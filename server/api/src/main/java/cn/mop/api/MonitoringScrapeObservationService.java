@@ -74,9 +74,11 @@ final class MonitoringScrapeObservationService {
         final String reason; InvalidResponse(String reason) { super(reason); this.reason = reason; }
     }
     static InvalidResponse bad(String reason) { return new InvalidResponse(reason); }
-    static String query(MonitoringPresetRegistry.Target target) {
+    static String query(MonitoringPresetRegistry.Target target) { return queryMetric(target,"up"); }
+    static String queryMetric(MonitoringPresetRegistry.Target target,String metric) {
+        if(!metric.equals("up")&&!metric.equals(target.preset().successMetric()))throw invalid();
         try {
-            String selector = "up{mop_tenant_id=" + quote(target.tenantId()) + ",mop_asset_id=" + quote(target.assetId()) +
+            String selector = metric + "{mop_tenant_id=" + quote(target.tenantId()) + ",mop_asset_id=" + quote(target.assetId()) +
                 ",mop_target_id=" + quote(target.id()) + ",mop_preset=" + quote(target.preset().id()) + "}";
             return "label_replace(" + selector + ",\"mop_read_kind\",\"state\",\"__name__\",\".*\") or label_replace(timestamp(" +
                 selector + "),\"mop_read_kind\",\"sample_time\",\"__name__\",\".*\")";
@@ -84,6 +86,10 @@ final class MonitoringScrapeObservationService {
     }
     private static String quote(String text) throws Exception { return MonitoringPresetRegistry.JSON.writeValueAsString(text); }
     static Map<String, Object> decode(byte[] bytes, MonitoringPresetRegistry.Target target, Instant evaluated, Instant checked, int maxAge, int lookback) {
+        return decodeMetric(bytes,target,evaluated,checked,maxAge,lookback,"up");
+    }
+    static Map<String,Object> decodeMetric(byte[] bytes,MonitoringPresetRegistry.Target target,Instant evaluated,Instant checked,int maxAge,int lookback,String expectedMetric) {
+        if(!expectedMetric.equals("up")&&!expectedMetric.equals(target.preset().successMetric()))throw invalid();
         try {
             if (bytes == null || bytes.length > MonitoringHttpTransport.MAX_BYTES) throw bad("RESPONSE_TOO_LARGE");
             String text = StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
@@ -115,7 +121,7 @@ final class MonitoringScrapeObservationService {
                 String expectedInstance = target.downstream() == null ? target.endpoint().getRawAuthority() : target.downstream();
                 if (!expectedInstance.equals(labelMap.get("instance")) || !labelMap.containsKey("job") || labelMap.get("job").isBlank()) throw bad("TARGET_INSTANCE_MISMATCH");
                 String kind = labelMap.remove("mop_read_kind"); String metric = labelMap.remove("__name__");
-                if (!Set.of("state", "sample_time").contains(kind == null ? "" : kind) || metric != null && !(kind.equals("state") && metric.equals("up"))) throw bad("INVALID_SERIES_KIND");
+                if (!Set.of("state", "sample_time").contains(kind == null ? "" : kind) || metric != null && !(kind.equals("state") && metric.equals(expectedMetric))) throw bad("INVALID_SERIES_KIND");
                 if (identity == null) identity = labelMap; else if (!identity.equals(labelMap)) throw bad("AMBIGUOUS_OR_INCOMPLETE_SERIES");
                 if (values.putIfAbsent(kind, decimal(value.get(1).textValue())) != null) throw bad("AMBIGUOUS_OR_INCOMPLETE_SERIES");
             }

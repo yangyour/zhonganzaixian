@@ -20,6 +20,13 @@ import org.springframework.core.env.Environment;
 })
 public class WorkerApplication {
     public static void main(String[] args) {
+        if (java.util.Arrays.asList(args).contains("--notification-relay")) {
+            if (args.length != 1) {
+                throw new IllegalArgumentException("Notification relay mode accepts no other arguments");
+            }
+            cn.mop.worker.notification.TicketNotificationRelayMain.run();
+            return;
+        }
         if(java.util.Arrays.asList(args).contains("--ticket-autoclose")){if(args.length!=1)throw new IllegalArgumentException("Ticket auto-close mode accepts no other arguments");cn.mop.worker.autoclose.TicketAutoCloseMain.run();return;}
         if(java.util.Arrays.asList(args).contains("--sla-reminders")){if(args.length!=1)throw new IllegalArgumentException("SLA reminder mode accepts no other arguments");cn.mop.worker.sla.SlaReminderMain.run();return;}
         if(java.util.Arrays.asList(args).contains("--autoticket-registration-retries")){if(args.length!=1)throw new IllegalArgumentException("Autoticket registration retry mode accepts no other arguments");cn.mop.worker.autoticket.AutoTicketRetryMain.run();return;}

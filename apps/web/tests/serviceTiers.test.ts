@@ -1,3 +1,4 @@
+import { contractNavigationModules } from '../src/utils/navigationModules'
 import {describe,it,expect,vi} from 'vitest'
 import {readFileSync} from 'node:fs'
 import {resolve} from 'node:path'
@@ -132,10 +133,10 @@ describe('service tiers and ticket SLA clock inspection',()=>{
 
  it('wires route, navigation and explicit M2-10 / Q27 / Q08 disclosures',()=>{
   const router=readFileSync(resolve('src/router.ts'),'utf8')
-  const nav=readFileSync(resolve('src/utils/navigationModules.ts'),'utf8')
+  const nav=contractNavigationModules.flatMap(module=>module.items)
   const pageSource=readFileSync(resolve('src/pages/ServiceTiersPage.vue'),'utf8')
   expect(router).toContain("path: '/service-tiers'")
-  expect(nav).toContain("['service-tiers','服务档位与SLA台账']")
+  expect(nav.find(item=>item.name==='service-tiers')?.title).toBe('服务档位与SLA台账')
   expect(pageSource).toContain('M2-10')
   expect(pageSource).toContain('Q27')
   expect(pageSource).toContain('商务审批仍待核验')

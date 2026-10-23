@@ -489,3 +489,7 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 ## 2026-10-21 dot 临时 PostgreSQL 实验环境
 
 从当前系统配置的 Debian 签名快照源下载并仅解包 postgresql-17、postgresql-client-17、libpq5 17.11-0+deb13u1，没有全局安装、系统服务或网络设置变更。临时 PostgreSQL 只监听 127.0.0.1，独立 mop_test 库与受限 migrator/runtime 身份用后清理；未连接原服务器。V1–V45 及重复/只读验证通过。实际 collation version 为 153.128；此环境不能冒充历史 PG17.9 或生产环境，带数据业务/HTTP 尚待验证。证据见 docs/evidence/integration-pg-20261021/attempt-1/。
+
+## 2026-10-23 合同布局发布前盘点
+
+指定 LAN 服务器只读盘点：SSH认证成功、14个既有服务运行、真实依赖ready、数据库V50。此次导航与首页仅复用现有API及采样，不新增组件；正式首页聚合、服务区间和磁盘排行来源仍未实现/未接入，影响和状态见 [合同布局记录](../contract-layout-20261023.md)。不以布局恢复宣称这些来源已完成联调。

@@ -15,3 +15,7 @@
 - apps/web/src/styles/adminPrototype.css: a0df6299e0faa0351d2943655713c05eee92c0a123b18405e39b1416ad564d4c
 - apps/web/src/styles/experience.css: 17ea7dc2547eb2e8204e9512f550c60c4c874136805d2d453f9e39685785be8f
 - apps/web/src/styles/compact-workspaces.css: 6541c9c8c970208b55026c48d5d5602022668ae4ad8188ea0811594230ff1f07
+
+## 2026-10-23 合同附件布局更新
+
+用户明确要求按合同附件一《工作说明书》排版并组织模块。导航调整为合同业务章节和独立整行，首页恢复 M1-11 固定布局；保留原配色和业务控件。此授权覆盖上文相应布局限制，详见 [合同布局记录](contract-layout-20261023.md)。

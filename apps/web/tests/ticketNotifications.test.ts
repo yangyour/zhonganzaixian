@@ -1,3 +1,4 @@
+import { contractNavigationModules } from '../src/utils/navigationModules'
 import {describe,it,expect,vi} from 'vitest'
 import {readFileSync} from 'node:fs'
 import {resolve} from 'node:path'
@@ -50,8 +51,8 @@ describe('ticket in-app notifications',()=>{
   const y=setup(internal);y.request.mockResolvedValue(intents());expect(await y.w.intents()).toBe(true);expect(y.request).toHaveBeenCalledWith('/notification-intents?page_size=25',{signal:expect.any(AbortSignal)})
  })
  it('route, menu and page separate explicit WeCom delivery from automatic channel policy',()=>{
-  const router=readFileSync(resolve('src/router.ts'),'utf8'),nav=readFileSync(resolve('src/utils/navigationModules.ts'),'utf8'),source=readFileSync(resolve('src/pages/TicketNotificationsPage.vue'),'utf8')
-  expect(router).toContain("path: '/ticket-notifications'");expect(router).toMatch(/ticket-notifications.*capability: 'tickets:read'/);expect(nav).toContain("['ticket-notifications','工单通知']")
+  const router=readFileSync(resolve('src/router.ts'),'utf8'),nav=contractNavigationModules.flatMap(module=>module.items),source=readFileSync(resolve('src/pages/TicketNotificationsPage.vue'),'utf8')
+  expect(router).toContain("path: '/ticket-notifications'");expect(router).toMatch(/ticket-notifications.*capability: 'tickets:read'/);expect(nav.find(item=>item.name==='ticket-notifications')?.title).toBe('工单通知')
   expect(source).toContain('WeComNotificationAction');expect(source).toContain('EmailNotificationAction');expect(readFileSync(resolve('src/components/NotificationChannelAction.vue'),'utf8')).toContain('服务器受理不等于实际收到')
  })
 })

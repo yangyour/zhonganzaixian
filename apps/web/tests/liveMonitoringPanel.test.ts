@@ -26,3 +26,20 @@ it('paused auto refresh still expires displayed samples after 90 seconds',async(
 
 // Policy transport is tested separately; these component checks isolate existing sample workflows.
 vi.mock('../src/utils/monitoringRefreshPolicy',async()=>{const {ref}=await import('vue');return {refreshPermissionRejected:(e:unknown)=>e instanceof ApiError&&[401,403].includes(e.status),useMonitoringRefreshPolicy:()=>({intervalSeconds:ref(30),label:ref('isolated unit policy'),error:ref(null),refresh:vi.fn()})}})
+
+it('contract Top5 switches CPU, memory and unconnected disk without inventing a disk rank',async()=>{
+ const raw=snapshot();raw.devices[0]!.vendor_metrics_status='PARTIAL_API'
+ const calls=vi.spyOn(api,'request').mockImplementation(async path=>(path.endsWith('/resources')?resource():raw) as any)
+ mount({mode:'ranking'});await settle()
+ expect(host.querySelector('.contract-ranking')?.textContent).toContain('12.5%')
+ expect(host.querySelector('meter')?.getAttribute('max')).toBe('100')
+ const selector=host.querySelector<HTMLSelectElement>('[aria-label="资源排行指标"]')!
+ selector.value='memory';selector.dispatchEvent(new Event('change',{bubbles:true}));await settle()
+ expect(host.querySelector('.contract-ranking')?.textContent).toContain('58.0%')
+ selector.value='disk';selector.dispatchEvent(new Event('change',{bubbles:true}));await settle()
+ expect(host.querySelector('.contract-ranking')?.textContent).toContain('尚未接入')
+ expect(host.querySelector('meter')).toBeNull()
+ selector.value='cpu';selector.dispatchEvent(new Event('change',{bubbles:true}));await settle()
+ expect(host.querySelector('.contract-ranking')?.textContent).toContain('12.5%')
+ expect(calls.mock.calls.every(([,options])=>!options?.method||options.method==='GET')).toBe(true)
+})

@@ -1,0 +1,103 @@
+{
+  "status": "PASSED",
+  "scope": "candidate_web_designated_server_api",
+  "cases": [
+    {
+      "width": 1440,
+      "route": "/dashboard",
+      "overflow": false,
+      "page_errors": 0
+    },
+    {
+      "width": 1440,
+      "route": "/assets",
+      "overflow": false,
+      "page_errors": 0
+    },
+    {
+      "width": 1440,
+      "route": "/monitoring-events",
+      "overflow": false,
+      "page_errors": 0
+    },
+    {
+      "width": 1024,
+      "route": "/dashboard",
+      "overflow": false,
+      "page_errors": 0
+    },
+    {
+      "width": 1024,
+      "route": "/assets",
+      "overflow": false,
+      "page_errors": 0
+    },
+    {
+      "width": 1024,
+      "route": "/monitoring-events",
+      "overflow": false,
+      "page_errors": 0
+    },
+    {
+      "width": 390,
+      "route": "/dashboard",
+      "overflow": false,
+      "page_errors": 0
+    },
+    {
+      "width": 390,
+      "route": "/assets",
+      "overflow": false,
+      "page_errors": 0
+    },
+    {
+      "width": 390,
+      "route": "/monitoring-events",
+      "overflow": false,
+      "page_errors": 0
+    },
+    {
+      "width": 320,
+      "route": "/dashboard",
+      "overflow": false,
+      "page_errors": 0
+    },
+    {
+      "width": 320,
+      "route": "/assets",
+      "overflow": false,
+      "page_errors": 0
+    },
+    {
+      "width": 320,
+      "route": "/monitoring-events",
+      "overflow": false,
+      "page_errors": 0
+    }
+  ],
+  "controls": [
+    {
+      "window": "DAYS_7",
+      "display": "告警趋势7天 · 降噪率未知"
+    },
+    {
+      "window": "DAYS_30",
+      "display": "告警趋势30天 · 降噪率未知"
+    },
+    {
+      "window": "HOURS_24",
+      "display": "告警趋势24小时 · 降噪率未知"
+    },
+    {
+      "resource": "memory"
+    },
+    {
+      "resource": "disk"
+    },
+    {
+      "resource": "cpu"
+    }
+  ],
+  "business_writes": 0,
+  "page_errors": 0
+}

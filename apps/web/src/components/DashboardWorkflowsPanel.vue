@@ -17,6 +17,7 @@ async function read(action:'refresh'|'next'|'previous'|'retry',filter?:WorkflowS
 function select(event:Event){void read('refresh',(event.target as HTMLSelectElement).value as WorkflowState)}
 async function cancel(){workspace.cancel();await nextTick();if(!disposed&&permitted.value)refreshButton.value?.focus()}
 onUnmounted(()=>{disposed=true;workspace.dispose()})
+defineExpose({ refresh: () => workspace.refresh() })
 </script>
 <template>
 <section v-if="permitted" class="dashboard-workflows" aria-labelledby="dashboard-workflows-title" :aria-busy="state.busy">

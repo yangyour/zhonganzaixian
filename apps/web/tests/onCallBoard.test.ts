@@ -1,3 +1,4 @@
+import { contractNavigationModules } from '../src/utils/navigationModules'
 import {describe,it,expect,vi} from 'vitest'
 import {readFileSync} from 'node:fs'
 import {resolve} from 'node:path'
@@ -200,13 +201,13 @@ describe('on-call board, 18:00 handoff, escalation policies and SLA monthly repo
 
  it('wires routes, navigation and explicit M5-9 / M5-10 / M5-12 / M5-13 / M5-19 disclosures',()=>{
   const router=readFileSync(resolve('src/router.ts'),'utf8')
-  const nav=readFileSync(resolve('src/utils/navigationModules.ts'),'utf8')
+  const nav=contractNavigationModules.flatMap(module=>module.items)
   const boardPage=readFileSync(resolve('src/pages/OnCallBoardPage.vue'),'utf8')
   const slaPage=readFileSync(resolve('src/pages/SlaReportsPage.vue'),'utf8')
   expect(router).toContain("path: '/oncall-board'")
   expect(router).toContain("path: '/sla-reports'")
-  expect(nav).toContain("['oncall-board','值班看板与升级链']")
-  expect(nav).toContain("['sla-reports','SLA月报与赔付']")
+  expect(nav.find(item=>item.name==='oncall-board')?.title).toBe('值班看板与升级链')
+  expect(nav.find(item=>item.name==='sla-reports')?.title).toBe('SLA月报与赔付')
   expect(boardPage).toContain('M5-12')
   expect(boardPage).toContain('M5-13')
   expect(boardPage).toContain('CONFIG_PENDING_Q15')

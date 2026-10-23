@@ -25,6 +25,7 @@ import './styles/compact-workspaces.css'
 import './styles/workspace.css'
 import './styles/controls.css'
 import { displayTenantName } from './utils/displayTenantName'
+import { navigationModuleTitle } from './utils/navigationModules'
 const route = useRoute()
 const router = useRouter()
 const homeRoute = computed(() => landingRoute(session.value, router.getRoutes()))
@@ -98,7 +99,7 @@ async function endSession() {
         <div class="page-context">
           <button type="button" class="sidebar-toggle desktop-sidebar-toggle" :aria-label="sidebarCollapsed ? '展开功能菜单' : '收起功能菜单'" :aria-expanded="!sidebarCollapsed" aria-controls="workspace-sidebar" @click="sidebarCollapsed = !sidebarCollapsed"><component :is="sidebarCollapsed ? Expand : Fold" /></button>
           <button type="button" class="sidebar-toggle mobile-sidebar-toggle" aria-label="打开功能菜单" aria-haspopup="dialog" aria-controls="mobile-navigation-panel" :aria-expanded="mobileNavigationOpen" @click="mobileNavigationOpen = true"><Menu /></button>
-          <el-breadcrumb separator="/"><el-breadcrumb-item>{{ route.meta.group }}</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.title }}</el-breadcrumb-item></el-breadcrumb>
+          <el-breadcrumb separator="/"><el-breadcrumb-item>{{ navigationModuleTitle(route.name) || route.meta.group }}</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.title }}</el-breadcrumb-item></el-breadcrumb>
           <div class="context-controls">
           <el-select v-if="maySwitchTenant" :model-value="session.tenant.id" :disabled="switchingTenant || tenantTransition" class="tenant-select" aria-label="切换租户" @change="changeTenant">
             <el-option v-for="tenant in session.allowed_tenants" :key="tenant.id" :label="displayTenantName(tenant.name)" :value="tenant.id" />

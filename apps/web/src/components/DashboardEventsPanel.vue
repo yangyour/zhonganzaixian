@@ -28,10 +28,11 @@ onUnmounted(()=>{alive=false;reset()})
 const severity={DISASTER:'灾难',HIGH:'严重',AVERAGE:'一般',WARNING:'警告',INFO:'信息'}
 const handling={NEW:'新事件',ACKNOWLEDGED:'已确认',IN_PROGRESS:'处理中',PENDING_REVIEW:'待复核',RESOLVED:'已解决',CLOSED:'已关闭'}
 const suppression={NONE:'无抑制',FLAP_SILENCED:'抖动静默',DEPENDENCY_SUPPRESSED:'依赖抑制',MAINTENANCE_SILENCED:'维护静默',INFO_DEFAULT_SILENT:'信息级默认静默'}
+defineExpose({ refresh: load })
 </script>
 <template>
 <section v-if="permitted" class="dashboard-events" aria-labelledby="dashboard-events-title" :aria-busy="busy">
- <header class="de-head"><h2 id="dashboard-events-title">近期监控事件</h2><div class="actions"><button type="button" :disabled="busy" @click="load">{{busy?'读取中…':'刷新近期事件'}}</button><router-link to="/monitoring-events">事件中心</router-link></div></header>
+ <header class="de-head"><h2 id="dashboard-events-title">最近事件</h2><div class="actions"><button type="button" :disabled="busy" @click="load">{{busy?'读取中…':'刷新近期事件'}}</button><router-link to="/monitoring-events">事件中心</router-link></div></header>
  <ApiErrorNotice :error="error" :retrying="busy" @retry="load" />
  <p v-if="!events" role="status" class="de-state">{{busy?'正在读取近期事件…':error?'事件读取失败，未沿用旧列表。':'尚未读取事件。'}}</p>
  <template v-else>

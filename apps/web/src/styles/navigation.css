@@ -93,3 +93,18 @@
   .el-drawer.mobile-navigation-drawer { width: min(300px,85vw) !important; }
 }
 @media (max-width: 360px) { .horizontal-shell .tenant-select { width: 165px !important; }.horizontal-shell .topbar-controls > .el-button { padding-inline: 6px; font-size: 11px; }.horizontal-shell .brand strong { font-size: 13px; }.horizontal-shell .topbar .brand { gap: 7px; }.environment-label { font-size: 10px; } }
+/* The contract has ten business chapters. Give their navigation a full-width row. */
+@media (min-width: 761px) {
+  .horizontal-shell { --workspace-header-height: 104px; }
+  .horizontal-shell .topbar {
+    height: 104px; display: grid; grid-template-columns: minmax(0,1fr) auto;
+    grid-template-rows: 56px 48px; gap: 0; padding-inline: 16px;
+  }
+  .horizontal-shell .topbar .brand { width: fit-content; }
+  .horizontal-shell .topbar-controls { grid-column: 2; grid-row: 1; }
+  .horizontal-shell .module-navigation {
+    grid-column: 1 / -1; grid-row: 2; border-top: 1px solid #edf1f7;
+    width: 100%; scroll-padding-inline: 8px;
+  }
+  .horizontal-shell .primary-nav-link { padding-inline: 12px; font-size: 13px; }
+}

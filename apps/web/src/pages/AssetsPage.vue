@@ -260,28 +260,37 @@ onUnmounted(() => { disposed=true;listGeneration++;detailGeneration++;listContro
     <div v-if="readable()" v-show="!detailOpen" ref="listRoot" class="asset-list-workspace">
     <h1 class="page-title-sr">资产管理</h1>
     
-    <div class="panel">
+    <div class="panel asset-ledger">
+      <header class="mop-card-head asset-ledger-head">
+        <div class="mop-card-title"><h2>资产列表</h2><span>{{ displayTenantName(session?.tenant.name ?? '') }} · 第 {{ cursorHistory.length + 1 }} 页 · 每页 {{ pageSize }} 条</span></div>
+        <div class="mop-card-actions assets-heading-actions">
+          <div class="asset-view-switch mop-segmented" role="group" aria-label="资产显示方式"><button type="button" :class="{ active: assetView === 'list' }" :aria-pressed="assetView === 'list'" @click="assetView = 'list'"><List />列表</button><button type="button" :class="{ active: assetView === 'grid' }" :aria-pressed="assetView === 'grid'" @click="assetView = 'grid'"><Grid />蜂巢</button></div>
+          <el-button v-if="exportAllowed" :icon="Download" :disabled="loading || pendingFilters" :title="pendingFilters ? '请先应用或撤销筛选修改' : '沿用已应用筛选准备导出'" @click="openExport">导出</el-button>
+          <PermissionGate capability="assets:write"><el-button v-if="importAllowed" :icon="Upload" @click="importOpen = true">导入</el-button><el-button type="primary" :icon="Plus" @click="openCreate">创建资产草稿</el-button></PermissionGate>
+        </div>
+      </header>
       <el-form class="asset-toolbar" :inline="true" @submit.prevent="applyFilters" @compositionstart="searchComposition.start" @compositionend="searchComposition.end" @keydown="searchComposition.keydown">
         <el-input v-model="filters.q" :prefix-icon="Search" clearable placeholder="搜索设备名称 / 管理 IP" aria-label="搜索资产" enterkeyhint="search" class="asset-search" />
-        <div class="asset-status-chips" aria-label="按资产状态筛选"><button v-for="item in statusFilters" :key="item.value" type="button" :disabled="loading" :class="{ active: queryString('status') === item.value }" :aria-pressed="queryString('status') === item.value" @click="filterStatus(item.value)">{{ item.label }}</button></div>
+        <div class="asset-status-chips mop-segmented" role="group" aria-label="按资产状态筛选"><button v-for="item in statusFilters" :key="item.value" type="button" :disabled="loading" :class="{ active: queryString('status') === item.value }" :aria-pressed="queryString('status') === item.value" @click="filterStatus(item.value)"><i v-if="item.value" class="status-swatch" :class="'swatch-' + item.value" aria-hidden="true" />{{ item.label }}</button></div>
         <div class="asset-select-filters"><el-select v-model="filters.type" clearable placeholder="全部类型" aria-label="设备类型"><el-option v-for="type in assetTypes" :key="type.value" :label="type.label" :value="type.value" /></el-select><el-input v-model="filters.site_id" clearable placeholder="全部站点 / 站点 ID" aria-label="站点 ID" enterkeyhint="search" /><el-button type="primary" native-type="submit" :disabled="loading">查询</el-button><el-button :disabled="loading" @click="resetFilters">重置</el-button><el-button :icon="Refresh" :loading="loading" aria-label="刷新已应用的资产筛选" title="仅刷新已应用条件，保留未提交输入" @click="loadAssets">刷新</el-button></div>
       </el-form>
-      <div class="asset-extended-filters content-toolbar"><span class="extended-filter-label">高级检索</span><template v-if="metadataAllowed"><el-button text bg size="small" @click="metadataQueryOpen = true">扩展资料检索</el-button><PermissionGate capability="asset_dates:read"><el-button text bg size="small" @click="dateQueryOpen = true">维保与超期筛查</el-button></PermissionGate></template><CmdbTypeCatalogPanel /><div class="content-actions"><div class="assets-heading-actions"><div class="asset-view-switch" aria-label="资产显示方式"><button type="button" :class="{ active: assetView === 'list' }" :aria-pressed="assetView === 'list'" @click="assetView = 'list'"><List />列表</button><button type="button" :class="{ active: assetView === 'grid' }" :aria-pressed="assetView === 'grid'" @click="assetView = 'grid'"><Grid />蜂巢</button></div><el-button v-if="exportAllowed" :icon="Download" :disabled="loading || pendingFilters" :title="pendingFilters ? '请先应用或撤销筛选修改' : '沿用已应用筛选准备导出'" @click="openExport">导出</el-button><PermissionGate capability="assets:write"><el-button v-if="importAllowed" :icon="Upload" @click="importOpen = true">导入</el-button><el-button type="primary" :icon="Plus" @click="openCreate">创建资产草稿</el-button></PermissionGate></div></div></div>
+      <div class="asset-extended-filters"><span class="extended-filter-label">高级检索</span><template v-if="metadataAllowed"><el-button text bg size="small" @click="metadataQueryOpen = true">扩展资料检索</el-button><PermissionGate capability="asset_dates:read"><el-button text bg size="small" @click="dateQueryOpen = true">维保与超期筛查</el-button></PermissionGate></template><CmdbTypeCatalogPanel /></div>
       <AppliedFilters :items="filterItems" :pending="pendingFilters" :loading="loading" :failed="Boolean(error)" :loaded="loaded" :count="rows.length" @remove="removeFilter" @clear="resetFilters" @apply="applyPendingFilters" @discard="discardFilterEdits" />
       <ApiErrorNotice :error="error" guidance="请点击“重试”重新加载当前列表。"><el-button size="small" @click="loadAssets">重试</el-button></ApiErrorNotice>
-      <AppTable v-if="assetView === 'list'" :error="error" :rows="rows" :loading="loading" :empty-text="error ? '列表加载失败，请点击重试' : !loaded ? '正在读取资产列表…' : filterItems.length ? '未找到匹配资产，可调整或清空筛选条件' : '当前授权范围内暂无资产'">
+      <p v-if="assetView === 'list' && loaded && rows.length" class="mop-note asset-ledger-note"><strong>列说明</strong>：Proxy、所属业务系统、CPU、内存、当前问题数、负责人当前接口未提供，以“—”显示；可用性与配置同步状态按监控接入结果独立显示，未知不计为正常。</p>
+      <AppTable v-if="assetView === 'list'" :error="error" :rows="rows" :loading="loading" label="资产列表，可横向滚动查看全部 12 列" :empty-text="error ? '列表加载失败，请点击重试' : !loaded ? '正在读取资产列表…' : filterItems.length ? '未找到匹配资产，可调整或清空筛选条件' : '当前授权范围内暂无资产'">
         <el-table-column v-for="column in assetLedgerColumns" :key="column.key" :label="column.label" :min-width="column.minWidth" :fixed="column.key === 'actions' ? 'right' : undefined">
           <template #default="{ row }">
               <div v-if="column.key === 'name'" class="asset-identity-cell"><span class="asset-type-symbol" :class="'asset-type-' + row.type" aria-hidden="true"><component :is="deviceIcons[row.type] || Box" /></span><div><el-button link type="primary" class="asset-link" :data-list-record="row.id" @click="openDetail(row.id, $event)">{{ assetLedgerCell(row, column.key).text }}</el-button><span class="cell-sub mono">{{ row.management_ip || '—' }}</span></div></div>
               <el-button v-else-if="column.key === 'actions'" link type="primary" :data-list-record="row.id" @click="openDetail(row.id, $event)">{{ assetLedgerCell(row, column.key).text }}</el-button>
               <span v-else-if="column.key === 'availability' || column.key === 'sync'" class="ledger-state" :class="{ 'ledger-state-pending': column.key === 'sync' }">{{ assetLedgerCell(row, column.key).text }}</span>
-            <span v-else :class="{ 'tabular-nums': ['cpu', 'memory', 'problems', 'sampled'].includes(column.key) }">{{ assetLedgerCell(row, column.key).text }}</span>
-              <span v-if="column.key !== 'name' && assetLedgerCell(row, column.key).detail && !['cpu','memory','business','problems','owner'].includes(column.key)" class="cell-sub">{{ assetLedgerCell(row, column.key).detail }}</span>
+            <span v-else :class="{ 'tabular-nums': ['cpu', 'memory', 'problems', 'sampled'].includes(column.key), 'ledger-missing': assetLedgerCell(row, column.key).text === '—' }" :title="assetLedgerCell(row, column.key).detail">{{ assetLedgerCell(row, column.key).text }}</span>
+              <span v-if="column.key !== 'name' && assetLedgerCell(row, column.key).detail && !['site','cpu','memory','business','problems','owner'].includes(column.key)" class="cell-sub">{{ assetLedgerCell(row, column.key).detail }}</span>
           </template>
         </el-table-column>
         <template #empty-action><el-button v-if="loaded && !error && filterItems.length" @click="resetFilters">清空筛选，查看全部资产</el-button></template>
       </AppTable>
-      <div v-else class="asset-honeycomb-region" :aria-busy="loading"><el-skeleton v-if="loading" :rows="5" animated /><div v-else-if="rows.length" class="asset-honeycomb"><button v-for="item in rows" :key="item.id" type="button" class="asset-tile" :class="'asset-tile-' + item.status" :data-list-record="item.id" @click="openDetail(item.id, $event)"><span class="tile-top"><component :is="deviceIcons[item.type] || Box" /><span>{{ typeLabel(item.type) }}</span></span><strong>{{ item.name }}</strong><span class="mono">{{ item.management_ip }}</span><span>{{ item.site_name || item.site_id }}</span><div><b>{{ assetLedgerCell(item, 'availability').text }}</b><small>{{ assetLedgerCell(item, 'sync').text }}</small></div></button></div><el-empty v-else :description="error ? '读取未完成，请按上方提示重试' : !loaded ? '正在读取资产列表…' : filterItems.length ? '未找到匹配资产，可调整或清空筛选条件' : '当前授权范围内暂无资产'"><el-button v-if="loaded && !error && filterItems.length" @click="resetFilters">清空筛选，查看全部资产</el-button></el-empty></div>
+      <div v-else class="asset-honeycomb-region" :aria-busy="loading"><el-skeleton v-if="loading" :rows="5" animated /><div v-else-if="rows.length" class="asset-honeycomb"><button v-for="item in rows" :key="item.id" type="button" class="asset-tile" :class="'asset-tile-' + item.status" :data-list-record="item.id" @click="openDetail(item.id, $event)"><span class="tile-top"><span class="asset-type-symbol" :class="'asset-type-' + item.type" aria-hidden="true"><component :is="deviceIcons[item.type] || Box" /></span><span>{{ typeLabel(item.type) }}</span></span><strong>{{ item.name }}</strong><span class="mono">{{ item.management_ip }}</span><span>{{ item.site_name || item.site_id }}</span><div class="tile-states"><span class="ledger-state">{{ assetLedgerCell(item, 'availability').text }}</span><span class="ledger-state ledger-state-pending">{{ assetLedgerCell(item, 'sync').text }}</span></div></button></div><el-empty v-else :description="error ? '读取未完成，请按上方提示重试' : !loaded ? '正在读取资产列表…' : filterItems.length ? '未找到匹配资产，可调整或清空筛选条件' : '当前授权范围内暂无资产'"><el-button v-if="loaded && !error && filterItems.length" @click="resetFilters">清空筛选，查看全部资产</el-button></el-empty></div>
       <div class="table-footer"><span class="tabular-nums">本页 {{ loading || error || !loaded ? '—' : rows.length }} 条</span><div class="cursor-pagination"><el-select :model-value="pageSize" :disabled="loading" aria-label="每页条数" @change="resizePage"><el-option v-for="size in pageSizes" :key="size" :label="`${size} 条 / 页`" :value="size" /></el-select><el-button v-if="queryString('cursor') && !cursorHistory.length" :disabled="loading" @click="firstPage">返回首页</el-button><el-button v-else :disabled="loading || !cursorHistory.length" @click="previousPage">上一页</el-button><el-button :disabled="loading || !hasMore" @click="nextPage">下一页</el-button></div></div>
     </div>
     </div>
@@ -329,15 +338,43 @@ onUnmounted(() => { disposed=true;listGeneration++;detailGeneration++;listContro
 <style scoped>
 .tabular-nums{font-variant-numeric:tabular-nums}
 .asset-time-refresh{min-height:44px}
+.asset-ledger{overflow:hidden}
 .assets-heading-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.assets-heading-actions :deep(.el-button+.el-button){margin-left:0}
-.asset-view-switch button{transition:background-color .15s,color .15s,box-shadow .15s}.asset-view-switch button:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
+.asset-view-switch{margin-right:4px}
+.asset-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin:0;padding:12px 16px;border-bottom:0}
 .asset-toolbar :deep(.el-input),.asset-toolbar :deep(.el-select){min-width:0}
-.asset-status-chips{max-width:100%;min-width:0}.asset-status-chips button{transition:background-color .15s,color .15s,border-color .15s}.asset-status-chips button:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
-.asset-select-filters{flex-wrap:wrap}
+.asset-toolbar .asset-search{flex:0 1 220px;width:220px}
+.asset-status-chips{max-width:100%;min-width:0}
+.status-swatch{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--mop-unknown-dot)}
+.swatch-ok{background:var(--mop-ok-dot)}.swatch-problem{background:var(--mop-danger-dot)}.swatch-unknown{background:transparent;border:1.5px dashed var(--mop-unknown-dot);width:5px;height:5px}.swatch-maintenance{background:var(--mop-maint-dot)}.swatch-disabled{background:#c4ccd6}
+.asset-select-filters{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.asset-select-filters :deep(.el-select){width:128px}.asset-select-filters :deep(.el-input){width:150px}
 .asset-select-filters :deep(.el-button){margin-left:0}
-.asset-extended-filters{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:0 16px 12px}.extended-filter-label{font-size:12px;font-weight:600;color:#4e637a}.asset-extended-filters :deep(.el-button+.el-button){margin-left:0}
-.asset-tile{transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}.asset-tile:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(15,23,42,.07)}.asset-tile:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
+.asset-extended-filters{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;width:auto;margin:0;padding:0 16px 12px;border:0;border-bottom:1px solid var(--mop-line-soft);font-size:12px}
+.extended-filter-label{font-size:12px;font-weight:600;color:var(--mop-muted)}
+.asset-extended-filters :deep(.el-button){margin:0;color:var(--mop-text-2)}
+.asset-extended-filters :deep(.el-button+.el-button){margin-left:0}
+.asset-ledger-note{border-bottom:0}
+.ledger-missing{color:var(--mop-faint)}
+.asset-honeycomb-region{padding:16px}
+.asset-honeycomb{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.asset-tile{display:flex;flex-direction:column;align-items:stretch;gap:4px;min-height:150px;padding:12px;border:1px solid var(--mop-line)!important;border-top:3px solid var(--mop-unknown-dot)!important;border-radius:8px!important;background:#fff!important;color:var(--mop-muted)!important;text-align:left;cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.asset-tile:hover{transform:translateY(-2px);box-shadow:var(--mop-shadow-2)}
+.asset-tile:focus-visible{outline:2px solid var(--mop-primary);outline-offset:2px}
+.asset-tile-ok{border-top-color:var(--mop-ok-dot)!important}.asset-tile-problem{border-top-color:var(--mop-danger-dot)!important;background:linear-gradient(#fff7f6,#fff 40%)!important}.asset-tile-maintenance{border-top-color:var(--mop-maint-dot)!important}.asset-tile-disabled{border-top-color:#c4ccd6!important;opacity:.85}
+.asset-tile .tile-top{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:12px;color:var(--mop-muted)}
+.asset-tile .tile-top .asset-type-symbol{width:28px;height:28px}
+.asset-tile>strong{color:var(--mop-ink);font-size:13px;font-weight:600;overflow-wrap:anywhere}
+.asset-tile>span{font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.tile-states{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto;padding-top:6px}
 .detail-section-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}.detail-section-actions :deep(.el-button+.el-button){margin-left:0}
-@media(max-width:760px){.asset-extended-filters>.content-actions{flex-basis:100%}.assets-heading-actions{width:100%}}
+.asset-detail-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px 16px;align-items:start;padding:16px 18px;border-radius:8px}
+.asset-detail-hero .asset-hero-title{min-width:0}
+.asset-detail-hero .asset-hero-actions{justify-content:flex-end;margin:0}
+.asset-detail-hero .asset-facts-grid{grid-column:1/-1;gap:1px;border:1px solid var(--mop-line-soft);border-radius:6px;background:var(--mop-line-soft);overflow:hidden}
+.asset-detail-hero .asset-facts-grid>div{border:0;border-radius:0;background:#fff;padding:10px 12px}
+.asset-detail-hero .asset-facts-grid strong{font-size:13px;color:var(--mop-ink)}
+@media(max-width:1100px){.asset-detail-hero{grid-template-columns:1fr}.asset-detail-hero .asset-hero-actions{justify-content:flex-start}}
+@media(max-width:760px){.assets-heading-actions{width:100%}.asset-toolbar{padding:12px}.asset-toolbar .asset-search{flex-basis:100%;width:100%}.asset-select-filters{width:100%}.asset-select-filters :deep(.el-select),.asset-select-filters :deep(.el-input){width:calc(50% - 4px)}.asset-extended-filters{padding:0 12px 12px}.asset-honeycomb{grid-template-columns:repeat(2,minmax(0,1fr))}.asset-honeycomb-region{padding:12px}}
 @media(max-width:760px){.assets-heading-actions :deep(.el-button){min-height:44px;height:auto;white-space:normal}.asset-select-filters :deep(.el-button){flex:1;min-height:44px}.asset-toolbar :deep(.el-input__wrapper),.asset-toolbar :deep(.el-select__wrapper){min-height:44px}.asset-extended-filters{min-width:0;overflow-wrap:anywhere}}
 </style>

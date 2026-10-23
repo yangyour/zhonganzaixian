@@ -34,6 +34,20 @@ beforeEach(() => { session.value = structuredClone(auth); switchingTenant.value 
 afterEach(() => { app?.unmount(); app = undefined; host?.remove(); session.value = null; vi.restoreAllMocks() })
 
 describe('D15 event page uses controller states and explicit human inputs', () => {
+  it('labels workspace sub-records in Chinese while keeping every original code in the badge title', async () => {
+    const { data } = ready()
+    data.quarantine_items[0]!.quarantine_reason = 'CROSS_TENANT_CLAIM'
+    mount(); await settle()
+    const label = (code: string) => host.querySelector(`.event-sub-card .mop-badge[title="${code}"]`)?.textContent?.trim()
+    expect(['ACTIVE', 'SCHEDULED', 'ENDED'].map(label)).toEqual(['进行中', '已计划', '已结束'])
+    expect(['CROSS_TENANT_CLAIM', 'UNKNOWN_MAPPING'].map(label)).toEqual(['跨租户声明', '来源未映射'])
+    expect(['BIND_ASSET', 'DISCARD'].map(label)).toEqual(['处置：已绑定资产', '处置：已丢弃'])
+    expect(['SUCCEEDED', 'RETRY_SCHEDULED', 'QUARANTINED_MANUAL_REQUIRED', 'MANUAL_CREATED', 'SUPPRESSED_SKIPPED'].map(label)).toEqual(['已登记', '等待重试', '待人工补建', '已人工补建', '已抑制跳过'])
+    expect(host.textContent).toContain('采集继续 · 抑制通知')
+    const shown = [...host.querySelectorAll('.event-sub-card .mop-badge')].map(b => b.textContent?.trim() ?? '')
+    expect(shown.length).toBeGreaterThan(10)
+    expect(shown.filter(text => /[A-Z]{3,}_[A-Z_]+/.test(text))).toEqual([])
+  })
   it('mounts real-shaped data with no writes, exposes legal transitions and keeps empty root causes disabled', async () => {
     const { request } = ready(); mount(); await settle()
     expect(host.querySelector('[title="PENDING_REVIEW"]')?.textContent).toBe('待复核')

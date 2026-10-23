@@ -4,6 +4,7 @@ import {api,isCancelled} from '../api/client'
 import {useMonitoringRefreshPolicy,refreshPermissionRejected} from '../utils/monitoringRefreshPolicy'
 import {can,session,switchingTenant,contextGeneration} from '../stores/session'
 import MonitoringHistoryTable from '../components/MonitoringHistoryTable.vue'
+import {clockTime} from '../utils/display'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import {historySegments,readHistory,readResourceHistory,readResources,readSnapshot,sampleText,type Metric,type HistoryMetric,type ResourceMetric,type ResourceHistory,type ResourceSnapshot,type NetworkHistory,type NetworkSnapshot} from '../utils/networkMonitoring'
 const snapshot=ref<NetworkSnapshot|null>(null),history=ref<NetworkHistory|ResourceHistory|null>(null)
@@ -13,6 +14,8 @@ const selected=ref(''),metric=ref<HistoryMetric>('latency'),window=ref<'HOUR_1'|
 const monitorView=ref<'list'|'cards'>('list'),deviceQuery=ref(''),autoPaused=ref(false)
 const filteredDevices=computed(()=>snapshot.value?.devices.filter(device=>`${device.name} ${device.management_ip} ${device.brand} ${device.model}`.toLocaleLowerCase().includes(deviceQuery.value.trim().toLocaleLowerCase()))??[])
 const reachableCount=computed(()=>snapshot.value?.devices.filter(device=>display(device,'icmp')==='可达').length??0)
+// Counts of the bound devices in this snapshot only; anything not freshly answered stays separate from reachable.
+const stateCounts=computed(()=>{const rows=snapshot.value?.devices??[],states=rows.map(device=>display(device,'icmp'));return {reachable:states.filter(s=>s==='可达').length,noResponse:states.filter(s=>s==='无回应').length,waiting:states.filter(s=>s!=='可达'&&s!=='无回应').length}})
 const resourceCount=computed(()=>snapshot.value?.devices.filter(device=>device.vendor_metrics_status==='PARTIAL_API').length??0)
 const selectedHasResources=computed(()=>snapshot.value?.devices.some(d=>d.asset_id===selected.value&&d.vendor_metrics_status==='PARTIAL_API')??false)
 const now=ref(performance.now()),loadedAt=ref(0)
@@ -20,6 +23,8 @@ const expired=computed(()=>!!snapshot.value&&now.value-loadedAt.value>90000)
 const permitted=computed(()=>!switchingTenant.value&&can('assets:read'))
 const {intervalSeconds:refreshInterval,label:refreshPolicyLabel,error:refreshPolicyError,refresh:refreshPolicy}=useMonitoringRefreshPolicy(permitted)
 const segments=computed(()=>history.value?historySegments(history.value):[])
+// Same vertical scale as historySegments: percent metrics to 100, latency to the window maximum, states 0/1.
+const axis=computed(()=>{const value=history.value;if(!value)return {top:'',middle:''};const max=['loss','cpu','memory'].includes(value.metric)?100:value.metric==='latency'?Math.max(...value.points.map(p=>Number(p.value)),0.001):1;const text=(n:number)=>value.metric==='latency'?`${(n*1000).toFixed(n*1000>=10?0:1)} ms`:['loss','cpu','memory'].includes(value.metric)?`${n}%`:String(n);return value.metric==='latency'||['loss','cpu','memory'].includes(value.metric)?{top:text(max),middle:text(max/2)}:{top:'1（可达/开放）',middle:''}})
 let alive=true,sequence=0,detailSequence=0,controller:AbortController|null=null,detailController:AbortController|null=null,timer:ReturnType<typeof setInterval>|null=null,lastRefresh=0
 function reset(){sequence++;detailSequence++;controller?.abort();detailController?.abort();snapshot.value=null;history.value=null;resources.value={};resourceErrors.value={};error.value=null;historyError.value=null;selected.value='';deviceQuery.value='';loading.value=false;historyLoading.value=false}
 function toggleAutomatic(){
@@ -81,11 +86,16 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
       <el-alert v-if="expired" title="页面数据已过期，请刷新后查看最新状态" type="warning" :closable="false" />
       <p v-if="loading&&!snapshot" role="status">正在读取监控数据…</p>
       <p v-if="snapshot&&!snapshot.devices.length" class="network-empty">当前租户尚未绑定基础监控设备。</p>
-      <section class="panel network-device-workspace"><div class="network-list-toolbar content-toolbar"><div class="network-view-tabs" aria-label="监控显示方式"><button type="button" :class="{active:monitorView==='list'}" :aria-pressed="monitorView==='list'" @click="monitorView='list'">设备列表</button><button type="button" :class="{active:monitorView==='cards'}" :aria-pressed="monitorView==='cards'" @click="monitorView='cards'">监控卡片</button></div><input v-model="deviceQuery" aria-label="搜索监控设备" placeholder="搜索设备 / IP / 型号" /><span>告警规则待确认</span><div class="content-actions"><div class="network-refresh-actions"><p v-if="permitted" class="network-refresh-state" role="status">{{autoPaused?'已暂停本页自动刷新并取消在途数据读取；仍可手动刷新或选择历史。':refreshInterval===null?'自动刷新等待有效配置；可手动刷新。':'自动刷新：'+refreshInterval+' 秒。'}}</p><p v-if="permitted" class="network-policy" aria-label="监控自动刷新设置">{{refreshPolicyLabel}}</p><button v-if="permitted" type="button" @click="toggleAutomatic">{{autoPaused?'恢复自动刷新':'暂停自动刷新'}}</button><el-button :loading="loading" :disabled="!permitted" @click="refresh">刷新监控</el-button></div></div></div>
-      <div v-if="monitorView==='list'" class="proto-table-wrap"><table class="proto-table network-device-table"><thead><tr><th>设备 / 型号</th><th>管理 IP</th><th>连通性</th><th>响应延迟</th><th>丢包率</th><th>CPU / 内存</th><th>最近记录</th><th>操作</th></tr></thead><tbody><tr v-for="d in filteredDevices" :key="d.asset_id" class="network-device-row" :class="{chosen:selected===d.asset_id}"><td><strong>{{d.name}}</strong><small>{{d.brand}} {{d.model}}</small></td><td class="mono">{{d.management_ip}}</td><td><span class="network-badge" :class="{reachable:display(d,'icmp')==='可达'}">{{display(d,'icmp')}}</span></td><td>{{display(d,'latency')}}</td><td>{{display(d,'loss')}}</td><td><template v-if="d.vendor_metrics_status==='PARTIAL_API'"><button type="button" class="resource-inline-link" aria-label="CPU 历史" @click="selectResource(d.asset_id,'cpu')">CPU {{resourceText(d.asset_id,'cpu')}}</button><button type="button" class="resource-inline-link" aria-label="内存历史" @click="selectResource(d.asset_id,'memory')">内存 {{resourceText(d.asset_id,'memory')}}</button><small v-if="resources[d.asset_id]?.data.state!=='FRESH'" class="network-resource-reason">{{resourceReason(d.asset_id)}}</small><small v-if="resources[d.asset_id]?.data.tls_mode==='TEST_INSECURE'" class="tls-note">证书校验未启用</small></template><span v-else class="muted">— <small>待采集</small></span></td><td><small>{{time(d.metrics.icmp.recorded_at)}}</small></td><td><el-button link type="primary" @click="selectDevice(d.asset_id)">查看历史</el-button></td></tr><tr v-if="!filteredDevices.length"><td colspan="8" class="proto-empty">{{loading?'正在读取监控设备…':snapshot?'当前筛选下没有设备':'监控数据尚未读取成功'}}</td></tr></tbody></table></div>
+      <section class="panel network-device-workspace">
+        <header class="mop-card-head network-head">
+          <div class="mop-card-title"><h2>设备监控</h2><template v-if="snapshot"><span class="mop-badge outline plain">绑定 {{snapshot.devices.length}} 台</span><span class="mop-badge ok">可达 {{stateCounts.reachable}}</span><span v-if="stateCounts.noResponse" class="mop-badge danger">无回应 {{stateCounts.noResponse}}</span><span v-if="stateCounts.waiting" class="mop-badge unknown">未取得/过期 {{stateCounts.waiting}}</span></template></div>
+          <div class="network-refresh-actions"><p v-if="permitted" class="network-policy mop-fresh" :class="{live:!autoPaused&&refreshInterval!==null,busy:loading}" aria-label="监控自动刷新设置">{{refreshPolicyLabel}}</p><button v-if="permitted" type="button" @click="toggleAutomatic">{{autoPaused?'恢复自动刷新':'暂停自动刷新'}}</button><el-button type="primary" :loading="loading" :disabled="!permitted" @click="refresh">刷新监控</el-button></div>
+        </header>
+        <div class="network-list-toolbar content-toolbar"><div class="network-view-tabs mop-segmented" role="group" aria-label="监控显示方式"><button type="button" :class="{active:monitorView==='list'}" :aria-pressed="monitorView==='list'" @click="monitorView='list'">设备列表</button><button type="button" :class="{active:monitorView==='cards'}" :aria-pressed="monitorView==='cards'" @click="monitorView='cards'">监控卡片</button></div><input v-model="deviceQuery" type="search" aria-label="搜索监控设备" placeholder="搜索设备 / IP / 型号" /><span class="mop-chip-tag">告警规则待确认</span><p v-if="permitted" class="network-refresh-state" role="status">{{autoPaused?'已暂停本页自动刷新并取消在途数据读取；仍可手动刷新或选择历史。':refreshInterval===null?'自动刷新等待有效配置；可手动刷新。':'自动刷新：'+refreshInterval+' 秒。'}}</p></div>
+      <div v-if="monitorView==='list'" class="proto-table-wrap"><table class="proto-table network-device-table"><thead><tr><th>设备 / 型号</th><th>管理 IP</th><th>连通性</th><th>响应延迟</th><th>丢包率</th><th>CPU / 内存</th><th>最近记录</th><th>操作</th></tr></thead><tbody><tr v-for="d in filteredDevices" :key="d.asset_id" class="network-device-row" :class="{chosen:selected===d.asset_id}"><td><strong>{{d.name}}</strong><small>{{d.brand}} {{d.model}}</small></td><td class="mono">{{d.management_ip}}</td><td><span class="network-badge" :class="{reachable:display(d,'icmp')==='可达','no-response':display(d,'icmp')==='无回应'}">{{display(d,'icmp')}}</span></td><td>{{display(d,'latency')}}</td><td>{{display(d,'loss')}}</td><td><template v-if="d.vendor_metrics_status==='PARTIAL_API'"><button type="button" class="resource-inline-link" aria-label="CPU 历史" @click="selectResource(d.asset_id,'cpu')">CPU {{resourceText(d.asset_id,'cpu')}}</button><button type="button" class="resource-inline-link" aria-label="内存历史" @click="selectResource(d.asset_id,'memory')">内存 {{resourceText(d.asset_id,'memory')}}</button><small v-if="resources[d.asset_id]?.data.state!=='FRESH'" class="network-resource-reason">{{resourceReason(d.asset_id)}}</small><small v-if="resources[d.asset_id]?.data.tls_mode==='TEST_INSECURE'" class="tls-note">证书校验未启用</small></template><span v-else class="muted">— <small>待采集</small></span></td><td><small>{{time(d.metrics.icmp.recorded_at)}}</small></td><td><el-button link type="primary" @click="selectDevice(d.asset_id)">查看历史</el-button></td></tr><tr v-if="!filteredDevices.length"><td colspan="8" class="proto-empty">{{loading?'正在读取监控设备…':snapshot?'当前筛选下没有设备':'监控数据尚未读取成功'}}</td></tr></tbody></table></div>
       <div v-else-if="snapshot" class="network-grid">
         <article v-for="d in filteredDevices" :key="d.asset_id" class="device-card" :class="{chosen:selected===d.asset_id}">
-          <div class="device-head"><span class="network-badge" :class="{reachable:display(d,'icmp')==='可达'}">{{display(d,'icmp')}}</span><small>IP 基础探测</small></div>
+          <div class="device-head"><span class="network-badge" :class="{reachable:display(d,'icmp')==='可达','no-response':display(d,'icmp')==='无回应'}">{{display(d,'icmp')}}</span><small>IP 基础探测</small></div>
           <h2>{{d.name}}</h2><p class="device-model">{{d.brand}} {{d.model}}</p><p class="device-ip">{{d.management_ip}}</p>
           <div class="network-stats"><div><span>平均响应</span><strong>{{display(d,'latency')}}</strong></div><div><span>本次丢包</span><strong>{{display(d,'loss')}}</strong></div></div>
           <dl class="network-ports"><template v-for="p in [22,80,443]" :key="p"><dt>TCP {{p}}</dt><dd>{{display(d,`tcp_${p}` as Metric)}}</dd></template></dl>
@@ -105,20 +115,29 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
         <ApiErrorNotice v-if="historyError" :error="historyError" @retry="loadHistory" />
         <template v-if="history">
           <p class="history-caption">共 {{history.points.length}} 个采样点 · {{time(history.from)}} — {{time(history.to)}} · 单位：{{history.unit||'状态值 (0/1)'}}</p>
-          <MonitoringHistoryTable :history="history" />
           <p v-if="history.source==='SANGFOR_AF_API'" class="history-caption">注：防火墙资源指标采用采集端接收时刻记录。</p>
           <p v-if="!history.points.length" class="network-empty">该时间窗口尚无采样记录。</p>
-          <svg v-else class="history-chart" viewBox="0 0 720 180" role="img" :aria-label="`${metric}历史采样，空窗不连线`"><path d="M16 20V154H704" stroke="#cedbe8" fill="none"/><g v-for="(segment,i) in segments" :key="i"><polyline :points="segment.line" fill="none" stroke="#1667b9" stroke-width="2"/><circle v-for="(p,j) in segment.dots" :key="j" :cx="p.x" :cy="p.y" r="2.5" fill="#1667b9"/></g></svg>
-          
-          <div class="history-table" role="region" tabindex="0" aria-label="历史采样表，可横向滚动"><table><thead><tr><th scope="col">最近采样时间</th><th scope="col">原始值 {{history.unit}}</th></tr></thead><tbody><tr v-for="p in history.points.slice(-12).reverse()" :key="p.recorded_at"><td>{{time(p.recorded_at)}}</td><td>{{p.value}}</td></tr></tbody></table></div>
+          <div v-else class="history-body">
+            <figure class="history-figure">
+              <svg class="history-chart" viewBox="0 0 720 180" role="img" :aria-label="`${metric}历史采样，空窗不连线`">
+                <g class="chart-grid" aria-hidden="true"><path d="M16 24H704M16 89H704" stroke="#edf1f6" fill="none"/><path d="M16 20V154H704" stroke="#cedbe8" fill="none"/></g>
+                <g class="chart-axis" aria-hidden="true"><text x="20" y="20">{{axis.top}}</text><text x="20" y="85">{{axis.middle}}</text><text x="20" y="150">0</text></g>
+                <g v-for="(segment,i) in segments" :key="i"><polyline :points="segment.line" fill="none" stroke="#2165c5" stroke-width="2"/><circle v-for="(p,j) in segment.dots" :key="j" :cx="p.x" :cy="p.y" r="2.5" fill="#2165c5"/></g>
+              </svg>
+              <figcaption class="chart-x"><span>{{clockTime(history.from)}}</span><span>{{clockTime((Date.parse(history.from)+Date.parse(history.to))/2)}}</span><span>{{clockTime(history.to)}}</span></figcaption>
+            </figure>
+            <div class="history-table" role="region" tabindex="0" aria-label="历史采样表，可横向滚动"><table class="mop-table"><thead><tr><th scope="col">最近采样时间</th><th scope="col">原始值 {{history.unit}}</th></tr></thead><tbody><tr v-for="p in history.points.slice(-12).reverse()" :key="p.recorded_at"><td>{{time(p.recorded_at)}}</td><td>{{p.value}}</td></tr></tbody></table></div>
+          </div>
+          <MonitoringHistoryTable :history="history" />
         </template>
       </section>
     </template>
   </section>
 </template>
 <style scoped>
-.network-page{max-width:1440px;margin:auto;color:#20334c;min-width:0}
-.network-policy{margin:0;font-size:12px;line-height:20px;padding:2px 10px;background:#f1f5fb;color:#41618a;border:1px solid #e1e9f4;border-radius:999px;white-space:nowrap}
+.network-page{max-width:none;margin:0;color:var(--mop-text,#2f4157);min-width:0;padding-top:4px}
+.network-policy{margin:0;font-size:12px;line-height:20px;padding:2px 10px;background:var(--mop-sunken,#f7f9fc);border:1px solid var(--mop-line,#e2e8f0);border-radius:999px;white-space:nowrap}
+.network-head .mop-card-title{gap:6px 8px}
 .network-heading,.history-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:18px}
 .network-heading h1{font-size:22px;margin:0}
 .network-heading p,.history-heading p{color:#64748b;margin:4px 0 0;font-size:13px;line-height:1.6}
@@ -126,15 +145,10 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
 .boundary-details summary{cursor:pointer;font-weight:500;color:#475569;user-select:none;transition:color .15s ease}
 .boundary-details summary:hover{color:#1d4ed8}
 .network-summary strong{font-variant-numeric:tabular-nums}
-.network-device-workspace{padding:16px;margin:16px 0;border:1px solid #dce5ee;border-radius:10px;background:#fff;min-width:0;box-shadow:0 1px 2px rgba(15,23,42,.02)}
-.network-list-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px}
-.network-view-tabs{display:inline-flex;gap:6px}
-.network-view-tabs button{min-height:34px;padding:6px 12px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:#334155;font-size:12px;cursor:pointer;transition:background-color .15s ease,border-color .15s ease,color .15s ease}
-.network-view-tabs button:hover:not(.active){border-color:#93c5fd;background:#f8fbff;color:#1d4ed8}
-.network-view-tabs button.active{background:#eff6ff;border-color:#3b82f6;color:#1d4ed8;font-weight:500}
-.network-list-toolbar input{min-height:34px;padding:6px 12px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;min-width:220px;transition:border-color .15s ease,box-shadow .15s ease}
-.network-list-toolbar input:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,.15)}
-.network-list-toolbar span{font-size:12px;color:#64748b}
+.network-device-workspace{padding:0;margin:0 0 12px;min-width:0;overflow:hidden}
+.network-list-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;min-height:0;margin:0;padding:10px 16px;border-bottom:1px solid var(--mop-line-soft,#edf1f6)}
+.network-list-toolbar input{min-width:240px;margin:0!important}
+.network-list-toolbar .network-refresh-state{margin-left:auto}
 .network-device-table td{font-variant-numeric:tabular-nums}
 .network-device-row{transition:background-color .15s ease}
 .network-device-row:hover{background:#f8fbff}
@@ -142,21 +156,24 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
 .resource-inline-link:hover{background:#eff6ff;border-color:#93c5fd}
 .network-resource-reason{display:block;font-size:11px;color:#64748b;margin-top:4px}
 .tls-note{display:block;font-size:11px;color:#92610c;margin-top:4px}
-.network-table-footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid #edf1f5;font-size:12px;color:#64748b;font-variant-numeric:tabular-nums}
+.network-table-footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:0;padding:10px 16px;border-top:1px solid var(--mop-line-soft,#edf1f6);font-size:12px;color:var(--mop-muted,#5d6e83);font-variant-numeric:tabular-nums}
+.network-badge{display:inline-flex;align-items:center;gap:5px;padding:1px 9px;border-radius:999px;background:var(--mop-unknown-bg,#eef2f6);color:var(--mop-unknown,#56657a);font-size:12px;font-weight:500;line-height:20px;white-space:nowrap}
+.network-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.network-badge.reachable{background:var(--mop-ok-bg,#e8f6ee);color:var(--mop-ok,#1d7a4c)}
+.network-badge.no-response{background:var(--mop-danger-bg,#fdecea);color:var(--mop-danger,#b42318)}
 .resource-panel{border-top:1px solid #e3eaf2;margin-top:16px;padding-top:16px}
 .resource-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .resource-stats span{font-size:12px;color:#64748b;display:block}
 .resource-stats strong{display:block;font-size:21px;color:#244260;margin:7px 0 10px;font-variant-numeric:tabular-nums}
 .resource-panel p{font-size:11px;color:#64748b;line-height:1.6;margin:8px 0 0;overflow-wrap:anywhere}
 .resource-panel .tls-note{color:#92610c}
-.network-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:start;gap:18px;margin:20px 0}
-.device-card,.network-history{border:1px solid #dce5ee;border-radius:10px;background:white;padding:20px;min-width:0;transition:border-color .18s ease,box-shadow .18s ease}
+.network-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));align-items:start;gap:12px;margin:0;padding:16px}
+.device-card,.network-history{border:1px solid var(--mop-line,#e2e8f0);border-radius:8px;background:white;padding:16px;min-width:0;transition:border-color .18s ease,box-shadow .18s ease}
+.network-history{padding:0;overflow:hidden}
 .device-card:hover{border-color:#b6c9de;box-shadow:0 3px 10px rgba(15,23,42,.05)}
 .device-card.chosen,.network-device-row.chosen{border-color:#438dcf;background:#f8fbff}
 .device-head{display:flex;justify-content:space-between;align-items:center}
 .device-head small{color:#7a899b}
-.network-badge{display:inline-block;padding:4px 10px;border-radius:20px;background:#fff2dc;color:#8d6222;font-size:12px;font-weight:500}
-.network-badge.reachable{background:#e9f5ef;color:#24724e}
 .device-card h2{font-size:18px;margin:16px 0 8px;overflow-wrap:anywhere}
 .device-model,.sample-time{font-size:12px;color:#64748b;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .device-ip{font-size:20px;font-variant-numeric:tabular-nums;margin:14px 0}
@@ -174,14 +191,16 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
 .history-controls select{padding:8px;border:1px solid #d4dfe9;border-radius:6px;background:white;color:#244260;cursor:pointer;transition:border-color .15s ease}
 .history-controls select:hover{border-color:#93c5fd}
 .network-empty{padding:30px;text-align:center;color:#7b8da3;background:#f7f9fc;border-radius:8px;font-size:14px}
-.history-chart{width:100%;max-height:260px;background:#f8fbff;border-radius:8px;border:1px solid #e6eff8}
-.history-caption{color:#6c7e92;font-size:12px;line-height:1.7;font-variant-numeric:tabular-nums}
-.history-table{overflow:auto;border:1px solid #edf1f5;border-radius:6px}
-.history-table table{border-collapse:collapse;width:100%;font-size:13px}
-.history-table th,.history-table td{text-align:left;border-bottom:1px solid #edf1f5;padding:9px 12px;font-variant-numeric:tabular-nums}
-.history-table th{color:#475569;background:#f7f9fc;font-weight:600}
-.history-table tbody tr:hover{background:#f8fbff}
-@media(max-width:1350px){.network-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.history-body{display:grid;grid-template-columns:minmax(0,2fr) minmax(240px,1fr);gap:12px;align-items:start}
+.history-figure{margin:0;min-width:0;padding:8px 8px 4px;border:1px solid var(--mop-line-soft,#edf1f6);border-radius:8px;background:var(--mop-sunken,#f7f9fc)}
+.history-chart{display:block;width:100%;max-height:260px;background:transparent;border:0}
+.chart-axis text{font-size:11px;fill:#5d6e83;font-variant-numeric:tabular-nums}
+.chart-x{display:flex;justify-content:space-between;padding:2px 14px 0 12px;font-size:11px;color:var(--mop-muted,#5d6e83);font-variant-numeric:tabular-nums}
+.history-caption{margin:0;color:var(--mop-muted,#5d6e83);font-size:12px;line-height:1.7;font-variant-numeric:tabular-nums}
+.history-table{max-height:300px;overflow:auto;border:1px solid var(--mop-line-soft,#edf1f6);border-radius:8px}
+.history-table th{position:sticky;top:0;z-index:1}
+@media(max-width:1100px){.history-body{grid-template-columns:1fr}}
+@media(max-width:760px){.network-list-toolbar{padding:10px 12px}.network-list-toolbar input{min-width:0;width:100%}.network-list-toolbar .network-refresh-state{margin-left:0}.network-grid{padding:12px}}
 @media(max-width:700px){.network-grid{grid-template-columns:1fr}.network-heading,.history-heading{align-items:flex-start;flex-direction:column}.device-card,.network-history,.network-device-workspace{padding:14px}.network-heading h1{font-size:20px}.history-controls{width:100%}.history-controls label{flex:1}.history-controls select,.network-list-toolbar input{width:100%}.network-view-tabs button,.network-list-toolbar input{min-height:44px}}
 .network-refresh-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.network-refresh-actions button{min-height:44px;padding:8px 12px;border:1px solid #dce4ee;border-radius:4px;background:white;color:#24374a;font:inherit;cursor:pointer}.network-refresh-actions :focus-visible{outline:3px solid #176bb5;outline-offset:3px}.network-refresh-state{margin:0;color:#5b6b80;font-size:12px;line-height:1.6;max-width:360px;overflow-wrap:anywhere}
 </style>

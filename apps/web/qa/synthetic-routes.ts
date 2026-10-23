@@ -1,5 +1,7 @@
-// Synthetic payload builders for the development-only UI preview. All names, addresses
-// (RFC 5737 documentation ranges) and identifiers are invented and labelled as such.
+// Synthetic payload builders for the development-only UI preview. Names and identifiers are
+// invented and labelled as such; addresses use RFC 5737 documentation ranges, except the one
+// firewall row that exercises the resource panel: readResources() only accepts the designated
+// test device address, so that row reuses it.
 import eventFixture from '../../../fixtures/monitoring-event-center-controller.json'
 import { row as dashboardRow } from '../tests/dashboard.fixture'
 import { metricNames } from '../src/utils/networkMonitoring'

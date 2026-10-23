@@ -21,12 +21,18 @@ public final class AssetDependencyController {
     private final PlatformRepository platform;
     private final AssetDependencyRepository dependencies;
     private final ObjectMapper mapper;
-    private record Access(String actor,String tenant,long permissionVersion) {}
+    private record Access(String actor,String tenant,long permissionVersion,Membership member) {}
     public AssetDependencyController(PlatformRepository platform,AssetDependencyRepository dependencies,ObjectMapper mapper){this.platform=platform;this.dependencies=dependencies;this.mapper=mapper;}
 
     @GetMapping("/assets/{id}/dependencies") Object current(@PathVariable String id,HttpServletRequest request){
-        Access a=access(request,false);noQuery(request);String asset=asset(id,a.tenant());
-        return success(dto(asset,dependencies.current(a.tenant(),a.actor())),request);
+        Access a=access(request,false);noQuery(request);String asset=uuid(mapper.getNodeFactory().textNode(id));
+        authorizedAsset(a,asset);
+        Draft draft=dependencies.current(a.tenant(),a.actor());
+        // A repository snapshot is not permission to release it after a scope or grant change.
+        if(!a.equals(access(request,false)))throw expired();
+        authorizedAsset(a,asset);
+        if(draft==null||!a.tenant().equals(draft.tenantId()))throw new DomainException(502,"INVALID_DEPENDENCY_SOURCE","依赖草稿来源范围无效");
+        return success(dto(asset,draft),request);
     }
     @PostMapping(value="/assets/{id}/dependencies",consumes=MediaType.APPLICATION_JSON_VALUE)
     Object appendRequest(@PathVariable String id,HttpServletRequest request){access(request,true);return append(id,body(request),request);}
@@ -56,9 +62,13 @@ public final class AssetDependencyController {
     }
     private Access access(HttpServletRequest request,boolean write){
         if(request.getUserPrincipal()==null||request.getSession(false)==null)throw expired();Object tenant=request.getSession(false).getAttribute("mop.tenant_id");if(!(tenant instanceof String scope))throw expired();
-        String actor=request.getUserPrincipal().getName();Membership member=platform.membership(actor,scope).orElseThrow(AssetDependencyController::expired);if(!member.active())throw expired();
+        String actor=request.getUserPrincipal().getName();Membership member=platform.membership(actor,scope).orElseThrow(AssetDependencyController::expired);if(!member.active()||member.permissionVersion()<1||!actor.equals(member.userId())||!scope.equals(member.tenantId()))throw expired();
         if(!member.capabilities().contains(write?"assets:write":"assets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无资产依赖动作权限");
-        return new Access(actor,scope,member.permissionVersion());
+        return new Access(actor,scope,member.permissionVersion(),member);
+    }
+    private void authorizedAsset(Access a,String id){
+        Asset value=platform.authorizedAsset(a.tenant(),a.actor(),a.permissionVersion(),id).orElseThrow(()->new DomainException(404,"OBJECT_NOT_FOUND","对象不存在或不可见"));
+        if(!a.tenant().equals(value.tenantId())||!id.equals(value.id()))throw new DomainException(502,"INVALID_DEPENDENCY_SOURCE","依赖草稿资产范围无效");
     }
     private String asset(String id,String tenant){String normalized=uuid(mapper.getNodeFactory().textNode(id));if(platform.find(tenant,normalized).isEmpty())throw new DomainException(404,"OBJECT_NOT_FOUND","对象不存在或不可见");return normalized;}
     private static String uuid(JsonNode value){if(value==null||!value.isTextual()||!value.textValue().matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))throw invalid();return UUID.fromString(value.textValue()).toString();}

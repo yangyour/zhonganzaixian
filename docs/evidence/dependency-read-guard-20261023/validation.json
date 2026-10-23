@@ -1,0 +1,34 @@
+{
+  "base_commit": "25ca547a0ad31fd8c5bbae346edf04db9ddd3c36",
+  "api_version": "0.83.0",
+  "java": {
+    "tests": 4363,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1042,
+    "executed": 3321
+  },
+  "focused_controller_mvc_tests": 39,
+  "added_java_tests": 13,
+  "node_contracts_passed": 207,
+  "contract_progress_tests_passed": 17,
+  "schema_changes": false,
+  "frontend_changes": false,
+  "business_data_written": false,
+  "deployed": false,
+  "not_run": [
+    "new live PostgreSQL authorization race integration",
+    "real browser",
+    "LAN deployment",
+    "formal contract TC execution"
+  ],
+  "source_sha256": {
+    "server/api/src/main/java/cn/mop/api/AssetDependencyController.java": "580d0d0fc06749379de29c8d82ba1c5408172508720555a77e2f9ed0c3d6e5ae",
+    "server/api/src/main/java/cn/mop/api/CustomerTopologyController.java": "66f1fe803c933a66ba4ed2aab2540c90662c6656c4e7430960571b810c431a05"
+  },
+  "notes": [
+    "Controller/MVC repositories are mocked; not new real-database acceptance",
+    "Initial full and focused Maven commands overlapped; final all-final run was repeated after both exited and is authoritative",
+    "13 new regression checks cover revocation, permission version, same-version role/capability changes, session tenant change, disappearing anchor, source identity and MVC no-response behavior"
+  ]
+}

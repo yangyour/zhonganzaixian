@@ -30,6 +30,7 @@ class CustomerTopologyHttpTest {
   @Bean PlatformRepository repository(){return mock(PlatformRepository.class);}
   @Bean AssetDependencyRepository dependencies(){return mock(AssetDependencyRepository.class);}
   @Bean ObjectMapper mapper(){return new ObjectMapper().findAndRegisterModules();}
+  @Bean AssetDependencyController legacyController(PlatformRepository p,AssetDependencyRepository d,ObjectMapper mapper){return new AssetDependencyController(p,d,mapper);}
   @Bean CustomerTopologyController controller(PlatformRepository p,AssetDependencyRepository d){return new CustomerTopologyController(p,d);}
  }
  @Autowired WebApplicationContext context;@Autowired PlatformRepository repository;@Autowired AssetDependencyRepository dependencies;MockMvc mvc;
@@ -40,4 +41,16 @@ class CustomerTopologyHttpTest {
  @Test void duplicateAndCrossTenantQueriesFail()throws Exception{for(var params:List.of(new String[]{"tenant_id",TENANT},new String[]{"offset","0","0"})){var r=get(BASE).with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT).param(params[0],Arrays.copyOfRange(params,1,params.length));mvc.perform(r).andExpect(status().isBadRequest());}verifyNoInteractions(dependencies);}
  @Test void postIsNotAnActivationRouteEvenWithCsrf()throws Exception{mvc.perform(post(BASE).with(user(ACTOR)).with(csrf()).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isMethodNotAllowed());verifyNoInteractions(dependencies);}
  @Test void versionConflictHasActionableCode()throws Exception{mvc.perform(get(BASE).param("graph_version","1").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isConflict()).andExpect(jsonPath("$.error.code").value("TOPOLOGY_VERSION_CHANGED"));}
+ @Test void legacyDependencyReadRejectsRevocationDuringRepositoryRead()throws Exception{
+  String asset=CustomerTopologyControllerTest.A;
+  when(repository.authorizedAsset(TENANT,ACTOR,7,asset)).thenReturn(Optional.of(new Asset(asset,TENANT,"Synthetic","switch","192.0.2.1","site","unknown","DRAFT","manual",null,null,1,null,null,null,null)));
+  when(dependencies.current(TENANT,ACTOR)).thenAnswer(call->{when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.empty());return new AssetDependencyRepository.Draft(TENANT,0,null,List.of());});
+  mvc.perform(get("/api/v1/assets/"+asset+"/dependencies").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isUnauthorized()).andExpect(jsonPath("$.data").doesNotExist());
+ }
+ @Test void legacyDependencyReadRemainsReadOnlyForAuthorizedViewer()throws Exception{
+  String asset=CustomerTopologyControllerTest.A;
+  when(repository.authorizedAsset(TENANT,ACTOR,7,asset)).thenReturn(Optional.of(new Asset(asset,TENANT,"Synthetic","switch","192.0.2.1","site","unknown","DRAFT","manual",null,null,1,null,null,null,null)));
+  mvc.perform(get("/api/v1/assets/"+asset+"/dependencies").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isOk()).andExpect(jsonPath("$.data.tenant_id").value(TENANT)).andExpect(jsonPath("$.data.monitoring_applied").value(false));
+  verify(dependencies,never()).append(anyString(),anyString(),anyLong(),anyList(),any());
+ }
 }

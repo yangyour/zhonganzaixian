@@ -480,7 +480,8 @@
       "has_progress_note": true,
       "local_references": [
         "docs/evidence/niko-asset-dependency-api-final-http-20261002.json",
-        "docs/evidence/niko-asset-dependency-repository-20261002.json"
+        "docs/evidence/niko-asset-dependency-repository-20261002.json",
+        "docs/function-spec-review-20261023.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1501,6 +1502,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "d810638ef4125294bccf1764608545060d371f16a05f7875563a97509af6b687"
+    "doc/development/07_合同逐项开发追踪.md": "7ea0e1d741b1015ee182a1bdf3ada3fc9ecf20fecdcb79a82205b7b9b9da3369"
   }
 }

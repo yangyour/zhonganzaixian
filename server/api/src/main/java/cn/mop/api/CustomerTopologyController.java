@@ -16,16 +16,16 @@ public final class CustomerTopologyController {
     public CustomerTopologyController(PlatformRepository platform, AssetDependencyRepository dependencies) {
         this.platform=platform; this.dependencies=dependencies;
     }
-    private record Access(String actor,String tenant,long version) {}
+    private record Access(String actor,String tenant,long version,Membership member) {}
     private Access access(HttpServletRequest request) {
         if(request.getUserPrincipal()==null||request.getSession(false)==null)throw expired();
         Object tenant=request.getSession(false).getAttribute("mop.tenant_id");
         if(!(tenant instanceof String scope))throw expired();
         String actor=request.getUserPrincipal().getName();
         Membership m=platform.membership(actor,scope).orElseThrow(CustomerTopologyController::expired);
-        if(!m.active())throw expired();
+        if(!m.active()||m.permissionVersion()<1||!actor.equals(m.userId())||!scope.equals(m.tenantId()))throw expired();
         if(!m.capabilities().contains("assets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","无资产读取权限");
-        return new Access(actor,scope,m.permissionVersion());
+        return new Access(actor,scope,m.permissionVersion(),m);
     }
     @GetMapping("/api/v1/customer-topology")
     Object read(HttpServletRequest request) {

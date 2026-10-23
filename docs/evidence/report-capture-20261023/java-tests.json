@@ -1,0 +1,66 @@
+[
+  {
+    "name": "cn.mop.persistence.InspectionQuarterlyReportDocumentCodecTest",
+    "tests": "11",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.702"
+  },
+  {
+    "name": "cn.mop.persistence.InspectionQuarterlyReportSchemaVerifierTest",
+    "tests": "5",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.053"
+  },
+  {
+    "name": "cn.mop.persistence.InspectionSourceCollectionInputTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.025"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresReportCaptureIsolatedIntegrationTest",
+    "tests": "7",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "38.733"
+  },
+  {
+    "name": "cn.mop.api.InspectionQuarterlyReportCaptureControllerTest",
+    "tests": "13",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "2.59"
+  },
+  {
+    "name": "cn.mop.api.InspectionQuarterlyReportControllerTest",
+    "tests": "16",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.27"
+  },
+  {
+    "name": "cn.mop.api.InspectionQuarterlyReportHttpSecurityTest",
+    "tests": "8",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "2.42"
+  },
+  {
+    "name": "cn.mop.api.InspectionQuarterlyReportTest",
+    "tests": "23",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.07"
+  }
+]

@@ -26,6 +26,10 @@ export function addInspectionQuarterlyReportContract(contract) {
     InspectionQuarterlyReportConfiguration:config,
     InspectionQuarterlyReportCreate:object({expected_version:{const:0},label:summary.properties.label,source_collection_id:uuid,expected_source_document_sha256:digest,expected_source_manifest_sha256:digest,...period,configuration:config}),
     InspectionQuarterlyReportSummary:summary,
+    InspectionQuarterlyReportCapture:object({expected_version:{const:0},label:summary.properties.label,
+      ...period,configuration:config,sources:contract.components.schemas.InspectionSourceCollectionCreate.properties.sources}),
+    InspectionQuarterlyReportCaptureSummary:object({...summary.properties,capture_mode:{const:'ATOMIC_EXPLICIT_WORKSHEET_REVISIONS'}}),
+    InspectionQuarterlyReportCaptureResult:envelope(ref('InspectionQuarterlyReportCaptureSummary')),
     InspectionQuarterlyReportFrozenDocument:frozen,
     InspectionQuarterlyReportDetail:object({...summary.properties,projection:{const:'FROZEN_INPUT_OUTPUT'},document_integrity:{const:'VERIFIED_SERVER_SIDE'},frozen_document:ref('InspectionQuarterlyReportFrozenDocument')}),
     InspectionQuarterlyReportSummaryResult:envelope(ref('InspectionQuarterlyReportSummary')),
@@ -39,6 +43,15 @@ export function addInspectionQuarterlyReportContract(contract) {
     post:op('createInspectionQuarterlyReport','InspectionQuarterlyReportSummaryResult',{'x-mop-capability':'inspection_quarterly_reports:write','x-mop-additional-capabilities':['inspection_source_collections:read'],'x-mop-idempotent-replay-reauthorization':true,'x-mop-max-body-bytes':16384,parameters:[{name:'Idempotency-Key',in:'header',required:true,schema:{type:'string',pattern:'^[A-Za-z0-9._:-]{1,128}$'}},{name:'X-CSRF-Token',in:'header',required:true,schema:text}],requestBody:{required:true,content:{'application/json':{schema:ref('InspectionQuarterlyReportCreate')}}}})
   };
   contract.paths['/inspection-quarterly-reports/{id}']={get:op('getInspectionQuarterlyReport','InspectionQuarterlyReportDetailResult',{parameters:[{name:'id',in:'path',required:true,schema:uuid}],'x-mop-document-projection':'FROZEN_INPUT_OUTPUT'})};
+  contract.paths['/inspection-quarterly-reports/capture']={post:op('captureInspectionQuarterlyReport','InspectionQuarterlyReportCaptureResult',{
+    summary:'Atomically capture explicit worksheet revisions, source collection and reproducible quarterly DRAFT',
+    'x-mop-capability':'inspection_quarterly_reports:write',
+    'x-mop-additional-capabilities':['inspection_source_collections:read','inspection_source_collections:write','inspection_worksheets:write'],
+    'x-mop-idempotent-replay-reauthorization':true,'x-mop-max-body-bytes':262144,
+    'x-mop-atomic-writes':['source_collection','source_collection_items','quarterly_report','audit','idempotency_receipt'],
+    parameters:contract.paths['/inspection-quarterly-reports'].post.parameters,
+    requestBody:{required:true,content:{'application/json':{schema:ref('InspectionQuarterlyReportCapture')}}}
+  })};
   const readiness=contract.components.schemas.ReadinessResult?.properties?.data;
   if(readiness){readiness.properties.inspection_quarterly_reports=object({schema_access_ready:{type:'boolean'},configuration_source:{const:'REQUEST_DRAFT_NOT_APPROVED'},generation_status:{const:'DRAFT'},report_published:{const:false},report_publishable:{const:false},evidence_access_granted:{const:false}});if(!readiness.required.includes('inspection_quarterly_reports'))readiness.required.push('inspection_quarterly_reports');}
 }

@@ -39,6 +39,11 @@ class InspectionQuarterlyReportHttpSecurityTest {
         @Bean InspectionQuarterlyReportRepository reader(){return mock(InspectionQuarterlyReportRepository.class);}
         @Bean ObjectMapper mapper(){return new ObjectMapper();}
         @Bean InspectionQuarterlyReportController controller(PlatformRepository repository,InspectionQuarterlyReportRepository reader){return new InspectionQuarterlyReportController(repository,reader);}
+        @Bean
+        InspectionQuarterlyReportCaptureController captureController(PlatformRepository repository,
+                                                                     InspectionQuarterlyReportRepository reader) {
+            return new InspectionQuarterlyReportCaptureController(repository, reader);
+        }
         @Override public void configureMessageConverters(List<HttpMessageConverter<?>> converters){converters.add(new MappingJackson2HttpMessageConverter(mapper()));}
     }
     @Autowired WebApplicationContext context;
@@ -49,6 +54,36 @@ class InspectionQuarterlyReportHttpSecurityTest {
     @BeforeEach void setup(){fixture.setup();reset(repository,reader);mvc=webAppContextSetup(context).apply(springSecurity()).build();when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"padmin",7,true)));when(reader.create(any(),anyLong(),any())).thenReturn(fixture.summary);when(reader.get(any(),any())).thenReturn(new InspectionQuarterlyReportRepository.Stored(fixture.summary,fixture.document));when(repository.idempotentAuthorized(any(),any(),any(),any(),any(),anyLong(),any(),any())).thenAnswer(c->{((Runnable)c.getArgument(6)).run();return ((java.util.function.Supplier<?>)c.getArgument(7)).get();});}
     private MockHttpServletRequestBuilder scoped(MockHttpServletRequestBuilder builder){var session=new MockHttpSession(context.getServletContext());session.setAttribute("mop.tenant_id",TENANT);return builder.session(session).with(user(ACTOR));}
     static final String BASE="/api/v1/inspection-quarterly-reports";
+
+    @Test
+    void atomicCaptureRequiresCsrfAndReturnsOnlyDraftMetadata() throws Exception {
+        var capture = new InspectionQuarterlyReportCaptureControllerTest();
+        capture.setup();
+        String input = capture.input().toString();
+        when(reader.capture(any(), anyLong(), any())).thenReturn(fixture.summary);
+        mvc.perform(scoped(post(BASE + "/capture")).contentType("application/json")
+                        .content(input).header("Idempotency-Key", "capture"))
+                .andExpect(status().isForbidden()).andExpect(jsonPath("$.error.code").value("CSRF_INVALID"));
+        verifyNoInteractions(reader);
+        mvc.perform(scoped(post(BASE + "/capture")).with(csrf().asHeader()).contentType("application/json")
+                        .content(input).header("Idempotency-Key", "capture"))
+                .andExpect(status().isOk()).andExpect(header().string("Cache-Control", "no-store"))
+                .andExpect(jsonPath("$.data.capture_mode").value("ATOMIC_EXPLICIT_WORKSHEET_REVISIONS"))
+                .andExpect(jsonPath("$.data.report_published").value(false));
+        verify(reader).authorizeCapture(any());
+    }
+
+    @Test
+    void atomicCaptureRejectsMissingSessionAndCurrentPermission() throws Exception {
+        mvc.perform(post(BASE + "/capture").with(csrf().asHeader()).contentType("application/json").content("{}"))
+                .andExpect(status().isUnauthorized());
+        when(repository.membership(ACTOR, TENANT)).thenReturn(Optional.of(
+                new Membership(ACTOR, TENANT, "padmin", 7, true, List.of("inspection_quarterly_reports:write"))));
+        mvc.perform(scoped(post(BASE + "/capture")).with(csrf().asHeader())
+                        .contentType("application/json").content("{}"))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(reader);
+    }
     @Test void csrfRequiredBeforeMutation()throws Exception{
         mvc.perform(scoped(post(BASE)).contentType("application/json").content(fixture.input().toString()).header("Idempotency-Key","test")).andExpect(status().isForbidden()).andExpect(jsonPath("$.error.code").value("CSRF_INVALID"));verifyNoInteractions(reader);
         mvc.perform(scoped(post(BASE)).with(csrf().asHeader()).contentType("application/json").content(fixture.input().toString()).header("Idempotency-Key","test")).andExpect(status().isOk()).andExpect(jsonPath("$.data.generation_status").value("DRAFT")).andExpect(jsonPath("$.data.report_published").value(false));verify(reader).authorizeWrite(any());

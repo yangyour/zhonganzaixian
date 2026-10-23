@@ -138,5 +138,55 @@
   "notification_V51": "NOT_MERGED; preserved in local unverified stash after isolated database verification",
   "deployment": "NOT_RUN",
   "formal_acceptance": "NOT_RUN",
-  "new_external_messages": 0
+  "new_external_messages": 0,
+  "branches": [
+    {
+      "owner": "assets",
+      "head": "e3af77cb7ebfb7b9f98ff0037574ba3bb3595336",
+      "clean": true,
+      "included_in_closeout": true
+    },
+    {
+      "owner": "monitoring",
+      "head": "395b732861ffd0b01d19d35af666364fafd9675f",
+      "clean": true,
+      "included_in_closeout": true
+    },
+    {
+      "owner": "notifications",
+      "head": "a8bce10b8494f12903a2eb4e8770d6ad34ee3d9e",
+      "clean": true,
+      "included_in_closeout": true
+    },
+    {
+      "owner": "backups",
+      "head": "02770d82f90a4561e28323c32378dc9effabc1f7",
+      "clean": true,
+      "included_in_closeout": true
+    },
+    {
+      "owner": "reports",
+      "head": "e2ca53763c065eb3c42289eb2802d7005d01c080",
+      "clean": true,
+      "included_in_closeout": true
+    },
+    {
+      "owner": "production",
+      "head": "d29817ef770aae22e1d27574d237b9b26bdac2ce",
+      "clean": true,
+      "included_in_closeout": true
+    }
+  ],
+  "cleanup": {
+    "branch_worktrees_clean": true,
+    "owned_candidate_ports_listening": 0,
+    "development_locks_released": true,
+    "integration_lock": "release by verified owner after successful final push",
+    "original_workspace_modified_files_preserved": [
+      "apps/web/qa/synthetic-routes.ts",
+      "apps/web/src/pages/AuditPage.vue",
+      "apps/web/src/pages/TenantInventoryPage.vue"
+    ]
+  },
+  "closeout_reconciled_at": "2026-10-23T16:19:00.386851+00:00"
 }

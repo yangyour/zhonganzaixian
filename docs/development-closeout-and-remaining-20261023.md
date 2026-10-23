@@ -87,7 +87,7 @@
 | --- | --- | --- |
 | assets / A05 | `1c26740136a7b3bea1a595ebe8dce7a69ebce1a1` | 批量资产事实读取与页面接线，缺指定环境验证。 |
 | monitoring / M01 | `61135c687be73bf2decaadc81d438268141f661d` | 恢复观察窗整组草稿；PG10项中9通过、1项回执比较断言失败；Web52项通过，但两处测试mock类型报错，不能发布。 |
-| notifications / N01、N02 | `bbe6e5d11225e6f6615e2152abe805f48a0a10fb` | 路由、偏好发布、持久发现、V51和调用方整组草稿；定向/隔离PG及构建通过，完整Java有3项ProfilePolicyTest失败、完整Web有2项来源集合测试失败，未合主干。 |
+| notifications / N01、N02 | `bbe6e5d11225e6f6615e2152abe805f48a0a10fb` | 路由、偏好发布、持久发现、V51和调用方整组草稿；定向/隔离PG及构建通过，完整Java有3项ProfilePolicyTest失败；完整Web有大批量来源超时、取消计数两项失败，未合主干。 |
 | reports / R02 | `19bad6b758e9c3ba5c3e9380359dd9cb73dffdf7` | 报告发布领域和测试草稿；无仓储、迁移、渲染器、API或页面，最后改动未完整复测。 |
 | production / P01 | `b97f437af8875a51323bcfd26f0c07bd8b30fbd2` | 生产检查诊断API和管理面板，缺实际页面联调；与已验证运行账号守卫分开保存。 |
 | production / P02 | `88cf0e3f311181e590a6dc77714018bd3e2f9c27` | 附件隔离业务接线，缺迁移/真实事务及扫描验证。 |
@@ -105,7 +105,7 @@
 | 首页/搜索 | `f90acc97`、`1e4431b5`、`7b42969b` | [集成进度](parallel/integration-progress.md) |
 | 资产 | `08a3a47c` | `e3af77cb`；[资产进度](parallel/assets-progress.md) |
 | 监控 | `4a62c0a3`、`87016702` | `395b7328`；[监控进度](parallel/monitoring-progress.md) |
-| 通知 | 原V50派发/回执成果保持；本轮V51草稿未合入 | [通知进度](parallel/notifications-progress.md) |
+| 通知 | 原V50派发/回执成果保持；本轮V51草稿未合入 | `a8bce10b`；[通知进度](parallel/notifications-progress.md) |
 | 备份 | `735be359`、`0a67482c`、`15ec3453` | `02770d82`；[备份进度](parallel/backups-progress.md) |
 | 报告 | `cbc6d874`、`d58ea011` | `e2ca5376`；[报告进度](parallel/reports-progress.md) |
 | 生产安全 | `c2b8f0d7`、`7e05923d` | `d29817ef`；[生产进度](parallel/production-progress.md) |
@@ -113,3 +113,5 @@
 最终统一回归：Java发现4,648项，实际执行3,563项通过，1,085项按环境/历史条件跳过，0失败；前端309文件、5,142项通过；202项根契约及9项备份契约通过，类型检查、构建、发布工件/策略和生成一致性通过。首次集成的3项启动安全测试被备份测试Bean冲突阻断，仅隔离测试配置后复验通过，业务逻辑未因此修改。构建仍有包体积提示，搜索弹窗无障碍问题仍按前文保留。
 
 这些数字是代码回归结果；真实组件证据按功能独立留存，不能换算为合同验收通过率。清单核对为128项、25组、漏分配0；正式TC、生产批准及本批部署均未据此标为完成。汇总见[最终验证记录](evidence/development-closeout-20261023/validation.json)。
+
+六个开发检出的最终HEAD均已纳入集成，标准工作树均干净；六份未完成stash对象已逐一核对存在。候选API/Web和浏览器调试端口已无监听，临时隧道/浏览器按各会话归属关闭，开发会话的迁移/环境锁已释放。总集成锁在最终推送成功后按归属释放。原主目录的三处在编前端改动保留，本轮不会自动恢复开发。

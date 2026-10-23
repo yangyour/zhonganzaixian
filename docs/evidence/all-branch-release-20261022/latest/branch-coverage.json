@@ -1,0 +1,233 @@
+{
+  "verified_at": "2026-10-23T00:45:07.377399+00:00",
+  "source_commit": "a41196874442a9a557efd656595a4a4f097076bc",
+  "main_equals_origin_main": true,
+  "canonical_origin": "https://github.com/yangyour/zhonganzaixian.git",
+  "local_branch_count_excluding_main": 8,
+  "remote_branch_count_excluding_main": 29,
+  "all_branch_tips_are_ancestors_of_main": true,
+  "branches": [
+    {
+      "ref": "refs/heads/codex/export-auto-preparation",
+      "sha": "c75b00aff99040b694fb74995805a3c9f864c9fe",
+      "ahead": 0,
+      "behind": 293
+    },
+    {
+      "ref": "refs/heads/codex/export-inbox",
+      "sha": "4dc17ee0179cdc0cb3836297881b03f03837ad21",
+      "ahead": 0,
+      "behind": 286
+    },
+    {
+      "ref": "refs/heads/codex/export-message-recovery",
+      "sha": "15905434909404e50b811d1ddbbd28034b596c13",
+      "ahead": 0,
+      "behind": 283
+    },
+    {
+      "ref": "refs/heads/codex/impeccable-ui-20261014",
+      "sha": "fe131c5d156fce8ae3643d28f0b2f2132d6b26e7",
+      "ahead": 0,
+      "behind": 277
+    },
+    {
+      "ref": "refs/heads/codex/page-ui-refinement-20261014",
+      "sha": "7935975746d9694aea5b74d3ef523c286e8b30da",
+      "ahead": 0,
+      "behind": 273
+    },
+    {
+      "ref": "refs/heads/codex/ticket-detail-reference-20261015",
+      "sha": "a1f31a4f302aeb710616425d559b6b46861990e5",
+      "ahead": 0,
+      "behind": 239
+    },
+    {
+      "ref": "refs/heads/feat/d07-ticket-lifecycle",
+      "sha": "4b126e98d4c4237193a058d68bc4d3cbcc9ef92a",
+      "ahead": 0,
+      "behind": 187
+    },
+    {
+      "ref": "refs/heads/handoff/cloud-20261001-photos",
+      "sha": "2122f0de0abbd1fdb1e1d9e51e56a7f56c4693ad",
+      "ahead": 0,
+      "behind": 226
+    },
+    {
+      "ref": "refs/remotes/origin/codex/export-auto-preparation",
+      "sha": "c75b00aff99040b694fb74995805a3c9f864c9fe",
+      "ahead": 0,
+      "behind": 293
+    },
+    {
+      "ref": "refs/remotes/origin/codex/export-inbox",
+      "sha": "4dc17ee0179cdc0cb3836297881b03f03837ad21",
+      "ahead": 0,
+      "behind": 286
+    },
+    {
+      "ref": "refs/remotes/origin/codex/export-message-recovery",
+      "sha": "15905434909404e50b811d1ddbbd28034b596c13",
+      "ahead": 0,
+      "behind": 283
+    },
+    {
+      "ref": "refs/remotes/origin/codex/impeccable-ui-20261014",
+      "sha": "fe131c5d156fce8ae3643d28f0b2f2132d6b26e7",
+      "ahead": 0,
+      "behind": 277
+    },
+    {
+      "ref": "refs/remotes/origin/codex/page-ui-refinement-20261014",
+      "sha": "7935975746d9694aea5b74d3ef523c286e8b30da",
+      "ahead": 0,
+      "behind": 273
+    },
+    {
+      "ref": "refs/remotes/origin/codex/ticket-detail-reference-20261015",
+      "sha": "a1f31a4f302aeb710616425d559b6b46861990e5",
+      "ahead": 0,
+      "behind": 239
+    },
+    {
+      "ref": "refs/remotes/origin/dot/continue-development-20261020",
+      "sha": "8bb50c01d84d5b338d7cfdc72ecdf74dbf08f2e4",
+      "ahead": 0,
+      "behind": 220
+    },
+    {
+      "ref": "refs/remotes/origin/dot/d09-inspection-report-20261019",
+      "sha": "8b7a6c165e2617be2335083f2faf3d32329b9104",
+      "ahead": 0,
+      "behind": 213
+    },
+    {
+      "ref": "refs/remotes/origin/dot/d10-change-approval-20261019",
+      "sha": "10f9ebcfaa4ad2b566c34de38a5aea8188f0e697",
+      "ahead": 0,
+      "behind": 213
+    },
+    {
+      "ref": "refs/remotes/origin/dot/d11-notification-channel-20261019",
+      "sha": "cdbdf774afad621fa1d1444c970519f13a33ca33",
+      "ahead": 0,
+      "behind": 213
+    },
+    {
+      "ref": "refs/remotes/origin/dot/event-handling-state-20261021",
+      "sha": "9114ca5985fe627d4f329f11e9e0adc845ef8728",
+      "ahead": 0,
+      "behind": 203
+    },
+    {
+      "ref": "refs/remotes/origin/dot/notification-routing-evidence-20261021",
+      "sha": "b925403cc4a42c6c8fd1e71acf4045bc50ccc014",
+      "ahead": 0,
+      "behind": 205
+    },
+    {
+      "ref": "refs/remotes/origin/dot/notification-routing-plan-20261021",
+      "sha": "04f3a89e2dccb030dfa842ff65851781ca053117",
+      "ahead": 0,
+      "behind": 206
+    },
+    {
+      "ref": "refs/remotes/origin/dot/parallel-integration-20261019",
+      "sha": "28e8da23b93aced8f51bf21f5087425c85aa1250",
+      "ahead": 0,
+      "behind": 191
+    },
+    {
+      "ref": "refs/remotes/origin/dot/public-webhook-transport-20261021",
+      "sha": "a23646059cf666b5d4f9e3f95c1033ae222a4f36",
+      "ahead": 0,
+      "behind": 204
+    },
+    {
+      "ref": "refs/remotes/origin/dot/sla-clock-20261020",
+      "sha": "4219e01fe41a2fefbf09619448c898dbdc274f62",
+      "ahead": 0,
+      "behind": 219
+    },
+    {
+      "ref": "refs/remotes/origin/dot/sla-reminder-intents-20261020",
+      "sha": "0d2b7b1c877597d76a87d8793a3149ea9f58e829",
+      "ahead": 0,
+      "behind": 210
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ticket-api-20261020",
+      "sha": "317e7a2effc38b9b07fc212b9ce9c6362675c532",
+      "ahead": 0,
+      "behind": 217
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ticket-autoclose-20261020",
+      "sha": "b5b41e2a5fa3d6ad6eaadaec2ed5d6b44722ad33",
+      "ahead": 0,
+      "behind": 214
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ticket-opening-20261020",
+      "sha": "a1c977982ca5b0a164d9b1590cf084bdcfcd9bd0",
+      "ahead": 0,
+      "behind": 215
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ticket-sla-policy-20261020",
+      "sha": "eb38e8776db77b98f591f629c92c3688798fdd96",
+      "ahead": 0,
+      "behind": 211
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ticket-sla-projection-20261020",
+      "sha": "44dcae9211854abac3cb961edad732805514a658",
+      "ahead": 0,
+      "behind": 213
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ticket-storage-20261020",
+      "sha": "75fc0a76976c38faa50fed0b52a385d41543df5e",
+      "ahead": 0,
+      "behind": 218
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ticket-ui-20261020",
+      "sha": "19945a6bfd4a4ffde64cd228a275b7986f3d3154",
+      "ahead": 0,
+      "behind": 216
+    },
+    {
+      "ref": "refs/remotes/origin/dot/zabbix-event-puller-20261021",
+      "sha": "5acc5ddbb35e12662233c2a089f8652a91d27bf4",
+      "ahead": 0,
+      "behind": 200
+    },
+    {
+      "ref": "refs/remotes/origin/dot/zabbix-read-envelope-20261021",
+      "sha": "b9ee49d249b16a2e7be0fe6310d07f2bbd13371e",
+      "ahead": 0,
+      "behind": 202
+    },
+    {
+      "ref": "refs/remotes/origin/feat/d07-ticket-lifecycle",
+      "sha": "4b126e98d4c4237193a058d68bc4d3cbcc9ef92a",
+      "ahead": 0,
+      "behind": 187
+    },
+    {
+      "ref": "refs/remotes/origin/handoff/cloud-20261001-photos",
+      "sha": "cca471d68064f212c506d033d056a381e2ef256d",
+      "ahead": 0,
+      "behind": 227
+    },
+    {
+      "ref": "refs/remotes/origin/web-redesign",
+      "sha": "251ea43c0f162298b93f92d0a81fb2826a066761",
+      "ahead": 0,
+      "behind": 26
+    }
+  ]
+}

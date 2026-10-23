@@ -1,0 +1,36 @@
+{
+  "status": "PASSED",
+  "source_commit": "a41196874442a9a557efd656595a4a4f097076bc",
+  "verified_at": "2026-10-23T00:45:07.690644+00:00",
+  "late_arriving_functional_commit": "4848519868d1f9cd5091032f8428f1d749affb4d",
+  "deployment_protection_tests": 20,
+  "node_contract_tests": 187,
+  "web": {
+    "files": 296,
+    "tests": 4913,
+    "workers": 4,
+    "failures": 0
+  },
+  "java": {
+    "tests": 4316,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1043,
+    "report_files": 384,
+    "executed": 3273
+  },
+  "typecheck_build_manifest_policy": "PASSED",
+  "http_checks": 370,
+  "browser_cases": 4,
+  "business_writes": 0,
+  "test_messages_sent": 0,
+  "monitoring_python_reused_from": "86713696932e476cbc6eb00c1e007895ff20a11a",
+  "monitoring_python_input_sha256_matches_current_source": true,
+  "monitoring_python_executed": 84,
+  "monitoring_python_skipped": 1,
+  "api_contract_version": "0.81.0",
+  "formal_contract_acceptance": "NOT_COMPLETED",
+  "production_ready": false,
+  "credentials_recorded": false,
+  "private_build_logs": ".local\\test-deployment\\20261023T003941Z-redeploy-a41196874442"
+}

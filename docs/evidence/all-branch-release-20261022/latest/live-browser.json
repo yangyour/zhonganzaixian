@@ -1,0 +1,40 @@
+{
+  "status": "PASSED",
+  "source_commit": "a41196874442a9a557efd656595a4a4f097076bc",
+  "cases": [
+    {
+      "route": "/assets",
+      "width": 1440,
+      "http_status": 200,
+      "page_errors": 0,
+      "document_horizontal_overflow": false
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 1440,
+      "http_status": 200,
+      "page_errors": 0,
+      "document_horizontal_overflow": false
+    },
+    {
+      "route": "/assets",
+      "width": 390,
+      "http_status": 200,
+      "page_errors": 0,
+      "document_horizontal_overflow": false
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 390,
+      "http_status": 200,
+      "page_errors": 0,
+      "document_horizontal_overflow": false
+    }
+  ],
+  "account": "JiangFaMing",
+  "business_writes": 0,
+  "test_messages_sent": 0,
+  "credentials_recorded": false,
+  "login_http_status": 200,
+  "verified_at": "2026-10-23T00:44:44.731Z"
+}

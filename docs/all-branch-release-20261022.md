@@ -1,5 +1,30 @@
 # 全分支覆盖核验与测试环境统一发布（2026-10-22 晚间）
 
+## 最终版本：包含发布期间新到达的监控提交
+
+**最终已于 2026-10-22 20:44:27 EDT 将 main `a41196874442a9a557efd656595a4a4f097076bc` 统一发布至全部 7 应用。** 14 服务真实就绪，数据库仍为 PostgreSQL17.9/V50，0 迁移；7 基础组件生命周期及原私有配置保持。业务入口仍为 http://mop.all-online.com.cn/login，内网入口仍为 http://192.168.1.215:10010/login。下文 20:30 的首轮发布保留作独立历史，当前以本节及 latest/ 证据为准。
+
+首轮发布归档推送期间，上游 main 在 20:38 新增 `4848519` 服务信号纯计算判定，普通推送因此被远端引用更新保护拒绝。重新 fetch 后以正常合并提交 `a411968` 同时保留上游功能和本地 `9e0fc00` 首轮发布证据，正常推送成功，没有强推或覆盖他人提交。再次执行完整本地构建门禁、候选验证及 7 应用统一发布，不把首轮运行结果当成新功能已部署。
+
+| 最终复验 | 实际结果 |
+| --- | --- |
+| 部署保护 / 契约 | 20 / 187 项重新执行通过；API契约生成一致 |
+| 前端 | 296 文件、4913 项重新执行通过，类型/生产构建/清单/安全策略通过 |
+| Java 全模块 package | 4316 项报告，实际执行 3273，条件跳过 1043，失败/错误 0；含新增 6 项服务信号测试 |
+| 正式 HTTP / 浏览器 | 370 项 HTTP/摘要和业务域名 4 项桌面手机页面读取重新通过，业务写请求 0 |
+| 文件与应用 | 166 文件 SHA256 一致，7 应用标签均为 a411968，0 异常重启 |
+| 数据与依赖 | 14 服务 ready=true/durable=true；仍为 4 台实际设备、工单/事件空态，PG17.9/V50、0 迁移 |
+
+Python 监控工具及 12 个测试输入文件的 SHA256 与首轮 84 项通过、1 项跳过的 Linux 套件完全一致，复用该套件的原始证据，不将其标为第二轮重新执行。第二轮另对实际发布目录的四项离线工具命令重新验证。Web build_id 仍为 `2ac49e25b90538a3c04162c402f50b4a4d160e5de9b76b53251a67e7b02b87a2`，API契约仍为 0.81.0。
+
+新增服务信号代码目前只提供固定声明指标的纯计算判定；现有 observation 仍仅查询 up，没有新增服务指标网络读取接口或自动配置。登记目录/Prometheus 来源仍未配置，真实 503 CONFIG_PENDING 与覆盖参数 400 的门禁在第二轮再次核实。未启用采集、创建演示身份、写入合成业务或发送消息，production_ready=false 和正式验收边界保持。
+
+最终发布目录：`/opt/mop-lan-test/releases/20261023T004231Z-a41196874442-87b746`；**当前回退事务**：`/opt/mop-lan-test/private/update-20261023T004231Z-a41196874442-87b746/transaction.json`，按统一流程可回到本次之前健康的 8671369/V50 应用组合。首轮事务是历史，不能代替当前事务使用。
+
+最终证据：[29远端/8本地分支覆盖](evidence/all-branch-release-20261022/latest/branch-coverage.json)、[部署](evidence/all-branch-release-20261022/latest/deployment.json)、[完整验证](evidence/all-branch-release-20261022/latest/validation.json)、[HTTP](evidence/all-branch-release-20261022/latest/http.json)、[浏览器](evidence/all-branch-release-20261022/latest/live-browser.json)、[组件](evidence/all-branch-release-20261022/latest/components.json)、[7应用/离线工具](evidence/all-branch-release-20261022/latest/server-assets.json)、[Java统计](evidence/all-branch-release-20261022/latest/java-summary.json)。第二轮原始日志/截图仅在本机忽略目录 `.local/test-deployment/20261023T003941Z-redeploy-a41196874442/`。最终归档提交只更新文档和证据，应用代码仍为本节已部署版本。
+
+## 20:30 首轮发布（历史）
+
 用户要求“拉取最新代码部署到测试环境，注意要全部分支的修改代码合并到main”。已于 **2026-10-22 20:30:17 EDT（America/New_York）** 将 main 的 `86713696932e476cbc6eb00c1e007895ff20a11a` 统一发布到指定测试环境的 7 个应用；随后真实 HTTP、浏览器和组件复核通过。
 
 ## 仓库及全部分支核验

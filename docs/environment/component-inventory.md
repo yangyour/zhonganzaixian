@@ -478,6 +478,10 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 2026-10-14 长文本界面与列表打磨复用 lan-test-20261008 真实API，本机回环生产前端预览；实际ready接口HTTP200、ready=true、production_ready=false。没有新增基础组件或依赖、迁移、服务重启、业务写入及替代响应。本轮组件版本未重新盘点，不沿用历史版本冒充本轮证据，功能和UI证据见[长文本交互](../reference-ux-textareas-20261014.md)。
 
 2026-10-14 reference-ux前端已按用户授权发布到lan-test-20261008。14个项目服务运行；Web切换之外13服务ID/镜像/启动时间/重启计数保持一致，API、Worker和基础组件均未更新，无迁移。公开91静态文件摘要一致，真实入口11项检查/12个页面视口、ready=true验证通过，production_ready=false保留。见[最终快照](../evidence/reference-ux-20261014/components-final.json)及[部署](../evidence/reference-ux-20261014/frontend-deployment.json)。
+# 2026-10-23 P01运行账号隔离守卫收尾
+
+复用指定lan-test-20261008的PG17.9，真实mop_test_runtime只读连接验证新运行工厂与权限守卫，1项通过，V50历史未变，0数据库写入／DDL／组件变更。新增的是启动和健康检查的最小权限核验，不是生产数据库／RLS选型或正式隔离验收。诊断UI及附件流程未完成部分已按用户停止指令保存在本线命名stash；见[本线收尾与剩余](../parallel/production-progress.md)及[真实PG证据](../evidence/gap-p01-runtime-20261023/postgresql-final.json)。未安装、启用扫描／KMS或执行恢复。
+
 # 2026-10-23 production线入口安全探测
 
 新增只读生产预检查工具，复用已登记业务入口，不创建替代组件。2026-10-23 06:56 UTC真实TLS证书校验失败，HTTP未满足永久同源HTTPS跳转；影响为无法经可信HTTPS核对生产依赖／会话属性，后续HTTPS检查NOT_RUN。正式TLS资源／信任链和数据库隔离批准仍待客户；候选为现有代理的获批证书配置，未获批、未实施。没有安装／停止服务、迁移、业务写入；本轮未重新盘点组件版本。见[运行与验证说明](../production-preflight.md)及[证据](../evidence/production-preflight-20261023/public-entry.json)。

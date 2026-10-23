@@ -1,0 +1,20 @@
+{
+  "environment": "lan-test-20261008",
+  "scope": "DESIGNATED_READ_ONLY_RUNTIME_PRIVILEGES",
+  "status": "PASSED",
+  "database_writes": 0,
+  "ddl_executed": 0,
+  "new_components": 0,
+  "production_database_approved": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "tests": 1,
+  "errors": 0,
+  "failures": 0,
+  "skipped": 0,
+  "schema_history_unchanged": true,
+  "source_commit": "b122896b84fc18fc09a3410f66e08676b22cbbd9",
+  "guard_source_sha256": "e40e464022ccd22411f78cfa3e61d8807501e9767e08be360d3e1093daf601c6",
+  "factory_source_sha256": "3dce71428c5c7545dd812377dbf0a9ec80ee9ab12297623e3f563082eadecd60",
+  "recorded_at_utc": "2026-10-23T15:42:10.134243+00:00"
+}

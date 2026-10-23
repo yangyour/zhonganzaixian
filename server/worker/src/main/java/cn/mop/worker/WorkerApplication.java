@@ -40,7 +40,8 @@ public class WorkerApplication {
         return WorkerRuntimeSettings.from(profiles,environment::getProperty);
     }
 
-    @Bean(destroyMethod="close") HikariDataSource workerDataSource(WorkerRuntimeSettings settings) {
+    @Bean(destroyMethod = "close")
+    HikariDataSource workerDataSource(WorkerRuntimeSettings settings) {
         HikariConfig configuration=new HikariConfig();
         configuration.setJdbcUrl(settings.jdbcUrl());
         configuration.setUsername(settings.databaseUser());
@@ -54,8 +55,7 @@ public class WorkerApplication {
         configuration.addDataSourceProperty("connectTimeout","5");
         configuration.addDataSourceProperty("socketTimeout","20");
         configuration.addDataSourceProperty("tcpKeepAlive","true");
-        try{return new HikariDataSource(configuration);}
-        catch(RuntimeException failure){throw new IllegalStateException("FAIL_CLOSED: designated restricted test PostgreSQL worker connection unavailable");}
+        return cn.mop.persistence.RuntimeDataSources.openRestrictedTest(configuration);
     }
 
     @Bean ObjectMapper workerObjectMapper(){return new ObjectMapper();}

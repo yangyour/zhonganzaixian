@@ -1,0 +1,68 @@
+{
+  "recorded_at_utc": "2026-10-23T16:03:18.641293+00:00",
+  "scope": "COMMITTABLE_RUNTIME_GUARD_CORE_ONLY",
+  "verification_base_commit": "b122896b84fc18fc09a3410f66e08676b22cbbd9",
+  "reactor": "mvn -B clean test",
+  "summary": {
+    "tests": 4571,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1071,
+    "executed": 3500
+  },
+  "modules": {
+    "api": {
+      "tests": 3013,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 58
+    },
+    "asset-export": {
+      "tests": 49,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 13
+    },
+    "export-preparation-worker": {
+      "tests": 29,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "import-parser": {
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "persistence": {
+      "tests": 1274,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 985
+    },
+    "worker": {
+      "tests": 176,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 15
+    }
+  },
+  "designated_postgresql_evidence": "postgresql-final.json",
+  "designated_postgresql_tests": 1,
+  "guard_source_sha256": "e40e464022ccd22411f78cfa3e61d8807501e9767e08be360d3e1093daf601c6",
+  "factory_source_sha256": "3dce71428c5c7545dd812377dbf0a9ec80ee9ab12297623e3f563082eadecd60",
+  "diagnostic_ui_included": false,
+  "attachment_workflow_included": false,
+  "production_profile_enabled": false,
+  "database_writes": 0,
+  "ddl_executed": 0,
+  "formal_contract_acceptance": "NOT_RUN",
+  "browser_application_visited": false,
+  "owned_api_web_started": false,
+  "owned_browser_closed": true,
+  "deferred_work": {
+    "P01_diagnostic_api_ui": "b97f437af8875a51323bcfd26f0c07bd8b30fbd2",
+    "P02_attachment_security": "88cf0e3f311181e590a6dc77714018bd3e2f9c27"
+  }
+}

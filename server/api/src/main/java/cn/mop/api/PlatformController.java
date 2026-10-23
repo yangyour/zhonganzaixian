@@ -101,7 +101,7 @@ public class PlatformController {
         if(firewallResources!=null&&firewallResources.enabled()){
             var status=firewallResources.readiness();if(!Boolean.TRUE.equals(status.get("ready")))throw new DomainException(503,"UPSTREAM_UNAVAILABLE","防火墙资源采集来源或新鲜样本未就绪",List.of(map("component","af_resources","readiness",status)));
         }
-        if(!repository.dependencyReady())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境 PostgreSQL 不可用，未就绪");
+        if(!repository.dependencyReady())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试数据库连接或运行账号隔离检查未通过，请管理员核对运行检查");
         ProjectIdentityService localIdentity=projectIdentity==null?null:projectIdentity.getIfAvailable();
         if(repository.metadata().mode().equals("remote_test")){
             if(localIdentity!=null&&!localIdentity.ready())throw new DomainException(503,"IDENTITY_UNAVAILABLE","项目账号与权限存储未就绪");

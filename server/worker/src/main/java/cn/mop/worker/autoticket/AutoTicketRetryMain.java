@@ -14,7 +14,7 @@ public final class AutoTicketRetryMain {
   var settings=AutoTicketRetrySettings.from(System::getenv);var config=new HikariConfig();config.setJdbcUrl(settings.jdbcUrl());config.setUsername(settings.databaseUser());config.setPassword(settings.databasePassword());
   config.setMaximumPoolSize(2);config.setMinimumIdle(0);config.setConnectionTimeout(5000);config.setValidationTimeout(3000);config.setInitializationFailTimeout(5000);config.setPoolName("mop-autoticket-registration-retry");config.addDataSourceProperty("connectTimeout","5");config.addDataSourceProperty("socketTimeout","20");
   var running=new AtomicBoolean(true);Thread stop=new Thread(()->running.set(false),"autoticket-registration-retry-stop");Runtime.getRuntime().addShutdownHook(stop);
-  try(var source=new HikariDataSource(config)){
+  try(var source=cn.mop.persistence.RuntimeDataSources.openRestrictedTest(config)){
    var mapper=new ObjectMapper().findAndRegisterModules();var platform=new PostgresPlatformRepository(source,mapper);var events=new PostgresMonitoringEventCenterRepository(source,platform);
    if(!events.readinessProblems().isEmpty())throw new IllegalStateException("CONFIG_PENDING: monitoring event schema is not ready; no startup migration is allowed");
    do{

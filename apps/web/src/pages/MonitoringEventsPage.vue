@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { api, ApiError } from '../api/client'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+import MonitoringRecoveryPanel from '../components/MonitoringRecoveryPanel.vue'
 import { session, switchingTenant, contextGeneration } from '../stores/session'
 import { isNavigationFailure, NavigationFailureType, onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
@@ -52,7 +53,8 @@ const capabilityScope = computed(() => JSON.stringify([...new Set(session.value?
 const canRead = computed(() => Boolean(session.value?.mode === 'remote_test' && ['msp', 'padmin'].includes(session.value.user.role) && session.value.capabilities.includes('tickets:read') && !switchingTenant.value))
 const canWrite = computed(() => canRead.value && Boolean(session.value?.capabilities.includes('ticket_notes:write_internal')))
 const canAdminConfirm = computed(() => canRead.value && session.value?.user.role === 'padmin' && Boolean(session.value?.capabilities.includes('configurations:write')))
-const locked = computed(() => state.value.busy !== null || state.value.attempt !== null)
+const recoveryPending = ref(false)
+const locked = computed(() => state.value.busy !== null || state.value.attempt !== null || recoveryPending.value)
 const rootCauseNotes = ref<Record<string, string>>({})
 const quarantineAssets = ref<Record<string, string>>({})
 const quarantineReasons = ref<Record<string, string>>({})
@@ -77,16 +79,16 @@ watch(
 
 watch(() => route.query.event_id, value => { navigationError.value = ''; if (canRead.value) void workspace.selectEventDetail(value) }, { flush: 'sync' })
 
-function mayLeave() { return !workspace.unresolved() }
+function mayLeave() { return !workspace.unresolved() && !recoveryPending.value }
 onBeforeRouteLeave(mayLeave)
 onBeforeRouteUpdate(mayLeave)
 const unregister = contextTransitionGuards.register(mayLeave)
-function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved()) { event.preventDefault(); event.returnValue = '' } }
+function beforeUnload(event: BeforeUnloadEvent) { if (!mayLeave()) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', beforeUnload)
 onBeforeUnmount(() => { unregister(); window.removeEventListener('beforeunload', beforeUnload); workspace.dispose() })
 
 async function selectEvent(id?: string) {
-  if (!canRead.value || workspace.unresolved() || navigating.value || id !== undefined && !exportUuid(id)) return
+  if (!canRead.value || !mayLeave() || navigating.value || id !== undefined && !exportUuid(id)) return
   navigating.value = true; navigationError.value = ''
   const query = { ...route.query }; if (id === undefined) delete query.event_id; else query.event_id = id
   try {
@@ -114,7 +116,7 @@ function switchWindow(w: FunnelWindow) {
 
     <p v-if="navigationError" role="alert">{{ navigationError }}</p>
     <section v-if="canRead && (state.detailId || state.detailError)" class="card event-detail" aria-label="监控事件详情" :aria-busy="state.detailBusy">
-      <div class="actions"><button type="button" :disabled="state.busy === 'write' || state.attempt !== null || navigating" @click="selectEvent()">关闭事件详情</button></div>
+      <div class="actions"><button type="button" :disabled="locked || navigating" @click="selectEvent()">关闭事件详情</button></div>
       <p v-if="state.detailBusy" role="status">正在读取所选事件详情…</p>
       <div v-if="state.detailError" role="alert">
         <p v-if="state.detailError instanceof ApiError && state.detailError.status === 404">事件不存在或当前无权查看。</p>
@@ -137,6 +139,7 @@ function switchWindow(w: FunnelWindow) {
           <div><dt>复盘门槛状态</dt><dd class="mono">{{ state.detail.event.review_policy_status }}</dd></div>
         </dl>
         <p class="event-notice">通知状态说明：<strong>{{ state.detail.event.notification_empty_state_label }}</strong></p>
+        <MonitoringRecoveryPanel :event-id="state.detail.event.id" @pending="recoveryPending=$event" @changed="workspace.loadEventDetail(state.detail.event.id)" />
         <h3>合并的原始事件成员（{{ state.detail.members.length }} 条）</h3>
         <ul class="event-members"><li v-for="m in state.detail.members" :key="m.id"><span class="member-seq">#{{ m.sequence_no }}</span><span class="mono">{{ m.source_event_id }}</span><span class="event-status" :data-state="m.source_phase === 'PROBLEM' ? 'PROBLEM' : 'RECOVERED'">{{ m.source_phase }}</span><time :datetime="m.occurred_at">{{ m.occurred_at }}</time></li></ul>
       </aside>
@@ -175,7 +178,7 @@ function switchWindow(w: FunnelWindow) {
               <td class="event-notification">{{ ev.notification_empty_state_label }}</td>
               <td>
                 <div class="event-row-actions" :class="{ 'has-review': canWrite && ev.handling_state === 'PENDING_REVIEW' }">
-                <button class="event-detail-button" type="button" :disabled="state.busy === 'write' || state.attempt !== null || navigating" @click="selectEvent(ev.id)">查看详情</button>
+                <button class="event-detail-button" type="button" :disabled="locked || navigating" @click="selectEvent(ev.id)">查看详情</button>
                 <button
                   v-if="canWrite && canTransition(ev, 'ACKNOWLEDGE')"
                   :disabled="locked"

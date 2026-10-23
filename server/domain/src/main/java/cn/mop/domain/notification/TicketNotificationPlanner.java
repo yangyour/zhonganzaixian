@@ -98,6 +98,18 @@ public final class TicketNotificationPlanner {
                         "您协办工单的关联监控事件再次报告故障，请核对恢复及复核记录。");
                 }
             }
+            case "ticket.monitoring_recovered" -> {
+                if (in.assigneeId() == null) {
+                    pending.add(PENDING_QUEUE);
+                } else {
+                    internal(recipients, in.assigneeId(), ref + " 监控恢复待复核",
+                        "已发布策略的恢复观察窗已通过，恢复SLA按确认t2停钟；仍须人工核对根因与工单状态。");
+                }
+                for (String collaborator : in.collaborators()) {
+                    internal(recipients, collaborator, ref + " 监控恢复待复核",
+                        "您协办的工单已收到经过观察窗核验的恢复记录，请核对证据并完成复核。");
+                }
+            }
             case "ticket.manager_review_required" -> pending.add(PENDING_MANAGER);
             case "ticket.cancelled" -> customer(recipients, in, ref + " 已撤销", "该工单已由平台管理员撤销。");
             case "ticket.sla_50", "ticket.sla_80", "ticket.sla_100" -> {

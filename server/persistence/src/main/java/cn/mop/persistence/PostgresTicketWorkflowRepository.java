@@ -277,14 +277,34 @@ public final class PostgresTicketWorkflowRepository implements TicketWorkflowRep
     private Event latest(Connection c,String tenant,String ticket)throws SQLException{
         try(var s=statement(c,"SELECT id::text,snapshot,snapshot_hash FROM public.mop_ticket_workflow_event WHERE tenant_id=?::uuid AND ticket_id=?::uuid ORDER BY version DESC LIMIT 1")){s.setString(1,tenant);s.setString(2,ticket);try(var r=s.executeQuery()){return r.next()?new Event(r.getString(1),decode(r.getString(2)),r.getString(3)):null;}}
     }
+    /** A raw RECOVERED flag, old unproved rows, or raw storage alone cannot authorize SLA completion/closure. */
+    private static final String RECOVERY_PROOF = "EXISTS(SELECT 1 FROM public.mop_monitoring_event_member rm "
+        + "JOIN public.mop_raw_monitoring_event rp ON rp.id=rm.raw_event_id AND rp.tenant_id=rm.tenant_id "
+        + "WHERE rm.tenant_id=e.tenant_id AND rm.event_id=e.id AND rm.source_phase='RECOVERED' "
+        + "AND rm.occurred_at=e.recovered_at AND rp.source_phase='RECOVERED' AND rp.asset_id=e.asset_id AND rp.source_event_id=rm.source_event_id "
+        + "AND rp.source_event_id LIKE 'recovery-observation:'||e.id::text||':%' "
+        + "AND EXISTS(SELECT 1 FROM public.mop_audit ra WHERE ra.tenant_id=e.tenant_id "
+        + "AND ra.payload->>'action'='monitoring.recovery.observe' AND ra.payload->>'resource_type'='monitoring_recovery_observation' "
+        + "AND ra.payload->>'resource_id'=rp.id::text AND ra.payload->>'result'='SUCCEEDED' "
+        + "AND position('_RESULT_RECOVERY_CONFIRMED_RELEASE_' IN ra.payload->>'reason')>0))";
+    static boolean recoveryConfirmed(Connection c, String tenant, String eventId) throws SQLException {
+        try (var s = statement(c, "SELECT monitor_state='RECOVERED' AND recovered_at IS NOT NULL AND "
+                + RECOVERY_PROOF + " FROM public.mop_monitoring_event e WHERE tenant_id=?::uuid AND id=?::uuid")) {
+            s.setString(1, tenant);
+            s.setString(2, eventId);
+            try (var r = s.executeQuery()) {
+                return r.next() && r.getBoolean(1);
+            }
+        }
+    }
     private static boolean linkedEventsReviewed(Connection c,String tenant,String ticket)throws SQLException{
-        try(var s=statement(c,"SELECT NOT EXISTS(SELECT 1 FROM public.mop_monitoring_event WHERE tenant_id=?::uuid AND ticket_id=?::uuid AND (monitor_state<>'RECOVERED' OR handling_state NOT IN ('RESOLVED','CLOSED')))")){
+        try(var s=statement(c,"SELECT NOT EXISTS(SELECT 1 FROM public.mop_monitoring_event e WHERE tenant_id=?::uuid AND ticket_id=?::uuid AND (monitor_state<>'RECOVERED' OR handling_state NOT IN ('RESOLVED','CLOSED') OR NOT " + RECOVERY_PROOF + "))")){
             s.setString(1,tenant);s.setString(2,ticket);try(var r=s.executeQuery()){r.next();return r.getBoolean(1);}
         }
     }
     record MonitoringRecovery(boolean linked,Instant recoveredAt){}
     static MonitoringRecovery monitoringRecovery(Connection c,String tenant,String ticket)throws SQLException{
-        try(var s=statement(c,"SELECT count(*)>0,CASE WHEN bool_and(monitor_state='RECOVERED' AND recovered_at IS NOT NULL) THEN max(recovered_at) ELSE NULL END FROM public.mop_monitoring_event WHERE tenant_id=?::uuid AND ticket_id=?::uuid")){
+        try(var s=statement(c,"SELECT count(*)>0,CASE WHEN bool_and(monitor_state='RECOVERED' AND recovered_at IS NOT NULL AND " + RECOVERY_PROOF + ") THEN max(recovered_at) ELSE NULL END FROM public.mop_monitoring_event e WHERE tenant_id=?::uuid AND ticket_id=?::uuid")){
             s.setString(1,tenant);s.setString(2,ticket);try(var r=s.executeQuery()){r.next();return new MonitoringRecovery(r.getBoolean(1),r.getObject(2)==null?null:r.getObject(2,OffsetDateTime.class).toInstant());}
         }
     }

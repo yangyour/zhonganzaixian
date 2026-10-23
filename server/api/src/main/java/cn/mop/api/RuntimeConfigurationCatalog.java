@@ -45,6 +45,9 @@ public final class RuntimeConfigurationCatalog {
         if ("asset.import_steps".equals(key)) {
             s.put("x-consumer-schema", "cmdb-source-drafts-v1");
         }
+        if ("monitor.threshold_matrix".equals(key)) {
+            s.put("x-recovery-observation-consumer", "bound-source-observation-v1");
+        }
         if("itsm.retry_backoff_sec".equals(key)){s.put("minItems",5);s.put("maxItems",5);s.put("items",Map.of("type","integer","minimum",1));}
         if("change_notice.approver_policy".equals(key)) {
             s.put("additionalProperties",false);s.put("required",List.of("reviewer_user_ids"));
@@ -55,6 +58,9 @@ public final class RuntimeConfigurationCatalog {
     public void validate(String key,JsonNode value){if(value!=null&&!value.isNull())depth(value,0);ConfigurationValueValidator.validate(entry(key),value);Map<String,Object> s=schema(key);
         if ("asset.import_steps".equals(key)) {
             cn.mop.adapters.cmdb.CmdbImportPlanner.validateConfiguration(value);
+        }
+        if ("monitor.threshold_matrix".equals(key)) {
+            cn.mop.persistence.MonitoringRecoveryRuleSet.validate(value);
         }
         if("change_notice.approver_policy".equals(key)) {
             if(!value.isObject()||value.size()!=1||!value.has("reviewer_user_ids"))throw invalid("审批人配置只接受reviewer_user_ids");

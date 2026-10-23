@@ -95,6 +95,10 @@ public final class MonitoringEventCenterController {
         String ruleName = text(b.get("rule_name"), 128);
         Severity severity = parseEnum(b.get("severity"), Severity.class);
         MonitorState phase = parseEnum(b.get("source_phase"), MonitorState.class);
+        if (phase == MonitorState.RECOVERED) {
+            throw new DomainException(422, "RECOVERY_OBSERVATION_REQUIRED",
+                "原始恢复信号不能直接确认t2，请通过已发布策略与服务端来源核验恢复观察窗");
+        }
         String sourceEventId = text(b.get("source_event_id"), 256);
         Instant occurredAt = b.get("occurred_at").isNull() ? null : parseInstant(b.get("occurred_at"));
         if (!b.get("simulate_autoticket_failure").isBoolean()) throw invalid();

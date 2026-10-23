@@ -42868,6 +42868,362 @@
           }
         }
       }
+    },
+    "/events/{eventId}/recovery-observations": {
+      "get": {
+        "operationId": "inspectMonitoringRecovery",
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "tickets:read",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "当前授权范围的真实持久化结果；恢复不代表工单关闭",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringRecoveryContextResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "summary": "读取恢复观察策略与来源绑定是否配置，不采样、不写入",
+        "parameters": [
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "observeMonitoringRecovery",
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "ticket_notes:write_internal",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "当前授权范围的真实持久化结果；恢复不代表工单关闭",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringRecoveryObservationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "summary": "读取服务端绑定来源，按精确发布策略保存观察证据，满足条件才确认t2",
+        "parameters": [
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonitoringRecoveryObserveInput"
+              }
+            }
+          }
+        },
+        "x-mop-idempotent-replay-reauthorization": true,
+        "x-mop-client-samples-accepted": false,
+        "x-mop-atomic-evidence-event-audit": true
+      }
+    },
+    "/events/{eventId}/recovery-observations/receipts/{commandSha256}": {
+      "get": {
+        "operationId": "readMonitoringRecoveryReceipt",
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "tickets:read",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "当前授权范围的真实持久化结果；恢复不代表工单关闭",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringRecoveryObservationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "权限、事件/策略版本、来源或证据错误；未知提交保留原请求身份",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "summary": "只读恢复原请求回执；尚未发现已提交证据时返回404，不重发写入",
+        "parameters": [
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "commandSha256",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -86823,6 +87179,522 @@
             "type": "string"
           }
         }
+      },
+      "MonitoringRecoveryContextResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "actor_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "permission_version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740990
+              },
+              "event_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "event_version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740990
+              },
+              "asset_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "monitor_state": {
+                "enum": [
+                  "PROBLEM",
+                  "RECOVERED"
+                ]
+              },
+              "handling_state": {
+                "enum": [
+                  "NEW",
+                  "ACKNOWLEDGED",
+                  "IN_PROGRESS",
+                  "PENDING_REVIEW",
+                  "RESOLVED",
+                  "CLOSED"
+                ]
+              },
+              "recovery_evidence_status": {
+                "enum": [
+                  "NOT_CONFIRMED",
+                  "UNVERIFIED",
+                  "CONFIRMED"
+                ]
+              },
+              "configuration_status": {
+                "enum": [
+                  "ACTIVE",
+                  "CONFIG_PENDING"
+                ]
+              },
+              "missing_reason": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "policy_release_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "policy_release_version": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740990
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "rule": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "metric": {
+                        "enum": [
+                          "icmp",
+                          "loss",
+                          "latency",
+                          "tcp_22",
+                          "tcp_80",
+                          "tcp_443"
+                        ]
+                      },
+                      "comparison": {
+                        "enum": [
+                          "GT",
+                          "GE",
+                          "LT",
+                          "LE"
+                        ]
+                      },
+                      "threshold": {
+                        "type": "string",
+                        "pattern": "^-?(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$"
+                      },
+                      "unit": {
+                        "type": "string",
+                        "maxLength": 32
+                      },
+                      "hold_seconds": {
+                        "type": "string",
+                        "pattern": "^-?(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$"
+                      },
+                      "max_gap_seconds": {
+                        "type": "string",
+                        "pattern": "^-?(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$"
+                      },
+                      "minimum_samples": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 2000
+                      }
+                    },
+                    "required": [
+                      "metric",
+                      "comparison",
+                      "threshold",
+                      "unit",
+                      "hold_seconds",
+                      "max_gap_seconds",
+                      "minimum_samples"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "observed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "source_binding_available": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "actor_id",
+              "permission_version",
+              "event_id",
+              "event_version",
+              "asset_id",
+              "monitor_state",
+              "handling_state",
+              "recovery_evidence_status",
+              "configuration_status",
+              "missing_reason",
+              "policy_release_id",
+              "policy_release_version",
+              "rule",
+              "observed_at",
+              "source",
+              "source_binding_available"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "configuration_status": {
+                      "const": "CONFIG_PENDING"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "rule": {
+                      "type": "null"
+                    },
+                    "policy_release_id": {
+                      "type": "null"
+                    },
+                    "policy_release_version": {
+                      "type": "null"
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "rule": {
+                      "type": "object",
+                      "properties": {
+                        "metric": {
+                          "enum": [
+                            "icmp",
+                            "loss",
+                            "latency",
+                            "tcp_22",
+                            "tcp_80",
+                            "tcp_443"
+                          ]
+                        },
+                        "comparison": {
+                          "enum": [
+                            "GT",
+                            "GE",
+                            "LT",
+                            "LE"
+                          ]
+                        },
+                        "threshold": {
+                          "type": "string",
+                          "pattern": "^-?(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$"
+                        },
+                        "unit": {
+                          "type": "string",
+                          "maxLength": 32
+                        },
+                        "hold_seconds": {
+                          "type": "string",
+                          "pattern": "^-?(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$"
+                        },
+                        "max_gap_seconds": {
+                          "type": "string",
+                          "pattern": "^-?(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$"
+                        },
+                        "minimum_samples": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 2000
+                        }
+                      },
+                      "required": [
+                        "metric",
+                        "comparison",
+                        "threshold",
+                        "unit",
+                        "hold_seconds",
+                        "max_gap_seconds",
+                        "minimum_samples"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "policy_release_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "policy_release_version": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740990
+                    },
+                    "missing_reason": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringRecoveryObservationResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "actor_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "permission_version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740990
+              },
+              "event_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "event_version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740990
+              },
+              "proof_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "status": {
+                "enum": [
+                  "RECOVERY_CONFIRMED",
+                  "NO_SAMPLES",
+                  "UNKNOWN_LATEST",
+                  "STALE_LATEST",
+                  "NOT_RECOVERED",
+                  "OBSERVING"
+                ]
+              },
+              "applied": {
+                "type": "boolean"
+              },
+              "confirmed_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "policy_release_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "policy_release_version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740990
+              },
+              "observed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "latest_sample_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "span_started_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "span_seconds": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^-?(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "matching_samples": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2000
+              },
+              "source_binding_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "source": {
+                "const": "ZABBIX_SIMPLE_CHECK"
+              },
+              "production_approved": {
+                "const": false
+              }
+            },
+            "required": [
+              "tenant_id",
+              "actor_id",
+              "permission_version",
+              "event_id",
+              "event_version",
+              "proof_id",
+              "status",
+              "applied",
+              "confirmed_at",
+              "policy_release_id",
+              "policy_release_version",
+              "observed_at",
+              "latest_sample_at",
+              "span_started_at",
+              "span_seconds",
+              "matching_samples",
+              "source_binding_sha256",
+              "source",
+              "production_approved"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "applied": {
+                      "const": true
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "status": {
+                      "const": "RECOVERY_CONFIRMED"
+                    },
+                    "confirmed_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "latest_sample_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "span_started_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "span_seconds": {
+                      "type": "string",
+                      "pattern": "^-?(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$"
+                    },
+                    "matching_samples": {
+                      "minimum": 1
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "status": {
+                      "not": {
+                        "const": "RECOVERY_CONFIRMED"
+                      }
+                    },
+                    "confirmed_at": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringRecoveryObserveInput": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "policy_release_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "policy_release_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          }
+        },
+        "required": [
+          "expected_version",
+          "policy_release_id",
+          "policy_release_version"
+        ],
+        "additionalProperties": false
       }
     }
   },

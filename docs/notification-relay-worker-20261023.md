@@ -33,3 +33,5 @@ API 仍沿用 `GET /api/v1/my/notifications`、`POST /api/v1/my/notifications/{i
 指定 LAN PostgreSQL 17.9 / V50 已只读探测，证据见 [inventory.json](evidence/notification-relay-20261023/inventory.json)。本轮没有写入测试租户、恢复旧身份、建本地数据库或运行自动迁移。现有实际业务租户不能用于合成通知测试；发现其他租户的存在也不能直接推断其可用于本轮测试。独立命名空间和当前有效测试身份未核验，因此真实 PG 的通知批次、撤权并发、提交响应丢失及后台持续消费仍待联调。
 
 站内 outbox 消费并不意味着外部通知路由、可信回执、供应商送达或正式合同 TC 通过。路由发布和客户未知配置保留原状态。
+
+收尾执行 Worker reactor `package -DskipTests` 成功，随后直接运行打包的 JAR，确认 `--notification-relay --unexpected` 在连接数据库或启动其他作业前按预期拒绝。该启动参数检查是工件验证，不计入业务投递测试；见 [packaged-cli.json](evidence/notification-relay-20261023/packaged-cli.json)。未启动常驻消费者或部署。

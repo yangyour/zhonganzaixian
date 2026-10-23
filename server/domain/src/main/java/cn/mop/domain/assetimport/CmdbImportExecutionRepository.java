@@ -38,4 +38,7 @@ public interface CmdbImportExecutionRepository {
 
     /** Caller supplies the existing idempotent transaction; any failure rolls back the entire batch. */
     Map<String, Object> execute(Access access, String sourceId, Command command);
+
+    /** Owner-authorized receipt lookup. Absence is not evidence that an in-flight command failed. */
+    Map<String, Object> receipt(Access access, String sourceId);
 }

@@ -52,6 +52,11 @@ public final class PostgresCmdbImportRepository implements CmdbImportExecutionRe
     }
 
     @Override
+    public Map<String, Object> receipt(Access access, String sourceId) {
+        return sources.executionReceipt(access, sourceId);
+    }
+
+    @Override
     public Map<String, Object> execute(Access access, String sourceId, Command command) {
         Connection c = platform.idempotentCommandConnection();
         try {

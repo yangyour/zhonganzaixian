@@ -1,0 +1,39 @@
+{
+  "attempts": [
+    {
+      "run_id": "edf8b01f4711",
+      "status": "STOPPED",
+      "error_type": null,
+      "new_test_identities_disabled": true,
+      "protected_fingerprints_unchanged": true,
+      "migration_history_unchanged": true,
+      "migrations": 0,
+      "schema_latest": "50"
+    },
+    {
+      "run_id": "961356ca52d7",
+      "status": "FAILED",
+      "error_type": "KeyError",
+      "new_test_identities_disabled": true,
+      "protected_fingerprints_unchanged": true,
+      "migration_history_unchanged": true,
+      "migrations": 0,
+      "schema_latest": "50"
+    },
+    {
+      "run_id": "ceb59acb8193",
+      "status": "STOPPED",
+      "error_type": null,
+      "new_test_identities_disabled": true,
+      "protected_fingerprints_unchanged": true,
+      "migration_history_unchanged": true,
+      "migrations": 0,
+      "schema_latest": "50"
+    }
+  ],
+  "actual_business_data_mutated": false,
+  "demo_initialization_rerun": false,
+  "historical_fixture_identities_restored": false,
+  "physical_deletion": false,
+  "candidate_api_stopped": true
+}

@@ -52,6 +52,7 @@ public final class PostgresBackupTaskAuthorization {
                 FROM public.mop_membership m
                 JOIN public.mop_user u ON u.id=m.user_id
                 WHERE m.tenant_id=? AND m.user_id=? AND m.active AND u.active
+                  AND m.role_code IN ('padmin','msp')
                 FOR SHARE OF m,u
                 """)) {
             query.setQueryTimeout(5);
@@ -86,6 +87,13 @@ public final class PostgresBackupTaskAuthorization {
                         ? Operation.VERSION_READ : Operation.VERSION_REGISTER);
     }
 
+    /** Enumeration is independent from a single version read, even when the result is empty. */
+    public PostgresBackupVersionRepository.InventoryAuthorizer inventoryAuthorizer() {
+        return (connection, access, scope) -> require(connection,
+                new Access(access.tenantId(), access.actorId(), access.permissionVersion()),
+                scope.tenantId(), scope.assetId(), Operation.VERSION_INVENTORY);
+    }
+
     private void checkGrant(Access access, UUID asset, Operation operation) {
         try {
             var now = clock.instant();
@@ -99,6 +107,9 @@ public final class PostgresBackupTaskAuthorization {
                 throw denied();
             }
         } catch (DomainException failure) {
+            if (failure.status == 503) {
+                throw unavailable();
+            }
             throw denied();
         } catch (RuntimeException failure) {
             throw unavailable();

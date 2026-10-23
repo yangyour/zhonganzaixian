@@ -16,7 +16,8 @@ public record BackupTaskGrant(
         Set<Operation> operations) {
 
     public enum Operation {
-        DISCOVER, ARCHIVE_READ, ARCHIVE_START, ARCHIVE_RECONCILE, VERSION_READ, VERSION_REGISTER
+        DISCOVER, ARCHIVE_READ, ARCHIVE_START, ARCHIVE_RECONCILE,
+        VERSION_INVENTORY, VERSION_READ, VERSION_REGISTER
     }
 
     public BackupTaskGrant {

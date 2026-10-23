@@ -150,6 +150,7 @@ class BackupTaskAuthorizationTest {
             case "getAutoCommit" -> autoCommit;
             case "prepareStatement" -> {
                 assertTrue(((String) ca[0]).contains("FOR SHARE OF m,u"));
+                assertTrue(((String) ca[0]).contains("m.role_code IN ('padmin','msp')"));
                 queries.incrementAndGet();
                 yield proxy(PreparedStatement.class, (q, qm, qa) -> {
                     if (qm.getName().equals("executeQuery")) {

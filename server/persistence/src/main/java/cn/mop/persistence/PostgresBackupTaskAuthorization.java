@@ -35,6 +35,30 @@ public final class PostgresBackupTaskAuthorization {
         return bindingReference;
     }
 
+    /** Fresh independent check for an external-I/O boundary; it never keeps a SQL transaction open during provider calls. */
+    public void requireCurrent(javax.sql.DataSource source, Access access, UUID asset, Operation operation) {
+        try (var connection = source.getConnection()) {
+            connection.setAutoCommit(false);
+            try (var statement = connection.createStatement()) {
+                statement.execute("SET LOCAL lock_timeout='5s'");
+                statement.execute("SET LOCAL statement_timeout='10s'");
+            }
+            try {
+                require(connection, access, access.tenantId(), asset, operation);
+                connection.commit();
+            } catch (SQLException | RuntimeException failure) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ignored) {
+                    // A failed authorization never becomes permission to continue external IO.
+                }
+                throw failure;
+            }
+        } catch (SQLException failure) {
+            throw unavailable();
+        }
+    }
+
     public void require(Connection connection, Access access, UUID tenant, UUID asset,
             Operation operation) throws SQLException {
         if (access == null || tenant == null || asset == null || operation == null) {

@@ -1,0 +1,26 @@
+{
+  "verified_at_utc": "2026-10-23T14:49:03.6691384Z",
+  "id": "B01.2",
+  "status": "CODE_COMPLETE_NEEDS_VERIFICATION",
+  "base": "6d510c2a",
+  "java_discovered": 99,
+  "java_executed": 98,
+  "java_skipped": 1,
+  "failures": 0,
+  "errors": 0,
+  "packaged_cli_rejections": 4,
+  "kms_provider_installed": false,
+  "actual_collector_proof_verified": false,
+  "actual_oss_verified": false,
+  "external_operations": 0,
+  "database_writes": 0,
+  "schema_migrations": 0,
+  "started": false,
+  "deployed": false,
+  "formal_tc": "NOT_RUN",
+  "remaining": [
+    "Q28 approved KMS adapter and actual ready check",
+    "trusted device collector signed manifest",
+    "nonempty designated PostgreSQL + OSS end-to-end processing"
+  ]
+}

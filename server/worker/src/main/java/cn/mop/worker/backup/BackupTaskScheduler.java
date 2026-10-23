@@ -119,11 +119,18 @@ public final class BackupTaskScheduler {
 
     /** One page per configured asset. Failed tasks do not monopolize the front page or another asset. */
     public synchronized Cycle tick() {
+        return tick(() -> false);
+    }
+
+    private synchronized Cycle tick(BooleanSupplier stopRequested) {
         if (!schedule.enabled()) {
             return new Cycle(false, 0, 0, 0, 0, 0, 0, 0);
         }
         int discovered = 0, archived = 0, registered = 0, reconciliation = 0, blocked = 0, unavailable = 0, failures = 0;
         for (Target target : schedule.targets()) {
+            if (stopRequested.getAsBoolean() || Thread.currentThread().isInterrupted()) {
+                break;
+            }
             Page page;
             try {
                 page = discovery.read(target.access(), target.scope(), cursors.get(target.scope()), schedule.pageSize());
@@ -133,6 +140,10 @@ public final class BackupTaskScheduler {
                 continue;
             }
             for (Task task : page.items()) {
+                if (stopRequested.getAsBoolean() || Thread.currentThread().isInterrupted()) {
+                    // Leave this page cursor unchanged so cancellation cannot skip its remaining durable tasks.
+                    return new Cycle(true, discovered, archived, registered, reconciliation, blocked, unavailable, failures);
+                }
                 discovered++;
                 boolean invoked = false;
                 try {
@@ -188,11 +199,11 @@ public final class BackupTaskScheduler {
         Objects.requireNonNull(stopRequested);
         Objects.requireNonNull(observer);
         if (!schedule.enabled()) {
-            observer.accept(tick());
+            observer.accept(tick(stopRequested));
             return;
         }
         while (!stopRequested.getAsBoolean() && !Thread.currentThread().isInterrupted()) {
-            observer.accept(tick());
+            observer.accept(tick(stopRequested));
             if (!stopRequested.getAsBoolean()) {
                 Thread.sleep(schedule.pollMillis());
             }

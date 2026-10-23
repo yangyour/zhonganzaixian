@@ -40969,6 +40969,152 @@
         "x-mop-document-projection": "FROZEN_INPUT_OUTPUT"
       }
     },
+    "/inspection-quarterly-reports/capture": {
+      "post": {
+        "operationId": "captureInspectionQuarterlyReport",
+        "summary": "Atomically capture explicit worksheet revisions, source collection and reproducible quarterly DRAFT",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-capability": "inspection_quarterly_reports:write",
+        "responses": {
+          "200": {
+            "description": "Draft snapshot only, not publication or customer approval",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionQuarterlyReportCaptureResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-additional-capabilities": [
+          "inspection_source_collections:read",
+          "inspection_source_collections:write",
+          "inspection_worksheets:write"
+        ],
+        "x-mop-idempotent-replay-reauthorization": true,
+        "x-mop-max-body-bytes": 262144,
+        "x-mop-atomic-writes": [
+          "source_collection",
+          "source_collection_items",
+          "quarterly_report",
+          "audit",
+          "idempotency_receipt"
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectionQuarterlyReportCapture"
+              }
+            }
+          }
+        }
+      }
+    },
     "/cmdb/type-catalog": {
       "get": {
         "operationId": "readCustomerCmdbTypeCatalog",
@@ -80809,6 +80955,294 @@
           "report_publishable",
           "evidence_access_granted",
           "tenant_asset_population"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionQuarterlyReportCapture": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "const": 0
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "year": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9998
+          },
+          "quarter": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4
+          },
+          "configuration": {
+            "type": "object",
+            "properties": {
+              "revision": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "time_zone": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "duplicate_rule": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "REQUIRE_SINGLE_SOURCE",
+                      "LATEST_REPORTED_PERFORMED_AT"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "archived_rule": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "INCLUDE",
+                      "EXCLUDE"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "metric_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "report_template_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "revision",
+              "time_zone",
+              "duplicate_rule",
+              "archived_rule",
+              "metric_version",
+              "report_template_version"
+            ],
+            "additionalProperties": false
+          },
+          "sources": {
+            "type": "array",
+            "maxItems": 1000,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "worksheet_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740990
+                },
+                "expected_source_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "worksheet_id",
+                "version",
+                "expected_source_sha256"
+              ],
+              "additionalProperties": false
+            },
+            "x-mop-unique-by": [
+              "worksheet_id",
+              "version"
+            ]
+          }
+        },
+        "required": [
+          "expected_version",
+          "label",
+          "year",
+          "quarter",
+          "configuration",
+          "sources"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionQuarterlyReportCaptureSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "const": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "source_collection_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_document_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source_manifest_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "year": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9998
+          },
+          "quarter": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4
+          },
+          "report_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "document_format": {
+            "const": "MOP_INSPECTION_QUARTERLY_DOCUMENT_V1"
+          },
+          "document_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "projection": {
+            "const": "METADATA_ONLY"
+          },
+          "configuration_source": {
+            "const": "REQUEST_DRAFT_NOT_APPROVED"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT_PADMIN"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "generation_status": {
+            "const": "DRAFT"
+          },
+          "report_published": {
+            "const": false
+          },
+          "report_publishable": {
+            "const": false
+          },
+          "evidence_access_granted": {
+            "const": false
+          },
+          "tenant_asset_population": {
+            "type": "null"
+          },
+          "capture_mode": {
+            "const": "ATOMIC_EXPLICIT_WORKSHEET_REVISIONS"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "created_by",
+          "recorded_at",
+          "version",
+          "label",
+          "source_collection_id",
+          "source_document_sha256",
+          "source_manifest_sha256",
+          "year",
+          "quarter",
+          "report_sha256",
+          "document_format",
+          "document_sha256",
+          "projection",
+          "configuration_source",
+          "scope",
+          "source",
+          "generation_status",
+          "report_published",
+          "report_publishable",
+          "evidence_access_granted",
+          "tenant_asset_population",
+          "capture_mode"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionQuarterlyReportCaptureResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/InspectionQuarterlyReportCaptureSummary"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
         ],
         "additionalProperties": false
       },

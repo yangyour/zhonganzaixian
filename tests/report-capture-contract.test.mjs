@@ -1,0 +1,39 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import Ajv2020 from 'ajv/dist/2020.js';
+import addFormats from 'ajv-formats';
+
+const contract = JSON.parse(readFileSync(new URL('../contracts/local-api.openapi.json', import.meta.url), 'utf8'));
+const ajv = new Ajv2020({ allErrors: true, strict: false });
+addFormats(ajv);
+ajv.addSchema({ $id: 'urn:mop:report-capture', components: contract.components });
+const validate = ajv.getSchema('urn:mop:report-capture#/components/schemas/InspectionQuarterlyReportCapture');
+const input = () => ({
+  expected_version: 0, label: 'SYNTHETIC_REPORT_CAPTURE', year: 2026, quarter: 4,
+  sources: [{ worksheet_id: '10000000-0000-4000-8000-000000000001', version: 2, expected_source_sha256: 'a'.repeat(64) }],
+  configuration: { revision: null, time_zone: null, duplicate_rule: null, archived_rule: null, metric_version: null, report_template_version: null }
+});
+
+test('capture contract requires exact source versions and preserves null configuration', () => {
+  assert.equal(validate(input()), true);
+  for (const patch of [{ expected_version: 1 }, { year: 2026.5 }, { quarter: 5 }, { tenant_id: 'forged' }, { report_published: true }]) {
+    assert.equal(validate({ ...input(), ...patch }), false);
+  }
+  for (const patch of [{ version: 0 }, { expected_source_sha256: null }, { expected_source_sha256: 'unknown' }]) {
+    const body = input();
+    Object.assign(body.sources[0], patch);
+    assert.equal(validate(body), false);
+  }
+});
+
+test('capture contract covers all permissions, atomic writes and replay protection', () => {
+  const post = contract.paths['/inspection-quarterly-reports/capture'].post;
+  assert.equal(post['x-mop-capability'], 'inspection_quarterly_reports:write');
+  assert.deepEqual(post['x-mop-additional-capabilities'], ['inspection_source_collections:read', 'inspection_source_collections:write', 'inspection_worksheets:write']);
+  assert.equal(post['x-mop-idempotent-replay-reauthorization'], true);
+  assert.equal(post['x-mop-max-body-bytes'], 262144);
+  assert.deepEqual(post.parameters.map(parameter => parameter.name), ['Idempotency-Key', 'X-CSRF-Token']);
+  assert.deepEqual(post['x-mop-atomic-writes'], ['source_collection', 'source_collection_items', 'quarterly_report', 'audit', 'idempotency_receipt']);
+  assert.equal(contract.components.schemas.InspectionQuarterlyReportCaptureSummary.properties.report_published.const, false);
+});

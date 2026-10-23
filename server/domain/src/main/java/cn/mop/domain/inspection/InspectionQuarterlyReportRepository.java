@@ -23,6 +23,25 @@ public interface InspectionQuarterlyReportRepository {
                    int year,int quarter,String reportSha256,String documentSha256) {}
     /** The frozen JSON contains both complete input and output; no live source lookup is needed. */
     record Stored(Summary summary,String frozenDocument) {}
+
+    /** Explicit immutable worksheet revisions; the source collection is created in the report transaction. */
+    record CaptureCreation(String label, List<InspectionSourceCollectionRepository.Source> sources,
+                           InspectionQuarterlyReport.Period period,
+                           InspectionQuarterlyReport.Configuration configuration) {
+        public CaptureCreation {
+            sources = new InspectionSourceCollectionRepository.Creation(label, sources).sources();
+            if (period == null || configuration == null) {
+                throw invalid();
+            }
+        }
+    }
+
+    /** Recheck every capture permission before both execution and idempotency receipt replay. */
+    void authorizeCapture(Access access);
+
+    /** Append the source collection, draft report and audits on the caller's protected command connection. */
+    Summary capture(Access access, long expectedVersion, CaptureCreation input);
+
     void authorizeWrite(Access access);
     Summary create(Access access,long expectedVersion,Creation input);
     Stored get(Access access,String id);

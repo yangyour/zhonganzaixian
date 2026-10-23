@@ -14,6 +14,35 @@ public final class PostgresInspectionQuarterlyReportRepository implements Inspec
     private final DataSource source;private final PostgresPlatformRepository platform;private final PostgresInspectionSourceCollectionRepository collections;
     public PostgresInspectionQuarterlyReportRepository(DataSource source,PostgresPlatformRepository platform){this.source=Objects.requireNonNull(source);this.platform=Objects.requireNonNull(platform);collections=new PostgresInspectionSourceCollectionRepository(source,platform);}
     @Override public void authorizeWrite(Access a){Connection c=platform.idempotentCommandConnection();try{authorize(c,a,true);}catch(SQLException failure){throw unavailable(failure);}}
+
+    /** Capture composes the existing immutable repositories on the same protected transaction. */
+    @Override
+    public void authorizeCapture(Access access) {
+        authorizeWrite(access);
+        collections.authorizeWrite(collectionAccess(access));
+        // Preserve the existing source-capture capability, including on receipt replay after revocation.
+        new PostgresInspectionWorksheetRepository(source, platform).authorizeWrite(
+                new InspectionWorksheetRepository.Access(access.actorId(), access.tenantId(),
+                        access.permissionVersion(), access.traceId()), null);
+    }
+
+    @Override
+    public Summary capture(Access access, long expectedVersion, CaptureCreation input) {
+        authorizeCapture(access);
+        if (expectedVersion != 0 || input == null) {
+            throw invalid();
+        }
+        var frozen = collections.create(collectionAccess(access), 0,
+                new InspectionSourceCollectionRepository.Creation(input.label(), input.sources()));
+        return create(access, 0, new Creation(input.label(), frozen.id(), frozen.documentSha256(),
+                frozen.sourceManifestSha256(), input.period(), input.configuration()));
+    }
+
+    private static InspectionSourceCollectionRepository.Access collectionAccess(Access access) {
+        return new InspectionSourceCollectionRepository.Access(access.actorId(), access.tenantId(),
+                access.permissionVersion(), access.traceId());
+    }
+
     @Override public Summary create(Access a,long expectedVersion,Creation input){
         Connection c=platform.idempotentCommandConnection();if(expectedVersion!=0||input==null)throw invalid();
         try{authorize(c,a,true);

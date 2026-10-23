@@ -23,7 +23,7 @@ public final class PostgresDashboardPendingTicketsReader implements DashboardPen
                           WHEN l.version IS NOT NULL THEN 'LIFECYCLE_V42'
                           ELSE 'UNCONFIGURED' END AS model,
                      CASE WHEN w.version IS NOT NULL THEN w.snapshot->>'state' ELSE l.state END AS state,
-                     COALESCE(w.version,l.version) AS version
+                     COALESCE(w.version,l.version) AS version,w.snapshot AS workflow_snapshot
                 FROM public.mop_ticket t
                 LEFT JOIN LATERAL (
                   SELECT version,snapshot FROM public.mop_ticket_workflow_event
@@ -50,6 +50,16 @@ public final class PostgresDashboardPendingTicketsReader implements DashboardPen
 
     @Override
     public Snapshot read(Access access) {
+        return readSnapshot(access, (connection, snapshot) -> snapshot);
+    }
+
+    /** Additional projections share the authorized read-only transaction and its observed timestamp. */
+    @FunctionalInterface
+    interface SnapshotProjection<T> {
+        T project(Connection connection, Snapshot snapshot) throws SQLException;
+    }
+
+    <T> T readSnapshot(Access access, SnapshotProjection<T> projection) {
         platform.requireStandaloneRead();
         if (access == null) {
             throw expired();
@@ -107,7 +117,8 @@ public final class PostgresDashboardPendingTicketsReader implements DashboardPen
                 }
                 var items = new ArrayList<Item>();
                 try (var statement = query(connection, access, internal,
-                        "SELECT * FROM visible WHERE model<>'UNCONFIGURED' AND state NOT IN ('CLOSED','CANCELLED') "
+                        "SELECT id,receipt_no,title,created_at,model,state,version FROM visible "
+                                + "WHERE model<>'UNCONFIGURED' AND state NOT IN ('CLOSED','CANCELLED') "
                                 + "ORDER BY created_at DESC,id DESC LIMIT 5")) {
                     try (var rows = statement.executeQuery()) {
                         while (rows.next()) {
@@ -131,8 +142,9 @@ public final class PostgresDashboardPendingTicketsReader implements DashboardPen
                         access.permissionVersion(), observed, internal ? "CURRENT_TENANT_INTERNAL" : "REPORTER_ONLY",
                         Math.addExact(Math.addExact(knownPending, terminal), unconfigured),
                         knownPending, terminal, unconfigured, items);
+                T result = projection.project(connection, snapshot);
                 connection.commit();
-                return snapshot;
+                return result;
             } catch (SQLException | RuntimeException failure) {
                 connection.rollback();
                 if (failure instanceof DomainException domain) {
@@ -145,7 +157,7 @@ public final class PostgresDashboardPendingTicketsReader implements DashboardPen
         }
     }
 
-    private static PreparedStatement query(Connection connection, Access access, boolean internal, String sql)
+    static PreparedStatement query(Connection connection, Access access, boolean internal, String sql)
             throws SQLException {
         var statement = connection.prepareStatement(VISIBLE + sql);
         statement.setQueryTimeout(10);

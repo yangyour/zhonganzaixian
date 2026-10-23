@@ -41,8 +41,12 @@
 - **R02 OPEN**：月报/体检、正式报告中心、审核发布、阅读与交付意图尚待实现；年度二期条件单列。未知评分、重生成和品牌配置保持null。
 - **R03 进行中**：在既有V1聚合基础上补独立SLA增强读取；成本/FTE、经营时间维度/导出仍未核销，不能把首页切片当整个R03完成。
 
-### UI01 依赖：待办SLA增强方案（代码实现中，尚未完成验证）
+### UI01 依赖：待办SLA增强接口子项（已验证，首页接线由集成会话完成）
 
 保留严格V1 `GET /dashboard/pending-tickets`。新增独立 `GET /dashboard/pending-tickets/sla`，`projection_version=MOP_PENDING_TICKETS_SLA_V2`；相同只读REPEATABLE_READ事务内读取权限、当前流程版本、前五条与SLA。逐行提供 `priority`、`frozen_service_tier`、`sla_metric_version`、`sla_version`、`overdue`、`response_clock/recovery_clock`；时钟含状态、breached、缺失原因、deadline_at/completed_at、服务时段剩余毫秒及remaining_basis。前端不自行计时或判定超时。
 
 复用已有V33 `TicketSlaClockEvaluation` 与V42 `SlaClockState`，不更改SLA基础规则。缺配置、停用V42消费者、未确认重开规则及尚未连接的V42监控t2消费保持unknown。全量已超时计数 `overdue_sla` 仅在全部可见登记可判断时返回；另给 `known_overdue/unknown_sla/evaluated_pending/unevaluated_pending/evaluation_limit`。单次最多100张非终态工单是明确技术预算，超出时返回部分证据与null总计，不静默把前五条当总数。集成会话负责DashboardPage、DashboardWorkflowsPanel与客户端，本线不修改。
+
+69项Java、201项契约、4项指定PG隔离检查及既有DEMO三角色的真实候选HTTP对照通过，匿名读取401。候选绑定 `http://127.0.0.1:18215`，默认验证后关闭；可用 `py -3.11 tools/verify-dashboard-sla-candidate.py --output .local/新的验证目录 --hold` 在持有environment.lock期间保留供首页联调，Ctrl+C清理。前端代理指向该本地候选，不使用测试站未部署的V2接口；不发送凭据。字段、命令及未验范围详见 [SLA增强读取](../dashboard-pending-ticket-sla-20261023.md)。V42完整真实流转、其监控t2连接、超100全量异步汇总和前端V2接线未由本线宣称完成。
+
+R01页面功能提交 `cbc6d874` 已以 `d86a913f` 正常合入main，合并后105项回归与类型检查通过；已保留集成会话的UI01.1和最新DEMO契约生成器。

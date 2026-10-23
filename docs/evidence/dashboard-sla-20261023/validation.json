@@ -1,0 +1,71 @@
+{
+  "java_suites": [
+    {
+      "name": "cn.mop.persistence.PostgresTicketLifecycleBoundaryTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.DashboardAvailabilitySnapshotTest",
+      "tests": "12",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.DashboardControllerTest",
+      "tests": "15",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.DashboardHttpSecurityTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.DashboardPendingTicketsTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.DashboardTicketSlaTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.MonitoringRecoveryClockEvidenceTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.persistence.DashboardSlaBridgeTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "java_tests": 69,
+  "java_failures": 0,
+  "java_skipped": 0,
+  "contract_tests": 201,
+  "contract_generation": "PASSED",
+  "actual_pg_tests": 4,
+  "actual_pg_failures": 0,
+  "v42_real_lifecycle": "NOT_RUN",
+  "formal_tc": "NOT_RUN",
+  "frontend_v2": "OWNED_BY_INTEGRATION",
+  "deployment": "NOT_RUN"
+}

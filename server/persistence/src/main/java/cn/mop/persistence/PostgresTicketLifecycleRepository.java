@@ -43,22 +43,73 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
             if(result.clock().lifecycleVersion()!=version)throw conflict();return result;
         }catch(SQLException failure){throw unavailable();}
     }
-    private Optional<SlaEntry> projectSla(Connection c,Access a,String ticket)throws SQLException{try{
-            Optional<Entry> current=latest(c,a,ticket);if(current.isEmpty())return Optional.empty();Entry e=current.get();
-            if(e.snapshot().version()>10000)throw new DomainException(422,"CONFIG_PENDING","工单历史超出在线投影技术预算",List.of(Map.of("reason","HISTORY_BUDGET_EXCEEDED")));
-            var opening=TicketOpeningConfiguration.restore(e.openingSnapshotJson(),mapper);Instant observed=now(c);var history=new ArrayList<TicketLifecycle.Snapshot>();
-            try(var statement=c.prepareStatement("SELECT tenant_id,state,version,reopen_count,occurred_at,resolved_at,closed_at,solution_snapshot_hash,close_mode,response_due_at,recovery_due_at FROM public.mop_ticket_lifecycle_revision WHERE tenant_id=?::uuid AND ticket_id=?::uuid ORDER BY version LIMIT 10001")){
-                statement.setQueryTimeout(10);statement.setString(1,a.tenantId());statement.setString(2,ticket);try(var r=statement.executeQuery()){
-                    while(r.next())history.add(new TicketLifecycle.Snapshot(r.getString("tenant_id"),TicketLifecycle.State.valueOf(r.getString("state")),r.getLong("version"),r.getInt("reopen_count"),instant(r,"occurred_at"),instant(r,"resolved_at"),instant(r,"closed_at"),r.getString("solution_snapshot_hash"),r.getString("close_mode")==null?null:TicketLifecycle.CloseMode.valueOf(r.getString("close_mode")),instant(r,"response_due_at"),instant(r,"recovery_due_at")));
+    /** Dashboard projection uses the existing feature gate and authorization within its one read-only snapshot. */
+    Optional<SlaEntry> dashboardSla(Connection connection, Access access, String ticket, Instant observed) throws SQLException {
+        if (!enabled) {
+            throw new DomainException(422, "LIFECYCLE_SLA_DISABLED", "V42工单SLA读取尚未显式启用");
+        }
+        if (!connection.isReadOnly() || connection.getAutoCommit()
+                || connection.getTransactionIsolation() != Connection.TRANSACTION_REPEATABLE_READ) {
+            throw new IllegalStateException("Dashboard SLA requires a read-only repeatable snapshot");
+        }
+        Objects.requireNonNull(observed, "Dashboard observation time is required");
+        authorize(connection, access, ticket, null);
+        return projectSla(connection, access, ticket, observed);
+    }
+
+    private Optional<SlaEntry> projectSla(Connection c,Access a,String ticket)throws SQLException {
+        return projectSla(c, a, ticket, null);
+    }
+
+    private Optional<SlaEntry> projectSla(Connection c, Access a, String ticket, Instant observed) throws SQLException {
+        try {
+            Optional<Entry> current = latest(c, a, ticket);
+            if (current.isEmpty()) {
+                return Optional.empty();
+            }
+            Entry entry = current.get();
+            if (entry.snapshot().version() > 10000) {
+                throw new DomainException(422, "CONFIG_PENDING", "工单历史超出在线投影技术预算",
+                        List.of(Map.of("reason", "HISTORY_BUDGET_EXCEEDED")));
+            }
+            var opening = TicketOpeningConfiguration.restore(entry.openingSnapshotJson(), mapper);
+            var history = new ArrayList<TicketLifecycle.Snapshot>();
+            if (observed == null) {
+                observed = now(c);
+            }
+            String sql = "SELECT tenant_id,state,version,reopen_count,occurred_at,resolved_at,closed_at,"
+                    + "solution_snapshot_hash,close_mode,response_due_at,recovery_due_at "
+                    + "FROM public.mop_ticket_lifecycle_revision WHERE tenant_id=?::uuid AND ticket_id=?::uuid "
+                    + "ORDER BY version LIMIT 10001";
+            try (var statement = c.prepareStatement(sql)) {
+                statement.setQueryTimeout(10);
+                statement.setString(1, a.tenantId());
+                statement.setString(2, ticket);
+                try (var rows = statement.executeQuery()) {
+                    while (rows.next()) {
+                        String closeMode = rows.getString("close_mode");
+                        history.add(new TicketLifecycle.Snapshot(rows.getString("tenant_id"),
+                                TicketLifecycle.State.valueOf(rows.getString("state")), rows.getLong("version"),
+                                rows.getInt("reopen_count"), instant(rows, "occurred_at"), instant(rows, "resolved_at"),
+                                instant(rows, "closed_at"), rows.getString("solution_snapshot_hash"),
+                                closeMode == null ? null : TicketLifecycle.CloseMode.valueOf(closeMode),
+                                instant(rows, "response_due_at"), instant(rows, "recovery_due_at")));
+                    }
                 }
             }
-            if(history.size()!=e.snapshot().version())throw unavailable();
-            var binding=new PostgresTicketSlaPolicyBindings(mapper).view(c,a,e);
-            boolean bound=Set.of("BOUND","OPENING_FROZEN").contains(binding.status());
-            var policy=bound?cn.mop.domain.sla.SlaClockCalculator.ReopenPolicy.valueOf(binding.clockPolicy()):null;
-            var projection=cn.mop.domain.sla.SlaClockState.project(opening.opening(),history,observed,policy);
-            return Optional.of(new SlaEntry(a.tenantId(),ticket,opening.opening().tier().name(),opening.opening().priority().name(),bound?binding.reference():null,bound?binding.clockPolicy():null,projection));
-        }catch(IllegalArgumentException corrupt){throw unavailable();}
+            if (history.size() != entry.snapshot().version()) {
+                throw unavailable();
+            }
+            var binding = new PostgresTicketSlaPolicyBindings(mapper).view(c, a, entry);
+            boolean bound = Set.of("BOUND", "OPENING_FROZEN").contains(binding.status());
+            var policy = bound ? cn.mop.domain.sla.SlaClockCalculator.ReopenPolicy.valueOf(binding.clockPolicy()) : null;
+            var projection = cn.mop.domain.sla.SlaClockState.project(opening.opening(), history, observed, policy);
+            return Optional.of(new SlaEntry(a.tenantId(), ticket, opening.opening().tier().name(),
+                    opening.opening().priority().name(), bound ? binding.reference() : null,
+                    bound ? binding.clockPolicy() : null, projection));
+        } catch (IllegalArgumentException corrupt) {
+            throw unavailable();
+        }
     }
     @Override public ReminderPage reminders(Access a,String ticket){
         uuid(ticket);return read(a,ticket,c->{

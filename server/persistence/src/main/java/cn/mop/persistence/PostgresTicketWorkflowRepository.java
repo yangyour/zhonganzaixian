@@ -148,6 +148,69 @@ public final class PostgresTicketWorkflowRepository implements TicketWorkflowRep
         try(var s=statement(c,"INSERT INTO public.mop_ticket_workflow_clock(id,tenant_id,ticket_id,clock_key,due_at,kind,cycle,created_at) VALUES(?::uuid,?::uuid,?::uuid,?,?,?,?,?) ON CONFLICT(tenant_id,ticket_id,clock_key) DO NOTHING")){
             s.setString(1,UUID.randomUUID().toString());s.setString(2,tenant);s.setString(3,ticket);s.setString(4,key);instant(s,5,due);s.setString(6,kind);s.setInt(7,cycle);instant(s,8,at);s.executeUpdate();}
     }
+
+    /** Called inside the authorized event transaction. Only committed outbox facts are consumed by the relay. */
+    void monitoringRecurrence(Connection c, String tenant, String ticket, String monitoringEvent,
+                              int problemSequence, boolean notificationEligible, Instant at) throws SQLException {
+        lock(c, tenant, ticket, false);
+        Event current = latest(c, tenant, ticket);
+        if (current == null) {
+            return; // Registration has not been activated; no SLA or recipients are invented.
+        }
+        if (Set.of(State.CLOSED, State.CANCELLED).contains(current.snapshot().state())) {
+            throw new DomainException(409, "TICKET_TERMINAL", "关联工单已结束，不能向该工单追加复发周期");
+        }
+        UUID eventId = UUID.fromString(monitoringEvent);
+        String onset = monitoringEvent + ":" + problemSequence;
+        if (notificationEligible) {
+            outbox(c, tenant, ticket, current, "monitoring:" + onset,
+                "ticket.monitoring_recurred", at);
+        }
+        for (int percent : List.of(50, 80, 100)) {
+            Instant due = current.snapshot().sla().threshold("recovery", percent);
+            if (due != null) {
+                task(c, tenant, ticket, new MonitoringRecurrenceClock(percent, eventId, problemSequence).key(),
+                    "SLA", due, 0, at);
+            }
+        }
+    }
+
+    /** Existing terminal workflows cannot receive another problem by reusing a recovered event. */
+    boolean terminal(Connection c, String tenant, String ticket) throws SQLException {
+        Event current = latest(c, tenant, ticket);
+        return current != null && Set.of(State.CLOSED, State.CANCELLED).contains(current.snapshot().state());
+    }
+
+    private static boolean currentMonitoringCycle(Connection c, String tenant, String ticket,
+                                                  MonitoringRecurrenceClock cycle) throws SQLException {
+        String sql = "SELECT event_id::text,sequence_no FROM ("
+            + "SELECT m.event_id,m.sequence_no,m.source_phase,m.occurred_at,m.recorded_at,"
+            + "lag(m.source_phase) OVER (PARTITION BY m.event_id ORDER BY m.sequence_no) AS previous_phase "
+            + "FROM public.mop_monitoring_event_member m JOIN public.mop_monitoring_event e "
+            + "ON e.tenant_id=m.tenant_id AND e.id=m.event_id WHERE e.tenant_id=?::uuid AND e.ticket_id=?::uuid"
+            + ") signals WHERE source_phase='PROBLEM' AND (previous_phase IS NULL OR previous_phase='RECOVERED') "
+            + "ORDER BY occurred_at DESC,recorded_at DESC,event_id DESC,sequence_no DESC LIMIT 1";
+        try (var statement = statement(c, sql)) {
+            statement.setString(1, tenant);
+            statement.setString(2, ticket);
+            try (var rows = statement.executeQuery()) {
+                return rows.next() && cycle.eventId().toString().equals(rows.getString(1))
+                    && cycle.sequence() == rows.getInt(2);
+            }
+        }
+    }
+
+    private static boolean hasMonitoringRecurrence(Connection c, String tenant, String ticket) throws SQLException {
+        try (var statement = statement(c, "SELECT EXISTS(SELECT 1 FROM public.mop_ticket_workflow_clock "
+                + "WHERE tenant_id=?::uuid AND ticket_id=?::uuid AND clock_key LIKE 'recovery:%:monitor:%')")) {
+            statement.setString(1, tenant);
+            statement.setString(2, ticket);
+            try (var rows = statement.executeQuery()) {
+                rows.next();
+                return rows.getBoolean(1);
+            }
+        }
+    }
     @Override public int tick(String tenant,int limit){
         uuid(tenant);if(limit<1||limit>100)throw invalid();
         return platform.ticketClockTransaction(()->{Connection c=platform.ticketClockConnection();try{
@@ -167,7 +230,22 @@ public final class PostgresTicketWorkflowRepository implements TicketWorkflowRep
                     }
                 }else if(!job.kind().equals("AUTO_CLOSE")){
                     var recovery=monitoringRecovery(c,tenant,job.ticket());
-                    Optional<ClockNotice> notice=WorkflowLifecycle.dueNotices(current.snapshot(),at,recovery.linked(),recovery.recoveredAt()).stream().filter(n->n.key().equals(job.key())).findFirst();
+                    List<ClockNotice> notices = WorkflowLifecycle.dueNotices(
+                        current.snapshot(), at, recovery.linked(), recovery.recoveredAt()
+                    );
+                    MonitoringRecurrenceClock cycle;
+                    try {
+                        cycle = MonitoringRecurrenceClock.parse(job.key());
+                    } catch (IllegalArgumentException invalidCycle) {
+                        throw unavailable();
+                    }
+                    String canonicalKey = cycle == null ? job.key() : cycle.canonicalKey();
+                    boolean eligible = cycle == null
+                        ? !job.key().startsWith("recovery:") || !hasMonitoringRecurrence(c, tenant, job.ticket())
+                        : currentMonitoringCycle(c, tenant, job.ticket(), cycle);
+                    Optional<ClockNotice> notice = eligible
+                        ? notices.stream().filter(n -> n.key().equals(canonicalKey)).findFirst()
+                        : Optional.empty();
                     if(notice.isPresent()){outbox(c,tenant,job.ticket(),current,"clock:"+job.key(),notice.get().eventType(),at);outcome="EMITTED";}
                 }
                 try(var s=statement(c,"INSERT INTO public.mop_ticket_workflow_clock_receipt(task_id,tenant_id,outcome,completed_at) VALUES(?::uuid,?::uuid,?,?)")){s.setString(1,job.id());s.setString(2,tenant);s.setString(3,outcome);instant(s,4,at);s.executeUpdate();}processed++;

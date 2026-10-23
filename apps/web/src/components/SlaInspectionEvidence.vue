@@ -2,6 +2,7 @@
 import {computed,nextTick,onUnmounted,ref,useId,watch} from 'vue'
 import type {TicketSlaInspection} from '../utils/serviceTiers'
 import {displayTime} from '../utils/display'
+import {monitoringRecurrenceLabel} from '../utils/monitoringRecurrence'
 const props=defineProps<{inspection:TicketSlaInspection}>()
 type SectionKey='tasks'|'missing'|'references'
 type EvidenceSection={key:SectionKey;title:string;columns:string[];rows:string[][];empty:string;guidance:string}
@@ -11,7 +12,7 @@ const kindLabels:Record<string,string>={SLA:'SLA 提醒',CONFIRMATION_REMINDER:'
 const outcomeLabels:Record<string,string>={EMITTED:'已生成内部事件（非外部送达）',OBSOLETE:'已过时',AUTO_CLOSED:'已自动关闭工单'}
 const missingLabels:Record<string,string>={response:'响应时限',recovery:'恢复时限',confirmation:'客户确认期限'}
 const sections=computed<EvidenceSection[]>(()=>[
- {key:'tasks',title:'耐久时钟任务',columns:['任务键','任务类型','计划时间','处理回执','完成时间'],rows:props.inspection.clock_tasks.map(t=>[t.clock_key,kindLabels[t.kind]??t.kind,displayTime(t.due_at),t.outcome===null?'未见处理回执':outcomeLabels[t.outcome]??t.outcome,t.completed_at===null?'未见完成时间':displayTime(t.completed_at)]),empty:'此快照未返回时钟任务，不表示通知已经送达，也不能据此判断后台处理器是否运行。',guidance:'仅核对本次接口返回的内部任务。EMITTED 不表示邮件、企业微信或短信送达；未见回执不等于执行失败。'},
+ {key:'tasks',title:'耐久时钟任务',columns:['任务键','任务类型','计划时间','处理回执','完成时间'],rows:props.inspection.clock_tasks.map(t=>[t.clock_key,monitoringRecurrenceLabel(t.clock_key)??kindLabels[t.kind]??t.kind,displayTime(t.due_at),t.outcome===null?'未见处理回执':outcomeLabels[t.outcome]??t.outcome,t.completed_at===null?'未见完成时间':displayTime(t.completed_at)]),empty:'此快照未返回时钟任务，不表示通知已经送达，也不能据此判断后台处理器是否运行。',guidance:'仅核对本次接口返回的内部任务。复发周期沿用原 SLA 截止；EMITTED 不表示邮件、企业微信或短信送达，未见回执不等于执行失败。'},
  {key:'missing',title:'快照缺失配置',columns:['配置项','原始键','缺失原因'],rows:Object.entries(props.inspection.sla_missing).map(([key,value])=>[missingLabels[key]??key,key,value]),empty:'此快照未报告缺失配置，不表示其他配置已经就绪或生产验收完成。',guidance:'缺失项保持未知，不在这里补费用、时限或审批默认值。修订配置不会自动改写本工单已冻结的 SLA。'},
  {key:'references',title:'冻结配置来源',columns:['配置键','来源类型','发布 ID','版本','定义摘要 SHA-256'],rows:props.inspection.sla_references.map(r=>[r.key,r.source==='CONTRACT_DEFAULT'?'合同默认定义快照':'运行配置发布快照',r.release_id===null?'无发布 ID（合同默认快照）':r.release_id,String(r.version),r.definition_hash]),empty:'此快照未返回冻结来源引用，不补造发布 ID 或定义摘要。',guidance:'这里只显示接口返回的冻结来源与摘要，不能据此确认客户已批准、外部证据已认证或新配置已经生效。'}
 ])

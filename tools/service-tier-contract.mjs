@@ -95,6 +95,7 @@ export function addServiceTierContract(contract) {
   contract.paths['/tickets/{id}/workflow/sla'] = {
     get: base('readTicketSlaClock', '读取工单冻结SLA时钟、50/80/100%提醒阈值、暂停状态与当前租户档位对照（M2-10/M5-8/M5-18/M5-20）', ref('TicketSlaInspectionResult'), {
       description: '已关联监控事件的缺失恢复时点保持计时；提供的 t2 必须为工单开始至服务端观察时刻范围内的有效毫秒时间，否则返回 503 RECOVERY_EVIDENCE_INVALID。与耐久 SLA 提醒处理共用门禁；时间合法不等于已通过恢复观察窗或客户验收。',
+      'x-mop-monitoring-recurrence': { clock_key: 'recovery:{50|80|100}:monitor:{event_id}:{problem_sequence}', frozen_deadline_preserved: true, superseded_cycles: 'OBSOLETE', intent_type: 'ticket.monitoring_recurred', provider_dispatch: 'NOT_CONFIGURED' },
       parameters: [{ name: 'id', in: 'path', required: true, schema: uuid }],
       'x-mop-capability': 'tickets:read',
     }),

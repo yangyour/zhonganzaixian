@@ -34922,6 +34922,13 @@
           }
         },
         "description": "已关联监控事件的缺失恢复时点保持计时；提供的 t2 必须为工单开始至服务端观察时刻范围内的有效毫秒时间，否则返回 503 RECOVERY_EVIDENCE_INVALID。与耐久 SLA 提醒处理共用门禁；时间合法不等于已通过恢复观察窗或客户验收。",
+        "x-mop-monitoring-recurrence": {
+          "clock_key": "recovery:{50|80|100}:monitor:{event_id}:{problem_sequence}",
+          "frozen_deadline_preserved": true,
+          "superseded_cycles": "OBSOLETE",
+          "intent_type": "ticket.monitoring_recurred",
+          "provider_dispatch": "NOT_CONFIGURED"
+        },
         "parameters": [
           {
             "name": "id",

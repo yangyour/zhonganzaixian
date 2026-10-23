@@ -120,7 +120,9 @@ public class SessionService {
             // No bearer token is returned by this API or persisted in the repository.
             var pending=request.getSession(true);pending.setMaxInactiveInterval(60);
             pending.setAttribute("mop.logout_auth",previous);pending.setAttribute("mop.logout_expires",Instant.now().plusSeconds(60));
-        }else expireCookie(response);
+        } else {
+            ProjectSessionCookie.expire(request, response);
+        }
         return map("logged_out",true,"redirect_url",providerLogout?"/auth/logout":null);
     }
     public void providerLogout(HttpServletRequest request,HttpServletResponse response)throws java.io.IOException,jakarta.servlet.ServletException{
@@ -132,7 +134,9 @@ public class SessionService {
                 pending.invalidate();
             }
         }
-        if(hasPending)expireCookie(response);
+        if (hasPending) {
+            ProjectSessionCookie.expire(request, response);
+        }
         var handler=oidcLogout.getIfAvailable();
         if(auth==null||handler==null){response.sendRedirect("/login");return;}
         handler.onLogoutSuccess(request,response,auth);
@@ -158,7 +162,6 @@ public class SessionService {
         return membership;
     }
     private String csrf(HttpServletRequest request){CsrfToken token=(CsrfToken)request.getAttribute(CsrfToken.class.getName());if(token==null)token=csrfRepository.loadToken(request);if(token==null)throw new IllegalStateException("CSRF token unavailable");return token.getToken();}
-    private static void expireCookie(HttpServletResponse response){var cookie=new jakarta.servlet.http.Cookie("MOP_SESSION","");cookie.setPath("/");cookie.setHttpOnly(true);cookie.setMaxAge(0);cookie.setAttribute("SameSite","Strict");response.addCookie(cookie);}
     private static String requestKey(HttpServletRequest request){String key=request.getHeader("Idempotency-Key");if(key==null||!key.matches("[A-Za-z0-9._:-]{1,128}"))throw validation("Idempotency-Key 为必填，长度1至128且仅包含字母数字及._:-");return key;}
     private static void fields(JsonNode body,Set<String> allowed){if(!body.isObject())throw validation("请求体必须为JSON对象");body.fieldNames().forEachRemaining(k->{if(!allowed.contains(k))throw validation("未知或禁止字段: "+k);});}
     private static String text(JsonNode body,String key,int max){JsonNode value=body.get(key);if(value==null||!value.isTextual())throw validation(key+" 必须为字符串");String result=value.asText().strip();if(result.isEmpty()||result.length()>max||result.codePoints().anyMatch(Character::isISOControl))throw validation(key+" 为空、过长或含控制字符");return result;}

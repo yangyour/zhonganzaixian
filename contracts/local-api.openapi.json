@@ -85660,5 +85660,21 @@
         ]
       }
     }
+  },
+  "x-mop-secure-session-transport": {
+    "enabled_by": "mop.security.require-https=true",
+    "default_enabled": false,
+    "scope": "DIRECT_TLS_ONLY",
+    "plaintext_response": {
+      "status": 400,
+      "code": "HTTPS_REQUIRED",
+      "schema": {
+        "$ref": "#/components/schemas/Error"
+      }
+    },
+    "plaintext_exception": "Credential-free loopback GET/HEAD /health/live or /health/ready only",
+    "forwarded_headers_trusted": false,
+    "session_cookie": "MOP_SESSION; Secure; HttpOnly; SameSite=Strict; Path=/; host-only; non-persistent",
+    "production_activation": false
   }
 }

@@ -3,6 +3,7 @@
 import { createApp, h, nextTick, type App } from 'vue'
 import { createMemoryHistory, createRouter, RouterView, type Router } from 'vue-router'
 import ElementPlus from 'element-plus'
+import axe from 'axe-core'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import GlobalSearch from '../src/components/GlobalSearch.vue'
 import MonitoringEventsPage from '../src/pages/MonitoringEventsPage.vue'
@@ -42,6 +43,26 @@ beforeEach(() => {
 afterEach(() => { app?.unmount(); app = undefined; host?.remove(); session.value = null; vi.restoreAllMocks(); vi.unstubAllGlobals(); document.body.innerHTML = '' })
 
 describe('event hits in the global search dialog', () => {
+  it('keeps dialog chrome inside native sectioning content instead of adding page-wide landmarks', async () => {
+    const banner=document.createElement('header');banner.textContent='合成页面顶栏';document.body.append(banner)
+    await mount();document.querySelector<HTMLButtonElement>('.global-search-trigger')!.click();await settle()
+    const dialog=document.querySelector<HTMLElement>('[role="dialog"]')!
+    expect(dialog.getAttribute('aria-label')).toBe('搜索当前租户')
+    expect(dialog.querySelector('.el-dialog__header')?.closest('section')).toBe(document.querySelector('.global-search-portal'))
+    expect(dialog.querySelector('.el-dialog__footer')?.closest('section')).toBe(document.querySelector('.global-search-portal'))
+    // Reproduce the former body-teleport semantics with the same real component DOM.
+    const portal=document.querySelector('.global-search-portal')!,overlay=dialog.closest('.el-overlay')!
+    document.body.append(overlay)
+    try {
+      const former=await axe.run(document.body,{runOnly:{type:'rule',values:['landmark-no-duplicate-banner']}})
+      expect(former.violations.map(v=>v.id)).toContain('landmark-no-duplicate-banner')
+    } finally { portal.append(overlay) }
+    const result=await axe.run(document.body,{runOnly:{type:'rule',values:['landmark-no-duplicate-banner','landmark-no-duplicate-contentinfo','landmark-banner-is-top-level','landmark-contentinfo-is-top-level','aria-dialog-name']}})
+    expect(result.violations).toEqual([])
+    const input=document.querySelector<HTMLInputElement>('input[aria-label="当前租户搜索词"]')!;input.focus();expect(document.activeElement).toBe(input)
+    button('关闭').click();await settle();await vi.waitFor(()=>expect((document.querySelector('.el-overlay') as HTMLElement).style.display).toBe('none'))
+  })
+
   it('opens with slash without a request, lets users disable it and retains Control K', async () => {
     const request=vi.spyOn(api,'request')
     await mount()

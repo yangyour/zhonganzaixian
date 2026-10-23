@@ -65,7 +65,8 @@
       "evidence": [
         "docs/dashboard-alert-bell-20261023.md",
         "docs/evidence/gap-ui03-bell-20261023/validation.json",
-        "docs/evidence/gap-ui03-search-20261023/validation.json"
+        "docs/evidence/gap-ui03-search-20261023/validation.json",
+        "docs/global-search-landmark-fix-20261023.md"
       ],
       "commits": [
         "1e4431b5",
@@ -73,14 +74,15 @@
       ],
       "completed_subitems": [
         "M1-8 current-tenant PROBLEM/NEW exact bell reader and header, permissions/recovery and designated PG/HTTP/browser verification",
-        "M1-8 slash shortcut, local opt-out and account-version invalidation; 65 targeted tests and real browser interaction"
+        "M1-8 slash shortcut, local opt-out and account-version invalidation; 65 targeted tests and real browser interaction",
+        "Search dialog page-wide landmark duplication fixed and original DOM semantics reproduced with real Element Plus/axe in jsdom; 66 targeted tests"
       ],
       "remaining_subitems": [
         "Review M1-5 recent events, M1-7 tenant switching, remaining M1-8 search groups and M7 gate",
         "Complete filter inheritance and M1-9 refresh coverage",
         "Review M1-11 fixed dashboard layout contract",
         "Formal contract acceptance",
-        "Search dialog duplicate banner landmark accessibility finding"
+        "Real browser revalidation of search landmark fix; formal accessibility acceptance"
       ]
     },
     {

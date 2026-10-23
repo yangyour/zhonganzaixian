@@ -1,0 +1,17 @@
+{
+  "status": "TARGETED_DOM_A11Y_FIXED_BROWSER_PENDING",
+  "original_dom_semantics": "landmark-no-duplicate-banner reproduced with the same real Element Plus DOM outside a native section",
+  "fixed_rules": ["landmark-no-duplicate-banner", "landmark-no-duplicate-contentinfo", "landmark-banner-is-top-level", "landmark-contentinfo-is-top-level", "aria-dialog-name"],
+  "targeted_tests": 66,
+  "failures": 0,
+  "typecheck": "PASSED",
+  "build": "PASSED_WITH_EXISTING_CHUNK_WARNING",
+  "independent_main_baseline": "73b2b83b6464ccf337f081373b7e84e879553644",
+  "independent_main_targeted_tests": 66,
+  "browser": "NOT_RUN",
+  "formal_acceptance": "NOT_RUN",
+  "api_changes": 0,
+  "migrations": 0,
+  "business_writes": 0,
+  "deployed": false
+}

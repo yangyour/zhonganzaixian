@@ -28,7 +28,8 @@ async function visit(kind:'assets'|'events'|'tickets',id:string){if(navigating.v
 </script>
 <template>
  <el-button v-if="permitted" class="global-search-trigger" :aria-label="slashEnabled?'打开全局搜索，快捷键斜杠、Control K 或 Command K':'打开全局搜索，快捷键 Control K 或 Command K'" :aria-keyshortcuts="slashEnabled?'Control+k Meta+k /':'Control+k Meta+k'" :title="slashEnabled?'搜索当前租户（/ 或 Ctrl+K / ⌘K）':'搜索当前租户（Ctrl+K / ⌘K）'" @click="show"><Search class="search-trigger-icon" aria-hidden="true" /><span class="search-trigger-label">搜索<span class="search-trigger-hint">资产 / 事件 / 报障记录</span></span><kbd aria-hidden="true">{{slashEnabled?'/ · Ctrl / ⌘ K':'Ctrl / ⌘ K'}}</kbd></el-button>
- <el-dialog v-model="open" title="搜索当前租户" width="680px" class="global-search-dialog" append-to-body :close-on-click-modal="false" :close-on-press-escape="!navigating" :show-close="!navigating" @opened="input?.focus()">
+ <Teleport to="body"><section class="global-search-portal">
+ <el-dialog v-model="open" title="搜索当前租户" width="680px" class="global-search-dialog" :close-on-click-modal="false" :close-on-press-escape="!navigating" :show-close="!navigating" @opened="input?.focus()">
   <el-form class="global-search-form" @submit.prevent="workspace.search()"><el-form-item><el-input ref="input" :model-value="state.query" :disabled="navigating" clearable aria-label="当前租户搜索词" placeholder="资产名称 / 事件规则名称或代码 / 报障标题 / 受理编号" @update:model-value="workspace.change(String($event))"/></el-form-item><el-button native-type="submit" type="primary" :loading="state.busy" :disabled="navigating">搜索</el-button></el-form>
   <label class="search-shortcut-preference"><input v-model="slashEnabled" type="checkbox" />启用 / 快捷键（输入文字或操作弹窗时不触发）</label>
   
@@ -52,6 +53,7 @@ async function visit(kind:'assets'|'events'|'tickets',id:string){if(navigating.v
   <p v-else-if="!state.busy&&!state.error" class="search-idle">按 Enter 搜索资产、监控事件与报障记录</p>
   <template #footer><el-button :disabled="navigating" @click="open=false">关闭</el-button></template>
  </el-dialog>
+ </section></Teleport>
 </template>
 <style scoped>
 .search-shortcut-preference{display:flex;align-items:center;gap:7px;margin:6px 0 12px;color:#536276;font-size:12px;line-height:1.6}.search-shortcut-preference input{margin:0;accent-color:#2165c5}.search-shortcut-preference input:focus-visible{outline:2px solid #2165c5;outline-offset:3px}

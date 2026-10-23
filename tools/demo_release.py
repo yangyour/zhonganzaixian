@@ -97,15 +97,17 @@ def release(env):
         candidate_created = True
         server.run(['docker', 'start', candidate], True)
         server.ready(18039)
-        probe = """import urllib.request,http.cookiejar,json,sys
+        probe = """import urllib.request,urllib.error,http.cookiejar,json,sys,uuid
 cfg=json.load(sys.stdin);base='http://127.0.0.1:18039/api/v1';op=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
 csrf=None
 def call(path,body=None,method=None):
  global csrf
- h={'Content-Type':'application/json','Origin':'http://127.0.0.1:18039'}
+ h={'Content-Type':'application/json','Origin':'http://127.0.0.1:18039','Idempotency-Key':str(uuid.uuid4())}
  if csrf:h['X-CSRF-Token']=csrf
  req=urllib.request.Request(base+path,None if body is None else json.dumps(body).encode(),h,method=method)
- return json.load(op.open(req,timeout=20))['data']
+ try:return json.load(op.open(req,timeout=20))['data']
+ except urllib.error.HTTPError as error:
+  data=json.load(error);print('CANDIDATE_HTTP_FAILURE',path,error.code,data.get('error',{}).get('code'));sys.exit(1)
 csrf=call('/auth/csrf')['csrf_token'];s=call('/auth/local/login',cfg['login']);csrf=s['csrf_token']
 s=call('/session/tenant',{'tenant_id':cfg['tenant']});csrf=s['csrf_token'];assert s['demo_examples_enabled'] is True
 for page in ['sla-scenarios','sla-reports','operational-comparison','capacity-estimates','observation-window-diagnostics','threshold-diagnostics','contact-import-preview']:
@@ -115,8 +117,10 @@ for provider in ['email','wecom']:
 print('CANDIDATE_DEMO_READS_PASSED')
 """
         login = {k: env.state['users']['main'][k] for k in ('username', 'password')}
-        output = server.run(['python3', '-c', probe], data=json_text({'login': login, 'tenant': env.state['contexts']['padmin']['tenant_id']}))
-        require('CANDIDATE_DEMO_READS_PASSED' in output, 'Candidate demo behavior failed')
+        code, output = server.run(['python3', '-c', probe], data=json_text({'login': login, 'tenant': env.state['contexts']['padmin']['tenant_id']}), check=False)
+        if code:
+            print(output)
+        require(code == 0 and 'CANDIDATE_DEMO_READS_PASSED' in output, 'Candidate demo behavior failed')
         server.run(['docker', 'rm', '-f', candidate], True)
         candidate_created = False
         server.selected = ['api', 'web']

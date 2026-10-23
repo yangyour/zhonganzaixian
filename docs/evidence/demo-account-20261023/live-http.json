@@ -1,0 +1,73 @@
+{
+  "verified_at": "2026-10-23T10:03:52.606929+00:00",
+  "contexts": [
+    {
+      "role": "padmin",
+      "tenant_id": "43ad0f67-7d50-5e2d-b1b5-1bd91ff18a26",
+      "assets": 7,
+      "network_devices": 1,
+      "workflows": 3,
+      "own_notifications": 1,
+      "audit_records_verified": 144,
+      "disabled_channel_bindings": 2
+    },
+    {
+      "role": "msp",
+      "tenant_id": "110c0ef7-1d21-5fe2-8c60-1848a33a26b6",
+      "assets": 7,
+      "network_devices": 1,
+      "workflows": 3,
+      "own_notifications": 2,
+      "audit_records_verified": 113,
+      "disabled_channel_bindings": 2
+    },
+    {
+      "role": "tadmin",
+      "tenant_id": "0e58bebe-1628-55b6-848a-70d57cb7c8cf",
+      "assets": 7,
+      "network_devices": 1,
+      "workflows": 3,
+      "own_notifications": 8,
+      "audit_records_verified": 80,
+      "disabled_channel_bindings": 2
+    }
+  ],
+  "cross_tenant": [
+    {
+      "role": "padmin",
+      "real_asset": 404,
+      "real_tenant_switch": 404
+    },
+    {
+      "role": "msp",
+      "real_asset": 404,
+      "real_tenant_switch": 404
+    },
+    {
+      "role": "tadmin",
+      "real_asset": 404,
+      "real_tenant_switch": 404
+    },
+    {
+      "real_account_to_demo_role": "padmin",
+      "asset": 404
+    },
+    {
+      "real_account_to_demo_role": "msp",
+      "asset": 404
+    },
+    {
+      "real_account_to_demo_role": "tadmin",
+      "asset": 404
+    }
+  ],
+  "credentials_recorded": false,
+  "real_account": {
+    "login": 200,
+    "assets": 4,
+    "demo_memberships": 0,
+    "demo_examples_enabled": false
+  },
+  "protected_rows_unchanged": true,
+  "schema_unchanged": true
+}

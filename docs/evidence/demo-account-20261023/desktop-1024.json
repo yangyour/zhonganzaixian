@@ -1,0 +1,44 @@
+[
+  {
+    "path": "/sla-scenarios",
+    "width": 1024,
+    "scrollWidth": 1024,
+    "demoBanner": 1
+  },
+  {
+    "path": "/operational-comparison",
+    "width": 1024,
+    "scrollWidth": 1024,
+    "demoBanner": 1
+  },
+  {
+    "path": "/capacity-estimates",
+    "width": 1024,
+    "scrollWidth": 1024,
+    "demoBanner": 1
+  },
+  {
+    "path": "/observation-window-diagnostics",
+    "width": 1024,
+    "scrollWidth": 1024,
+    "demoBanner": 1
+  },
+  {
+    "path": "/threshold-diagnostics",
+    "width": 1024,
+    "scrollWidth": 1024,
+    "demoBanner": 1
+  },
+  {
+    "path": "/contact-import-preview",
+    "width": 1024,
+    "scrollWidth": 1024,
+    "demoBanner": 1
+  },
+  {
+    "path": "/sla-reports",
+    "width": 1024,
+    "scrollWidth": 1024,
+    "demoBanner": 1
+  }
+]

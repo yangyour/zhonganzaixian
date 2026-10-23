@@ -1,0 +1,26 @@
+{
+  "checks": [
+    {
+      "path": "/email/check",
+      "status": 409,
+      "code": "DEMO_CHANNEL_DISABLED"
+    },
+    {
+      "path": "/email/test-messages",
+      "status": 409,
+      "code": "DEMO_CHANNEL_DISABLED"
+    },
+    {
+      "path": "/wecom/check",
+      "status": 409,
+      "code": "DEMO_CHANNEL_DISABLED"
+    },
+    {
+      "path": "/wecom/test-messages",
+      "status": 409,
+      "code": "DEMO_CHANNEL_DISABLED"
+    }
+  ],
+  "provider_calls": 0,
+  "credentials_recorded": false
+}

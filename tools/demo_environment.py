@@ -11,6 +11,7 @@ import datetime as dt
 import hashlib
 import importlib.util
 import json
+import re
 from pathlib import Path
 import secrets
 import subprocess
@@ -206,7 +207,13 @@ class Client:
         if method != 'GET' and path not in ('/auth/local/login', '/session/tenant'):
             require(self.session and self.session['tenant']['id'] == self.tenant and self.tenant in self.env.tenants, 'Demo write guard')
             require(not any(value in path or value in json_text(body) for value in PROTECTED), 'Protected reference')
-            require(not any(forbidden in path for forbidden in ('test-messages', '/wecom', '/email', '/identity/policy', '/monitoring-onboarding/registered-targets')), 'Outbound/global operation prohibited')
+            binding = re.fullmatch(r'/(email|wecom)/bindings/([0-9a-f-]{36})', path)
+            allowed_disabled_binding = bool(
+                method == 'PUT' and binding and isinstance(body, dict) and body.get('active') is False
+                and binding[2] in {user['id'] for user in self.env.state['users'].values()}
+                and (binding[1] == 'email' and re.fullmatch(r'[A-Za-z0-9._-]+@example\.invalid', body.get('email', ''))
+                    or binding[1] == 'wecom' and re.fullmatch(r'DEMO_[A-Za-z0-9_-]{1,50}', body.get('wecom_user_id', ''))))
+            require(allowed_disabled_binding or not any(forbidden in path for forbidden in ('test-messages', '/wecom', '/email', '/identity/policy', '/monitoring-onboarding/registered-targets')), 'Outbound/global operation prohibited')
         headers = {'Origin': ORIGIN, 'Accept': 'application/json'}
         if self.csrf:
             headers['X-CSRF-Token'] = self.csrf

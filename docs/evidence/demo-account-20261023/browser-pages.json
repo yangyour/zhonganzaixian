@@ -1,0 +1,628 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "pages": [
+    {
+      "path": "/account",
+      "url": "/account",
+      "headings": [
+        "我的账号",
+        "[DEMO] 全功能测试用户",
+        "基本资料",
+        "修改密码"
+      ],
+      "rows": 0,
+      "textLength": 265,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/asset-export-jobs",
+      "url": "/asset-export-jobs",
+      "headings": [
+        "资产台账导出 ",
+        "我的导出作业"
+      ],
+      "rows": 1,
+      "textLength": 197,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/assets",
+      "url": "/assets",
+      "headings": [
+        "资产管理",
+        "资产列表"
+      ],
+      "rows": 7,
+      "textLength": 1200,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/audit",
+      "url": "/audit",
+      "headings": [
+        "审计检索与区间校验",
+        "哈希链区间校验"
+      ],
+      "rows": 15,
+      "textLength": 3076,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/backup-plan-drafts",
+      "url": "/backup-plan-drafts",
+      "headings": [
+        "每日备份计划草稿",
+        "已保存草稿（含归档）"
+      ],
+      "rows": 1,
+      "textLength": 270,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/capability-catalog",
+      "url": "/capability-catalog",
+      "headings": [
+        "系统能力与权限目录"
+      ],
+      "rows": 48,
+      "textLength": 3085,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/capacity-estimates",
+      "url": "/capacity-estimates",
+      "headings": [
+        "容量与 Proxy 缓冲评估",
+        "导入已发布运行配置参数",
+        "容量模型",
+        "模型系数",
+        "Proxy 缓冲测算",
+        "主机数增长推演",
+        "容量模型估算结果",
+        "平均NVPS",
+        "日写入量",
+        "历史总量",
+        "趋势数据量",
+        "单节点容量",
+        "主备两份容量",
+        "2倍峰值目标",
+        "有效监控项总数",
+        "资源池数量估算",
+        "Proxy缓冲：已完成估算",
+        "计算依据",
+        "本次模型输入核对"
+      ],
+      "rows": 0,
+      "textLength": 1140,
+      "demoInput": true,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/change-notice-drafts",
+      "url": "/change-notice-drafts",
+      "headings": [
+        "变更报备草稿",
+        "已保存草稿（含归档）",
+        "明确修订审批"
+      ],
+      "rows": 1,
+      "textLength": 357,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/configurations",
+      "url": "/configurations",
+      "headings": [
+        "配置项登记",
+        "配置登记与修订"
+      ],
+      "rows": 186,
+      "textLength": 31015,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/contact-import-preview",
+      "url": "/contact-import-preview",
+      "headings": [
+        "联系人导入格式预览",
+        "待校验 JSON 数据",
+        "服务端格式诊断结果",
+        "第1行：格式通过"
+      ],
+      "rows": 0,
+      "textLength": 234,
+      "demoInput": true,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/contact-imports",
+      "url": "/contact-imports",
+      "headings": [
+        "联系人批量新建与作业",
+        "我的导入作业"
+      ],
+      "rows": 1,
+      "textLength": 231,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/customer-contacts",
+      "url": "/customer-contacts",
+      "headings": [
+        "客户联系人"
+      ],
+      "rows": 4,
+      "textLength": 454,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/customer-topology",
+      "url": "/customer-topology",
+      "headings": [
+        "客户拓扑"
+      ],
+      "rows": 0,
+      "textLength": 246,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/dashboard",
+      "url": "/dashboard",
+      "headings": [
+        "运营总览",
+        "资产在线率",
+        "当前问题",
+        "本月服务可用率",
+        "待处理工单",
+        "MTTA近24小时",
+        "通知送达率近24小时",
+        "告警趋势",
+        "服务健康",
+        "故障时间线",
+        "最近事件",
+        "待处理工单",
+        "资源占用 Top5"
+      ],
+      "rows": 2,
+      "textLength": 1011,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/email",
+      "url": "/email",
+      "headings": [
+        "邮件通知",
+        "发件连接",
+        "平台账号收件地址",
+        "邮件发送记录"
+      ],
+      "rows": 2,
+      "textLength": 478,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/identity/roles",
+      "url": "/identity/roles",
+      "headings": [
+        "角色与权限",
+        "角色矩阵"
+      ],
+      "rows": 4,
+      "textLength": 288,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/identity/settings",
+      "url": "/identity/settings",
+      "headings": [
+        "身份认证设置",
+        "可配置策略",
+        "统一身份认证接口"
+      ],
+      "rows": 6,
+      "textLength": 297,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/identity/users",
+      "url": "/identity/users",
+      "headings": [
+        "用户与成员授权"
+      ],
+      "rows": 5,
+      "textLength": 563,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/inspection-quarterly-reports",
+      "url": "/inspection-quarterly-reports",
+      "headings": [
+        "季度巡检报告草稿",
+        "已保存季度草稿 · 仅元数据"
+      ],
+      "rows": 2,
+      "textLength": 298,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/inspection-source-collections",
+      "url": "/inspection-source-collections",
+      "headings": [
+        "巡检来源集合草稿",
+        "已保存集合 · 元数据列表",
+        "报告生成状态"
+      ],
+      "rows": 1,
+      "textLength": 273,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/inspection-templates",
+      "url": "/inspection-templates",
+      "headings": [
+        "巡检模板候选"
+      ],
+      "rows": 1,
+      "textLength": 187,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/inspection-worksheets",
+      "url": "/inspection-worksheets",
+      "headings": [
+        "人工巡检执行单"
+      ],
+      "rows": 1,
+      "textLength": 217,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/manual-incidents",
+      "url": "/manual-incidents",
+      "headings": [
+        "手工故障与事件登记 ",
+        "手工登记列表"
+      ],
+      "rows": 1,
+      "textLength": 169,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/monitoring-events",
+      "url": "/monitoring-events",
+      "headings": [
+        "监控事件中心与降噪漏斗",
+        "监控事件流",
+        "计划维护窗口与 SLA 排除确认",
+        "监控隔离区（0）与自动建单补偿（2）",
+        "自动建单补偿"
+      ],
+      "rows": 3,
+      "textLength": 864,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/monitoring-onboarding",
+      "url": "/monitoring-onboarding",
+      "headings": [
+        "监控接入配置",
+        "服务器登记目标"
+      ],
+      "rows": 0,
+      "textLength": 360,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/my-export-messages",
+      "url": "/my-export-messages",
+      "headings": [
+        "我的导出消息 "
+      ],
+      "rows": 1,
+      "textLength": 212,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/my-notification-preferences",
+      "url": "/my-notification-preferences",
+      "headings": [
+        "个人通知偏好设置 ",
+        "钉钉",
+        "邮件",
+        "短信",
+        "语音",
+        "Webhook",
+        "企业微信",
+        "当前通知偏好",
+        "当前版本 v1",
+        "偏好修订历史 不是通知发送或供应商送达记录"
+      ],
+      "rows": 0,
+      "textLength": 507,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/my-tasks",
+      "url": "/my-tasks",
+      "headings": [
+        "我的待办"
+      ],
+      "rows": 2,
+      "textLength": 370,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/my-worklogs",
+      "url": "/my-worklogs",
+      "headings": [
+        "我的工时记录 ",
+        "工时明细筛选",
+        "本页类型分布"
+      ],
+      "rows": 1,
+      "textLength": 521,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/network-monitoring",
+      "url": "/network-monitoring",
+      "headings": [
+        "基础网络监控",
+        "设备监控",
+        "采样历史"
+      ],
+      "rows": 1,
+      "textLength": 368,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/observation-window-diagnostics",
+      "url": "/observation-window-diagnostics",
+      "headings": [
+        "采样观察窗诊断",
+        "诊断结果",
+        "候选观察跨度达到，但不是实际恢复确认"
+      ],
+      "rows": 0,
+      "textLength": 351,
+      "demoInput": true,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/oncall-board",
+      "url": "/oncall-board",
+      "headings": [
+        "值班看板与升级链管理 ",
+        "登记升级执行 / 电话未接听升级（M5-12 / M5-13）"
+      ],
+      "rows": 3,
+      "textLength": 566,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/operational-comparison",
+      "url": "/operational-comparison",
+      "headings": [
+        "经营样本与人力测算",
+        "服务端测算结果对照",
+        "本次样本分布",
+        "人力与规模参数核对",
+        "耗时样本录入",
+        "月度人力参数录入"
+      ],
+      "rows": 7,
+      "textLength": 642,
+      "demoInput": true,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/runtime-configurations",
+      "url": "/runtime-configurations",
+      "headings": [
+        "运行配置与发布",
+        "配置目录"
+      ],
+      "rows": 0,
+      "textLength": 9297,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/service-tiers",
+      "url": "/service-tiers",
+      "headings": [
+        "服务档位与 SLA 时钟台账 ",
+        "登记服务档位变更"
+      ],
+      "rows": 1,
+      "textLength": 553,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/sla-reports",
+      "url": "/sla-reports",
+      "headings": [
+        "SLA 月度报表与赔付试算 ",
+        "服务节点可用性与区间明细（M5-9 / M5-10）",
+        "月度工单 SLA 达标判定与赔付试算（M5-19 / CONFIG_PENDING_Q26）",
+        "实时达标评估 (2026-10)",
+        "已保存月度快照",
+        "本月逐工单 SLA 达标与原因明细"
+      ],
+      "rows": 10,
+      "textLength": 2333,
+      "demoInput": true,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/sla-scenarios",
+      "url": "/sla-scenarios",
+      "headings": [
+        "SLA 场景测算 ",
+        "模拟场景样本",
+        "场景 1",
+        "场景 2",
+        "场景已测算"
+      ],
+      "rows": 2,
+      "textLength": 738,
+      "demoInput": true,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/tenant-inventory",
+      "url": "/tenant-inventory",
+      "headings": [
+        "租户资源台账"
+      ],
+      "rows": 1,
+      "textLength": 364,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/threshold-diagnostics",
+      "url": "/threshold-diagnostics",
+      "headings": [
+        "告警阈值规则诊断",
+        "数学一致，仍不可发布",
+        "原输入回显",
+        "警告条件",
+        "严重条件",
+        "恢复条件",
+        "精确关系检查",
+        "候选阈值输入"
+      ],
+      "rows": 0,
+      "textLength": 392,
+      "demoInput": true,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/ticket-notifications",
+      "url": "/ticket-notifications",
+      "headings": [
+        "工单通知 "
+      ],
+      "rows": 0,
+      "textLength": 217,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/ticket-workflows",
+      "url": "/ticket-workflows",
+      "headings": [
+        "工单处理 ",
+        "已激活工单列表"
+      ],
+      "rows": 3,
+      "textLength": 280,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/tickets",
+      "url": "/tickets",
+      "headings": [
+        "报障与受理 ",
+        "全部故障申报"
+      ],
+      "rows": 5,
+      "textLength": 823,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    },
+    {
+      "path": "/wecom",
+      "url": "/wecom",
+      "headings": [
+        "企业微信",
+        "应用连接",
+        "成员与平台账号",
+        "消息发送记录"
+      ],
+      "rows": 2,
+      "textLength": 403,
+      "demoInput": false,
+      "errors": [],
+      "apiFailures": []
+    }
+  ],
+  "credentialsRecorded": false
+}

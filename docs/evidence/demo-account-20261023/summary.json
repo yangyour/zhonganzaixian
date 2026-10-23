@@ -1,0 +1,24 @@
+{
+  "application": {
+    "source_commit": "c3e1c35b19bb80f483a89a4aacac43c6255a6b00",
+    "build_id": "5f33d59c2244ec3ca123f855ccff009d32eb5ef9a1f7263a1dfd557b27948763",
+    "files_verified": 151,
+    "other_12_containers_unchanged": true,
+    "schema_unchanged": true,
+    "candidate_demo_reads": true
+  },
+  "validation": {
+    "java_reported": 4274,
+    "java_executed": 3233,
+    "java_skipped": 1041,
+    "web_tests": 4960,
+    "contract_tests": 199,
+    "final_page_guard_tests": 38,
+    "python_scope_tests": 8,
+    "offline_linux_plan_tests": 18,
+    "browser_pages": 43,
+    "desktop_1024_pages": 7
+  },
+  "formal_contract_acceptance": "NOT_COMPLETED",
+  "credentials_recorded": false
+}

@@ -1,0 +1,132 @@
+{
+  "status": "PASSED",
+  "origin": "http://mop.all-online.com.cn",
+  "login_http_status": 200,
+  "cases": [
+    {
+      "route": "/dashboard",
+      "width": 1440,
+      "http": 200,
+      "overflow": false
+    },
+    {
+      "route": "/assets",
+      "width": 1440,
+      "http": 200,
+      "overflow": false
+    },
+    {
+      "route": "/customer-topology",
+      "width": 1440,
+      "http": 200,
+      "overflow": false
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 1440,
+      "http": 200,
+      "overflow": false
+    },
+    {
+      "route": "/dashboard",
+      "width": 1024,
+      "http": 200,
+      "overflow": false
+    },
+    {
+      "route": "/assets",
+      "width": 1024,
+      "http": 200,
+      "overflow": false
+    },
+    {
+      "route": "/customer-topology",
+      "width": 1024,
+      "http": 200,
+      "overflow": false
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 1024,
+      "http": 200,
+      "overflow": false
+    },
+    {
+      "route": "/dashboard",
+      "width": 390,
+      "http": 200,
+      "overflow": false
+    },
+    {
+      "route": "/assets",
+      "width": 390,
+      "http": 200,
+      "overflow": false
+    },
+    {
+      "route": "/customer-topology",
+      "width": 390,
+      "http": 200,
+      "overflow": false
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 390,
+      "http": 200,
+      "overflow": false
+    },
+    {
+      "route": "/dashboard",
+      "width": 320,
+      "http": 200,
+      "overflow": false
+    },
+    {
+      "route": "/assets",
+      "width": 320,
+      "http": 200,
+      "overflow": false
+    },
+    {
+      "route": "/customer-topology",
+      "width": 320,
+      "http": 200,
+      "overflow": false
+    },
+    {
+      "route": "/monitoring-events",
+      "width": 320,
+      "http": 200,
+      "overflow": false
+    }
+  ],
+  "axe": [
+    {
+      "width": 1440,
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "violations": []
+    }
+  ],
+  "business_writes": 0,
+  "page_errors": 0,
+  "controls": [
+    "mobile menu open, navigate and return",
+    "window DAYS_7",
+    "window DAYS_30",
+    "window HOURS_24",
+    "refresh, auto refresh and CPU/memory/disk round trip",
+    "sidebar collapse, keyboard module navigation and browser back"
+  ],
+  "verified_at": "2026-10-23T05:30:04.247Z"
+}

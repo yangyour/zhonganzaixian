@@ -1,0 +1,1835 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-23",
+  "source_commit": "f45891bad39f7964b462a18fb5cc4f93ba2957d0",
+  "scope": "Implementation gap work and review coverage; not formal acceptance or a completion percentage",
+  "tasks": [
+    {
+      "id": "UI01",
+      "owner": "integration",
+      "title": "首页待办汇总与跨状态前五条接入",
+      "requirement_ids": [
+        "M1-1",
+        "M1-6"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "接入已有pending-tickets真实接口，区分完整/部分/失败，保留角色范围、取消/切租户与详情入口，不以某状态分页代替全集。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "UI02",
+      "owner": "integration",
+      "title": "其余首页指标、趋势、健康、时间线和资源来源接线",
+      "requirement_ids": [
+        "M1-1",
+        "M1-2",
+        "M1-3",
+        "M1-4",
+        "M1-10"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "与报告/监控实际来源衔接；已定义口径可计算，来源或规则缺失保持null，不能用演示数据补正常。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "UI03",
+      "owner": "integration",
+      "title": "首页近期事件、搜索、铃铛、筛选继承与刷新复核",
+      "requirement_ids": [
+        "M1-5",
+        "M1-7",
+        "M1-8",
+        "M1-9",
+        "M1-11"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "核对已有功能并补真实缺口；无权菜单与未实现M7脚本搜索维持明确边界，不重设计菜单。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "A01",
+      "owner": "assets",
+      "title": "资产导入执行页面与完整字段/引用落地",
+      "requirement_ids": [
+        "M3-4",
+        "M3-6"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "连接现有事务导入API，明确33列映射与扩展保留/生效边界，真实来源、配额、去重、幂等、回滚和用户结果回读闭环。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "A02",
+      "owner": "assets",
+      "title": "租户开通与多维配额治理",
+      "requirement_ids": [
+        "M2-2",
+        "M2-3",
+        "M2-4",
+        "M2-11"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "实现申请/审核/开通/失败补偿、预留与释放、配额计量；实际租户/限额配置化，生产物理隔离待Q02。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "A03",
+      "owner": "assets",
+      "title": "租户角色、成员、联系人与档位差距补齐",
+      "requirement_ids": [
+        "M2-1",
+        "M2-6",
+        "M2-7",
+        "M2-8",
+        "M2-9",
+        "M2-10",
+        "M2-14"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "先核销已有实现，再补合同遗漏，保持身份与授权变更即时失效、双主体审批和审计；不修改原主目录在编前端。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "A04",
+      "owner": "assets",
+      "title": "维保、退役迁移和租户保留治理",
+      "requirement_ids": [
+        "M2-13",
+        "M3-10",
+        "M3-11"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "补定期到期处理、通知意图、退役/迁移及保留/删除状态机和历史可追溯；真实删除默认关闭。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "A05",
+      "owner": "assets",
+      "title": "资产详情/台账字段、来源和导出闭环",
+      "requirement_ids": [
+        "M3-1",
+        "M3-2",
+        "M3-3",
+        "M3-5",
+        "M3-7",
+        "M3-9",
+        "M3-12"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "补可信字段投影、来源和关联核验、已实现导出链的合同缺口；未知Proxy/责任人等不造值。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "M01",
+      "owner": "monitoring",
+      "title": "实际恢复观察窗与复发时钟闭环",
+      "requirement_ids": [
+        "M4-4",
+        "M4-7",
+        "M4-8",
+        "M4-9",
+        "M4-10",
+        "M4-11",
+        "M4-14",
+        "M5-2",
+        "M5-3",
+        "M5-4",
+        "M5-8",
+        "M5-17",
+        "M5-18",
+        "M5-20"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "实际样本/有效策略→观察确认→t2与事件/工单；复发重新安排必要任务及耐久通知意图，证明缺失不得提前停钟。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "M02",
+      "owner": "monitoring",
+      "title": "持久监控接入与采集/规则发布",
+      "requirement_ids": [
+        "M3-4",
+        "M4-1",
+        "M4-2",
+        "M4-3",
+        "M4-5",
+        "M4-6",
+        "M4-18",
+        "M4-19"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "完成注册任务、参数/OID/模板消费、显式应用与首值回读、失败恢复，234项目录仅按已获参数配置，不假设全部已采集。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "M03",
+      "owner": "monitoring",
+      "title": "模板灰度、Proxy/站点和资源池治理",
+      "requirement_ids": [
+        "M4-12",
+        "M4-15",
+        "M4-16"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "补版本/摘要、分批发布/观察/回退、站点与Proxy/资源池生命周期和容量校验；真实外部操作另行受控。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "M04",
+      "owner": "monitoring",
+      "title": "工单闭环与外部同步剩余项",
+      "requirement_ids": [
+        "M5-1",
+        "M5-5",
+        "M5-6",
+        "M5-7",
+        "M5-12",
+        "M5-13",
+        "M5-14",
+        "M5-15",
+        "M5-16",
+        "M5-21"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "核销已有流转后补正式激活、外部ITSM补偿接口、升级/提醒/关单/重开及工时合同遗漏；外发由通知线接收意图。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "M05",
+      "owner": "monitoring",
+      "title": "SLA导出、冻结对账与补偿审批",
+      "requirement_ids": [
+        "M5-9",
+        "M5-10",
+        "M5-11",
+        "M5-19"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "补统一快照、正式导出和对账审批/舍入，费用和未确认口径可配置且缺失为空；不自动支付。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "N01",
+      "owner": "notifications",
+      "title": "通知路由、队列、供应商回执与死信闭环",
+      "requirement_ids": [
+        "M4-13",
+        "M8-1",
+        "M8-2",
+        "M8-3",
+        "M8-10",
+        "M8-11"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "补路由发布/绑定事务、持续调度、可信签名、原请求查询、受控重试及人工处置API/页面，保留既有站内relay与DEMO通道隔离。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "N02",
+      "owner": "notifications",
+      "title": "客户门户与通知入口合同补齐",
+      "requirement_ids": [
+        "M1-8",
+        "M8-4",
+        "M8-5",
+        "M8-6",
+        "M8-7",
+        "M8-8",
+        "M8-9",
+        "M8-12"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "先核对已有门户/扫码/偏好/工单入口，补桌面可实现的链路；报告入口接报告线，移动专项按后续安排，不外发真实消息。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "B01",
+      "owner": "backups",
+      "title": "备份调度装配、版本枚举及受保护下载/差异",
+      "requirement_ids": [
+        "M6-1",
+        "M6-2",
+        "M6-3",
+        "M6-6"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "连接已有任务发现/调度与独立授权来源，补可显式启动的Worker、版本列表提供者、下载/解密/差异；设备采集证明和KMS未配时明确未就绪。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "B02",
+      "owner": "backups",
+      "title": "失败工单、恢复演练、清理和变更联动",
+      "requirement_ids": [
+        "M4-17",
+        "M6-4",
+        "M6-5",
+        "M6-7"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "补失败计数与幂等工单意图、恢复申请/批准/结果和演练记录、保留清理及变更检测报备，真实执行/删除默认关闭。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "R01",
+      "owner": "reports",
+      "title": "原子报告捕获页面与统一冻结来源",
+      "requirement_ids": [
+        "M9-1",
+        "M9-2",
+        "M9-7",
+        "M9-9"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "接capture API并补跨业务同版本来源、草稿/批准/发布状态边界和H5/PDF同源，不将草稿下载当正式报告。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "R02",
+      "owner": "reports",
+      "title": "月报、体检、交付阅读与年度范围",
+      "requirement_ids": [
+        "M8-9",
+        "M9-3",
+        "M9-4",
+        "M9-5",
+        "M9-6",
+        "M9-8"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "补模板、审核发布、报告中心/阅读记录和交付意图；评分/重生成/品牌未决值配置化，年度二期条件单列。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "R03",
+      "owner": "reports",
+      "title": "经营真实聚合、成本人效与导出",
+      "requirement_ids": [
+        "M10-1",
+        "M10-2",
+        "M10-3",
+        "M10-4",
+        "M10-5",
+        "M10-6",
+        "M10-7",
+        "M10-9",
+        "M10-10",
+        "M10-11",
+        "M10-12",
+        "M10-13"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "补真实来源/已定义数学、时间维度与导出、版本/未知原因，支持首页所需真实聚合；不编造成本/FTE/远程执行事实。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "P01",
+      "owner": "production",
+      "title": "生产运行/迁移与隔离安全装配",
+      "requirement_ids": [
+        "M2-5"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "实现可验证的生产配置、迁移/隔离接口和启用前守卫；最终数据库/生产DDL待Q02，不能仅改ready布尔或解除测试库限制。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "P02",
+      "owner": "production",
+      "title": "凭据轮换、附件隔离与审计留存接线",
+      "requirement_ids": [
+        "M2-12",
+        "M2-13",
+        "M3-8"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "把现有传输/协调器接入实际业务授权、审计、隔离发布和受控生命周期；缺KMS/扫描服务时保持未配置，不安装或启用替代。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "P03",
+      "owner": "production",
+      "title": "灾备/性能/故障与合同验收证据",
+      "requirement_ids": [
+        "M10-8"
+      ],
+      "status": "OPEN",
+      "completion_criterion": "完善有界安全执行工具与真实隔离演练/压测条件、逐项验收证据；不能用验证器或空数据当实际恢复/规模达标。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "G01",
+      "owner": "production",
+      "title": "M7远程路线与审批前置门禁",
+      "requirement_ids": [
+        "M7-0",
+        "M7-1",
+        "M7-2",
+        "M7-3",
+        "M7-4",
+        "M7-5",
+        "M7-6",
+        "M7-7",
+        "M7-8",
+        "M7-9"
+      ],
+      "status": "CUSTOMER_GATED",
+      "completion_criterion": "Q01未确认前仅设计/接口模拟/验证方案，不进入正式排期或真实建连。",
+      "evidence": [],
+      "commits": []
+    },
+    {
+      "id": "G02",
+      "owner": "notifications",
+      "title": "移动端专项后续范围",
+      "requirement_ids": [
+        "M8-8",
+        "M8-12"
+      ],
+      "status": "DEFERRED_MOBILE",
+      "completion_criterion": "按最新用户要求先做桌面Web；手机触控、窄屏及移动专属验收单列，不冒充已完成。",
+      "evidence": [],
+      "commits": []
+    }
+  ],
+  "requirements": [
+    {
+      "id": "M1-1",
+      "title": "运营总览首页",
+      "scope": "合同内一期",
+      "owner": "integration",
+      "gap_ids": [
+        "UI01",
+        "UI02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M1-2",
+      "title": "告警趋势图",
+      "scope": "合同内一期",
+      "owner": "integration",
+      "gap_ids": [
+        "UI02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M1-3",
+      "title": "服务健康概览",
+      "scope": "合同内一期",
+      "owner": "integration",
+      "gap_ids": [
+        "UI02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M1-4",
+      "title": "故障时间线（近24小时）",
+      "scope": "合同内一期",
+      "owner": "integration",
+      "gap_ids": [
+        "UI02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M1-5",
+      "title": "最近事件列表",
+      "scope": "合同内一期",
+      "owner": "integration",
+      "gap_ids": [
+        "UI03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M1-6",
+      "title": "待处理工单列表",
+      "scope": "合同内一期",
+      "owner": "integration",
+      "gap_ids": [
+        "UI01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M1-7",
+      "title": "租户视图切换",
+      "scope": "合同内一期",
+      "owner": "integration",
+      "gap_ids": [
+        "UI03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M1-8",
+      "title": "全局搜索与通知铃铛",
+      "scope": "合同内一期",
+      "owner": "integration",
+      "gap_ids": [
+        "UI03",
+        "N02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M1-9",
+      "title": "刷新与时间范围控件",
+      "scope": "合同内一期",
+      "owner": "integration",
+      "gap_ids": [
+        "UI03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M1-10",
+      "title": "资源占用Top5",
+      "scope": "合同内一期",
+      "owner": "integration",
+      "gap_ids": [
+        "UI02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M1-11",
+      "title": "首页版面管理",
+      "scope": "合同内一期",
+      "owner": "integration",
+      "gap_ids": [
+        "UI03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M2-1",
+      "title": "租户列表",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M2-2",
+      "title": "新建租户",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M2-3",
+      "title": "配额管理",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M2-4",
+      "title": "隔离模式三档",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M2-5",
+      "title": "六层隔离约束与验证",
+      "scope": "合同内一期",
+      "owner": "production",
+      "gap_ids": [
+        "P01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M2-6",
+      "title": "角色定义与权限矩阵",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M2-7",
+      "title": "菜单与操作权限",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M2-8",
+      "title": "成员管理",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M2-9",
+      "title": "客户联系人管理",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M2-10",
+      "title": "服务档位管理与变更留痕",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M2-11",
+      "title": "设备数量上限控制",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M2-12",
+      "title": "审计日志",
+      "scope": "合同内一期",
+      "owner": "production",
+      "gap_ids": [
+        "P02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M2-13",
+      "title": "数据保留与删除",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A04",
+        "P02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M2-14",
+      "title": "身份认证与组织",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M3-1",
+      "title": "资产列表",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A05"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M3-2",
+      "title": "资产列表字段",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A05"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M3-3",
+      "title": "资产详情",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A05"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M3-4",
+      "title": "资产接入向导（5步）",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A01",
+        "M02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M3-5",
+      "title": "设备信息维护",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A05"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M3-6",
+      "title": "Excel批量导入",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M3-7",
+      "title": "台账导出",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A05"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M3-8",
+      "title": "凭据加密托管",
+      "scope": "合同内一期",
+      "owner": "production",
+      "gap_ids": [
+        "P02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M3-9",
+      "title": "设备依赖关系配置",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A05"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M3-10",
+      "title": "维保到期管理",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A04"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M3-11",
+      "title": "资产退役与迁移",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A04"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M3-12",
+      "title": "设备来源与发现方式",
+      "scope": "合同内一期",
+      "owner": "assets",
+      "gap_ids": [
+        "A05"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-1",
+      "title": "设备状态监控",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-2",
+      "title": "资源监控（按设备类型）",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-3",
+      "title": "流量监控",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-4",
+      "title": "线路质量监控",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-5",
+      "title": "告警阈值分级与受控宏",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-6",
+      "title": "触发规则管理",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-7",
+      "title": "告警防抖",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-8",
+      "title": "重复告警合并",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-9",
+      "title": "告警抑制（依赖）",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-10",
+      "title": "维护窗口静默",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-11",
+      "title": "恢复通知与复核",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-12",
+      "title": "监控模板与灰度治理",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-13",
+      "title": "通知渠道管理",
+      "scope": "合同内一期",
+      "owner": "notifications",
+      "gap_ids": [
+        "N01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-14",
+      "title": "事件中心与事件详情",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-15",
+      "title": "Proxy与站点管理",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-16",
+      "title": "监控资源池管理（平台管理员）",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-17",
+      "title": "设备配置变更监控",
+      "scope": "合同内一期",
+      "owner": "backups",
+      "gap_ids": [
+        "B02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-18",
+      "title": "监控对象与阈值基线（必须补齐项）",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M4-19",
+      "title": "多品牌OID映射机制",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-1",
+      "title": "工单列表",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M04"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-2",
+      "title": "三方状态职责分离",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-3",
+      "title": "工单状态与同步状态",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-4",
+      "title": "告警自动建单与规则配置",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-5",
+      "title": "客户自助报障表单",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M04"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-6",
+      "title": "手工登记事件",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M04"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-7",
+      "title": "处置记录与评论",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M04"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-8",
+      "title": "SLA计时口径",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-9",
+      "title": "SLA报表",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M05"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-10",
+      "title": "月报快照与合同对账",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M05"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-11",
+      "title": "SLA报表导出",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M05"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-12",
+      "title": "值班看板",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M04"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-13",
+      "title": "升级策略与值班规则",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M04"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-14",
+      "title": "工单转派与改派",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M04"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-15",
+      "title": "客户确认关单（一期核心信任机制）",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M04"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-16",
+      "title": "超时自动关单",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M04"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-17",
+      "title": "工单重开",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-18",
+      "title": "超时提醒与催办",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-19",
+      "title": "SLA未达标与补偿计算",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M05"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-20",
+      "title": "SLA时钟引擎（底座能力）",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M5-21",
+      "title": "工时记录",
+      "scope": "合同内一期",
+      "owner": "monitoring",
+      "gap_ids": [
+        "M04"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M6-1",
+      "title": "定时备份计划",
+      "scope": "合同内一期",
+      "owner": "backups",
+      "gap_ids": [
+        "B01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M6-2",
+      "title": "备份结果查询与差异比对",
+      "scope": "合同内一期",
+      "owner": "backups",
+      "gap_ids": [
+        "B01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M6-3",
+      "title": "版本历史与回滚参考",
+      "scope": "合同内一期",
+      "owner": "backups",
+      "gap_ids": [
+        "B01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M6-4",
+      "title": "备份失败自动建单",
+      "scope": "合同内一期",
+      "owner": "backups",
+      "gap_ids": [
+        "B02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M6-5",
+      "title": "恢复演练记录",
+      "scope": "合同内一期",
+      "owner": "backups",
+      "gap_ids": [
+        "B02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M6-6",
+      "title": "客户侧只读查看",
+      "scope": "合同内一期",
+      "owner": "backups",
+      "gap_ids": [
+        "B01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M6-7",
+      "title": "变更检测与报备联动",
+      "scope": "合同内一期",
+      "owner": "backups",
+      "gap_ids": [
+        "B02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M7-0",
+      "title": "远程处置总纲与技术约束",
+      "scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "owner": "production",
+      "gap_ids": [
+        "G01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M7-1",
+      "title": "受控自动化执行流程（可选增强）",
+      "scope": "可选增强，须书面确认后报价",
+      "owner": "production",
+      "gap_ids": [
+        "G01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M7-2",
+      "title": "操作风险分级策略",
+      "scope": "可选增强，须书面确认后报价",
+      "owner": "production",
+      "gap_ids": [
+        "G01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M7-3",
+      "title": "读写操作审批",
+      "scope": "可选增强，须书面确认后报价",
+      "owner": "production",
+      "gap_ids": [
+        "G01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M7-4",
+      "title": "执行记录与输出归档",
+      "scope": "可选增强，须书面确认后报价",
+      "owner": "production",
+      "gap_ids": [
+        "G01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M7-5",
+      "title": "审计要求（通用）",
+      "scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "owner": "production",
+      "gap_ids": [
+        "G01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M7-6",
+      "title": "交互式远程连接（本期主线）",
+      "scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "owner": "production",
+      "gap_ids": [
+        "G01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M7-7",
+      "title": "设备授权清单",
+      "scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "owner": "production",
+      "gap_ids": [
+        "G01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M7-8",
+      "title": "会话录屏",
+      "scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "owner": "production",
+      "gap_ids": [
+        "G01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M7-9",
+      "title": "命令日志与高危命令拦截",
+      "scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "owner": "production",
+      "gap_ids": [
+        "G01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M8-1",
+      "title": "通知渠道对接",
+      "scope": "合同内一期",
+      "owner": "notifications",
+      "gap_ids": [
+        "N01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M8-2",
+      "title": "渠道×级别矩阵",
+      "scope": "合同内一期",
+      "owner": "notifications",
+      "gap_ids": [
+        "N01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M8-3",
+      "title": "送达记录与死信管理",
+      "scope": "合同内一期",
+      "owner": "notifications",
+      "gap_ids": [
+        "N01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M8-4",
+      "title": "企业微信门户与免密登录",
+      "scope": "合同内一期",
+      "owner": "notifications",
+      "gap_ids": [
+        "N02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M8-5",
+      "title": "设备概况（客户视角）",
+      "scope": "合同内一期",
+      "owner": "notifications",
+      "gap_ids": [
+        "N02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M8-6",
+      "title": "拍照报障",
+      "scope": "合同内一期",
+      "owner": "notifications",
+      "gap_ids": [
+        "N02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M8-7",
+      "title": "工单进度查询",
+      "scope": "合同内一期",
+      "owner": "notifications",
+      "gap_ids": [
+        "N02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M8-8",
+      "title": "确认关单与重开（移动端）",
+      "scope": "合同内一期",
+      "owner": "notifications",
+      "gap_ids": [
+        "N02",
+        "G02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M8-9",
+      "title": "报告中心",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "N02",
+        "R02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M8-10",
+      "title": "通知偏好设置",
+      "scope": "合同内一期",
+      "owner": "notifications",
+      "gap_ids": [
+        "N01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M8-11",
+      "title": "分级推送落地",
+      "scope": "合同内一期",
+      "owner": "notifications",
+      "gap_ids": [
+        "N01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M8-12",
+      "title": "门户通用要求",
+      "scope": "合同内一期",
+      "owner": "notifications",
+      "gap_ids": [
+        "N02",
+        "G02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M9-1",
+      "title": "报表计算口径（所有报告的统一数据源）",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M9-2",
+      "title": "月报快照与冻结",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M9-3",
+      "title": "老板版月报（1页，核心交付物）",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M9-4",
+      "title": "完整版月报（6章）",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M9-5",
+      "title": "报告推送与阅读记录",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M9-6",
+      "title": "网络健康体检报告（售前转化工具）",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M9-7",
+      "title": "季度巡检报告",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M9-8",
+      "title": "年度复盘报告（标注优先级，可二期交付）",
+      "scope": "合同列项，可二期交付；阶段待Q11确认",
+      "owner": "reports",
+      "gap_ids": [
+        "R02"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M9-9",
+      "title": "报告通用规则（验收硬约束）",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R01"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M10-1",
+      "title": "SLA达成率",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M10-2",
+      "title": "告警确认及时率",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M10-3",
+      "title": "远程处置率",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M10-4",
+      "title": "客户毛利统计",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M10-5",
+      "title": "人员服务能力",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M10-6",
+      "title": "运营计量看板",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M10-7",
+      "title": "容量估算模型（平台管理员）",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M10-8",
+      "title": "平台健康与SLO（平台管理员）",
+      "scope": "合同内一期",
+      "owner": "production",
+      "gap_ids": [
+        "P03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M10-9",
+      "title": "时间维度与导出",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M10-10",
+      "title": "单人可管客户数",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M10-11",
+      "title": "跳档触发提示",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M10-12",
+      "title": "八项经营指标口径定义",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    },
+    {
+      "id": "M10-13",
+      "title": "前置依赖：工时字段",
+      "scope": "合同内一期",
+      "owner": "reports",
+      "gap_ids": [
+        "R03"
+      ],
+      "implementation_review": "REVIEW_REQUIRED",
+      "formal_acceptance": "NOT_RUN"
+    }
+  ]
+}

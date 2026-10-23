@@ -108,3 +108,7 @@
   }
   .horizontal-shell .primary-nav-link { padding-inline: 12px; font-size: 13px; }
 }
+/* Contract navigation labels meet the same contrast target as workspace text. */
+.horizontal-shell .brand small,
+.horizontal-shell .sidebar-section-heading,
+.horizontal-shell .tenant-name { color: #526276; }

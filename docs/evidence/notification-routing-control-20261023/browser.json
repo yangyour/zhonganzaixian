@@ -1,0 +1,58 @@
+{
+  "source": "explicit synthetic API in real browser; not live HTTP/database/provider acceptance",
+  "browser": "156.0.4314.42",
+  "viewports": [
+    1440,
+    1024
+  ],
+  "checks": [
+    {
+      "name": "rule_publish_roundtrip",
+      "passed": true
+    },
+    {
+      "name": "reload_recovers_exact_original_without_new_post",
+      "passed": true
+    },
+    {
+      "name": "recovered_current_value",
+      "passed": true
+    },
+    {
+      "name": "one_channel_failure_keeps_other_binding_usable",
+      "passed": true
+    },
+    {
+      "name": "partial_dependency_does_not_hide_verified_policy",
+      "passed": true
+    },
+    {
+      "name": "cancelled_read_ignores_late_result",
+      "passed": true
+    },
+    {
+      "name": "revocation_clears_old_scope_and_late_results",
+      "passed": true
+    },
+    {
+      "name": "owner_saved_revision_publication",
+      "passed": true
+    },
+    {
+      "name": "owner_publication_withdrawal",
+      "passed": true
+    }
+  ],
+  "final_page_errors": [],
+  "axe": {
+    "viewport": 1024,
+    "violations": []
+  },
+  "mobile": "DEFERRED_G02",
+  "actual_external_messages": 0,
+  "notes": [
+    "Initial fixture stylesheet and template issues were corrected before the recorded final flows.",
+    "Final dense-matrix screenshot reviewed at 1024; earlier 1440 screenshots retained separately.",
+    "Existing owner-publication QA completed during closeout; no browser scenarios ran after the final stop-and-archive instruction."
+  ]
+}

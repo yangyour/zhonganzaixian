@@ -1,0 +1,16 @@
+{
+  "environment": "lan-test-20261008",
+  "isolated_database": "mop_notification_test_82709f4a179f",
+  "schema_source": "schema_only_clone_of_V50",
+  "customer_data_copied": false,
+  "live_database_migrated": false,
+  "new_local_components": 0,
+  "external_messages": 0,
+  "status": "FAILED",
+  "started_at": "2026-10-23T14:58:19.585735+00:00",
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "failure_type": "InvalidSchemaName",
+  "details": "private details withheld",
+  "cleanup_failure_type": "ValueError",
+  "finished_at": "2026-10-23T14:58:23.469246+00:00"
+}

@@ -1,0 +1,17 @@
+{
+  "checked_at": "2026-10-23T06:58:57.033523+00:00",
+  "read_only": true,
+  "business_writes": 0,
+  "external_messages": 0,
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "schema_version": 50,
+  "tenant_count": 2,
+  "non_business_tenant_count": 1,
+  "journal_rows": 0,
+  "outbox_rows": 0,
+  "pending_notification_intents": 0,
+  "source_read_allowed": true,
+  "journal_read_allowed": true,
+  "environment": "lan-test-20261008",
+  "ssh_authenticated": true
+}

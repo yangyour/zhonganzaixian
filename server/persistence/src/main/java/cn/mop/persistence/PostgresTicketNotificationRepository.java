@@ -81,7 +81,7 @@ public final class PostgresTicketNotificationRepository implements TicketNotific
     private static Set<String> active(Connection c, String tenant, String ticket, List<Recipient> recipients) throws SQLException {
         var result = new HashSet<String>();
         for (Recipient recipient : recipients) {
-            try (var s = statement(c, "SELECT m.role_code,t.reporter_id::text FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id JOIN public.mop_ticket t ON t.tenant_id=m.tenant_id AND t.id=?::uuid WHERE m.tenant_id=?::uuid AND m.user_id=?::uuid AND m.active AND u.active")) {
+            try (var s = statement(c, "SELECT m.role_code,t.reporter_id::text FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id JOIN public.mop_ticket t ON t.tenant_id=m.tenant_id AND t.id=?::uuid WHERE m.tenant_id=?::uuid AND m.user_id=?::uuid AND m.active AND u.active FOR SHARE OF m,u")) {
                 s.setString(1, ticket); s.setString(2, tenant); s.setString(3, recipient.userId());
                 try (var r = s.executeQuery()) {
                     if (!r.next()) continue;
@@ -183,6 +183,18 @@ public final class PostgresTicketNotificationRepository implements TicketNotific
         try (Connection c = source.getConnection()) {
             c.setReadOnly(true);
             try (var s = statement(c, "SELECT current_database()='mop_test' AND current_user='mop_test_runtime'"); var r = s.executeQuery()) { if (!r.next() || !r.getBoolean(1)) throw new SQLException(); }
+            // The consumer must be able to read committed source facts and current recipient authorization.
+            for (String table : List.of("mop_ticket_workflow_outbox", "mop_ticket_workflow_event",
+                    "mop_ticket", "mop_membership", "mop_user")) {
+                try (var s = statement(c, "SELECT has_table_privilege(current_user,?,'SELECT')")) {
+                    s.setString(1, "public." + table);
+                    try (var r = s.executeQuery()) {
+                        if (!r.next() || !r.getBoolean(1)) {
+                            throw new SQLException();
+                        }
+                    }
+                }
+            }
             for (String table : TABLES) {
                 try (var s = statement(c, "SELECT has_table_privilege(current_user,?,'SELECT') AND has_table_privilege(current_user,?,'INSERT') AND NOT has_table_privilege(current_user,?,'DELETE,TRUNCATE')")) {
                     for (int n = 1; n <= 3; n++) s.setString(n, "public." + table);

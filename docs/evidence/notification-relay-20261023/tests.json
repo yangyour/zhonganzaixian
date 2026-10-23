@@ -1,0 +1,37 @@
+[
+  {
+    "name": "cn.mop.api.TicketNotificationControllerTest",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "cn.mop.api.TicketNotificationPlannerTest",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "cn.mop.persistence.PostgresTicketNotificationIntegrationTest",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 2
+  },
+  {
+    "name": "cn.mop.worker.notification.TicketNotificationRelaySettingsTest",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "cn.mop.worker.notification.TicketNotificationRelayTest",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+]

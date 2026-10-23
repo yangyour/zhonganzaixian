@@ -1,0 +1,8 @@
+{
+  "tested_commit": "356f2d856c37c441afffd7b6f5c7049e31a6f27d",
+  "tests": 115.0,
+  "skipped": 4.0,
+  "failures": 0.0,
+  "errors": 0.0,
+  "scope": "notification targeted reactor tests; designated PostgreSQL evidence is separate"
+}

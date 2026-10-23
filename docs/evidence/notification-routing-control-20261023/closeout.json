@@ -1,0 +1,85 @@
+{
+  "status": "STOPPED_WIP_STASHED_NOT_RELEASED",
+  "base_commit": "b122896b84fc18fc09a3410f66e08676b22cbbd9",
+  "branch": "codex/launch-notifications-20261023",
+  "stash_name": "mop-notifications-stop-20261023-n01-v51-unverified",
+  "stash_sha": "bbe6e5d11225e6f6615e2152abe805f48a0a10fb",
+  "stash_files": 33,
+  "focused_checks": [
+    {
+      "skipped": 0,
+      "tests": 7,
+      "suite": "cn.mop.persistence.NotificationRoutingValidationTest",
+      "errors": 0,
+      "failures": 0
+    },
+    {
+      "skipped": 0,
+      "tests": 46,
+      "suite": "cn.mop.persistence.TestSchemaMigrationTest",
+      "errors": 0,
+      "failures": 0
+    },
+    {
+      "skipped": 0,
+      "tests": 6,
+      "suite": "cn.mop.api.NotificationRoutingHttpSecurityTest",
+      "errors": 0,
+      "failures": 0
+    },
+    {
+      "skipped": 0,
+      "tests": 2,
+      "suite": "cn.mop.api.NotificationRoutingReadinessTest",
+      "errors": 0,
+      "failures": 0
+    }
+  ],
+  "java_full": {
+    "note": "Full application scan/TestConfiguration isolation failure; no further fixes after stop",
+    "status": "FAILED",
+    "suite": "cn.mop.api.ProfilePolicyTest",
+    "failures": 3
+  },
+  "web_full": {
+    "followup": "Not investigated or rerun after stop",
+    "passed": 5038,
+    "status": "FAILED",
+    "failures": [
+      "1000-source integrity test timeout after 20000ms",
+      "cancellation digest expected 3 calls, observed 6"
+    ],
+    "suite": "inspectionSourceCollections.test.ts",
+    "failed": 2
+  },
+  "web_build": "PASSED",
+  "contract_checks": {
+    "failed": 0,
+    "passed": 194
+  },
+  "control_client_tests": {
+    "failed": 0,
+    "passed": 12
+  },
+  "designated_postgresql": {
+    "passed": 6,
+    "isolated_database_removed": true,
+    "failed": 0,
+    "isolated_v51_applied": true,
+    "live_schema": "V50",
+    "live_database": "mop_test",
+    "live_v51_applied": false,
+    "sql_sha256": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b"
+  },
+  "resources": {
+    "environment_lock": "NOT_HELD",
+    "migration_lock": "OWN_LOCK_RELEASED",
+    "integration_lock": "NOT_ACQUIRED_BY_NOTIFICATIONS",
+    "api_18213": "NOT_STARTED",
+    "browser": "closed via Playwright; retained contexts closed",
+    "web_port_15213": "STOPPED",
+    "ssh_tunnels": "closed by verification utility"
+  },
+  "formal_tc": "NOT_RUN",
+  "browser_recorded_assertions": 9
+}

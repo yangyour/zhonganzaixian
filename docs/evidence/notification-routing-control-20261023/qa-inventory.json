@@ -1,0 +1,13 @@
+{
+  "scope": "Desktop Web 1024 and 1440 CSS pixels; synthetic API separate from designated PostgreSQL evidence",
+  "checks": [
+    {"claim":"Unknown policy values stay empty and require explicit publication","controls":"policy fields, matrix toggle and channel cells, publication and acknowledgment","states":"initial, edited, discarded, saved","evidence":"browser actions and screenshots"},
+    {"claim":"A lost write response retains the original command","controls":"save, recover original, retry original, stop waiting","states":"response lost, blocked replacement, recovered","evidence":"same command identity and visible recovery"},
+    {"claim":"Current bindings are checked without enabling demo or external channels","controls":"load bindings, choose, check, valid-until, internal-use checkbox, save/discard","states":"partial channel failure, verified choice, dirty edit, saved reference","evidence":"browser actions; backend live role and binding checks separately"},
+    {"claim":"Read and navigation controls preserve scope and unsaved work","controls":"refresh, stop read, list selector, source replan, navigation","states":"loading, cancelled, dirty, empty, unauthorized","evidence":"normal input plus late-response unit tests"},
+    {"claim":"Owner publishes only a saved preference revision","controls":"read publication, acknowledge, publish, withdraw, original-command recovery","states":"unpublished, published, withdrawn","evidence":"browser flow and backend source-fingerprint checks"},
+    {"claim":"Desktop content is readable without page-level horizontal clipping","controls":"all visible labels, table region and focus","states":"initial and dense matrix at both widths","evidence":"viewport screenshots and geometry"}
+  ],
+  "exploratory": ["Lose the first write response and recover without changing request identity", "Fail one channel lookup while retaining the other channel", "Revoke internal permission while a read is in flight"],
+  "excluded": ["Mobile and touch acceptance G02", "Vendor transmission or signatures", "Formal contract TC", "Unimplemented dispatch/dead-letter controls tracked as remaining N01 work"]
+}

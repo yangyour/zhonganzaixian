@@ -1,0 +1,7 @@
+{
+  "database": "mop_notification_test_82709f4a179f",
+  "verified_owner": "mop_test_migrator",
+  "owner_marker": "MOP_NOTIFICATION_ISOLATION:fcd50dde-aa23-4d33-9a78-307b906b6c06",
+  "removed": true,
+  "live_database_modified": false
+}

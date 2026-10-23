@@ -1,0 +1,22 @@
+{
+  "environment": "lan-test-20261008",
+  "isolated_database": "mop_notification_test_619229fbdfad",
+  "owner_marker": "MOP_NOTIFICATION_ISOLATION:a8c38540-d19a-4a34-a2a2-c29aafb1a316",
+  "schema_source": "schema_only_clone_of_V50",
+  "customer_data_copied": false,
+  "live_database_migrated": false,
+  "new_local_components": 0,
+  "external_messages": 0,
+  "status": "PASSED",
+  "started_at": "2026-10-23T15:03:50.575156+00:00",
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "maven_exit_code": 0,
+  "isolated_v51_applied": true,
+  "v51_installed_at": "2026-10-23 11:04:10.349101",
+  "v51_flyway_checksum": -930297811,
+  "v51_sha256": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b",
+  "live_history_unchanged": true,
+  "live_v51_absent": true,
+  "owned_database_removed": true,
+  "finished_at": "2026-10-23T15:04:39.777801+00:00"
+}

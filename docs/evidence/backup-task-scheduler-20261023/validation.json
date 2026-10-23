@@ -1,0 +1,83 @@
+{
+  "verified_at_utc": "2026-10-23T07:22:59.7179974Z",
+  "base": "5946693e",
+  "suites": [
+    {
+      "name": "cn.mop.persistence.BackupTaskAuthorizationTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.persistence.BackupTaskDiscoveryPostgresReadTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    {
+      "name": "cn.mop.persistence.BackupTaskDiscoveryTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.worker.backup.BackupArchiveDispatchCryptoTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.worker.backup.BackupArchiveDispatchTest",
+      "tests": 29,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.worker.backup.BackupVersionRegistrationDispatchTest",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.worker.backup.BackupTaskSchedulerTest",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "new_scheduler_tests": 17,
+  "logic_regression_executed": 90,
+  "default_actual_database_test_skipped": 1,
+  "explicit_postgres_read_check": {
+    "environment": "lan-test-20261008",
+    "version": "17.9 (Debian 17.9-1.pgdg12+1)",
+    "tests": 1,
+    "passed": 1,
+    "purpose": "modified discovery join plus active identity and stale permission rejection",
+    "nonempty_queue_verified": false
+  },
+  "business_writes": 0,
+  "migrations": 0,
+  "device_operations": 0,
+  "external_storage_operations": 0,
+  "deployed": false,
+  "enabled": false,
+  "formal_contract_tc": "NOT_RUN",
+  "not_verified": [
+    "nonempty PostgreSQL scheduler and concurrent writes",
+    "actual trusted proof source",
+    "KMS and OSS",
+    "device backup/recovery",
+    "download/decrypt",
+    "failure ticket intents",
+    "retention cleanup",
+    "recovery drills"
+  ]
+}

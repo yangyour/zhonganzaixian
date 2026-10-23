@@ -4,6 +4,7 @@ import type { ReportPhoto } from '../api/types'
 import type { PhotoQueue, PhotoSelection } from '../utils/photoQueue'
 import type { PhotoAppender } from '../utils/photoAttachments'
 import ApiErrorNotice from './ApiErrorNotice.vue'
+import AttachmentSecurityPanel from './AttachmentSecurityPanel.vue'
 
 const props = withDefaults(defineProps<{ queue: PhotoQueue; existing?: ReportPhoto[]; disabled?: boolean; selectable?: boolean; showSelections?: boolean; appender?: PhotoAppender }>(), { existing: () => [], disabled: false, selectable: true, showSelections: true })
 const selectionMessage = ref('')
@@ -38,6 +39,7 @@ function select(event: Event) {
     <p v-if="!queue.policy.value?.allowed_media_types?.length && selectable" class="muted">{{ queue.policyLoading.value ? '正在读取照片上传配置…' : '照片上传配置暂未就绪，可先提交文字故障申报。' }}</p>
     <div v-for="photo in existing" :key="photo.id" class="photo-row photo-existing-row">
       <div class="photo-row-summary"><strong>{{ photo.original_name }}</strong><span>{{ photo.size_bytes.toLocaleString() }} bytes · 已关联工单</span></div>
+      <AttachmentSecurityPanel :file-id="photo.id" class="photo-row-actions" @content-access="allowed => { if (!allowed) queue.revokeContent(photo.id) }" />
       <div class="photo-row-actions"><el-button :loading="queue.contentBusy.value[photo.id]" @click="queue.view(photo)">查看原图</el-button><a v-if="queue.contentUrls.value[photo.id]" :href="queue.contentUrls.value[photo.id]" :download="photo.original_name" class="photo-download">下载原图</a></div>
       <ApiErrorNotice :error="queue.contentErrors.value[photo.id]" />
       <img v-if="queue.contentUrls.value[photo.id]" :src="queue.contentUrls.value[photo.id]" :alt="photo.original_name" class="photo-original-preview" />
@@ -45,6 +47,7 @@ function select(event: Event) {
     <div v-for="row in showSelections ? queue.rows.value : []" :key="row.uid" class="photo-row">
       <img :src="row.previewUrl" :alt="`本地选择：${row.file.name}`" class="photo-local-preview" />
       <div class="photo-row-summary"><strong>{{ row.file.name }}</strong><span>{{ row.file.size.toLocaleString() }} bytes · {{ statusLabel[row.status] }}</span><p v-if="row.message">{{ row.message }}</p><p v-if="existing.some(photo => photo.id === row.record?.id)">已关联至当前工单。</p></div>
+      <AttachmentSecurityPanel v-if="row.record" :file-id="row.record.id" class="photo-row-actions" @content-access="allowed => { if (!allowed && row.record) queue.revokeContent(row.record.id) }" />
       <div class="photo-row-actions">
         <el-button v-if="!row.operationId" :loading="row.uploading" :disabled="disabled || appender?.busy.value || appender?.uncertain.value" @click="queue.upload(row.uid)">{{ row.status === 'UNCERTAIN' ? '重试上传' : '上传原图' }}</el-button>
         <el-button v-else :loading="row.reading" :disabled="disabled" @click="queue.refresh(row.uid)">刷新上传状态</el-button>

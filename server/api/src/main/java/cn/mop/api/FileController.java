@@ -20,6 +20,9 @@ public class FileController {
     private final PhotoPolicy policy;
     private final PhotoObjectStore store;
     private final ObjectMapper mapper;
+    /** A storage READY flag never grants access to an unreviewed or revoked attachment. */
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
+    private AttachmentSecurityRepository attachmentSecurity;
     private record Access(String actor,String tenant,Membership membership) {}
     public FileController(PlatformRepository repository,PhotoPolicy policy,PhotoObjectStore store,ObjectMapper mapper){this.repository=repository;this.policy=policy;this.store=store;this.mapper=mapper;}
 
@@ -56,9 +59,12 @@ public class FileController {
     @PostMapping("/files/{id}/content-grants") Object grant(@PathVariable String id,@RequestBody JsonNode body,HttpServletRequest request){
         Access access=access(request,false);noQuery(request);String key=requestKey(request);
         if(body==null||!body.isObject()||!body.isEmpty())throw invalid("下载授权请求体必须为空JSON对象");
-        Object result=repository.idempotent(access.actor,access.tenant,route(request),key,hash(Map.of()),access.membership.permissionVersion(),()->{
-            current(access,false);Map<String,Object> grant=repository.contentGrant(access.tenant,access.actor,id);
-            repository.audit(access.actor,access.tenant,"file.content_grant.create","file",id,"SUCCEEDED","ACTOR_TENANT_PERMISSION_BOUND_15_MINUTES",trace(request));
+        Object result=repository.idempotentAuthorized(access.actor,access.tenant,route(request),key,hash(Map.of()),access.membership.permissionVersion(),()->{
+            current(access, false);
+            requireReleased(access, id);
+        },()->{
+            Map<String,Object> grant=repository.contentGrant(access.tenant,access.actor,id);
+            repository.audit(access.actor,access.tenant,"file.content_grant.create","file",id,"SUCCEEDED","CURRENT_SCAN_RELEASE_AND_PERMISSION_BOUND",trace(request));
             return map("content_url",grant.get("content_url"),"expires_at",grant.get("expires_at"));
         });
         return success(result,request);
@@ -68,11 +74,15 @@ public class FileController {
         Access access=access(request,false);Map<String,String[]> query=request.getParameterMap();
         if(!query.keySet().equals(Set.of("grant"))||query.get("grant").length!=1||!query.get("grant")[0].matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))throw invalid("仅接受一个合法的 grant 查询参数");
         String grant=query.get("grant")[0];Map<String,Object> location=repository.photoContent(access.tenant,access.actor,id,grant);
+        long releaseVersion = requireReleased(access, id);
         byte[] original=store.read((String)location.get("object_key"),((Number)location.get("byte_size")).longValue(),(String)location.get("sha256"));
         // Storage I/O can outlive a role change. Recheck the persisted grant before returning bytes.
         Map<String,Object> confirmed=repository.photoContent(access.tenant,access.actor,id,grant);
+        if (requireReleased(access, id) != releaseVersion) {
+            throw new DomainException(409, "VERSION_CONFLICT", "附件安全状态在读取期间发生变化，请重新确认");
+        }
         if(!location.equals(confirmed))throw missing();
-        repository.audit(access.actor,access.tenant,"file.content.read","file",id,"SUCCEEDED","CURRENT_AUTHORIZATION_ORIGINAL_BYTES_VERIFIED",trace(request));
+        repository.audit(access.actor,access.tenant,"file.content.read","file",id,"SUCCEEDED","ACTIVE_SCAN_RELEASE_AND_ORIGINAL_BYTES_VERIFIED",trace(request));
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).header("X-Content-Type-Options","nosniff")
             .header(HttpHeaders.CONTENT_DISPOSITION,ContentDisposition.inline().filename((String)location.get("original_name"),StandardCharsets.UTF_8).build().toString())
             .contentType(MediaType.parseMediaType((String)location.get("media_type"))).contentLength(original.length).body(original);
@@ -86,6 +96,13 @@ public class FileController {
         return new Access(actor,tenant,membership);
     }
     private void current(Access access,boolean write){Membership current=repository.membership(access.actor,access.tenant).orElseThrow(FileController::expired);if(!current.capabilities().contains(write?"tickets:report":"tickets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无此照片动作权限");}
+    private long requireReleased(Access access, String id) {
+        if (attachmentSecurity == null) {
+            throw new DomainException(503, "ATTACHMENT_SECURITY_UNAVAILABLE", "附件隔离检查尚未配置，未授予原图读取权限");
+        }
+        return attachmentSecurity.requireReleased(new AttachmentSecurityRepository.Access(
+            access.tenant, access.actor, access.membership.permissionVersion()), id);
+    }
     private static Map<String,Part> parts(HttpServletRequest request){
         try{Collection<Part> raw=request.getParts();Map<String,Part> result=new LinkedHashMap<>();for(Part part:raw){if(!Set.of("file","purpose").contains(part.getName())||result.putIfAbsent(part.getName(),part)!=null)throw invalid("multipart 含未知或重复字段");}if(!result.keySet().equals(Set.of("file","purpose")))throw invalid("multipart 必须只包含 file 和 purpose");return result;}
         catch(DomainException safe){throw safe;}catch(Exception error){throw invalid("multipart 格式无效或超过照片大小上限");}

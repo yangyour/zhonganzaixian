@@ -139,9 +139,15 @@ export function createPhotoQueue(client: Pick<typeof api, 'request' | 'requestBl
     for (const url of Object.values(contentUrls.value)) URL.revokeObjectURL(url)
     contentUrls.value = {}; contentBusy.value = {}; contentErrors.value = {}
   }
+  function revokeContent(id: string) {
+    const key = `content:${id}`
+    controllers.get(key)?.abort(); controllers.delete(key)
+    if (contentUrls.value[id]) URL.revokeObjectURL(contentUrls.value[id]!)
+    delete contentUrls.value[id]; contentBusy.value[id] = false; contentErrors.value[id] = null
+  }
   // A same-scope session refresh must retain the original File, preview and upload key.
   const stopContextWatch = watch([() => contextGeneration.value, () => session.value?.tenant.id, () => session.value?.user.id, () => session.value?.user.role, () => session.value?.permission_version], clear, { flush: 'sync' })
   function dispose() { stopContextWatch(); clear() }
-  return { rows, policy, policyLoading, policyError, contentUrls, contentBusy, contentErrors, loadPolicy, add, canRemove, remove, upload, refresh, readyIds, view, reconcile, releaseContent, clear, dispose }
+  return { rows, policy, policyLoading, policyError, contentUrls, contentBusy, contentErrors, loadPolicy, add, canRemove, remove, upload, refresh, readyIds, view, reconcile, releaseContent, revokeContent, clear, dispose }
 }
 export type PhotoQueue = ReturnType<typeof createPhotoQueue>

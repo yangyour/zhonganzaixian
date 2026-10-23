@@ -53,4 +53,13 @@ class CustomerTopologyHttpTest {
   mvc.perform(get("/api/v1/assets/"+asset+"/dependencies").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isOk()).andExpect(jsonPath("$.data.tenant_id").value(TENANT)).andExpect(jsonPath("$.data.monitoring_applied").value(false));
   verify(dependencies,never()).append(anyString(),anyString(),anyLong(),anyList(),any());
  }
+ @Test void populatedTopologyKeepsOpaqueSiteCodesAndIsoDateInActualMvcResponse()throws Exception{
+  String a=CustomerTopologyControllerTest.A,b=CustomerTopologyControllerTest.B;
+  var nodeA=new Asset(a,TENANT,"Synthetic A","switch","192.0.2.1","site-a-main","unknown","DRAFT","manual",null,null,1,null,null,null,null);
+  var nodeB=new Asset(b,TENANT,"Synthetic B","switch","192.0.2.2","site-a-main","unknown","DRAFT","manual",null,null,1,null,null,null,null);
+  when(dependencies.current(TENANT,ACTOR)).thenReturn(new AssetDependencyRepository.Draft(TENANT,1,java.time.Instant.parse("2026-10-23T00:00:00Z"),List.of(new AssetDependencyRepository.ProposedEdge(a,b,null,null,null))));
+  when(repository.authorizedAssetBatch(TENANT,ACTOR,7,List.of(a,b))).thenReturn(List.of(nodeB,nodeA));
+  mvc.perform(get(BASE).with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isOk()).andExpect(jsonPath("$.data.nodes[0].id").value(a)).andExpect(jsonPath("$.data.nodes[0].site_id").value("site-a-main")).andExpect(jsonPath("$.data.updated_at").value("2026-10-23T00:00:00Z")).andExpect(jsonPath("$.data.edges[0].proposed_enabled").isEmpty());
+  verify(repository,times(1)).authorizedAssetBatch(TENANT,ACTOR,7,List.of(a,b));verify(repository,never()).authorizedAsset(anyString(),anyString(),anyLong(),anyString());
+ }
 }

@@ -57094,8 +57094,7 @@
                   "type": "string"
                 },
                 "site_id": {
-                  "type": "string",
-                  "format": "uuid"
+                  "type": "string"
                 }
               },
               "required": [

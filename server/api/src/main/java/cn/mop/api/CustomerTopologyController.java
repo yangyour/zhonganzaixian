@@ -38,8 +38,7 @@ public final class CustomerTopologyController {
         long version=number(expected,-1,9007199254740991L);
         if(offset>0&&expected==null)throw invalid();
         if(focus!=null&&!focus.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))throw invalid();
-        Map<String,Asset> assets=new LinkedHashMap<>();
-        if(focus!=null)assets.put(focus,asset(a,focus));
+        if(focus!=null)asset(a,focus); // Hide foreign focus before graph-version/count diagnostics.
         var draft=dependencies.current(a.tenant(),a.actor());
         if(!a.tenant().equals(draft.tenantId())||draft.edges().size()>10000)throw new DomainException(502,"INVALID_TOPOLOGY_SOURCE","拓扑来源范围无效");
         if(expected!=null&&version!=draft.version())throw new DomainException(409,"TOPOLOGY_VERSION_CHANGED","拓扑已更新，请重新读取第一页");
@@ -47,11 +46,21 @@ public final class CustomerTopologyController {
         if(offset>edges.size())throw invalid();
         int end=Math.min(offset+50,edges.size());
         var page=edges.subList(offset,end);
-        for(var edge:page)for(String id:List.of(edge.parentId(),edge.childId()))if(!assets.containsKey(id))assets.put(id,asset(a,id));
+        Set<String> ids=new LinkedHashSet<>();if(focus!=null)ids.add(focus);
+        for(var edge:page){ids.add(edge.parentId());ids.add(edge.childId());}
+        Map<String,Asset> assets=new LinkedHashMap<>();
+        if(!ids.isEmpty()){
+            var batch=platform.authorizedAssetBatch(a.tenant(),a.actor(),a.version(),List.copyOf(ids));
+            if(batch==null||batch.size()>101)throw invalidSource();
+            for(Asset n:batch){
+                if(n==null||!a.tenant().equals(n.tenantId())||!ids.contains(n.id())||assets.putIfAbsent(n.id(),n)!=null)throw invalidSource();
+            }
+            if(!assets.keySet().equals(ids))throw new DomainException(404,"OBJECT_NOT_FOUND","对象不存在或不可见");
+        }
         if(!a.equals(access(request)))throw expired();
-        return success(map("tenant_id",a.tenant(),"version",draft.version(),"updated_at",draft.updatedAt(),"source","postgresql","scope","CURRENT_TENANT","lifecycle_status","DRAFT","physical_topology_verified",false,"monitoring_applied",false,
+        return success(map("tenant_id",a.tenant(),"version",draft.version(),"updated_at",draft.updatedAt()==null?null:draft.updatedAt().toString(),"source","postgresql","scope","CURRENT_TENANT","lifecycle_status","DRAFT","physical_topology_verified",false,"monitoring_applied",false,
             "focus_asset_id",focus,"offset",offset,"page_size",50,"total_edges",edges.size(),"has_more",end<edges.size(),
-            "nodes",assets.values().stream().map(n->map("id",n.id(),"name",n.name(),"type",n.type(),"management_ip",n.managementIp(),"site_id",n.siteId())).toList(),
+            "nodes",ids.stream().map(assets::get).map(n->map("id",n.id(),"name",n.name(),"type",n.type(),"management_ip",n.managementIp(),"site_id",n.siteId())).toList(),
             "edges",page.stream().map(e->map("parent_id",e.parentId(),"child_id",e.childId(),"proposed_type",e.proposedType(),"proposed_suppression_scope",e.proposedSuppressionScope(),"proposed_enabled",e.proposedEnabled())).toList()),request);
     }
     private Asset asset(Access a,String id) {
@@ -64,6 +73,7 @@ public final class CustomerTopologyController {
         if(!value.matches("0|[1-9][0-9]{0,15}"))throw invalid();
         try {long n=Long.parseLong(value);if(n>max)throw invalid();return n;}catch(NumberFormatException e){throw invalid();}
     }
+    private static DomainException invalidSource(){return new DomainException(502,"INVALID_TOPOLOGY_SOURCE","拓扑资产批量来源范围无效");}
     private static DomainException invalid(){return new DomainException(400,"VALIDATION_ERROR","拓扑分页或筛选参数无效");}
     private static DomainException expired(){return new DomainException(401,"SESSION_EXPIRED","当前成员关系已变化，请重新读取");}
 }

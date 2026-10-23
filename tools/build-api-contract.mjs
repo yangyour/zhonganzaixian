@@ -480,7 +480,7 @@ const customerTopology = object({
   tenant_id: uuid, version: {type:'integer',minimum:0,maximum:9007199254740991}, updated_at:{...dateTime,type:['string','null']},
   source:{const:'postgresql'}, scope:{const:'CURRENT_TENANT'}, lifecycle_status:{const:'DRAFT'}, physical_topology_verified:{const:false}, monitoring_applied:{const:false},
   focus_asset_id:{...uuid,type:['string','null']}, offset:{type:'integer',minimum:0,maximum:10000}, page_size:{const:50}, total_edges:{type:'integer',minimum:0,maximum:10000}, has_more:{type:'boolean'},
-  nodes:{type:'array',maxItems:101,items:object({id:uuid,name:string,type:string,management_ip:string,site_id:uuid})}, edges:{type:'array',maxItems:50,items:dependencyEdge},
+  nodes:{type:'array',maxItems:101,items:object({id:uuid,name:string,type:string,management_ip:string,site_id:string})}, edges:{type:'array',maxItems:50,items:dependencyEdge},
 });
 customerTopology['x-mop-cross-field-checks']=['nodes exactly cover paged edge endpoints plus optional focus; all assets freshly authorized in current tenant','offset + edges.length determines has_more; next pages pin graph_version; changed graph returns 409','draft dependency arrows are not verified physical links, monitored health or effective suppression'];
 const dependencyAppend = object({ expected_version: { type: 'integer', minimum: 0, maximum: 9007199254740990, description: '当前完整租户图的CAS版本，不是资产版本；所有引用在同租户且每条新增边须连接路径资产。未知业务元数据明确null。' }, additions: { type: 'array', minItems: 1, maxItems: 100, uniqueItems: true, items: dependencyEdge } });

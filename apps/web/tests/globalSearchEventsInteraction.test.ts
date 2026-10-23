@@ -35,12 +35,45 @@ async function search(query = base.query) {
   document.querySelector('form.global-search-form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); await settle()
 }
 beforeEach(() => {
+  localStorage.clear()
   session.value = structuredClone(auth); switchingTenant.value = false; contextGeneration.value = 0
   vi.stubGlobal('ResizeObserver', class { observe() {} unobserve() {} disconnect() {} })
 })
 afterEach(() => { app?.unmount(); app = undefined; host?.remove(); session.value = null; vi.restoreAllMocks(); vi.unstubAllGlobals(); document.body.innerHTML = '' })
 
 describe('event hits in the global search dialog', () => {
+  it('opens with slash without a request, lets users disable it and retains Control K', async () => {
+    const request=vi.spyOn(api,'request')
+    await mount()
+    window.dispatchEvent(new KeyboardEvent('keydown',{key:'/',bubbles:true,cancelable:true}));await settle()
+    const checkbox=document.querySelector('.search-shortcut-preference input') as HTMLInputElement
+    expect(checkbox.checked).toBe(true);expect(request).not.toHaveBeenCalled()
+    checkbox.click();await settle();expect(localStorage.getItem('mop.global-search.slash-enabled')).toBe('false')
+    button('关闭').click();await settle()
+    await vi.waitFor(()=>expect((document.querySelector('.el-overlay') as HTMLElement).style.display).toBe('none'))
+    window.dispatchEvent(new KeyboardEvent('keydown',{key:'/',bubbles:true,cancelable:true}));await settle()
+    expect((document.querySelector('.el-overlay') as HTMLElement).style.display).toBe('none')
+    window.dispatchEvent(new KeyboardEvent('keydown',{key:'k',ctrlKey:true,bubbles:true,cancelable:true}));await settle()
+    await vi.waitFor(()=>expect((document.querySelector('.el-overlay') as HTMLElement).style.display).not.toBe('none'))
+    expect(checkbox.checked).toBe(false);expect(request).not.toHaveBeenCalled()
+  })
+  it('respects a saved slash opt-out after remount and tolerates unavailable storage', async () => {
+    localStorage.setItem('mop.global-search.slash-enabled','false');await mount()
+    expect(document.querySelector('.global-search-trigger')?.getAttribute('aria-keyshortcuts')).toBe('Control+k Meta+k')
+    app!.unmount();app=undefined;host.remove()
+    vi.spyOn(Storage.prototype,'getItem').mockImplementation(()=>{throw new Error('synthetic blocked storage')})
+    vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw new Error('synthetic blocked storage')})
+    await mount()
+    window.dispatchEvent(new KeyboardEvent('keydown',{key:'/',bubbles:true,cancelable:true}));await settle()
+    const checkbox=document.querySelector('.search-shortcut-preference input') as HTMLInputElement
+    expect(checkbox.checked).toBe(true);checkbox.click();await settle();expect(checkbox.checked).toBe(false)
+  })
+  it('clears displayed results and query when the account version changes',async()=>{
+    vi.spyOn(api,'request').mockResolvedValue(base);await mount();await search()
+    session.value={...auth,account_version:2};await settle()
+    expect(document.querySelectorAll('.search-group')).toHaveLength(0)
+    expect(document.querySelector<HTMLInputElement>('input[aria-label="当前租户搜索词"]')?.value).toBe('')
+  })
   it.each(['/home', '/monitoring-events'])('navigates from %s using only the named canonical event route', async path => {
     const request = vi.spyOn(api, 'request').mockResolvedValue(base)
     await mount(path); await search()

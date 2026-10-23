@@ -1,0 +1,56 @@
+{
+  "status": "PASSED",
+  "environment": "lan-test-20261008",
+  "candidate": true,
+  "business_writes": 0,
+  "external_messages": 0,
+  "cases": [
+    {
+      "role": "padmin",
+      "width": 1440,
+      "total": 2,
+      "rows": 2,
+      "viewport_fits": true,
+      "axe_violations": 0
+    },
+    {
+      "role": "padmin",
+      "width": 1024,
+      "total": 2,
+      "rows": 2,
+      "viewport_fits": true,
+      "axe_violations": 0
+    },
+    {
+      "role": "msp",
+      "width": 1440,
+      "total": 2,
+      "rows": 2,
+      "viewport_fits": true,
+      "axe_violations": 0
+    },
+    {
+      "role": "msp",
+      "width": 1024,
+      "total": 2,
+      "rows": 2,
+      "viewport_fits": true,
+      "axe_violations": 0
+    }
+  ],
+  "errors": [],
+  "customerHidden": true,
+  "failureThenRealRetry": true,
+  "escapeFocus": true,
+  "detailLink": true,
+  "roleChangeCleared": true,
+  "cancelRestoresFocus": true,
+  "visibleAutomaticRefresh": {
+    "passed": true,
+    "waited_ms": 19774
+  },
+  "verified_at": "2026-10-23T15:40:00.664Z",
+  "formal_acceptance": "NOT_RUN",
+  "deployment": "NOT_RUN",
+  "visual_review": "1440 and 1024 screenshots inspected; panel fits and controls readable"
+}

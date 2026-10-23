@@ -10,6 +10,7 @@ import HorizontalModuleNavigation from './components/HorizontalModuleNavigation.
 import './styles/navigation.css'
 import ApiErrorNotice from './components/ApiErrorNotice.vue'
 import GlobalSearch from './components/GlobalSearch.vue'
+import HeaderAlertBell from './components/HeaderAlertBell.vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import './styles/identity.css'
 import './styles/experience.css'
@@ -89,6 +90,7 @@ async function endSession() {
         <a class="brand" :href="router.resolve({ name: homeRoute }).href" @click="navigateFromLink($event, () => router.push({ name: homeRoute }))"><span class="brand-mark">M</span><span><strong>MOP 运维托管</strong><small>网络设备管理平台</small></span></a>
         <HorizontalModuleNavigation v-model:mobile-open="mobileNavigationOpen" :collapsed="sidebarCollapsed" />
         <div class="topbar-controls">
+          <HeaderAlertBell />
           <GlobalSearch v-if="can('search:read')" />
           <div class="identity"><span class="avatar">{{ session.user.display_name.slice(0, 1) }}</span><div><strong>{{ session.user.display_name }}</strong><small>{{ roleLabel[session.user.role] }}</small></div></div>
           <el-button v-if="['project_local','oidc','wecom'].includes(session.identity_source)" text class="account-button" @click="router.push('/account')">我的账号</el-button>

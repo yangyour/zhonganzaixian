@@ -1,0 +1,28 @@
+{
+  "status": "FUNCTIONAL_PASS_WITH_A11Y_FINDING",
+  "environment": "lan-test-20261008",
+  "business_writes": 0,
+  "cases": [
+    {
+      "width": 1440,
+      "axe_violations": 1,
+      "viewport_fits": true
+    },
+    {
+      "width": 1024,
+      "axe_violations": 1,
+      "viewport_fits": true
+    }
+  ],
+  "errors": [],
+  "slashOptOut": true,
+  "realRead": true,
+  "savedChoiceAndReenable": true,
+  "accessibility_finding": {
+    "id": "landmark-no-duplicate-banner",
+    "impact": "moderate",
+    "scope": "Element Plus dialog header",
+    "status": "OPEN"
+  },
+  "verified_at": "2026-10-23T15:50:47.750Z"
+}

@@ -8,24 +8,29 @@ import { displayTime,typeLabel } from '../utils/display'
 import ApiErrorNotice from './ApiErrorNotice.vue'
 import { Search } from '@element-plus/icons-vue'
 const router=useRouter(),route=useRoute(),open=ref(false),navigating=ref(false),navigationError=ref(''),input=ref<{focus:()=>void}|null>(null)
+const shortcutPreference='mop.global-search.slash-enabled'
+const slashEnabled=ref(true)
+try{slashEnabled.value=localStorage.getItem(shortcutPreference)!=='false'}catch{/* Storage is optional for this non-sensitive UI preference. */}
+watch(slashEnabled,value=>{try{localStorage.setItem(shortcutPreference,String(value))}catch{/* The current-page choice still applies. */}})
 const state=shallowRef<SearchState>({query:'',result:null,busy:false,error:null})
 const workspace=createGlobalSearchWorkspace(api,value=>{state.value=value})
 const capabilityScope=computed(()=>JSON.stringify([...new Set(session.value?.capabilities??[])].sort()))
 const permitted=computed(()=>can('search:read')&&!switchingTenant.value)
 // Equivalent /session refreshes must retain the modal if a later navigation guard blocks the move.
-watch([()=>session.value?.tenant.id,()=>session.value?.user.id,()=>session.value?.permission_version,()=>session.value?.user.role,()=>capabilityScope.value,()=>contextGeneration.value,()=>permitted.value],()=>{const s=session.value;open.value=false;navigationError.value='';workspace.reset(permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role}:null)},{immediate:true,flush:'sync'})
+watch([()=>session.value?.tenant.id,()=>session.value?.user.id,()=>session.value?.permission_version,()=>session.value?.account_version,()=>session.value?.user.role,()=>capabilityScope.value,()=>contextGeneration.value,()=>permitted.value],()=>{const s=session.value;open.value=false;navigationError.value='';workspace.reset(permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role}:null)},{immediate:true,flush:'sync'})
 watch(open,value=>{if(!value){workspace.clear();navigationError.value=''}},{flush:'sync'})
 watch(()=>route.fullPath,()=>{open.value=false},{flush:'sync'})
 function show(){if(!permitted.value||open.value)return;open.value=true}
-function shortcut(event:KeyboardEvent){if(permitted.value&&shouldFocusGlobalSearch(event)){event.preventDefault();void show()}}
+function shortcut(event:KeyboardEvent){if(permitted.value&&shouldFocusGlobalSearch(event,slashEnabled.value)){event.preventDefault();void show()}}
 onMounted(()=>window.addEventListener('keydown',shortcut))
 onBeforeUnmount(()=>{window.removeEventListener('keydown',shortcut);workspace.dispose()})
 async function visit(kind:'assets'|'events'|'tickets',id:string){if(navigating.value)return;navigating.value=true;navigationError.value='';try{const failure=await router.push(searchDestination(kind,id));if(isNavigationFailure(failure)&&!isNavigationFailure(failure,NavigationFailureType.duplicated))navigationError.value='跳转未完成，搜索结果已保留，请先处理当前页面的提示';else open.value=false}catch{navigationError.value='跳转失败，搜索结果已保留'}finally{navigating.value=false}}
 </script>
 <template>
- <el-button v-if="permitted" class="global-search-trigger" aria-label="打开全局搜索，快捷键 Control K 或 Command K" aria-keyshortcuts="Control+k Meta+k" title="搜索当前租户（Ctrl+K / ⌘K）" @click="show"><Search class="search-trigger-icon" aria-hidden="true" /><span class="search-trigger-label">搜索<span class="search-trigger-hint">资产 / 事件 / 报障记录</span></span><kbd aria-hidden="true">Ctrl / ⌘ K</kbd></el-button>
+ <el-button v-if="permitted" class="global-search-trigger" :aria-label="slashEnabled?'打开全局搜索，快捷键斜杠、Control K 或 Command K':'打开全局搜索，快捷键 Control K 或 Command K'" :aria-keyshortcuts="slashEnabled?'Control+k Meta+k /':'Control+k Meta+k'" :title="slashEnabled?'搜索当前租户（/ 或 Ctrl+K / ⌘K）':'搜索当前租户（Ctrl+K / ⌘K）'" @click="show"><Search class="search-trigger-icon" aria-hidden="true" /><span class="search-trigger-label">搜索<span class="search-trigger-hint">资产 / 事件 / 报障记录</span></span><kbd aria-hidden="true">{{slashEnabled?'/ · Ctrl / ⌘ K':'Ctrl / ⌘ K'}}</kbd></el-button>
  <el-dialog v-model="open" title="搜索当前租户" width="680px" class="global-search-dialog" append-to-body :close-on-click-modal="false" :close-on-press-escape="!navigating" :show-close="!navigating" @opened="input?.focus()">
   <el-form class="global-search-form" @submit.prevent="workspace.search()"><el-form-item><el-input ref="input" :model-value="state.query" :disabled="navigating" clearable aria-label="当前租户搜索词" placeholder="资产名称 / 事件规则名称或代码 / 报障标题 / 受理编号" @update:model-value="workspace.change(String($event))"/></el-form-item><el-button native-type="submit" type="primary" :loading="state.busy" :disabled="navigating">搜索</el-button></el-form>
+  <label class="search-shortcut-preference"><input v-model="slashEnabled" type="checkbox" />启用 / 快捷键（输入文字或操作弹窗时不触发）</label>
   
   <ApiErrorNotice :error="state.error"/>
   <el-alert v-if="navigationError" :title="navigationError" type="warning" :closable="false"/>
@@ -49,6 +54,7 @@ async function visit(kind:'assets'|'events'|'tickets',id:string){if(navigating.v
  </el-dialog>
 </template>
 <style scoped>
+.search-shortcut-preference{display:flex;align-items:center;gap:7px;margin:6px 0 12px;color:#536276;font-size:12px;line-height:1.6}.search-shortcut-preference input{margin:0;accent-color:#2165c5}.search-shortcut-preference input:focus-visible{outline:2px solid #2165c5;outline-offset:3px}
 .search-idle{margin:4px 0 0;color:#6a7b90;font-size:12px}.global-search-trigger{min-height:44px;padding:8px 12px}kbd{margin-left:8px;border:1px solid #c9d4e2;border-radius:4px;padding:0 5px;color:#596d88}.global-search-form{display:flex;align-items:center;gap:10px;margin-bottom:10px}.global-search-form :deep(.el-form-item){flex:1;margin-bottom:0}.search-boundary,.search-observed,.search-group p{color:#536276;line-height:1.6;font-size:13px}.search-group{border-top:1px solid #e2e9f2;padding:15px 0;overflow-wrap:anywhere}.search-group h3{display:flex;justify-content:space-between;gap:12px}.search-group small{color:#596d84;font-weight:400}.search-group ul{list-style:none;padding:0;margin:0}.search-group li{display:flex;flex-direction:column;align-items:flex-start;padding:8px 0;gap:3px}.search-group li span{font-size:12px;color:#536276}.search-group :deep(.el-button){white-space:normal;text-align:left;min-height:44px}.unavailable{background:#f8fafc;padding:15px 10px}.global-search-dialog :deep(.el-input__wrapper){min-height:44px}@media(max-width:700px){.global-search-trigger{padding:6px 8px}.global-search-trigger kbd{display:none}.search-group h3{flex-wrap:wrap}.search-group small{font-size:12px}}
 </style>
 <style>

@@ -83,4 +83,10 @@ class MonitoringPresetHttpSecurityTest {
   mvc.perform(get(BASE+"/"+ACTOR+"/observation").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isNotFound());assertEquals(0,probes.get());
  }
 
+ @Test void serviceObservationHasSameAuthenticationAndScopeBoundaries()throws Exception{
+  mvc.perform(get(BASE+"/"+target.id()+"/service-observation")).andExpect(status().isUnauthorized());
+  mvc.perform(get(BASE+"/"+target.id()+"/service-observation").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isOk()).andExpect(jsonPath("$.data.source").value("PROMETHEUS_SERVICE_OBSERVATION")).andExpect(jsonPath("$.data.report.service_signal.status").value("NOT_SUPPORTED"));
+  mvc.perform(get(BASE+"/"+target.id()+"/service-observation").param("metric","other").with(user(ACTOR)).sessionAttr("mop.tenant_id",TENANT)).andExpect(status().isBadRequest());assertEquals(0,probes.get());
+ }
+
 }

@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-23",
+  "api_version": "0.82.0",
+  "backend": {
+    "total": 4331,
+    "executed": 3289,
+    "skipped": 1042,
+    "failures": 0,
+    "errors": 0,
+    "new_tests_since_4848519": 15
+  },
+  "node": {
+    "tests": 204,
+    "passed": 204
+  },
+  "python": {
+    "tests": 248,
+    "passed": 248,
+    "skipped": 0
+  },
+  "package": {
+    "status": "PASS",
+    "sha256": "f7230849fc36ec83346a463e00bfe98e479d118c4572d54f399d0db9fb64c71d",
+    "catalog_bytes_match": true,
+    "test_classes_excluded": true
+  },
+  "official_prometheus_loopback": {
+    "version": "3.15.1",
+    "source_archive_sha256": "6a726885328ad9efebbf36e876ce2fb6225468a71fd1e7ce3ba666d5f4d97a84",
+    "scope": "Synthetic isolated 790 tenant labels, loopback exporter, temporary TSDB",
+    "verified": [
+      "service success",
+      "scrape success with redis_up=0",
+      "scrape failure blocks service signal",
+      "recovery",
+      "no data",
+      "duplicate jobs rejected",
+      "source stopped",
+      "cleanup"
+    ]
+  },
+  "contract_generation": "PASS",
+  "formal_progress": "PASS",
+  "initial_compile_issue": "Fixed Java quote escaping in combined-query tag rewrite; all tests rerun after final edits",
+  "demo_preparation": "API source lock and offline golden fixture refreshed only; no account, credentials, permission grants, data writes or deployment",
+  "not_run": [
+    "Real devices/services",
+    "Source authentication setup",
+    "Business deployment",
+    "Frontend interaction acceptance",
+    "Business database integration"
+  ],
+  "sql_migrations": 0,
+  "frozen_sql": "V1-V50 unchanged",
+  "formal_acceptance": {
+    "total": 128,
+    "NOT_RUN": 128
+  }
+}

@@ -1,4 +1,4 @@
-import { addMonitoringOnboardingContract, addMonitoringPlanningContract, addMonitoringObservationContract } from './monitoring-onboarding-contract.mjs';
+import { addMonitoringOnboardingContract, addMonitoringPlanningContract, addMonitoringObservationContract, addMonitoringServiceObservationContract } from './monitoring-onboarding-contract.mjs';
 import { addBackupVersionInventoryContract } from './backup-version-inventory-contract.mjs';
 import { addObservationWindowContract } from './observation-window-contract.mjs';
 import { addCmdbSourcePreflightContract } from './cmdb-source-preflight-contract.mjs';
@@ -968,7 +968,8 @@ addBackupVersionInventoryContract(contract);
 addMonitoringOnboardingContract(contract);
 addMonitoringPlanningContract(contract);
 addMonitoringObservationContract(contract);
-contract.info.version = '0.81.0';
+addMonitoringServiceObservationContract(contract);
+contract.info.version = '0.82.0';
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

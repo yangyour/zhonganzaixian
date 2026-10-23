@@ -125,3 +125,38 @@ export function addMonitoringObservationContract(contract) {
       ...Object.fromEntries([400, 401, 403, 404, 409, 429, 503].map(code => [code, { description: 'Scope, request, concurrent read or registration rejection; no fallback target or source', content: { 'application/json': { schema: ref('Error') } } }])) }
   } };
 }
+
+export function addMonitoringServiceObservationContract(contract) {
+  const ref = name => ({ $ref: '#/components/schemas/' + name });
+  const nullable = schema => ({ anyOf: [schema, { type: 'null' }] });
+  const timestamp = { type: 'string', format: 'date-time' };
+  const signal = { type: 'object', additionalProperties: false, properties: {
+    metric: { enum: [null, 'probe_success', 'pg_up', 'mysql_up', 'redis_up'] },
+    status: { enum: ['NOT_SUPPORTED','NOT_CHECKED','SIGNAL_SUCCESS','SIGNAL_FAILURE','STALE','NO_DATA','INVALID_RESPONSE','OUT_OF_SYNC','BLOCKED_SCRAPE'] },
+    value: nullable({ type: 'integer', enum: [0,1] }), sample_at: nullable(timestamp),
+    sample_age_seconds: nullable({ type: 'number', minimum: 0 }), health_verified: { const: false }
+  }, required: ['metric','status','value','sample_at','sample_age_seconds','health_verified'] };
+  signal.allOf = [
+    { if: { properties: { status: { const: 'NOT_SUPPORTED' } } }, then: { properties: { metric: { type: 'null' } } }, else: { properties: { metric: { type: 'string' } } } },
+    { if: { properties: { status: { enum: ['SIGNAL_SUCCESS','SIGNAL_FAILURE','STALE','OUT_OF_SYNC'] } } }, then: { properties: { sample_at: timestamp, sample_age_seconds: { type: 'number', minimum: 0 } } }, else: { properties: { sample_at: { type: 'null' }, sample_age_seconds: { type: 'null' } } } },
+    { if: { properties: { status: { const: 'SIGNAL_SUCCESS' } } }, then: { properties: { value: { const: 1 } } }, else: {
+      if: { properties: { status: { const: 'SIGNAL_FAILURE' } } }, then: { properties: { value: { const: 0 } } }, else: { properties: { value: { type: 'null' } } }
+    } }
+  ];
+  const report = JSON.parse(JSON.stringify(contract.components.schemas.MonitoringScrapeObservationReport));
+  report.properties.service_signal = ref('MonitoringServiceSignal'); report.required.push('service_signal');
+  report.allOf.push({ if: { properties: { service_signal: { properties: { status: { enum: ['SIGNAL_SUCCESS','SIGNAL_FAILURE','STALE','NO_DATA','INVALID_RESPONSE','OUT_OF_SYNC'] } } } } }, then: { properties: { observation_status: { const: 'SCRAPE_SUCCEEDED' } } } });
+  report.allOf.push({ if: { properties: { service_signal: { properties: { status: { const: 'BLOCKED_SCRAPE' } } } } }, then: { properties: { observation_status: { enum: ['SCRAPE_FAILED','STALE','NO_DATA'] } } } });
+  report.allOf.push({ if: { properties: { service_signal: { properties: { status: { const: 'NOT_CHECKED' } } } } }, then: { properties: { observation_status: { enum: ['CONFIG_PENDING','TARGET_DISABLED','UNSUPPORTED_ENGINE','SOURCE_UNAVAILABLE','SOURCE_INVALID_RESPONSE'] } } } });
+  report['x-mop-cross-field-checks'].push('Service success/failure requires the same job, instance, tenant/asset/target/preset and exact scrape timestamp; extra service labels are allowed only for one unambiguous series', 'One query/evaluation/deadline; at most four series plus a fifth sentinel for ambiguity. Scrape failure/staleness/no-data blocks service values');
+  const result = JSON.parse(JSON.stringify(contract.components.schemas.MonitoringScrapeObservationResult));
+  result.properties.data.properties.source = { const: 'PROMETHEUS_SERVICE_OBSERVATION' };
+  result.properties.data.properties.report = ref('MonitoringServiceObservationReport');
+  Object.assign(contract.components.schemas, { MonitoringServiceSignal: signal, MonitoringServiceObservationReport: report, MonitoringServiceObservationResult: result });
+  const operation = JSON.parse(JSON.stringify(contract.paths['/monitoring-onboarding/registered-targets/{id}/observation'].get));
+  operation.operationId = 'readRegisteredMonitoringServiceObservation';
+  operation.summary = '单次查询同时区分抓取成功与预设服务成功信号，不推断设备整体健康';
+  operation.responses[200].content['application/json'].schema = ref('MonitoringServiceObservationResult');
+  operation['x-mop-network-io'] = 'One fixed combined query; no arbitrary metric, destination or PromQL; shared concurrency slot with scrape observations';
+  contract.paths['/monitoring-onboarding/registered-targets/{id}/service-observation'] = { get: operation };
+}

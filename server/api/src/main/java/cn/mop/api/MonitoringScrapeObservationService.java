@@ -22,10 +22,14 @@ final class MonitoringScrapeObservationService {
     interface Reader { byte[] read(Source source, MonitoringPresetRegistry.Target target, Instant evaluatedAt); }
     private final Map<String, Source> sources;
     private final Reader reader;
+    private final Reader serviceReader;
     private final Clock clock;
     private final Semaphore slot = new Semaphore(1);
     MonitoringScrapeObservationService(Map<String, Source> sources, Reader reader, Clock clock) {
-        this.sources = Map.copyOf(sources); this.reader = Objects.requireNonNull(reader); this.clock = Objects.requireNonNull(clock);
+        this(sources,reader,null,clock);
+    }
+    MonitoringScrapeObservationService(Map<String,Source> sources,Reader reader,Reader serviceReader,Clock clock) {
+        this.sources = Map.copyOf(sources); this.reader = Objects.requireNonNull(reader); this.serviceReader=serviceReader; this.clock = Objects.requireNonNull(clock);
     }
     static Map<String, Source> sources(String raw, String allowedEndpoints) {
         try {
@@ -46,22 +50,25 @@ final class MonitoringScrapeObservationService {
         } catch (Exception failure) { throw invalid(); }
     }
     static IllegalArgumentException invalid() { return new IllegalArgumentException("Invalid monitoring observation source configuration"); }
-    Map<String, Object> read(MonitoringPresetRegistry.Target target) {
+    Map<String,Object> read(MonitoringPresetRegistry.Target target){return read(target,false);}
+    Map<String,Object> readService(MonitoringPresetRegistry.Target target){return read(target,true);}
+    private Map<String, Object> read(MonitoringPresetRegistry.Target target,boolean includeService) {
         var result = map("target_id", target.id(), "configuration_sha256", target.hash(), "observation_status", "CONFIG_PENDING",
             "reason", "SOURCE_NOT_CONFIGURED", "evaluated_at", null, "checked_at", null, "sample_at", null, "sample_age_seconds", null,
             "scrape_up", null, "max_age_seconds", null, "lookback_seconds", null, "network_attempted", false,
             "continuous_collection_verified", false, "active_configuration_verified", false, "device_identity_verified", false, "health_verified", false);
+        if(includeService)result.put("service_signal",MonitoringServiceObservation.pending(target));
         if (!target.enabled()) return state(result, "TARGET_DISABLED", "TARGET_NOT_ENABLED");
         if (!target.preset().engine().equals("prometheus")) return state(result, "UNSUPPORTED_ENGINE", "PROMETHEUS_SOURCE_REQUIRED");
-        Source source = sources.get(target.tenantId()); if (source == null) return result;
+        Source source = sources.get(target.tenantId()); if (source == null || includeService && serviceReader==null) return result;
         if (!slot.tryAcquire()) throw new DomainException(429, "RATE_LIMITED", "已有采集状态查询在执行，请稍后重试");
         try {
             Instant evaluated = clock.instant().truncatedTo(ChronoUnit.MILLIS);
             result.put("evaluated_at", evaluated.toString()); result.put("max_age_seconds", source.maxAge()); result.put("lookback_seconds", source.lookback());
             result.put("network_attempted", true);
-            byte[] response = reader.read(source, target, evaluated);
+            byte[] response = (includeService?serviceReader:reader).read(source, target, evaluated);
             Instant checked = clock.instant().truncatedTo(ChronoUnit.MILLIS); result.put("checked_at", checked.toString());
-            result.putAll(decode(response, target, evaluated, checked, source.maxAge(), source.lookback())); return result;
+            result.putAll(includeService?MonitoringServiceObservation.decode(response,target,evaluated,checked,source.maxAge(),source.lookback()):decode(response, target, evaluated, checked, source.maxAge(), source.lookback())); return result;
         } catch (InvalidResponse failure) { return state(result, "SOURCE_INVALID_RESPONSE", failure.reason); }
         catch (MonitoringHttpTransport.Failure failure) { return state(result, "SOURCE_UNAVAILABLE", failure.reason); }
         catch (RuntimeException failure) { return state(result, "SOURCE_UNAVAILABLE", "SOURCE_READ_FAILED"); }
@@ -76,7 +83,7 @@ final class MonitoringScrapeObservationService {
     static InvalidResponse bad(String reason) { return new InvalidResponse(reason); }
     static String query(MonitoringPresetRegistry.Target target) { return queryMetric(target,"up"); }
     static String queryMetric(MonitoringPresetRegistry.Target target,String metric) {
-        if(!metric.equals("up")&&!metric.equals(target.preset().successMetric()))throw invalid();
+        if(metric==null||!metric.matches("[a-zA-Z_:][a-zA-Z0-9_:]{0,127}")||!metric.equals("up")&&!metric.equals(target.preset().successMetric()))throw invalid();
         try {
             String selector = metric + "{mop_tenant_id=" + quote(target.tenantId()) + ",mop_asset_id=" + quote(target.assetId()) +
                 ",mop_target_id=" + quote(target.id()) + ",mop_preset=" + quote(target.preset().id()) + "}";
@@ -89,7 +96,7 @@ final class MonitoringScrapeObservationService {
         return decodeMetric(bytes,target,evaluated,checked,maxAge,lookback,"up");
     }
     static Map<String,Object> decodeMetric(byte[] bytes,MonitoringPresetRegistry.Target target,Instant evaluated,Instant checked,int maxAge,int lookback,String expectedMetric) {
-        if(!expectedMetric.equals("up")&&!expectedMetric.equals(target.preset().successMetric()))throw invalid();
+        if(expectedMetric==null||!expectedMetric.matches("[a-zA-Z_:][a-zA-Z0-9_:]{0,127}")||!expectedMetric.equals("up")&&!expectedMetric.equals(target.preset().successMetric()))throw invalid();
         try {
             if (bytes == null || bytes.length > MonitoringHttpTransport.MAX_BYTES) throw bad("RESPONSE_TOO_LARGE");
             String text = StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
@@ -146,13 +153,15 @@ final class MonitoringScrapeObservationService {
         if (number.precision() > 20 || number.scale() < -9 || number.scale() > 9) throw bad("INVALID_NUMERIC_VALUE");
         return number;
     }
-    static Reader network() {
+    static Reader network(){return network(false);}
+    static Reader serviceNetwork(){return network(true);}
+    private static Reader network(boolean includeService) {
         HttpClient client = MonitoringHttpTransport.client();
         return (source, target, evaluated) -> {
             CompletableFuture<HttpResponse<byte[]>> pending = null;
             try {
-                String uri = source.endpoint() + "?query=" + MonitoringPresetProbeService.encode(query(target)) + "&time=" +
-                    BigDecimal.valueOf(evaluated.toEpochMilli(), 3).toPlainString() + "&timeout=" + source.timeout() + "s&lookback_delta=" + source.lookback() + "s&limit=3";
+                String uri = source.endpoint() + "?query=" + MonitoringPresetProbeService.encode(includeService?MonitoringServiceObservation.query(target):query(target)) + "&time=" +
+                    BigDecimal.valueOf(evaluated.toEpochMilli(), 3).toPlainString() + "&timeout=" + source.timeout() + "s&lookback_delta=" + source.lookback() + "s&limit="+(includeService&&target.preset().successMetric()!=null?5:3);
                 var request = HttpRequest.newBuilder(URI.create(uri)).timeout(Duration.ofSeconds(source.timeout()))
                     .header("Accept", "application/json").header("Accept-Encoding", "identity").GET().build();
                 pending = client.sendAsync(request, ignored -> new MonitoringHttpTransport.LimitedBody());

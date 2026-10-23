@@ -472,6 +472,8 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 
 附件扫描：现有登记未提供本轮可核验的获批扫描端点、版本、签名新鲜度和扫描策略；状态UNVERIFIED_NOT_ENABLED。影响为不能执行真实附件扫描／隔离发布验收。候选ClamD的有界流式适配代码已具备13项纯协议测试，不表示已批准ClamAV、已发现服务或已完成联调。未探测扫描端口、未安装或启动替代组件、未提交实际附件。未来优先盘点指定服务器已有能力，确认受控访问和隔离权限后接入；[接口和缺口](../attachment-scan-adapter.md)。
 
+恢复演练：本线尚无获核验的隔离恢复命名空间、受限恢复权限、源备份／水位及演练窗口；状态NOT_RUN。已实现只读归档摘要和演练观测验证器，14项纯单元通过，不表示恢复可用。候选为指定测试服务器独立受限演练空间，须核验授权／容量后使用；未创建或恢复任何数据库，禁止以共享mop_test或实际租户替代。见[恢复验证工具](../recovery-drill-verifier.md)。
+
 # 2026-10-15 前端验收规范复用盘点
 
 通过既有固定主机密钥SSH只读盘点指定LAN测试环境：14个项目服务运行，PostgreSQL17.9、Nginx1.31.6、Redis7.4.9、RabbitMQ4.3.2、MinIO RELEASE.2025-09-07T16-13-09Z、Zabbix7.0.31。API ready=true、production_ready=false。本轮本地前端经回环预览访问既有项目API；无新增组件、迁移、服务生命周期或全局配置变更。组件在线不表示业务/生产验收。见[盘点证据](../evidence/frontend-acceptance-20261015/components.json)。

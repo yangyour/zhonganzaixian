@@ -4,6 +4,7 @@ import cn.mop.adapters.backup.BackupContentRuntime;
 import cn.mop.adapters.backup.BackupEnvelopeArchive;
 import cn.mop.adapters.backup.BackupEnvelopeEncryption;
 import cn.mop.persistence.BackupGrantFile;
+import cn.mop.persistence.RuntimeDataSources;
 import cn.mop.persistence.BackupTaskGrant.Operation;
 import cn.mop.persistence.PostgresBackupArchiveRepository.Access;
 import cn.mop.persistence.PostgresBackupTaskAuthorization;
@@ -33,18 +34,7 @@ public final class BackupWorkerMain {
             var settings = BackupWorkerSettings.from(System::getenv);
             var proof = new SignedBackupCollectionProofs(settings.proofDirectory(), settings.collectorPublicKey(),
                     settings.collectorBinding(), Clock.systemUTC());
-            var config = new HikariConfig();
-            config.setJdbcUrl(settings.jdbcUrl());
-            config.setUsername("mop_test_runtime");
-            config.setPassword(settings.password());
-            config.setMaximumPoolSize(2);
-            config.setMinimumIdle(0);
-            config.setConnectionTimeout(5000);
-            config.setValidationTimeout(3000);
-            config.setInitializationFailTimeout(5000);
-            config.addDataSourceProperty("connectTimeout", "5");
-            config.addDataSourceProperty("socketTimeout", "20");
-            try (var source = new HikariDataSource(config)) {
+            try (var source = openDataSource(settings)) {
                 var authorization = new PostgresBackupTaskAuthorization("backup-task-binding:" + settings.schedule().binding(),
                         new BackupGrantFile(settings.grantsFile()), Clock.systemUTC());
                 for (var target : settings.schedule().targets()) {
@@ -103,4 +93,27 @@ public final class BackupWorkerMain {
             }
         }
     }
+    /** Shared privilege guard must finish before grants, storage/KMS readiness or scheduler construction. */
+    static HikariDataSource openDataSource(BackupWorkerSettings settings) {
+        return openDataSource(settings, RuntimeDataSources::openRestrictedTest);
+    }
+
+    /** Factory seam for configuration-only tests; the production entry always uses the guarded overload. */
+    static HikariDataSource openDataSource(BackupWorkerSettings settings,
+            java.util.function.Function<HikariConfig, HikariDataSource> guardedOpen) {
+        var config = new HikariConfig();
+        config.setJdbcUrl(settings.jdbcUrl());
+        config.setUsername("mop_test_runtime");
+        config.setPassword(settings.password());
+        config.setMaximumPoolSize(2);
+        config.setMinimumIdle(0);
+        config.setConnectionTimeout(5000);
+        config.setValidationTimeout(3000);
+        config.setInitializationFailTimeout(5000);
+        config.addDataSourceProperty("connectTimeout", "5");
+        config.addDataSourceProperty("socketTimeout", "20");
+        RuntimeDataSources.validateConfiguration(config);
+        return guardedOpen.apply(config);
+    }
+
 }

@@ -1,0 +1,14 @@
+{
+  "status": "BACKUP_ENTRY_SHARED_RUNTIME_GUARD_WIRED",
+  "java_executed": 10,
+  "failures": 0,
+  "skipped": 0,
+  "independent_main_baseline": "bb00bc90bbea82e8c79129f1a94f97010eea1669",
+  "independent_main_java_executed": 10,
+  "actual_database_privileges": "NOT_RUN_MISSING_PRIVATE_CONFIGURATION",
+  "actual_kms_and_objects": "NOT_RUN",
+  "actual_backup_processing": "NOT_RUN",
+  "api_changes": 0,
+  "migrations": 0,
+  "deployment": "NOT_RUN"
+}

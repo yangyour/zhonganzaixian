@@ -328,7 +328,8 @@
       "evidence": [
         "docs/backup-access-provider-20261023.md",
         "docs/evidence/backup-access-provider-20261023/validation.json",
-        "docs/evidence/backup-version-content-20261023/validation.json"
+        "docs/evidence/backup-version-content-20261023/validation.json",
+        "docs/backup-worker-runtime-guard-20261023.md"
       ],
       "commits": [
         "735be359",
@@ -338,7 +339,8 @@
         "15ec3453"
       ],
       "completed_subitems": [
-        "Independent version-inventory grant provider and explicit configuration wiring"
+        "Independent version-inventory grant provider and explicit configuration wiring",
+        "Backup postprocessing entry now uses the shared restricted runtime datasource/privilege guard before dependency and scheduler work; targeted configuration/wiring tests only"
       ],
       "remaining_subitems": [
         "Worker lifecycle and postprocessing integration",
@@ -1929,9 +1931,9 @@
       "formal_acceptance": "NOT_RUN"
     }
   ],
-  "execution_status": "STOPPED_BY_USER",
+  "execution_status": "DOT_RESUMED_BY_USER",
   "closeout_document": "docs/development-closeout-and-remaining-20261023.md",
-  "status_note": "Implementation statuses describe partial delivery only; no active development continues after closeout.",
+  "status_note": "The current dot resumed under explicit user authorization on 2026-10-23; prior six local sessions remain stopped. Implementation/validation/customer gates/formal acceptance remain distinct; local pending-upload work is not automatically in main.",
   "preserved_unverified_work": [
     {
       "owner": "assets",
@@ -2014,6 +2016,6 @@
     "resume_base": "latest origin/main",
     "wip_export_manifest": "docs/evidence/cloud-wip-handoff-20261023.json",
     "local_development": "STOPPED",
-    "cloud_session": "NOT_STARTED_BY_LOCAL_THREAD"
+    "cloud_session": "CURRENT_DOT_IN_PROGRESS"
   }
 }

@@ -474,6 +474,8 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 
 恢复演练：本线尚无获核验的隔离恢复命名空间、受限恢复权限、源备份／水位及演练窗口；状态NOT_RUN。已实现只读归档摘要和演练观测验证器，14项纯单元通过，不表示恢复可用。候选为指定测试服务器独立受限演练空间，须核验授权／容量后使用；未创建或恢复任何数据库，禁止以共享mop_test或实际租户替代。见[恢复验证工具](../recovery-drill-verifier.md)。
 
+凭据轮换：尚无绑定到本线的获批KMS／凭据后端、受限scope及激活／撤销授权；状态BACKEND_NOT_CONFIGURED，影响为不能执行实际轮换和消费者重载验证。协调接口及16项纯单元已完成；优先复用指定环境已有秘密管理能力，产品／版本及原子代数语义仍需盘点，未把任何候选当作获批组件，未修改真实凭据。见[轮换协调接口](../credential-rotation-coordinator.md)。
+
 # 2026-10-15 前端验收规范复用盘点
 
 通过既有固定主机密钥SSH只读盘点指定LAN测试环境：14个项目服务运行，PostgreSQL17.9、Nginx1.31.6、Redis7.4.9、RabbitMQ4.3.2、MinIO RELEASE.2025-09-07T16-13-09Z、Zabbix7.0.31。API ready=true、production_ready=false。本轮本地前端经回环预览访问既有项目API；无新增组件、迁移、服务生命周期或全局配置变更。组件在线不表示业务/生产验收。见[盘点证据](../evidence/frontend-acceptance-20261015/components.json)。

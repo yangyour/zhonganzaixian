@@ -4,6 +4,8 @@
 
 用户最新要求结束现有开发、整理提交，剩余单文档由集成会话统一编写。本线已停止新增功能，不再申请main集成锁。以下是交接事实，不是P01–P03整项VERIFIED声明，也不改总JSON或128项正式TC。
 
+最终核心代码提交 **`7e05923d423b1d21205e819ecb33d95ac030029e`** 已推送 `codex/launch-production-20261023`，本线未自行合main；验证基线为 `b122896b`，停止后上游新增入口不计入已验证范围。P03 `c2b8f0d7` 已在main `b122896b`。最新未完成对象仍为P01 `b97f437af8875a51323bcfd26f0c07bd8b30fbd2`、P02 `88cf0e3f311181e590a6dc77714018bd3e2f9c27`；工作区业务改动已全部提交或保留在这些stash，无本线运行资源或持有锁，后续不自动继续。
+
 **已完成且单独验证的提交范围**：P01运行账号守卫核心新增 `RuntimeDatabaseGuard`／`RuntimeDataSources`，检查数据库／current_user／session_user、超级用户／BYPASSRLS／建库／建角色／复制权限、DDL权限、迁移角色成员关系及危险系统角色。API、照片／资产导入／联系人／导出Worker、工单自动登记／关闭／SLA提醒／通知中继的10个运行连接入口统一使用受限工厂，失败关闭连接池；现有健康就绪会重新检查角色漂移。旧身份bootstrap及独立迁移入口未执行，生产profile、数据库选型和RLS方案未放开。无新HTTP端点、无未验证管理界面混入核心提交。
 
 **核心收尾验证**：在移走未完成代码后重新 `mvn -B clean test`，4571项发现、3500项实际执行通过、1071项跳过，0失败／错误。最新PG验证在指定17.9上使用真实受限账号和只读连接，1项实际通过，schema历史保持V50，数据库写入／DDL／组件安装为0；实际验证的守卫及工厂源码SHA256与本次提交文件一致。见[收尾汇总](../evidence/gap-p01-runtime-20261023/closing-validation.json)、[实际PG最终记录](../evidence/gap-p01-runtime-20261023/postgresql-final.json)。较早 `postgresql.json`／`postgresql-factory.json` 保留为逐步验证历史；不以旧WIP回归计数替代本次核心计数。

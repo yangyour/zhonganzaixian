@@ -1,0 +1,94 @@
+{
+  "date": "2026-10-23",
+  "status": "WIP_NOT_RELEASE_READY",
+  "reason": "User explicitly stopped development; unresolved checks preserved without promoting the source.",
+  "source_base": "87016702",
+  "latest_postgresql": {
+    "tests": 10,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0
+  },
+  "postgresql_cases": [
+    {
+      "name": "missingPublicationCannotReadSourceOrConfirm",
+      "status": "PASSED"
+    },
+    {
+      "name": "confirmedEvidenceCommitsWithEventAndSlaAndOriginalReplayDoesNotResample",
+      "status": "FAILED"
+    },
+    {
+      "name": "insufficientEvidenceIsDurableButDoesNotAdvanceEventAndNewCommandCanObserveAgain",
+      "status": "PASSED"
+    },
+    {
+      "name": "stalePolicyVersionAndForeignEventDoNotReadSource",
+      "status": "PASSED"
+    },
+    {
+      "name": "concurrentConfirmationsHaveOneWinnerAndOneEvidenceRecord",
+      "status": "PASSED"
+    },
+    {
+      "name": "failedEventCasRollsBackRawProofAndReceiptThenOriginalRequestCanRetry",
+      "status": "PASSED"
+    },
+    {
+      "name": "sourceErrorsAndBindingMismatchCannotStoreEvidence",
+      "status": "PASSED"
+    },
+    {
+      "name": "legacyRawRecoveryCannotStopSlaUntilBoundObservationIsConfirmed",
+      "status": "PASSED"
+    },
+    {
+      "name": "expiryDuringSourceReadCannotCommitRecoveryProof",
+      "status": "PASSED"
+    },
+    {
+      "name": "liveBoundTestServerSampleConfirmsOnlyAfterPublicationAndKeepsRawTimes",
+      "status": "PASSED"
+    }
+  ],
+  "web_tests": {
+    "executed": 52,
+    "failed": 0
+  },
+  "web_typecheck": {
+    "status": "FAILED",
+    "errors": 2,
+    "scope": "MessageBoxData test mock typing"
+  },
+  "unresolved_postgresql": "Original response/replay JSON tree equality assertion; numeric node type requires investigation and revalidation.",
+  "desktop_browser": "NOT_RUN",
+  "formal_contract_acceptance": "NOT_RUN",
+  "deployment": "NOT_RUN",
+  "source_paths": [
+    "apps/web/src/pages/MonitoringEventsPage.vue",
+    "contracts/local-api.openapi.json",
+    "server/api/src/main/java/cn/mop/api/MonitoringEventCenterController.java",
+    "server/api/src/main/java/cn/mop/api/RuntimeConfigurationCatalog.java",
+    "server/domain/src/main/java/cn/mop/domain/notification/TicketNotificationPlanner.java",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresMonitoringEventCenterRepository.java",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresTicketWorkflowRepository.java",
+    "tools/build-api-contract.mjs",
+    "tools/verify-monitoring-isolated.py",
+    "apps/web/src/components/MonitoringRecoveryPanel.vue",
+    "apps/web/src/utils/monitoringRecovery.ts",
+    "apps/web/tests/monitoringRecovery.test.ts",
+    "apps/web/tests/monitoringRecoveryPanel.test.ts",
+    "server/api/src/main/java/cn/mop/api/MonitoringRecoveryConfiguration.java",
+    "server/api/src/main/java/cn/mop/api/MonitoringRecoveryController.java",
+    "server/api/src/main/java/cn/mop/api/MonitoringRecoverySource.java",
+    "server/api/src/test/java/cn/mop/api/MonitoringRecoveryDesignatedIntegrationTest.java",
+    "server/api/src/test/java/cn/mop/api/MonitoringRecoveryHttpTest.java",
+    "server/api/src/test/java/cn/mop/api/MonitoringRecoverySourceTest.java",
+    "server/api/src/test/java/cn/mop/api/RecoveryObservationTest.java",
+    "server/domain/src/main/java/cn/mop/domain/monitoring/RecoveryObservation.java",
+    "server/domain/src/main/java/cn/mop/domain/monitoring/RecoverySourceBatch.java",
+    "server/persistence/src/main/java/cn/mop/persistence/MonitoringRecoveryRuleSet.java",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresMonitoringRecoveryRepository.java",
+    "tools/monitoring-recovery-contract.mjs"
+  ]
+}

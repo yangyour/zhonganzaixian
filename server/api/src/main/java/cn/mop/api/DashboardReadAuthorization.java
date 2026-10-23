@@ -20,6 +20,7 @@ final class DashboardReadAuthorization {
         if (!expected.equals(current)) {
             throw expired();
         }
+        ProjectSessionValidationFilter.recheckBeforeReturn(request);
     }
 
     private static DomainException expired() {

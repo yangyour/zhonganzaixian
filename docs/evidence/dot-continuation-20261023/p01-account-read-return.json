@@ -1,0 +1,21 @@
+{
+  "status": "SHARED_READ_RETURN_ACCOUNT_GUARD_CODE_VALIDATED",
+  "independent_main_baseline": "ae5142c1951dcf20f1a9aed2b552a6d4c2680dc4",
+  "baseline_new_tests": 10,
+  "baseline_failures": 10,
+  "independent_main_regression_tests": 66,
+  "independent_main_failures": 0,
+  "full_java": {
+    "discovered": 5026,
+    "executed": 3908,
+    "skipped": 1118,
+    "failures": 0,
+    "errors": 0
+  },
+  "actual_postgresql_oidc_browser": "NOT_RUN_MISSING_PRIVATE_CONFIGURATION",
+  "real_account_changes": 0,
+  "success_dto_changes": 0,
+  "migrations": 0,
+  "deployed": false,
+  "formal_acceptance": "NOT_RUN"
+}

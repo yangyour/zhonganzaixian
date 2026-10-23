@@ -456,7 +456,9 @@
       "status": "IN_PROGRESS",
       "completion_criterion": "实现可验证的生产配置、迁移/隔离接口和启用前守卫；最终数据库/生产DDL待Q02，不能仅改ready布尔或解除测试库限制。",
       "evidence": [
-        "docs/evidence/gap-p01-runtime-20261023/closing-validation.json"
+        "docs/evidence/gap-p01-runtime-20261023/closing-validation.json",
+        "docs/read-return-account-revision-20261023.md",
+        "docs/evidence/dot-continuation-20261023/p01-account-read-return.json"
       ],
       "commits": [
         "7e05923d"

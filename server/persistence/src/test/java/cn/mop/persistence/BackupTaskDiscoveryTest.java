@@ -167,6 +167,9 @@ class BackupTaskDiscoveryTest {
         values.put("submission_id", UUID.randomUUID());
         values.put("attempt_number", 1);
         values.put("run_version", 1L);
+        values.put("lease_request_id", UUID.randomUUID());
+        values.put("lease_owner", "synthetic-original-device-lease");
+        values.put("fencing_token", 1L);
         values.put("recorded_at", now.atOffset(ZoneOffset.UTC));
         values.put("phase", phase.name());
         values.put("event_version", version);

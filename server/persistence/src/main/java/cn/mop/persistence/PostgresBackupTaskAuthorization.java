@@ -31,6 +31,10 @@ public final class PostgresBackupTaskAuthorization {
         this.clock = Objects.requireNonNull(clock);
     }
 
+    public String bindingReference() {
+        return bindingReference;
+    }
+
     public void require(Connection connection, Access access, UUID tenant, UUID asset,
             Operation operation) throws SQLException {
         if (access == null || tenant == null || asset == null || operation == null) {

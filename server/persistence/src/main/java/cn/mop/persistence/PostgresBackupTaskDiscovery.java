@@ -37,15 +37,19 @@ public final class PostgresBackupTaskDiscovery {
 
     /** Immutable source identity allows stable commands to survive process restarts. No proof is inferred. */
     public record Task(Scope scope, UUID submissionId, long stagedRunVersion, Instant stagedAt,
-            Phase phase, long archiveEventVersion, UUID dispatchId, String dispatchOwner, long dispatchCount) {
+            Phase phase, long archiveEventVersion, UUID dispatchId, String dispatchOwner, long dispatchCount,
+            PostgresBackupRunRepository.LeaseClaim originalLease) {
         public Task {
             if (scope == null || submissionId == null || stagedRunVersion < 1
                     || stagedRunVersion > 9007199254740991L || !validInstant(stagedAt)
-                    || phase == null || archiveEventVersion < 0 || archiveEventVersion > 9007199254740991L
+                    || originalLease == null || phase == null
+                    || archiveEventVersion < 0 || archiveEventVersion > 9007199254740991L
                     || dispatchCount < 0 || dispatchCount > 9007199254740991L
                     || (dispatchCount == 0 ? dispatchId != null || dispatchOwner != null
                             : dispatchId == null || dispatchOwner == null
-                                    || !dispatchOwner.matches("[A-Za-z0-9._:-]{1,128}"))) {
+                                    || !dispatchOwner.matches("[A-Za-z0-9._:-]{1,128}"))
+                    || archiveEventVersion == 0 && (phase != Phase.STAGED || dispatchCount != 0)
+                    || (phase == Phase.STORE_STARTED || phase == Phase.VERIFY_REQUIRED) && dispatchCount == 0) {
                 throw invalid();
             }
         }
@@ -104,8 +108,11 @@ public final class PostgresBackupTaskDiscovery {
                 String sql = """
                         SELECT s.tenant_id,s.asset_id,s.run_id,s.attempt_number,s.version_id,
                                s.submission_id,s.run_version,s.recorded_at,
-                               e.phase,e.event_version,e.dispatch_id,e.dispatch_owner,e.dispatch_count
+                               e.phase,e.event_version,e.dispatch_id,e.dispatch_owner,e.dispatch_count,
+                               r.lease_request_id,r.lease_owner,r.fencing_token
                         FROM public.mop_backup_archive_submission s
+                        JOIN public.mop_backup_run_event r ON r.tenant_id=s.tenant_id AND r.run_id=s.run_id
+                            AND r.version=s.run_version AND r.asset_id=s.asset_id AND r.attempt_number=s.attempt_number
                         JOIN LATERAL (
                             SELECT phase,event_version,dispatch_id,dispatch_owner,dispatch_count
                             FROM public.mop_backup_archive_event
@@ -187,7 +194,9 @@ public final class PostgresBackupTaskDiscovery {
         return new Task(scope, row.getObject("submission_id", UUID.class), row.getLong("run_version"),
                 row.getObject("recorded_at", OffsetDateTime.class).toInstant(), Phase.valueOf(row.getString("phase")),
                 row.getLong("event_version"), row.getObject("dispatch_id", UUID.class),
-                row.getString("dispatch_owner"), row.getLong("dispatch_count"));
+                row.getString("dispatch_owner"), row.getLong("dispatch_count"),
+                new PostgresBackupRunRepository.LeaseClaim(row.getObject("lease_request_id", UUID.class),
+                        row.getString("lease_owner"), row.getLong("fencing_token")));
     }
 
     private static boolean validInstant(Instant instant) {

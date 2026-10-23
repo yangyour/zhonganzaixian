@@ -1,0 +1,96 @@
+{
+  "base_commit": "ecce9434ff7aa44e2e1d233cba4ca4fc33a5d00b",
+  "preceding_guard_commit": "e84f80f6ffaed4b08583215d9edf9e95e63beb92",
+  "api_version": "0.83.0",
+  "java": {
+    "tests": 4494,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1056,
+    "executed": 3438
+  },
+  "new_java_tests_this_slice": 13,
+  "focused_java_tests": 52,
+  "node_contract_tests_passed": 208,
+  "python_tests_passed": 290,
+  "python_tests_skipped": 0,
+  "frontend_regression": {
+    "files": 299,
+    "passed": 4951,
+    "failed": 0,
+    "source": "preserved upstream ecce9434; no own frontend source changes",
+    "layer": "Vitest/jsdom; not real browser"
+  },
+  "build": {
+    "backend_package": "PASS",
+    "jar_sha256": "fc872ab6fec44f2740de3d8a7a2386b96d7a3ed117eed4219fc8df2cdc4a1dd4",
+    "frontend_typecheck": "PASS",
+    "frontend_production": "PASS",
+    "static_artifacts": "PASS",
+    "candidate_security_policy": "PASS",
+    "web_build_id": "15ee933a2a84177818415a856313d617b65ce036e7991af69c05008f451e9bff"
+  },
+  "query_structure_evidence": {
+    "layer": "instrumented JDBC against production repository SQL",
+    "assets": 101,
+    "connections": 1,
+    "asset_selects": 1,
+    "authorization_selects": 2,
+    "latency_benchmark": "NOT_RUN"
+  },
+  "initial_failures_resolved": [
+    "JDBC test initially placed in persistence module without Mockito; moved to existing API test module, no dependency added",
+    "nonempty MVC date serialized as numeric under its converter; topology now emits explicit ISO string and regression passes"
+  ],
+  "not_run": [
+    "new live PostgreSQL batch/snapshot integration: isolated V50 data environment not prepared, no historical identities restored",
+    "real browser/visual/axe",
+    "business deployment",
+    "physical topology discovery or verified impact computation"
+  ],
+  "boundaries": {
+    "migrations_changed": false,
+    "business_data_written": false,
+    "demo_account_or_grants_created": false,
+    "frontend_source_changed_by_this_slice": false,
+    "contract_acceptance_status_changed": false
+  },
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/PlatformRepository.java": "f0d6fdd4d5e38663bd285b3141a9180d5a146ed8e963ef2770e91810b55d4472",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresPlatformRepository.java": "27297dd62872c69695e2e99561f60145c2ee2a3a9a4b33fff027411fa0b5ffee",
+    "server/api/src/main/java/cn/mop/api/CustomerTopologyController.java": "3aa83c3e6bfa228fedc306fa62b71f67cf9e838938c74c54f3c53f324238cbd1",
+    "contracts/local-api.openapi.json": "bdca8188fc110d201442bb5235d067ff0a114f85b6b332f600c87513cd04a759"
+  },
+  "previous_b0d3bec_validation": {
+    "java": {
+      "tests": 4376,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1042,
+      "executed": 3334
+    },
+    "frontend_regression": {
+      "files": 299,
+      "passed": 4947,
+      "failed": 0,
+      "source": "preserved upstream b0d3bec; no own frontend source changes",
+      "layer": "Vitest/jsdom; not real browser"
+    },
+    "python_tests_passed": 248,
+    "build": {
+      "backend_package": "PASS",
+      "jar_sha256": "2932cf0da5379b5e4919c30c9036e7cba6166649707038a8a02211987651af92",
+      "frontend_typecheck": "PASS",
+      "frontend_production": "PASS",
+      "static_artifacts": "PASS",
+      "candidate_security_policy": "PASS",
+      "web_build_id": "15a6bb1dc9172ae8490e1071ff9bd8adca22538b534a1457bab177c5e8718211"
+    }
+  },
+  "integration": {
+    "source_conflicts": "three-way merge from b0d3bec into ecce9434; generated contract rebuilt",
+    "preserved": "upstream atomic quota, CMDB import, notifications, backup discovery, monitoring and frontend changes",
+    "static_review": "no additional issues; no unscoped fallback",
+    "delivery": "feature branch pending original Windows integration.lock; main not updated by this slice"
+  }
+}

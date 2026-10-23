@@ -1576,3 +1576,9 @@ test('customer topology never labels drafts as verified physical or applied moni
 test('customer topology rejects oversized node and edge payloads',()=>{
  const schema=contract.components.schemas.CustomerTopology;assert.equal(schema.properties.nodes.maxItems,101);assert.equal(schema.properties.edges.maxItems,50);assert.equal(schema.additionalProperties,false);
 });
+
+test('customer topology accepts the same opaque site codes as the asset ledger, not only UUIDs',()=>{
+ const node={id:id('2'),name:'Synthetic switch',type:'switch',management_ip:'192.0.2.1',site_id:'site-a-main'};
+ const value={tenant_id:id('1'),version:0,updated_at:null,source:'postgresql',scope:'CURRENT_TENANT',lifecycle_status:'DRAFT',physical_topology_verified:false,monitoring_applied:false,focus_asset_id:node.id,offset:0,page_size:50,total_edges:0,has_more:false,nodes:[node],edges:[]};
+ assert.equal(validates('CustomerTopology',value),true);assert.equal(validates('CustomerTopology',{...value,nodes:[{...node,site_id:17}]}),false);
+});

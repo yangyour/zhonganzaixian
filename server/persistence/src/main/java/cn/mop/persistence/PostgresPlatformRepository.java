@@ -150,6 +150,24 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     @Override public Optional<Asset> authorizedAsset(String tenant,String actor,long permissionVersion,String id){
         return readSnapshot(c->{authorizeAssetRead(c,tenant,actor,permissionVersion);if(id==null||!id.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))return Optional.empty();try(var statement=c.prepareStatement("SELECT * FROM public.mop_asset WHERE tenant_id=?::uuid AND id=?::uuid")){statement.setQueryTimeout(10);statement.setString(1,tenant);statement.setString(2,id);try(var rows=statement.executeQuery()){return rows.next()?Optional.of(asset(rows)):Optional.empty();}}});
     }
+    @Override public List<Asset> authorizedAssetBatch(String tenant,String actor,long permissionVersion,List<String> ids){
+        if(ids==null||ids.size()>101)throw new DomainException(400,"VALIDATION_ERROR","资产批量回读最多101个明确标识");
+        List<String> selected=new ArrayList<>();Set<String> unique=new HashSet<>();
+        for(String id:ids){
+            if(id==null||!id.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")||!unique.add(id))throw new DomainException(400,"VALIDATION_ERROR","资产批量标识须规范且不重复");
+            selected.add(id);
+        }
+        return readSnapshot(c->{
+            authorizeAssetRead(c,tenant,actor,permissionVersion);
+            if(selected.isEmpty())return List.of();
+            List<Asset> values=new ArrayList<>();
+            try(var statement=c.prepareStatement("SELECT a.* FROM public.mop_asset a WHERE a.tenant_id=?::uuid AND a.id=ANY(?::uuid[]) ORDER BY a.id LIMIT 101")){
+                statement.setQueryTimeout(10);statement.setString(1,tenant);var array=c.createArrayOf("uuid",selected.toArray());
+                try{statement.setArray(2,array);try(var rows=statement.executeQuery()){while(rows.next())values.add(asset(rows));}}finally{array.free();}
+            }
+            return List.copyOf(values);
+        });
+    }
     private static void authorizeAssetRead(Connection c,String tenant,String actor,long permissionVersion)throws SQLException{
         if(tenant==null||actor==null||permissionVersion<1)throw new DomainException(401,"SESSION_EXPIRED","当前成员关系或权限版本已失效");
         try(var statement=c.prepareStatement("SELECT m.role_code,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id=?::uuid AND m.user_id=?::uuid AND m.active AND u.active")){statement.setQueryTimeout(10);statement.setString(1,tenant);statement.setString(2,actor);try(var rows=statement.executeQuery()){if(!rows.next()||rows.getLong(2)!=permissionVersion)throw new DomainException(401,"SESSION_EXPIRED","当前成员关系或权限版本已失效");if(!PostgresAuthorization.capabilities(c,actor,tenant).contains("assets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无资产读取权限");}}

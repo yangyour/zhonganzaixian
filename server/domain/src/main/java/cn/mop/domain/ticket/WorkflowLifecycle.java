@@ -2,6 +2,7 @@ package cn.mop.domain.ticket;
 
 import cn.mop.domain.DomainException;
 import cn.mop.domain.TicketCustomerActionRules;
+import cn.mop.domain.sla.MonitoringRecoveryClockEvidence;
 import java.time.*;
 import java.util.*;
 
@@ -91,6 +92,9 @@ public final class WorkflowLifecycle {
     }
     public static List<ClockNotice> dueNotices(Snapshot s,Instant now,boolean hasMonitoringEvents,Instant confirmedRecoveryAt) {
         if(now==null||now.isBefore(s.updatedAt()))throw invalid();TicketSlaSnapshot.time(now);
+        MonitoringRecoveryClockEvidence.requireConsistent(
+            s.sla().startedAt(), now, hasMonitoringEvents, confirmedRecoveryAt
+        );
         if(s.state()==State.CANCELLED)return List.of();
         var result=new ArrayList<ClockNotice>();
         for(String clock:List.of("response","recovery")) {

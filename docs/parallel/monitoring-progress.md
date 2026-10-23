@@ -15,3 +15,11 @@
 完整 `mvn -q -pl server/api -am test` 汇总 4142 项：执行 3119、跳过 1023、失败/错误 0；跳过项包含未启用真实组件测试，不能算作通过。`npm test` 194 项通过，API 契约生成一致性与 `git diff --check` 通过。证据汇总见 [JSON](../evidence/monitoring-recurrence-20261023.json)。
 
 本轮不使用 API/Web 端口、不启用采集、不部署，不持有 migration/environment 锁；main 集成按 integration.lock 单独串行执行。
+
+功能 1 已提交并推送 `3092d6d6`；取得集成锁后合入当时最新 main `c1be5d6f`，合并提交 `5e227645` 已正常快进推送 main。唯一文本冲突为组件清单的并发追加，备份与监控两份记录均保留。集成分支 76 项定向测试及 194 项契约回归通过，功能分支已吸收主干并释放自己的锁。
+
+## 功能 2：SLA 读取与提醒处理统一恢复时点门禁
+
+[实现与接口说明](../monitoring-recovery-clock-evidence-20261023.md)：共用关联/时间范围/精度验证，错误 t2 在提醒意图或时钟任务回执写入前报错；缺失 t2 保持原截止计时。10 项新增领域测试、4 项 Worker 控制流程替身测试及相邻回归共 94 项通过；194 项契约测试、契约生成一致性与差异检查通过。
+
+代码与纯逻辑/替身验证完成；真实写回滚、并发处理、观察窗确认、客户批准和正式 TC 均未因此完成。仍复用上述指定 PostgreSQL，缺少核验的隔离写范围，不新增组件或恢复旧身份。证据见 [JSON](../evidence/monitoring-recovery-clock-evidence-20261023.json)。

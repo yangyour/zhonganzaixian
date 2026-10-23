@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-23",
+  "branch": "codex/launch-monitoring-20261023",
+  "base": "5e227645",
+  "feature": "Shared monitoring t2 validation for SLA reads and durable reminder processing",
+  "tests": {"executed": 94, "new_domain_tests": 10, "new_worker_jdbc_substitute_tests": 4, "failures": 0, "errors": 0, "skipped": 0},
+  "contract_tests": {"executed": 194, "failures": 0, "errors": 0, "skipped": 0},
+  "contract_generation_check": "PASS",
+  "write_transaction_rollback_integration": "NOT_RUN",
+  "worker_concurrency_integration": "NOT_RUN",
+  "source_sampling_and_observation_confirmation": "NOT_IMPLEMENTED_BY_THIS_FEATURE",
+  "designated_environment_reference": "monitoring-recurrence-20261023.json",
+  "business_writes": 0,
+  "migrations": 0,
+  "provider_sends": 0,
+  "deployment": "NOT_RUN",
+  "formal_contract_acceptance": "NOT_RUN",
+  "customer_production_approval": "UNVERIFIED"
+}

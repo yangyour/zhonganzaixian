@@ -181,6 +181,26 @@ class PostgresCmdbImportExecutionIntegrationTest {
         assertEquals(1, count("mop_asset"));
     }
 
+    @Test
+    void manualCreationSharesThePublishedQuotaWithImports() throws Exception {
+        var source = source(Map.of(), 2);
+        sql("RESET ROLE");
+        publish("tenant.contract_device_quota", 2, 2);
+        sql("SET LOCAL ROLE mop_test_runtime");
+        run(source, "fill-quota", imports);
+        assertEquals("ASSET_QUOTA_EXCEEDED", assertThrows(DomainException.class, () ->
+                platform.idempotent(actor, tenant, "/manual-quota-test", "manual", "a".repeat(64), 1,
+                        () -> platform.insert(tenant, actor, "SYNTHETIC extra", "switch", "192.0.2.99", "unit-site"))).code);
+        assertEquals(2, count("mop_asset"));
+        assertEquals(1, count("mop_idempotency"));
+        sql("RESET ROLE");
+        publish("tenant.contract_device_quota", 3, 3);
+        sql("SET LOCAL ROLE mop_test_runtime");
+        assertNotNull(platform.idempotent(actor, tenant, "/manual-quota-test", "manual", "a".repeat(64), 1,
+                () -> platform.insert(tenant, actor, "SYNTHETIC extra", "switch", "192.0.2.99", "unit-site")));
+        assertEquals(3, count("mop_asset"));
+    }
+
     record Source(String id, CmdbImportExecutionRepository.Command command) {}
 
     private Source source(Map<Integer, String> overrides, int count) throws Exception {

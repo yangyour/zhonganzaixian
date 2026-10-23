@@ -1,5 +1,9 @@
 // Atomic source-backed draft import; preserved extensions do not imply CMDB relationships.
 export function addCmdbImportExecutionContract(contract) {
+  const manualCreate = contract.paths['/assets'].post;
+  manualCreate.description = (manualCreate.description ?? '') + 'Asset creation requires an active published tenant.contract_device_quota. Missing, disabled or expired quota rejects with 422; zero/full quota rejects with 409 ASSET_QUOTA_EXCEEDED. All registered drafts consume a device slot. The quota publication lock and tenant admission lock are held through asset insertion and receipt commit.';
+  manualCreate['x-mop-device-quota-configuration-required'] = true;
+  manualCreate['x-mop-atomic-device-quota'] = 'REGISTERED_ASSET_ROWS';
   contract.paths['/assets/import-sources/{id}/cmdb-imports'] = {
   "post": {
     "summary": "Atomically register asset drafts from a trusted 33-column CMDB source",

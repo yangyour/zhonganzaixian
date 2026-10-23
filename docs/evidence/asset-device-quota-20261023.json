@@ -1,0 +1,29 @@
+{
+  "feature": "atomic device admission shared by manual creation and CMDB import",
+  "date": "2026-10-23",
+  "branch": "codex/launch-assets-20261023",
+  "preceding_feature_commit": "3b3820b0",
+  "java_reactor": {"total": 4154, "executed": 3126, "skipped": 1028, "failures": 0, "errors": 0},
+  "contract": {"generation_consistent": true, "passed": 187, "failed": 0},
+  "postgres": {
+    "environment": "lan-test-20261008",
+    "version": "17.9 (Debian 17.9-1.pgdg12+1)",
+    "tests": 6,
+    "passed": 6,
+    "failed": 0,
+    "mode": "fresh invisible tenant, runtime-role SQL under savepoints, final outer rollback",
+    "cleanup": "tenant absence asserted after each outer rollback",
+    "new_scenario": "import fills published device quota; manual creation refused; explicit new quota publication permits retry",
+    "prior_feature_scenarios_rerun": true,
+    "migrations": 0,
+    "storage_and_parser": "not exercised; explicitly synthetic parsed artifact seed"
+  },
+  "local_ignored_logs": [".local-asset-quota-reactor.log", ".local-asset-quota-contract.log", ".local-asset-quota-postgres.log"],
+  "no_new_components": true,
+  "no_real_business_tenant_test_data": true,
+  "no_old_test_identity_restoration": true,
+  "not_run": ["multiple concurrent connections", "committed crash recovery", "500-row performance", "new-command real HTTP/browser", "formal TC"],
+  "not_implemented_by_this_slice": ["durable onboarding reservations", "item and NVPS metering", "tenant provisioning approval", "retention and deletion governance"],
+  "customer_quota_values": null,
+  "production_approved": false
+}

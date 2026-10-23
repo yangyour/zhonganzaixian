@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "recorded_at_utc": "2026-10-23T14:52:55.567821+00:00",
+  "scope": "READ_ONLY_READINESS_BURST",
+  "environment": "lan-test-20261008",
+  "transport": "HTTP_OVER_PINNED_PROJECT_SSH",
+  "endpoint": "live",
+  "requested_samples": 3,
+  "actual_samples": 3,
+  "max_requests_per_second": 1.0,
+  "concurrency": 1,
+  "budget_seconds": 10,
+  "result": "PASSED",
+  "client_observed_p95_ms": 78.0,
+  "latency_target_ms": null,
+  "latency_acceptance": "NOT_ASSESSED",
+  "samples": [
+    {
+      "sequence": 1,
+      "http_status": 200,
+      "elapsed_ms": 78.0,
+      "outcome": "EXPECTED_TEST_RESPONSE"
+    },
+    {
+      "sequence": 2,
+      "http_status": 200,
+      "elapsed_ms": 78.0,
+      "outcome": "EXPECTED_TEST_RESPONSE"
+    },
+    {
+      "sequence": 3,
+      "http_status": 200,
+      "elapsed_ms": 78.0,
+      "outcome": "EXPECTED_TEST_RESPONSE"
+    }
+  ],
+  "dependency_readiness_verified": false,
+  "business_requests_sent": 0,
+  "component_lifecycle_changed": false,
+  "formal_scale_acceptance": "NOT_RUN",
+  "production_ready": false
+}

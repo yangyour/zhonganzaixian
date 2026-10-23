@@ -1,0 +1,18 @@
+{
+  "environment": "lan-test-20261008",
+  "started_at": "2026-10-23T07:17:14.930128+00:00",
+  "namespace": {
+    "tenant": "e6f0aa3f-f08d-4bed-b24c-9763d23ed467",
+    "actor": "944d89ce-90f2-4c77-8e4c-46b7cf269dad",
+    "name": "SYNTHETIC_NOTIFICATION_DISPATCH_412ac4c42a7d"
+  },
+  "external_provider": "isolated_test_double",
+  "external_messages": 0,
+  "migrations_applied": 0,
+  "retention": "immutable synthetic namespace and journal rows retained",
+  "maven_exit_code": 0,
+  "schema_version": 50,
+  "namespace_journal_rows": 15,
+  "other_tenant_journal_rows": 0,
+  "finished_at": "2026-10-23T07:17:48.158059+00:00"
+}

@@ -14,12 +14,18 @@ public final class RedactedBackupDiff {
     public static final long MAX_NANOS=2_000_000_000L;
     public enum Status { IDENTICAL, CHANGED, LIMIT_EXCEEDED, CANCELLED, UNAVAILABLE }
     /** Intentionally not a record: auto-generated toString must never print configuration content. */
-    public static final class VersionInput {
+    public static final class VersionInput implements AutoCloseable {
         private final UUID tenantId,assetId,versionId;
         private final byte[] bytes;
+        private boolean closed;
         public VersionInput(UUID tenantId,UUID assetId,UUID versionId,byte[] bytes){
             if(tenantId==null||assetId==null||versionId==null||bytes==null||bytes.length>MAX_BYTES)throw invalid();
             this.tenantId=tenantId;this.assetId=assetId;this.versionId=versionId;this.bytes=bytes.clone();
+        }
+        @Override
+        public void close() {
+            Arrays.fill(bytes, (byte) 0);
+            closed = true;
         }
     }
     public record Hunk(int beforeStart,int beforeCount,int afterStart,int afterCount){
@@ -50,7 +56,14 @@ public final class RedactedBackupDiff {
     /** Must be called only after current authorization of both versions; these checks do not replace that authorization. */
     public Summary compare(UUID tenantId,UUID assetId,VersionInput before,VersionInput after){
         if(tenantId==null||assetId==null||before==null||after==null)throw invalid();
-        for(VersionInput input:List.of(before,after))if(!tenantId.equals(input.tenantId)||!assetId.equals(input.assetId))throw new DomainException(404,"NOT_FOUND","备份版本不存在");
+        for (VersionInput input : List.of(before, after)) {
+            if (input.closed) {
+                throw invalid();
+            }
+            if (!tenantId.equals(input.tenantId) || !assetId.equals(input.assetId)) {
+                throw new DomainException(404, "NOT_FOUND", "备份版本不存在");
+            }
+        }
         if(before.versionId.equals(after.versionId)&&!Arrays.equals(before.bytes,after.bytes))throw new DomainException(409,"BACKUP_VERSION_CONFLICT","同一不可变版本内容不一致");
         Budget budget=new Budget(clock.getAsLong());
         try{

@@ -41838,7 +41838,7 @@
           "assets:read"
         ],
         "x-mop-independent-authorization": "Mandatory asset-wide inventory authorizer AND per-version READ authorizer with current revocation locks; assets:read only gates asset visibility, never enumeration",
-        "x-mop-runtime-binding": "UNCONFIGURED_BY_DEFAULT_NO_QUERY_BEAN",
+        "x-mop-runtime-binding": "EXPLICIT_PRIVATE_GRANTS_AND_BINDING_REQUIRED",
         "x-mop-allowed-query-keys": [
           "page_size",
           "before_registered_at",
@@ -41850,6 +41850,347 @@
         "x-mop-business-writes-performed": false,
         "x-mop-success-writes-audit-or-receipts": false,
         "description": "仅remote_test服务边界。BackupVersionInventoryQuery必须由显式应用绑定提供，两类授权不能用草稿读取或管理员角色默认代替；缺失返回503 BACKUP_VERSION_INVENTORY_NOT_CONFIGURED，例子中的null引用不是可自动发布配置。POST/PUT/PATCH/DELETE不支持，不返回KMS引用、对象位置、内部证明、租约owner或下载URL。"
+      }
+    },
+    "/assets/{assetId}/backup-versions/{versionId}/content": {
+      "get": {
+        "operationId": "downloadRegisteredBackupContent",
+        "summary": "独立授权下载已登记版本的密文信封或明文文件",
+        "x-mop-roles": [
+          "padmin",
+          "msp"
+        ],
+        "x-mop-capability": "assets:read",
+        "x-mop-read-only": true,
+        "x-mop-business-writes-performed": false,
+        "x-mop-success-writes-audit-or-receipts": true,
+        "x-mop-current-membership-recheck": true,
+        "x-mop-customer-roles-rejected": true,
+        "parameters": [
+          {
+            "name": "assetId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "versionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "envelope",
+                "plaintext"
+              ],
+              "default": "envelope"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "完整核验后作为附件返回；审计仅表示授权读取，不代表浏览器下载或恢复成功",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              },
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-independent-authorization": "VERSION_READ + VERSION_DOWNLOAD; plaintext additionally requires VERSION_DECRYPT and current KMS permission; never inferred from inventory grants",
+        "x-mop-allowed-query-keys": [
+          "format"
+        ],
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "真实登记/父运行关系、同租户同设备、当前独立授权、密文摘要/信封范围核验；明文须完整AEAD认证。无公开或预签名URL，无正文日志。配置缺失503，外部对象/KMS未配不使用内存或本地密钥后备。"
+      }
+    },
+    "/assets/{assetId}/backup-versions/diff": {
+      "get": {
+        "operationId": "compareRegisteredBackupVersions",
+        "summary": "受保护的同设备版本脱敏差异",
+        "x-mop-roles": [
+          "padmin",
+          "msp"
+        ],
+        "x-mop-capability": "assets:read",
+        "x-mop-read-only": true,
+        "x-mop-business-writes-performed": false,
+        "x-mop-success-writes-audit-or-receipts": true,
+        "x-mop-current-membership-recheck": true,
+        "x-mop-customer-roles-rejected": true,
+        "parameters": [
+          {
+            "name": "assetId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before_version_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "after_version_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "只返回位置和数量；未知/超限不归为无变化，也不批准变更或自动建单",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupVersionDiffResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "当前会话、范围、独立授权、取消、文本边界或依赖检查未通过；不返回部分正文",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-independent-authorization": "VERSION_READ on both original versions + VERSION_DIFF + VERSION_DECRYPT; download authority is separate",
+        "x-mop-max-encoded-query-bytes": 2048,
+        "x-mop-reject-duplicate-query-keys": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-idempotency": "Read-only immutable-version comparison; every request reauthorizes and writes its own access audit, no mutation receipt"
       }
     },
     "/monitoring-onboarding/registered-targets": {
@@ -84594,6 +84935,240 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/BackupVersionInventoryPage"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "BackupVersionDiffResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "asset_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "before_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "after_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "status": {
+                "enum": [
+                  "IDENTICAL",
+                  "CHANGED",
+                  "LIMIT_EXCEEDED",
+                  "CANCELLED",
+                  "UNAVAILABLE"
+                ]
+              },
+              "changed": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "before_lines": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "after_lines": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "hunks": {
+                "type": "array",
+                "maxItems": 2000,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "before_start": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000
+                    },
+                    "before_count": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000
+                    },
+                    "after_start": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000
+                    },
+                    "after_count": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000
+                    }
+                  },
+                  "required": [
+                    "before_start",
+                    "before_count",
+                    "after_start",
+                    "after_count"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "redaction": {
+                "const": "ALL_TEXT_WITHHELD"
+              },
+              "noise_policy": {
+                "const": "NONE_APPLIED_UNCONFIRMED"
+              },
+              "change_approved": {
+                "const": false
+              },
+              "automatic_ticket_allowed": {
+                "const": false
+              },
+              "actual_recovery_verified": {
+                "const": false
+              }
+            },
+            "required": [
+              "tenant_id",
+              "asset_id",
+              "before_version_id",
+              "after_version_id",
+              "status",
+              "changed",
+              "before_lines",
+              "after_lines",
+              "hunks",
+              "redaction",
+              "noise_policy",
+              "change_approved",
+              "automatic_ticket_allowed",
+              "actual_recovery_verified"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "LIMIT_EXCEEDED",
+                        "CANCELLED",
+                        "UNAVAILABLE"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "changed": {
+                      "type": "null"
+                    },
+                    "before_lines": {
+                      "type": "null"
+                    },
+                    "after_lines": {
+                      "type": "null"
+                    },
+                    "hunks": {
+                      "maxItems": 0
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "const": "IDENTICAL"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "changed": {
+                      "const": false
+                    },
+                    "before_lines": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000
+                    },
+                    "after_lines": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000
+                    },
+                    "hunks": {
+                      "maxItems": 0
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "const": "CHANGED"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "changed": {
+                      "const": true
+                    },
+                    "before_lines": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000
+                    },
+                    "after_lines": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000
+                    },
+                    "hunks": {
+                      "minItems": 1
+                    }
+                  }
+                }
+              }
+            ]
           },
           "trace_id": {
             "type": "string"

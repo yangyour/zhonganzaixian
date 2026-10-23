@@ -123,7 +123,10 @@ export class ApiClient {
       signal?.removeEventListener('abort', cancel)
     }
   }
-  async requestBlob(path: string, options: { signal?: AbortSignal; timeoutMs?: number } = {}): Promise<Blob> {
+  async requestFile(path: string, options: { signal?: AbortSignal; timeoutMs?: number } = {}): Promise<Blob> {
+    return this.requestBlob(path, { ...options, contentKind: 'file' })
+  }
+  async requestBlob(path: string, options: { signal?: AbortSignal; timeoutMs?: number; contentKind?: 'image' | 'file' } = {}): Promise<Blob> {
     assertApiPath(path)
     const generation = this.generation, controller = new AbortController()
     this.controllers.add(controller)
@@ -136,7 +139,7 @@ export class ApiClient {
     const timeout = setTimeout(() => { timedOut = true; controller.abort() }, Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 120000)
     try {
       if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
-      const response = await cancellable(this.transport(this.base + path, { headers: { Accept: 'image/jpeg, image/png' }, credentials: 'same-origin', cache: 'no-store', redirect: 'error', signal: controller.signal }), controller.signal)
+      const response = await cancellable(this.transport(this.base + path, { headers: { Accept: options.contentKind === 'file' ? 'application/octet-stream' : 'image/jpeg, image/png' }, credentials: 'same-origin', cache: 'no-store', redirect: 'error', signal: controller.signal }), controller.signal)
       if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
       if (!response.ok) {
         let failure: FailureEnvelope = {}
@@ -148,11 +151,11 @@ export class ApiClient {
       if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
       return result
     } catch (cause) {
-      if (timedOut && generation === this.generation && !signal?.aborted) throw new ApiError(0, 'REQUEST_TIMEOUT', '图片读取超时，请重新申请查看', '—')
+      if (timedOut && generation === this.generation && !signal?.aborted) throw new ApiError(0, 'REQUEST_TIMEOUT', options.contentKind === 'file' ? '文件读取超时，请重试原请求' : '图片读取超时，请重新申请查看', '—')
       if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
       if (cause instanceof ApiError) { if (cause.status === 401) this.onUnauthorized(); throw cause }
       if (isCancelled(cause)) throw cause
-      throw new ApiError(0, 'NETWORK_ERROR', '无法读取图片，请检查连接后重新申请查看', '—')
+      throw new ApiError(0, 'NETWORK_ERROR', options.contentKind === 'file' ? '无法读取文件，请检查连接后重试' : '无法读取图片，请检查连接后重新申请查看', '—')
     } finally { clearTimeout(timeout); this.controllers.delete(controller); signal?.removeEventListener('abort', cancel) }
   }
   async pollOperation<T extends { status: string }>(id: string, options: { signal?: AbortSignal; intervalMs?: number; maxAttempts?: number; onUpdate?: (operation: T) => void } = {}): Promise<T> {

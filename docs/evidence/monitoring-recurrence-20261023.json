@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-23",
+  "project": "yangyour/zhonganzaixian",
+  "branch": "codex/launch-monitoring-20261023",
+  "initial_base": "05ec77ba9fbbca99e2b1e4db739c2c0aafcb645d",
+  "feature": "Monitoring recurrence association to an existing WORKFLOW_V33 ticket",
+  "targeted_tests": {"executed": 76, "new_boundary_tests": 13, "failures": 0, "errors": 0, "skipped": 0},
+  "reactor": {"command": "mvn -q -pl server/api -am test", "total": 4142, "executed": 3119, "skipped": 1023, "failures": 0, "errors": 0},
+  "contract_tests": {"executed": 194, "failures": 0},
+  "contract_generation_check": "PASS",
+  "designated_postgresql": {
+    "environment": "lan-test-20261008",
+    "version": "17.9 (Debian 17.9-1.pgdg12+1)",
+    "schema_version": 50,
+    "role": "mop_test_runtime",
+    "read_only_query_tests_executed": 1,
+    "read_only_query_tests_failed": 0,
+    "default_dedupe_seconds": 1800,
+    "active_members_outside_real_tenant": 0,
+    "isolated_write_scope_verified": false,
+    "business_writes": 0,
+    "migrations": 0
+  },
+  "real_write_transaction_tests": "NOT_RUN",
+  "real_concurrency_tests": "NOT_RUN",
+  "recovery_observation_window_activation": "NOT_IMPLEMENTED_BY_THIS_FEATURE",
+  "provider_dispatch": "NOT_RUN",
+  "deployment": "NOT_RUN",
+  "formal_contract_acceptance": "NOT_RUN",
+  "customer_production_approval": "UNVERIFIED"
+}

@@ -306,6 +306,7 @@ export function addMonitoringEventCenterContract(contract) {
 
   contract.paths['/events/ingest'] = {
     post: base('ingestMonitoringEvent', '归一化接入监控事件：5分钟指纹去重合并×N、闪断静默、依赖拓扑抑制、维护窗口静默与自动建单重试记录（M4-7..M4-11/M5-4）', ref('MonitoringEventSummaryResult'), {
+      description: '新事件自动登记前，按当前租户 ticket.default_dedupe_window_sec 关联同指纹窗口内最近的未关闭 WORKFLOW_V33 正式工单，保留原 SLA 快照和处置状态。窗口读取已发布值或无发布时的合同登记默认；停用、过期或无效配置返回 CONFIG_PENDING。未激活登记、其他流程权威不参与复用。恢复观察窗确认和外部通知仍分别受控。',
       parameters: writeHeaders,
       requestBody: { required: true, content: { 'application/json': { schema: ref('MonitoringIngestEventInput') } } },
       'x-mop-roles': ['msp', 'padmin'],
@@ -377,6 +378,7 @@ export function addMonitoringEventCenterContract(contract) {
 
   contract.paths['/autoticket-attempts/{id}/manual-create'] = {
     post: base('manualCreateAutoTicket', '对连续5次自动建单重试耗尽进入隔离态的事件执行一键人工补建工单（M5-4）', ref('AutoTicketAttemptResult'), {
+      description: '与自动登记、到期重试共用同指纹工单去重规则；可能关联窗口内已有正式工单，MANUAL_CREATED 不保证新增一张登记。已有绑定不能覆盖，版本冲突或配置不可用不会留下部分关联。',
       parameters: [{ name: 'id', in: 'path', required: true, schema: uuid }, ...writeHeaders],
       requestBody: { required: true, content: { 'application/json': { schema: ref('ManualAutoTicketInput') } } },
       'x-mop-roles': ['msp', 'padmin'],

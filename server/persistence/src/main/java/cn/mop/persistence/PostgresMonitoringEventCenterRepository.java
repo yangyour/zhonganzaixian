@@ -295,9 +295,12 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
         );
         String ticketId = existing.map(AutoTicketAttempt::ticketId).orElse(null);
         if (plan.status() == AutoTicketStatus.SUCCEEDED && ticketId == null) {
-            ticketId = insertAutoCreatedTicket(c, a.tenantId(), a.actorId(), assetId, assetName,
+            EventSummary event = findEvent(c, a.tenantId(), eventId)
+                .orElseThrow(PostgresMonitoringEventCenterRepository::unavailable);
+            ticketId = reuseOrCreateTicket(c, a, event, assetName,
                 "[" + severity.name() + "] " + ruleName + " (" + ruleCode + ")",
-                "监控事件中心自动建单: event_id=" + eventId + ", rule_code=" + ruleCode + ", severity=" + severity.name(), now);
+                "监控事件中心自动建单: event_id=" + eventId + ", rule_code=" + ruleCode
+                    + ", severity=" + severity.name(), now);
             linkTicketToEvent(c, a.tenantId(), eventId, ticketId, a.actorId(), now);
         }
 
@@ -557,7 +560,10 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
         try {
             member(c, a, "ticket_notes:write_internal", true, true);
             AutoTicketAttempt initial = findAutoTicketAttemptById(c, a.tenantId(), attemptId).orElseThrow(() -> new DomainException(404,"RESOURCE_NOT_FOUND","当前租户下不存在该建单记录"));
-            // Ingestion updates the event before its attempt. Keep the same row-lock order.
+            EventSummary initialEvent = findEvent(c, a.tenantId(), initial.eventId())
+                .orElseThrow(PostgresMonitoringEventCenterRepository::unavailable);
+            lock(c, "mop.monitoring_event|" + initialEvent.fingerprint());
+            // Match ingestion: fingerprint first, then event row, then attempt CAS.
             try (var s = statement(c, "SELECT id FROM public.mop_monitoring_event WHERE tenant_id=?::uuid AND id=?::uuid FOR UPDATE")) {
                 s.setString(1, a.tenantId()); s.setString(2, initial.eventId());
                 try (var rows = s.executeQuery()) { if (!rows.next()) throw unavailable(); }
@@ -600,6 +606,11 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
             lock(c, "mop.autoticket_attempt|" + a.tenantId() + "|" + cmd.attemptId());
             AutoTicketAttempt current = findAutoTicketAttemptById(c, a.tenantId(), cmd.attemptId())
                 .orElseThrow(() -> new DomainException(404, "RESOURCE_NOT_FOUND", "当前租户下不存在该建单隔离记录"));
+            EventSummary initialEvent = findEvent(c, a.tenantId(), current.eventId())
+                .orElseThrow(PostgresMonitoringEventCenterRepository::unavailable);
+            lock(c, "mop.monitoring_event|" + initialEvent.fingerprint());
+            current = findAutoTicketAttemptById(c, a.tenantId(), cmd.attemptId())
+                .orElseThrow(PostgresMonitoringEventCenterRepository::unavailable);
             if (current.version() != cmd.expectedVersion())
                 throw new DomainException(409, "VERSION_CONFLICT", "建单尝试记录版本已变化，请刷新后重试");
             if (current.status() != AutoTicketStatus.QUARANTINED_MANUAL_REQUIRED && current.status() != AutoTicketStatus.RETRY_SCHEDULED)
@@ -607,9 +618,12 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
 
             EventSummary event = findEvent(c, a.tenantId(), current.eventId())
                 .orElseThrow(() -> new DomainException(404, "RESOURCE_NOT_FOUND", "关联监控事件不存在"));
+            if (current.ticketId() != null || event.ticketId() != null) {
+                throw new DomainException(409, "AUTOTICKET_ALREADY_LINKED", "事件已有工单关联，请重新读取");
+            }
             String assetName = requireAssetName(c, a.tenantId(), event.assetId());
             Instant now = now(c);
-            String ticketId = insertAutoCreatedTicket(c, a.tenantId(), a.actorId(), event.assetId(), assetName,
+            String ticketId = reuseOrCreateTicket(c, a, event, assetName,
                 "[人工补建-" + event.severity().name() + "] " + event.ruleName() + " (" + event.ruleCode() + ")",
                 "建单隔离队列人工补建(M5-4): reason=" + cmd.reason().trim() + ", event_id=" + event.id(), now);
             linkTicketToEvent(c, a.tenantId(), event.id(), ticketId, a.actorId(), now);
@@ -634,6 +648,25 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
         } catch (SQLException e) {
             throw unavailable();
         }
+    }
+
+    /** The existing event/attempt/audit transaction owns both the reused link and a newly created registration. */
+    private String reuseOrCreateTicket(Connection c, Access a, EventSummary event, String assetName,
+                                       String title, String description, Instant now) throws SQLException {
+        Optional<MonitoringTicketDedupe.Match> reused = MonitoringTicketDedupe.find(
+            c, a.tenantId(), event.id(), event.fingerprint(), event.problemAt(), now
+        );
+        if (reused.isPresent()) {
+            MonitoringTicketDedupe.Match match = reused.get();
+            platform.audit(a.actorId(), a.tenantId(), "monitoring.autoticket.recurrence_link",
+                "monitoring_event", event.id(), "SUCCEEDED",
+                "PREVIOUS_EVENT_" + match.eventId() + "_TICKET_" + match.ticketId()
+                    + "_WINDOW_SEC_" + match.policy().seconds() + "_POLICY_" + match.policy().reference(),
+                a.traceId());
+            return match.ticketId();
+        }
+        return insertAutoCreatedTicket(c, a.tenantId(), a.actorId(), event.assetId(), assetName,
+            title, description, now);
     }
 
     private String insertAutoCreatedTicket(Connection c, String tenant, String actor, String assetId, String assetName, String title, String description, Instant now) throws SQLException {
@@ -1050,6 +1083,11 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
                 + " AND has_table_privilege(current_user,'public.mop_maintenance_window','SELECT,INSERT') AND NOT has_table_privilege(current_user,'public.mop_maintenance_window','DELETE,TRUNCATE')"
                 + " AND has_table_privilege(current_user,'public.mop_monitoring_quarantine_decision','SELECT,INSERT') AND NOT has_table_privilege(current_user,'public.mop_monitoring_quarantine_decision','UPDATE,DELETE,TRUNCATE')"
                 + " AND has_table_privilege(current_user,'public.mop_autoticket_attempt','SELECT,INSERT') AND NOT has_table_privilege(current_user,'public.mop_autoticket_attempt','DELETE,TRUNCATE')"
+                + " AND has_table_privilege(current_user,'public.mop_configuration','SELECT')"
+                + " AND has_table_privilege(current_user,'public.mop_runtime_configuration_release','SELECT')"
+                + " AND has_table_privilege(current_user,'public.mop_ticket_workflow_authority','SELECT')"
+                + " AND has_table_privilege(current_user,'public.mop_ticket_workflow_event','SELECT')"
+                + " AND has_table_privilege(current_user,'public.mop_ticket_lifecycle_revision','SELECT')"
                 + " AND (SELECT count(*)=6 FROM pg_trigger WHERE tgname IN ('mop_monitoring_event_guard','mop_monitoring_event_member_guard','mop_event_noise_record_guard','mop_maintenance_window_guard','mop_monitoring_quarantine_decision_guard','mop_autoticket_attempt_guard') AND tgenabled='O')");
                  var r = s.executeQuery()) {
                 if (!r.next() || !r.getBoolean(1)) return List.of("MONITORING_EVENT_CENTER_SCHEMA_OR_ACL_INVALID");

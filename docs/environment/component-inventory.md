@@ -505,3 +505,7 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 ## 2026-10-23 备份任务发现只读验证
 
 备份并行检出经固定主机密钥 SSH 隧道复用指定 LAN PostgreSQL 17.9（Debian 17.9-1.pgdg12+1），受限 mop_test_runtime 账号实际验证现有身份/设备读取、任务查询、分页及失效权限版本拒绝。业务写入、设备操作、迁移和部署均 0；未创建或恢复旧测试身份。补查 Flyway 管理历史被权限拒绝，保留证据且不扩大权限；本轮不重新宣称管理历史已核验。没有已核验的非空隔离备份任务/真实 OSS/KMS/采集完成证明，本轮相应验证 NOT_RUN，替代候选无批准；不另建组件或造数据。运行 grant 配置仍未启用。详见 [发现契约](../backup-task-discovery-20261023.md) 与 [验证记录](../evidence/backup-task-discovery-20261023/validation.json)。
+
+## 2026-10-23 监控复发关联会话只读核查
+
+本会话经既有固定主机密钥 SSH 复用指定 `lan-test-20261008` PostgreSQL 17.9/V50。受限运行角色 READ ONLY 事务通过工单去重配置读取及不存在范围的候选查询，业务写入/迁移/部署均 0。两租户中实际业务租户之外有效成员为 0，没有本轮核验的隔离写入命名空间；影响为新复发关联的真实写事务、并发关单和回滚验收未运行。候选为在已有 PostgreSQL 内核验独立项目测试范围及受限身份，状态 UNVERIFIED，不表示已批准或已创建；不恢复历史测试身份、不另建组件或使用 fixture 代替。见 [监控证据](../evidence/monitoring-recurrence-20261023.json)。

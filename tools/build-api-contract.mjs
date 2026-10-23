@@ -2,6 +2,7 @@ import { addMonitoringOnboardingContract, addMonitoringPlanningContract, addMoni
 import { addBackupVersionInventoryContract } from './backup-version-inventory-contract.mjs';
 import { addObservationWindowContract } from './observation-window-contract.mjs';
 import { addCmdbSourcePreflightContract } from './cmdb-source-preflight-contract.mjs';
+import { addCmdbImportExecutionContract } from './cmdb-import-execution-contract.mjs';
 import { addCmdbTypeCatalogContract } from './cmdb-type-catalog-contract.mjs';
 import { addTicketLifecycleContract } from './ticket-lifecycle-contract.mjs';
 import { addInspectionQuarterlyReportContract } from './inspection-quarterly-report-contract.mjs';
@@ -979,6 +980,7 @@ addMonitoringPlanningContract(contract);
 addMonitoringObservationContract(contract);
 addMonitoringServiceObservationContract(contract);
 contract.info.version = '0.83.0';
+addCmdbImportExecutionContract(contract);
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

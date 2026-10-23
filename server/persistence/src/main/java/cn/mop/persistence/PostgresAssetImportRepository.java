@@ -147,6 +147,47 @@ public final class PostgresAssetImportRepository implements AssetImportSourceRep
         });
     }
     private record Source(String id,String tenant,String actor,String key,ImportFormat format,long size,String sha,long version,String storage,String parse,String storeOperation,String parseOperation,String artifact,String mapping,Map<String,Object> dto){}
+
+    /** Execution uses this transaction-bound artifact, never an earlier read-only preview. */
+    record ExecutionSource(long version, String artifactId, String parseHash, ParsedArtifact parsed) {}
+
+    void authorizeExecution(Access access, String sourceId) {
+        command(access, connection -> {
+            if (!uuid(sourceId)) {
+                throw missing();
+            }
+            sourceRow(connection, access, sourceId, true);
+            return null;
+        });
+    }
+
+    ExecutionSource executionSource(Access access, String sourceId) {
+        return command(access, connection -> {
+            if (!uuid(sourceId)) {
+                throw missing();
+            }
+            Source source = sourceRow(connection, access, sourceId, true);
+            if (!"READY".equals(source.storage()) || !"PARSED".equals(source.parse())) {
+                throw state();
+            }
+            Map<String, Object> stored = artifact(connection, source);
+            if (stored == null || !AssetImportSchema.VERSION.equals(stored.get("schema_version"))) {
+                throw unavailable();
+            }
+            ParsedArtifact parsed = parsedArtifact(stored);
+            Map<String, Object> binding = new LinkedHashMap<>();
+            binding.put("tenant_id", access.tenantId());
+            binding.put("source_id", sourceId);
+            binding.put("source_sha256", source.sha());
+            binding.put("selection", stored.get("selection"));
+            binding.put("schema_version", AssetImportSchema.VERSION);
+            binding.put("artifact", mapper.valueToTree(parsed));
+            if (!canonicalHash(mapper.valueToTree(binding)).equals(stored.get("parse_hash"))) {
+                throw unavailable();
+            }
+            return new ExecutionSource(source.version(), source.artifact(), (String) stored.get("parse_hash"), parsed);
+        });
+    }
     private Source sourceRow(Connection connection,Access access,String id,boolean locked)throws SQLException{
         try(PreparedStatement statement=prepare(connection,SOURCE_SELECT+(locked?" FOR UPDATE OF s":""),access.tenantId(),id,access.actorId());ResultSet rows=statement.executeQuery()){
             if(!rows.next())throw missing();Map<String,Object> dto=new LinkedHashMap<>();for(String field:List.of("id","tenant_id","created_by","purpose","original_name","declared_format","sha256","storage_status","parse_status","store_operation_id","parse_operation_id","latest_artifact_id","latest_mapping_id"))dto.put(field,rows.getString(field));dto.put("version",rows.getLong("version"));dto.put("size_bytes",rows.getLong("size_bytes"));times(dto,rows);

@@ -39,6 +39,12 @@ public final class RuntimeConfigurationCatalog {
         }
         if(Set.of("oncall.handoff_local_time","backup.default_local_time").contains(key))s.put("pattern","^(?:[01][0-9]|2[0-3]):[0-5][0-9]$");
         if("itsm.local_authority_mode".equals(key))s.put("enum",List.of("MOP","EXTERNAL"));
+        if ("asset.ip_scope".equals(key)) {
+            s.put("enum", List.of("TENANT", "SITE"));
+        }
+        if ("asset.import_steps".equals(key)) {
+            s.put("x-consumer-schema", "cmdb-source-drafts-v1");
+        }
         if("itsm.retry_backoff_sec".equals(key)){s.put("minItems",5);s.put("maxItems",5);s.put("items",Map.of("type","integer","minimum",1));}
         if("change_notice.approver_policy".equals(key)) {
             s.put("additionalProperties",false);s.put("required",List.of("reviewer_user_ids"));
@@ -47,6 +53,9 @@ public final class RuntimeConfigurationCatalog {
         s.put("description",range);s.put("x-max-depth",12);s.put("x-max-container-items",1000);s.put("x-number-precision","SAFE_INTEGERS");return s;
     }
     public void validate(String key,JsonNode value){if(value!=null&&!value.isNull())depth(value,0);ConfigurationValueValidator.validate(entry(key),value);Map<String,Object> s=schema(key);
+        if ("asset.import_steps".equals(key)) {
+            cn.mop.adapters.cmdb.CmdbImportPlanner.validateConfiguration(value);
+        }
         if("change_notice.approver_policy".equals(key)) {
             if(!value.isObject()||value.size()!=1||!value.has("reviewer_user_ids"))throw invalid("审批人配置只接受reviewer_user_ids");
             JsonNode ids=value.get("reviewer_user_ids");if(!ids.isArray()||ids.size()<1||ids.size()>1000)throw invalid("审批人必须为1至1000个明确用户UUID");

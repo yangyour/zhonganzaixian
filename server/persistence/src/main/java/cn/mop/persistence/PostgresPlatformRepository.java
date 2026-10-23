@@ -159,6 +159,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     @Override public boolean siteBelongsTo(String tenantId,String siteId){return connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT 1 FROM public.mop_site WHERE tenant_id::text=? AND id=?")){statement.setString(1,tenantId);statement.setString(2,siteId);try(ResultSet rows=statement.executeQuery()){return rows.next();}}});}
     @Override public Asset insert(String tenantId,String actorId,String name,String type,String ip,String siteId){
         if(transaction.get()==null)throw new IllegalStateException("Asset writes require idempotent transaction");
+        lock("mop.asset.admission|" + tenantId);
         if(!siteBelongsTo(tenantId,siteId))throw missing();
         return connection(connection->{try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_asset(id,tenant_id,name,type,management_ip,site_id,status,lifecycle_status,source,unknown_reason,version,created_by,updated_by) VALUES (?::uuid,?::uuid,?,?,?,?,'unknown','DRAFT','manual','尚未接入，未取得监控采样',1,?::uuid,?::uuid) RETURNING *")){
             statement.setString(1,UUID.randomUUID().toString());statement.setString(2,tenantId);statement.setString(3,name);statement.setString(4,type);statement.setString(5,ip);statement.setString(6,siteId);statement.setString(7,actorId);statement.setString(8,actorId);

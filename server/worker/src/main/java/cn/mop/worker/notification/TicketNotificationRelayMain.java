@@ -28,7 +28,7 @@ public final class TicketNotificationRelayMain {
         var running = new AtomicBoolean(true);
         Thread stop = new Thread(() -> running.set(false), "notification-relay-stop");
         Runtime.getRuntime().addShutdownHook(stop);
-        try (var source = new HikariDataSource(config)) {
+        try (var source = cn.mop.persistence.RuntimeDataSources.openRestrictedTest(config)) {
             var mapper = new ObjectMapper();
             var repository = new PostgresTicketNotificationRepository(source,
                     new PostgresPlatformRepository(source, mapper), mapper);

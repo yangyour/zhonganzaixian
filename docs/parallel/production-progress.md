@@ -1,5 +1,36 @@
 # production 会话进度
 
+## 用户停止开发后的收尾（2026-10-23）
+
+用户最新要求结束现有开发、整理提交，剩余单文档由集成会话统一编写。本线已停止新增功能，不再申请main集成锁。以下是交接事实，不是P01–P03整项VERIFIED声明，也不改总JSON或128项正式TC。
+
+**已完成且单独验证的提交范围**：P01运行账号守卫核心新增 `RuntimeDatabaseGuard`／`RuntimeDataSources`，检查数据库／current_user／session_user、超级用户／BYPASSRLS／建库／建角色／复制权限、DDL权限、迁移角色成员关系及危险系统角色。API、照片／资产导入／联系人／导出Worker、工单自动登记／关闭／SLA提醒／通知中继的10个运行连接入口统一使用受限工厂，失败关闭连接池；现有健康就绪会重新检查角色漂移。旧身份bootstrap及独立迁移入口未执行，生产profile、数据库选型和RLS方案未放开。无新HTTP端点、无未验证管理界面混入核心提交。
+
+**核心收尾验证**：在移走未完成代码后重新 `mvn -B clean test`，4571项发现、3500项实际执行通过、1071项跳过，0失败／错误。最新PG验证在指定17.9上使用真实受限账号和只读连接，1项实际通过，schema历史保持V50，数据库写入／DDL／组件安装为0；实际验证的守卫及工厂源码SHA256与本次提交文件一致。见[收尾汇总](../evidence/gap-p01-runtime-20261023/closing-validation.json)、[实际PG最终记录](../evidence/gap-p01-runtime-20261023/postgresql-final.json)。较早 `postgresql.json`／`postgresql-factory.json` 保留为逐步验证历史；不以旧WIP回归计数替代本次核心计数。
+
+P03有界真实只读执行器提交 `c2b8f0d7`，已按锁合入main `b122896b`；9项单元和3次真实live GET通过，规模验收、恢复及RPO/RTO仍NOT_RUN。本次停止指令之后的P01核心提交只推送本线，交由集成会话决定合并，不再自行main集成。
+
+### 剩余项按总清单ID交接
+
+| ID | 已有／当前状态 | 不必等客户、仍可继续的工作 | 客户或真实环境前提 |
+| --- | --- | --- | --- |
+| P01 | 已有预检、直接TLS模式、回退工具；本次核心连接／就绪隔离守卫已验证。诊断API及管理面板未进入提交，整项未核销。 | 恢复并完成诊断API／桌面界面实际联调；补完整生产配置与迁移／隔离装配接口、启用流程和失败恢复。 | Q02最终数据库／租户隔离／生产DDL，生产TLS和代理信任、组件／资源批准；不得靠放宽mop_test守卫启用生产。 |
+| P02 | 既有扫描传输／轮换协调器保留；附件真实仓储／授权API／前端／单次Worker已写但未完成SQL与真实PG验证，全部stash。凭据业务授权审计、安全留存尚缺。 | 补附件迁移和独立schema测试、隔离发布状态与扫描结果回填完整验证；接入凭据轮换业务权限／审计／消费者重载；补配置化留存与受控生命周期。 | 指定环境扫描／KMS受限接口及核验策略、保留／删除／轮换授权。未配置继续拒绝发布；不能在正在运行服务的mop_test公共谱系直接应用未发布DDL。 |
+| P03 | 验证器、证据矩阵及真实只读请求执行已有；P03整项仍未完成。 | 补可恢复的隔离演练执行与数据／权限／对象／密钥恢复核验，业务负载／故障执行能力及逐项用例。 | 获核验隔离恢复空间与受限权限、备份／水位、压测资源／演练窗口、Q04口径和客户正式签收。小样本live请求不能外推合同规模。 |
+| G01 | CUSTOMER_GATED，未开启M7正式开发或任何真实远程连接。 | 仅复用／完善设计、接口模拟和权限审计验证方案。 | Q01堡垒机路线、产品／许可／接口及审批规则；确认前不进入正式排期。 |
+
+本线不代替A／M／N／B／R各会话核销其编号；跨线剩余由集成会话统一汇总。
+
+### 未完成代码的安全保留与恢复
+
+1. **P01诊断API／界面**：命名stash `production P01 diagnostics API UI WIP not live-verified at user stop 20261023`，固定对象 `b97f437af8875a51323bcfd26f0c07bd8b30fbd2`。包含 `ProductionReadinessController.java`、相应测试、`ProductionReadinessPanel.vue`、`productionReadiness.ts`、运行配置页接线、契约helper及生成物。曾通过直接控制器／客户端单元、相关前端44项和构建，但未运行真实HTTP／页面浏览器验证，不能当作可发布UI。
+2. **P02附件隔离流程**：命名stash `production P02 WIP awaiting migration lock while implementing P01 guard`，固定对象 `88cf0e3f311181e590a6dc77714018bd3e2f9c27`。包含 `AttachmentSecurityRepository`、`PostgresAttachmentSecurityRepository`、配置／控制器、`FileController`授权前后复核、`ClamdAttachmentScanner`、`AttachmentScanOnce`及Worker入口、照片面板／队列接线、契约和测试。阶段性Java/Worker29项、前端8+41项及构建通过；新增PG测试未执行，**尚未创建或分配附件SQL迁移版本**，没有数据库结构验收。扫描器未启用，真实扫描0，隔离发布流程未完成。
+3. 旧检查点 `4987965b69030ebe869ba6a10b0ae201ed757609`（P03集成前P02）及 `e150b9cec1ea71e5bab8e729f6ff60693bde1d8a`（581f同步前）仅作回退保留；优先使用上面两个最新对象，旧检查点包含已被主干替代的DEMO生成器修复，不能整体覆盖上游。
+
+恢复须在本独立检出先核对干净工作树、origin和最新main，先执行 `git stash show --include-untracked --stat <上述固定对象>` 审阅，再 `git stash apply <固定对象>`；使用apply保留原备份。两份stash都涉及契约生成器／生成物，须正常合并并复用主干 `demo-api-contract.mjs`，再生成契约，不能覆盖最新DEMO门禁。新迁移必须重新取得migration.lock、核对最新已分配／已执行版本，不照搬猜测版本号。恢复仅是交接说明，本线不会自动继续。
+
+**资源状态**：本线没有启动候选API／Web；18216／15216未由本线占用。只读验证的SSH连接／临时转发均在脚本finally关闭；单独启动的浏览器只停留空白页、未访问应用或登录，已显式关闭。未取得本轮environment.lock或migration.lock，P03使用的integration.lock已释放；停止时的其他锁属于集成／通知等会话，未改动。私有文件、密码、Cookie及原始日志不入Git。
+
 ## 缺口清单续作（基线9cdccdc8）
 
 2026-10-23按最新授权继续实际开发，已核对独立绝对目录、规范origin及本线分支，工作树无他人修改后正常快进最新main。`check_implementation_gaps.py`通过（128条／25组／无遗漏映射，completion_verified=false）。下方旧P01–P07是历史切片序号；**本节P01–P03／G01以新版总清单ID为准**，不能用旧切片完成替代总项完成。

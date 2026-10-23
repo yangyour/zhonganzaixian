@@ -8,8 +8,24 @@ import org.springframework.core.env.Environment;
 @Configuration(proxyBeanMethods=false)
 class ContactImportWorkerConfiguration {
     @Bean ContactImportWorkerSettings contactImportSettings(Environment environment){String[] profiles=environment.getActiveProfiles().length==0?environment.getDefaultProfiles():environment.getActiveProfiles();return ContactImportWorkerSettings.from(profiles,environment::getProperty);}
-    @Bean(destroyMethod="close") HikariDataSource contactImportDataSource(ContactImportWorkerSettings settings){
-        HikariConfig c=new HikariConfig();c.setJdbcUrl(settings.jdbcUrl());c.setUsername(settings.databaseUser());c.setPassword(settings.databasePassword());c.setMaximumPoolSize(2);c.setMinimumIdle(0);c.setConnectionTimeout(5000);c.setValidationTimeout(3000);c.setInitializationFailTimeout(5000);c.setPoolName("mop-contact-import-worker");c.addDataSourceProperty("connectTimeout","5");c.addDataSourceProperty("socketTimeout","20");c.addDataSourceProperty("tcpKeepAlive","true");c.addDataSourceProperty("ApplicationName","mop-contact-import-worker");try{return new HikariDataSource(c);}catch(RuntimeException failure){throw new IllegalStateException("FAIL_CLOSED: designated restricted contact import PostgreSQL connection unavailable");}
+    /** Open only the dedicated runtime identity after verifying its effective PostgreSQL privileges. */
+    @Bean(destroyMethod = "close")
+    HikariDataSource contactImportDataSource(ContactImportWorkerSettings settings) {
+        HikariConfig configuration = new HikariConfig();
+        configuration.setJdbcUrl(settings.jdbcUrl());
+        configuration.setUsername(settings.databaseUser());
+        configuration.setPassword(settings.databasePassword());
+        configuration.setMaximumPoolSize(2);
+        configuration.setMinimumIdle(0);
+        configuration.setConnectionTimeout(5000);
+        configuration.setValidationTimeout(3000);
+        configuration.setInitializationFailTimeout(5000);
+        configuration.setPoolName("mop-contact-import-worker");
+        configuration.addDataSourceProperty("connectTimeout", "5");
+        configuration.addDataSourceProperty("socketTimeout", "20");
+        configuration.addDataSourceProperty("tcpKeepAlive", "true");
+        configuration.addDataSourceProperty("ApplicationName", "mop-contact-import-worker");
+        return RuntimeDataSources.openRestrictedTest(configuration);
     }
     @Bean ObjectMapper contactImportObjectMapper(){return new ObjectMapper();}
     @Bean ContactImportRepository contactImportRepository(HikariDataSource contactImportDataSource,ObjectMapper contactImportObjectMapper){return new PostgresContactImportRepository(contactImportDataSource,new PostgresPlatformRepository(contactImportDataSource,contactImportObjectMapper));}

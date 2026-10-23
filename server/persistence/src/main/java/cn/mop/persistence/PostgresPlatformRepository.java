@@ -26,9 +26,22 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     private final ThreadLocal<Boolean> notificationRelayScope = new ThreadLocal<>();
     public PostgresPlatformRepository(DataSource dataSource,ObjectMapper mapper){this.dataSource=dataSource;this.mapper=mapper;}
     @Override public RepositoryMetadata metadata(){return new RepositoryMetadata("remote_test","postgresql",true,"test_oidc");}
-    @Override public boolean dependencyReady(){
-        try(Connection connection=dataSource.getConnection();PreparedStatement statement=connection.prepareStatement("SELECT current_database()='mop_test' AND current_user='mop_test_runtime' AND EXISTS(SELECT 1 FROM public.mop_tenant)")){statement.setQueryTimeout(3);try(ResultSet rows=statement.executeQuery()){return rows.next()&&rows.getBoolean(1);}}
-        catch(SQLException exception){return false;}
+    @Override
+    public boolean dependencyReady() {
+        try (Connection connection = dataSource.getConnection()) {
+            connection.setReadOnly(true);
+            if (!RuntimeDatabaseGuard.inspect(connection).accepted()) {
+                return false;
+            }
+            try (PreparedStatement statement = connection.prepareStatement("SELECT EXISTS(SELECT 1 FROM public.mop_tenant)")) {
+                statement.setQueryTimeout(3);
+                try (ResultSet rows = statement.executeQuery()) {
+                    return rows.next() && rows.getBoolean(1);
+                }
+            }
+        } catch (SQLException | RuntimeException unavailable) {
+            return false;
+        }
     }
     @Override public List<String> assetReadProblems(){try(Connection c=dataSource.getConnection()){c.setReadOnly(true);return PostgresUnicodeSearch.ready(c)?List.of():List.of("ASSET_UNICODE_SEARCH_UNAVAILABLE");}catch(SQLException|RuntimeException unavailable){return List.of("ASSET_UNICODE_SEARCH_UNAVAILABLE");}}
     @Override public List<String> backupPlanDraftProblems(){return new PostgresBackupPlanDraftRepository(dataSource,this).readinessProblems();}

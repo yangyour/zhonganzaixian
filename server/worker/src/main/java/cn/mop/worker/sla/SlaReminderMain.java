@@ -15,7 +15,7 @@ public final class SlaReminderMain {
         config.setPoolName("mop-sla-reminder");config.addDataSourceProperty("connectTimeout","5");config.addDataSourceProperty("socketTimeout","20");
         var running=new AtomicBoolean(true);Thread stop=new Thread(()->running.set(false),"sla-reminder-stop");
         Runtime.getRuntime().addShutdownHook(stop);
-        try(var source=new HikariDataSource(config)){
+        try(var source=cn.mop.persistence.RuntimeDataSources.openRestrictedTest(config)){
             var mapper=new ObjectMapper();var repository=new PostgresSlaReminderRepository(source,new PostgresPlatformRepository(source,mapper),mapper);
             if(!repository.ready())throw new IllegalStateException("CONFIG_PENDING: SLA reminder V36 schema is not verified; apply migration separately");
             String owner="sla-reminder-"+UUID.randomUUID();System.out.println("SLA reminder worker started; intents only, no provider delivery or paid sends");

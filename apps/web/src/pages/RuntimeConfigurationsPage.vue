@@ -11,6 +11,7 @@ import { createRuntimeConfigurationWorkspace, emptyRuntimeState, type RuntimeSta
 import { readConfigurationRevision } from '../utils/configurationRevisionWriter'
 import { displayTime } from '../utils/display'
 import ConfigurationRevisions from '../components/ConfigurationRevisions.vue'
+import ProductionReadinessPanel from '../components/ProductionReadinessPanel.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import baseline from '../../../../contracts/config-baseline.json'
 import { capacityRuntimeKeys } from '../utils/capacityRuntimeInputs'
@@ -81,6 +82,7 @@ onUnmounted(()=>{disposed=true;++epoch;cancelValidation();abort?.abort();workspa
   
   <p v-if="!permitted">当前没有配置读取权限。</p>
   <template v-else>
+   <ProductionReadinessPanel />
    <ApiErrorNotice :error="catalogError" :retrying="catalogBusy" @retry="catalog" />
    <div class="runtime-layout"><aside class="runtime-catalog panel"><div class="runtime-heading content-toolbar"><h2>配置目录</h2><button :disabled="catalogBusy||Boolean(state.busy)||workspace.unresolved()" @click="catalog">刷新目录</button><div class="content-actions"><router-link to="/configurations">配置登记与历史提案</router-link></div></div><label>搜索配置<input v-model="query" type="search" aria-label="搜索运行配置" placeholder="配置键 / 说明 / 合同来源"/></label><label>待确认编号<select v-model="question" aria-label="按待确认编号筛选"><option value="">全部编号</option><option v-for="n in 31" :key="n" :value="'Q'+String(n).padStart(2,'0')">Q{{ String(n).padStart(2,'0') }}</option></select></label><label class="runtime-check"><input v-model="editableOnly" type="checkbox"/>只看可配置项</label><p>{{ catalogBusy?'读取中…':`显示 ${visible.length} / ${definitions.length} 项` }}</p><div class="runtime-keys"><button v-for="d in visible" :key="d.key" :class="{active:state.key===d.key}" :disabled="Boolean(state.busy)||workspace.unresolved()" @click="select(d.key)"><strong>{{d.key}}</strong><span>{{d.description}}</span><small>{{d.question_ids.join(' / ')||'合同明确'}} · {{d.editable?'可配置':'固定约束'}}</small></button></div></aside>
     <div class="runtime-workspace"><p v-if="!selected" class="panel runtime-empty">从左侧目录选择配置项</p><template v-else>

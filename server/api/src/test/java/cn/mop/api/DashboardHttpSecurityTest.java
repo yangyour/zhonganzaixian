@@ -40,14 +40,39 @@ class DashboardHttpSecurityTest {
         @Bean DashboardAvailabilityReader reader(){return mock(DashboardAvailabilityReader.class);}
         @Bean ObjectMapper mapper(){return new ObjectMapper();}
         @Bean DashboardController controller(PlatformRepository repository,DashboardAvailabilityReader reader){return new DashboardController(repository,reader);}
+        @Bean
+        cn.mop.domain.dashboard.DashboardPendingTicketsReader pendingReader() {
+            return mock(cn.mop.domain.dashboard.DashboardPendingTicketsReader.class);
+        }
+        @Bean
+        DashboardPendingTicketsController pendingController(PlatformRepository repository,
+                cn.mop.domain.dashboard.DashboardPendingTicketsReader pendingReader) {
+            return new DashboardPendingTicketsController(repository, pendingReader);
+        }
         @Override public void configureMessageConverters(List<HttpMessageConverter<?>> converters){converters.add(new MappingJackson2HttpMessageConverter(mapper()));}
     }
     @Autowired WebApplicationContext context;
     @Autowired PlatformRepository repository;
     @Autowired DashboardAvailabilityReader reader;
+    @Autowired
+    cn.mop.domain.dashboard.DashboardPendingTicketsReader pendingReader;
     private MockMvc mvc;
     @BeforeEach void setup(){reset(repository,reader);mvc=webAppContextSetup(context).apply(springSecurity()).build();when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"viewer",7,true)));when(reader.read(any(),any())).thenAnswer(c->DashboardControllerTest.snapshot(c.getArgument(0),c.getArgument(1)));}
     private MockHttpServletRequestBuilder scoped(MockHttpServletRequestBuilder builder){var session=new MockHttpSession(context.getServletContext());session.setAttribute("mop.tenant_id",TENANT);return builder.session(session).with(user(ACTOR));}
+    @Test
+    void pendingTicketFactsRequireSessionAndRemainNoStoreWithoutMutation() throws Exception {
+        when(pendingReader.read(any())).thenReturn(new cn.mop.domain.dashboard.DashboardPendingTicketsReader.Snapshot(
+                UUID.fromString(TENANT), UUID.fromString(ACTOR), 7, DashboardControllerTest.TIME,
+                "REPORTER_ONLY", 0, 0, 0, 0, List.of()));
+        mvc.perform(scoped(get("/api/v1/dashboard/pending-tickets")))
+                .andExpect(status().isOk()).andExpect(header().string("Cache-Control", "no-store"))
+                .andExpect(jsonPath("$.data.pending_tickets").value(0))
+                .andExpect(jsonPath("$.data.overdue_sla").value(nullValue()))
+                .andExpect(jsonPath("$.data.scope").value("REPORTER_ONLY"));
+        mvc.perform(get("/api/v1/dashboard/pending-tickets")).andExpect(status().isUnauthorized());
+        mvc.perform(scoped(post("/api/v1/dashboard/pending-tickets")).with(csrf().asHeader()))
+                .andExpect(status().isMethodNotAllowed());
+    }
     @Test void getNeedsNoCsrfAndPreservesNullsWithNoStore()throws Exception{
         mvc.perform(scoped(get("/api/v1/dashboard"))).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store")).andExpect(jsonPath("$.trace_id").isString()).andExpect(jsonPath("$.data.tenant_id").value(TENANT)).andExpect(jsonPath("$.data.kpis[0].value").value(nullValue())).andExpect(jsonPath("$.data.panels[0].items").value(nullValue())).andExpect(jsonPath("$.data.metric_samples_loaded").value(false));
         verify(repository).membership(ACTOR,TENANT);verifyNoMoreInteractions(repository);

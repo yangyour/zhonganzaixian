@@ -37,3 +37,21 @@ test('capture contract covers all permissions, atomic writes and replay protecti
   assert.deepEqual(post['x-mop-atomic-writes'], ['source_collection', 'source_collection_items', 'quarterly_report', 'audit', 'idempotency_receipt']);
   assert.equal(contract.components.schemas.InspectionQuarterlyReportCaptureSummary.properties.report_published.const, false);
 });
+
+test('pending ticket facts preserve unknown counts and exclude terminal rows', () => {
+  const validate = ajv.getSchema('urn:mop:report-capture#/components/schemas/DashboardPendingTickets');
+  const sample = { tenant_id: '20000000-0000-4000-8000-000000000002', actor_id: '10000000-0000-4000-8000-000000000001',
+    permission_version: 1, observed_at: '2026-10-23T08:00:00Z', scope: 'REPORTER_ONLY', source: 'postgresql',
+    metric_version: 'MOP_VISIBLE_NONTERMINAL_TICKETS_V1', registrations: 1, known_pending: 0, terminal: 0, unconfigured: 1,
+    pending_tickets: null, state: 'PARTIAL', unavailable_reason: 'REGISTRATIONS_WITHOUT_WORKFLOW', item_limit: 5,
+    sort: 'REGISTRATION_CREATED_AT_DESC_ID_DESC', items: [], overdue_sla: null, writes_performed: false };
+  assert.equal(validate(sample), true);
+  assert.equal(validate({ ...sample, pending_tickets: 0 }), false);
+  assert.equal(validate({ ...sample, state: 'AVAILABLE' }), false);
+  assert.equal(validate({ ...sample, overdue_sla: 0 }), false);
+  assert.equal(validate({ ...sample, items: [{ ticket_id: sample.tenant_id, receipt_no: 'SYNTHETIC', title: '合成',
+    registered_at: sample.observed_at, workflow_model: 'WORKFLOW_V33', state: 'CANCELLED', version: 2 }] }), false);
+  const route = contract.paths['/dashboard/pending-tickets'].get;
+  assert.equal(route['x-mop-customer-scope'], 'REPORTER_ONLY');
+  assert.equal(route['x-mop-snapshot-isolation'], 'REPEATABLE_READ');
+});

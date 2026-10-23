@@ -1,0 +1,94 @@
+{
+  "java_suites": [
+    {
+      "name": "cn.mop.persistence.InspectionQuarterlyReportDocumentCodecTest",
+      "tests": "11",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.persistence.InspectionQuarterlyReportSchemaVerifierTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.DashboardAvailabilitySnapshotTest",
+      "tests": "12",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.DashboardControllerTest",
+      "tests": "15",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.DashboardHttpSecurityTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.DashboardPendingTicketsTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.InspectionQuarterlyReportCaptureControllerTest",
+      "tests": "13",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.InspectionQuarterlyReportControllerTest",
+      "tests": "16",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.InspectionQuarterlyReportHttpSecurityTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.InspectionQuarterlyReportTest",
+      "tests": "23",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.QuarterlyReportPdfControllerTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "java_tests": 128,
+  "java_failures": 0,
+  "java_skipped": 0,
+  "contract_tests": 197,
+  "contract_failures": 0,
+  "contract_generation": "PASS",
+  "actual_pg_tests": 4,
+  "actual_pg_failures": 0,
+  "tcp_http": "NOT_RUN",
+  "browser": "NOT_RUN",
+  "formal_contract_tc": "NOT_RUN",
+  "v42_real_flow": "NOT_RUN",
+  "deployment": "NOT_RUN"
+}

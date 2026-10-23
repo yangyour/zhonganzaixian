@@ -3,6 +3,7 @@ import { addBackupVersionInventoryContract } from './backup-version-inventory-co
 import { addObservationWindowContract } from './observation-window-contract.mjs';
 import { addCmdbSourcePreflightContract } from './cmdb-source-preflight-contract.mjs';
 import { addCmdbImportExecutionContract } from './cmdb-import-execution-contract.mjs';
+import { addDashboardPendingTicketsContract } from './dashboard-pending-tickets-contract.mjs';
 import { addCmdbTypeCatalogContract } from './cmdb-type-catalog-contract.mjs';
 import { addTicketLifecycleContract } from './ticket-lifecycle-contract.mjs';
 import { addInspectionQuarterlyReportContract } from './inspection-quarterly-report-contract.mjs';
@@ -991,6 +992,7 @@ contract['x-mop-secure-session-transport'] = {
   production_activation: false
 };
 addCmdbImportExecutionContract(contract);
+addDashboardPendingTicketsContract(contract);
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

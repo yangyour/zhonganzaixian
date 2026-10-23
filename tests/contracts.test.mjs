@@ -2,11 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 const read = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'));
 const contract = read('../contracts/local-api.openapi.json');
 const baseline = read('../contracts/config-baseline.json');
+test('the published contract remains reproducible from source generators', () => {
+  assert.doesNotThrow(() => execFileSync(process.execPath,
+    [fileURLToPath(new URL('../tools/build-api-contract.mjs', import.meta.url)), '--check'],
+    { stdio: ['ignore', 'pipe', 'pipe'] }));
+});
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
 ajv.addFormat('binary', true);

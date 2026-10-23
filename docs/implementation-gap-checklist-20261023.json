@@ -18,7 +18,9 @@
         "docs/dashboard-pending-tickets-ui-20261023.md",
         "docs/evidence/gap-ui01-20261023/validation.json"
       ],
-      "commits": [],
+      "commits": [
+        "f90acc97"
+      ],
       "completed_subitems": [
         "Shared authorized V1 snapshot, numeric zero/nonzero and partial-coverage semantics",
         "Cross-state top five, permissions/cancellation/retry, actual desktop verification"
@@ -280,10 +282,24 @@
         "M6-3",
         "M6-6"
       ],
-      "status": "OPEN",
+      "status": "IN_PROGRESS",
       "completion_criterion": "连接已有任务发现/调度与独立授权来源，补可显式启动的Worker、版本列表提供者、下载/解密/差异；设备采集证明和KMS未配时明确未就绪。",
-      "evidence": [],
-      "commits": []
+      "evidence": [
+        "docs/backup-access-provider-20261023.md",
+        "docs/evidence/backup-access-provider-20261023/validation.json"
+      ],
+      "commits": [
+        "735be359",
+        "ad49598b"
+      ],
+      "completed_subitems": [
+        "Independent version-inventory grant provider and explicit configuration wiring"
+      ],
+      "remaining_subitems": [
+        "Worker lifecycle and postprocessing integration",
+        "Protected download/decryption and diff",
+        "Complete nonempty real workflow verification"
+      ]
     },
     {
       "id": "B02",

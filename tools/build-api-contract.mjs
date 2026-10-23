@@ -4,6 +4,7 @@ import { addObservationWindowContract } from './observation-window-contract.mjs'
 import { addCmdbSourcePreflightContract } from './cmdb-source-preflight-contract.mjs';
 import { addCmdbImportExecutionContract } from './cmdb-import-execution-contract.mjs';
 import { addDashboardPendingTicketsContract } from './dashboard-pending-tickets-contract.mjs';
+import { addDemoApiContract } from './demo-api-contract.mjs';
 import { addCmdbTypeCatalogContract } from './cmdb-type-catalog-contract.mjs';
 import { addTicketLifecycleContract } from './ticket-lifecycle-contract.mjs';
 import { addInspectionQuarterlyReportContract } from './inspection-quarterly-report-contract.mjs';
@@ -980,7 +981,7 @@ addMonitoringOnboardingContract(contract);
 addMonitoringPlanningContract(contract);
 addMonitoringObservationContract(contract);
 addMonitoringServiceObservationContract(contract);
-contract.info.version = '0.83.0';
+contract.info.version = '0.84.0';
 contract['x-mop-secure-session-transport'] = {
   enabled_by: 'mop.security.require-https=true',
   default_enabled: false,
@@ -993,6 +994,7 @@ contract['x-mop-secure-session-transport'] = {
 };
 addCmdbImportExecutionContract(contract);
 addDashboardPendingTicketsContract(contract);
+addDemoApiContract(contract);
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

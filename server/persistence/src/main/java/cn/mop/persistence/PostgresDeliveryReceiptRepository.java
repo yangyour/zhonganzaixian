@@ -25,6 +25,25 @@ public final class PostgresDeliveryReceiptRepository {
     public record Receipt(DeliveryReceiptJournal journal,long appliedVersion,boolean replay){
         public boolean databaseRecorded(){return true;}public boolean providerReceiptVerified(){return false;}public boolean automaticSendEnabled(){return false;}
     }
+    /** Original stored command plus current head; recovery is never a fresh permission to send. */
+    public record RecoveredCommand(Command original, long appliedVersion, DeliveryReceiptJournal current) {}
+
+    /** Recovers a transition after a lost response using its original identity and live read authorization. */
+    public Optional<RecoveredCommand> recover(Access access, Scope scope, UUID commandId) {
+        matching(access, scope);
+        if (commandId == null) {
+            throw invalid();
+        }
+        return transaction(access, scope, Operation.READ, connection -> {
+            var loaded = load(connection, scope, false);
+            if (loaded == null) {
+                return Optional.empty();
+            }
+            var journal = loaded.journal();
+            return journal.command(commandId).map(command -> new RecoveredCommand(command,
+                    journal.commandVersion(commandId).orElseThrow(), journal));
+        });
+    }
     private record Row(Scope scope,long version,UUID commandId,UUID actorId,long permissionVersion,String trace,long expectedVersion,String previous,byte[] encoded,String sha,String commandSha,Instant recordedAt){}
     private record Loaded(DeliveryReceiptJournal journal,Row root,List<Row> rows){}
     private final DataSource source;private final Authorizer authorizer;private final CommandVerifier verifier;

@@ -36,7 +36,8 @@ class BackupTaskDiscoveryPostgresReadTest {
                     SELECT m.tenant_id,m.user_id,m.permission_version,a.id
                     FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id
                     JOIN public.mop_asset a ON a.tenant_id=m.tenant_id
-                    WHERE m.active AND u.active ORDER BY m.tenant_id,m.user_id,a.id LIMIT 1
+                    WHERE m.active AND u.active AND m.role_code IN ('padmin','msp')
+                    ORDER BY m.tenant_id,m.user_id,a.id LIMIT 1
                     """); var rows = query.executeQuery()) {
                 assertTrue(rows.next(), "Existing active identity and asset required; never synthesize them");
                 access = new Access(rows.getObject(1, UUID.class), rows.getObject(2, UUID.class), rows.getLong(3));

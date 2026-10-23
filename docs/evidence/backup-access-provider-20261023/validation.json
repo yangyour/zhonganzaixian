@@ -1,0 +1,25 @@
+{
+  "verified_at_utc": "2026-10-23T14:17:32.5019319Z",
+  "checklist_id": "B01",
+  "subitem": "B01.1 version inventory provider",
+  "status": "CODE_COMPLETE_NEEDS_VERIFICATION",
+  "baseline": "9cdccdc8",
+  "java_logic_http_tests": 53,
+  "designated_postgres_provider_read_tests": 1,
+  "postgres_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "web_panel_client_tests": 94,
+  "checklist_self_check": "128 requirements / 25 groups / 0 unassigned / completion_verified=false",
+  "actual_business_writes": 0,
+  "migrations": 0,
+  "deployed": false,
+  "nonempty_live_inventory_verified": false,
+  "live_browser_new_provider": "NOT_RUN",
+  "formal_tc": "NOT_RUN",
+  "temporary_grants_removed": true,
+  "ssh_tunnel_closed": true,
+  "remaining": [
+    "B01 worker runtime assembly",
+    "B01 protected download/decrypt/diff",
+    "B02 failure intents/restore/drills/retention/change linkage"
+  ]
+}

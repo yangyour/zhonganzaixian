@@ -48,6 +48,15 @@ class BackupVersionInventoryHttpSecurityTest {
  @Test void forgedTenantAndDuplicatePageArgumentsAreRejected()throws Exception{mvc.perform(scoped(get(ROOT).param("tenant_id",TENANT))).andExpect(status().isBadRequest());mvc.perform(scoped(get(ROOT).param("page_size","10","20"))).andExpect(status().isBadRequest());verifyNoInteractions(inventory);}
  @Test void adminRoleCannotOverrideIndependentDenial()throws Exception{when(inventory.inventory(any(),any(),any(),anyInt())).thenThrow(new DomainException(403,"PRIVATE_POLICY_DETAIL","SYNTHETIC_PRIVATE_DETAIL"));mvc.perform(scoped(get(ROOT))).andExpect(status().isForbidden()).andExpect(jsonPath("$.error.code").value("BACKUP_VERSION_INVENTORY_ACCESS_DENIED")).andExpect(jsonPath("$.data").doesNotExist());}
  @Test void unreadyServiceNeverReturnsEmptySuccess()throws Exception{when(inventory.inventory(any(),any(),any(),anyInt())).thenThrow(new DomainException(503,"PRIVATE_UNREADY","SYNTHETIC_PRIVATE_DETAIL"));mvc.perform(scoped(get(ROOT))).andExpect(status().isServiceUnavailable()).andExpect(jsonPath("$.error.code").value("BACKUP_VERSION_INVENTORY_UNAVAILABLE")).andExpect(jsonPath("$.data").doesNotExist());}
+ @Test
+ void absentConfiguredProviderPreservesActionable503WithoutPrivateDetails() throws Exception {
+  when(inventory.inventory(any(), any(), any(), anyInt()))
+    .thenThrow(new DomainException(503, "BACKUP_VERSION_INVENTORY_NOT_CONFIGURED", "SYNTHETIC_PRIVATE_PATH"));
+  mvc.perform(scoped(get(ROOT)))
+    .andExpect(status().isServiceUnavailable())
+    .andExpect(jsonPath("$.error.code").value("BACKUP_VERSION_INVENTORY_NOT_CONFIGURED"))
+    .andExpect(jsonPath("$.data").doesNotExist());
+ }
  @Test void staleMembershipSuppressesEntireResponse()throws Exception{when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(member(7)),Optional.of(member(8)));mvc.perform(scoped(get(ROOT))).andExpect(status().isUnauthorized()).andExpect(jsonPath("$.data").doesNotExist());}
  @Test void decodedCursorIsPinnedWithoutScopeOverrides()throws Exception{when(inventory.inventory(any(),any(),any(),anyInt())).thenReturn(new InventoryPage(List.of(),false,null));mvc.perform(scoped(get(ROOT).param("page_size","50").param("before_registered_at",AT.toString()).param("before_version_id",id(30).toString()))).andExpect(status().isOk()).andExpect(jsonPath("$.data.page_size").value(50));verify(inventory).inventory(access(),scope(),new InventoryCursor(scope(),AT,id(30)),50);}
 }

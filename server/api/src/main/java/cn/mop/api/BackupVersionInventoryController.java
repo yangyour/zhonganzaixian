@@ -14,28 +14,78 @@ import java.util.*;
 import static cn.mop.api.ApiResponse.*;
 
 /** Historical metadata only. Asset visibility does not grant enumeration; the explicitly bound query must authorize it independently. */
-@RestController @Profile("remote_test") @RequestMapping("/api/v1/assets/{assetId}/backup-versions")
+@RestController
+@Profile("remote_test")
+@RequestMapping("/api/v1/assets/{assetId}/backup-versions")
 public final class BackupVersionInventoryController {
  private static final long MAX=9007199254740991L;
  private static final Instant MIN_TIME=Instant.parse("0001-01-01T00:00:00Z"),MAX_TIME=Instant.parse("9999-12-31T23:59:59.999Z");
- private final PlatformRepository platform;private final ObjectProvider<BackupVersionInventoryQuery> queries;
+ /** Current tenant membership and capability checks before and after the scoped query. */
+ private final PlatformRepository platform;
+ /** Independently configured backup reader; absent or ambiguous providers cannot fall back to draft access. */
+ private final ObjectProvider<BackupVersionInventoryQuery> queries;
  private record SessionAccess(Access value,Membership membership){}
- public BackupVersionInventoryController(PlatformRepository platform,ObjectProvider<BackupVersionInventoryQuery> queries){this.platform=Objects.requireNonNull(platform);this.queries=Objects.requireNonNull(queries);}
- @ModelAttribute void privateHeaders(HttpServletResponse response){response.setHeader("Cache-Control","no-store");response.setHeader("Referrer-Policy","no-referrer");}
- @GetMapping Object list(@PathVariable String assetId,HttpServletRequest request){
-  SessionAccess session=access(request);Access a=session.value();var scope=new InventoryScope(a.tenantId(),uuid(assetId));
-  var q=query(request);int limit=size(q.getOrDefault("page_size","15"));
-  boolean time=q.containsKey("before_registered_at"),id=q.containsKey("before_version_id");if(time!=id)throw invalid();
-  InventoryCursor before=time?new InventoryCursor(scope,parseTime(q.get("before_registered_at")),uuid(q.get("before_version_id"))):null;
-  BackupVersionInventoryQuery reader;
-  try{reader=queries.getIfUnique();}catch(RuntimeException failure){throw unavailable();}
-  if(reader==null)throw new DomainException(503,"BACKUP_VERSION_INVENTORY_NOT_CONFIGURED","版本列表的独立授权服务尚未装配；没有使用草稿权限代替，也未授予下载");
-  InventoryPage result;
-  try{result=reader.inventory(a,scope,before,limit);}catch(DomainException denied){if(denied.status==403)throw forbidden();if(denied.status==404)throw new DomainException(404,"BACKUP_VERSION_NOT_FOUND","当前范围未找到设备或版本登记");if(denied.status==401)throw expired();throw unavailable();}catch(RuntimeException failure){throw unavailable();}
-  Map<String,Object> out=pageDto(a,scope,before,limit,result);
-  if(!session.equals(access(request)))throw expired();
-  return success(out,request);
- }
+    public BackupVersionInventoryController(PlatformRepository platform, ObjectProvider<BackupVersionInventoryQuery> queries) {
+        this.platform = Objects.requireNonNull(platform);
+        this.queries = Objects.requireNonNull(queries);
+    }
+
+    @ModelAttribute
+    void privateHeaders(HttpServletResponse response) {
+        response.setHeader("Cache-Control", "no-store");
+        response.setHeader("Referrer-Policy", "no-referrer");
+    }
+
+    @GetMapping
+    Object list(@PathVariable String assetId, HttpServletRequest request) {
+        SessionAccess session = access(request);
+        Access identity = session.value();
+        var scope = new InventoryScope(identity.tenantId(), uuid(assetId));
+        var query = query(request);
+        int limit = size(query.getOrDefault("page_size", "15"));
+        boolean time = query.containsKey("before_registered_at");
+        boolean id = query.containsKey("before_version_id");
+        if (time != id) {
+            throw invalid();
+        }
+        InventoryCursor before = time
+                ? new InventoryCursor(scope, parseTime(query.get("before_registered_at")), uuid(query.get("before_version_id")))
+                : null;
+        BackupVersionInventoryQuery reader;
+        try {
+            reader = queries.getIfUnique();
+        } catch (RuntimeException failure) {
+            throw unavailable();
+        }
+        if (reader == null) {
+            throw new DomainException(503, "BACKUP_VERSION_INVENTORY_NOT_CONFIGURED", "版本列表的独立授权服务尚未装配");
+        }
+        InventoryPage result;
+        try {
+            result = reader.inventory(identity, scope, before, limit);
+        } catch (DomainException denied) {
+            if (denied.status == 403) {
+                throw forbidden();
+            }
+            if (denied.status == 404) {
+                throw new DomainException(404, "BACKUP_VERSION_NOT_FOUND", "当前范围未找到设备或版本登记");
+            }
+            if (denied.status == 401) {
+                throw expired();
+            }
+            if (denied.status == 503 && "BACKUP_VERSION_INVENTORY_NOT_CONFIGURED".equals(denied.code)) {
+                throw new DomainException(503, "BACKUP_VERSION_INVENTORY_NOT_CONFIGURED", "版本列表的独立授权配置尚未提供");
+            }
+            throw unavailable();
+        } catch (RuntimeException failure) {
+            throw unavailable();
+        }
+        Map<String, Object> resultDto = pageDto(identity, scope, before, limit, result);
+        if (!session.equals(access(request))) {
+            throw expired();
+        }
+        return success(resultDto, request);
+    }
  static Map<String,Object> pageDto(Access access,InventoryScope scope,InventoryCursor before,int limit,InventoryPage page){
   if(access==null||scope==null||!access.tenantId().equals(scope.tenantId())||limit<1||limit>50||page==null||page.items().size()>limit||before!=null&&!before.scope().equals(scope))throw unavailable();
   var items=new ArrayList<Map<String,Object>>();var seen=new HashSet<UUID>();InventoryCursor previous=before;

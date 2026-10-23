@@ -1,5 +1,7 @@
 # 资产导入暂存与独立 Worker 运行说明
 
+2026-10-23增量：本文描述的上传/解析/旧映射仍是技术暂存链。新的33列可信来源执行入口、运行配置、整批事务和验证边界见 [来源导入草稿](cmdb-import-execution-20261023.md)；所有真实资产新增的配额门禁见 [设备登记配额](asset-device-quota-20261023.md)。新功能不会自动启用监控，不把下面历史暂存状态当作新执行回执。
+
 本能力处理原始 CSV/XLSX 源文件的耐久暂存、解析产物和显式列映射。它不写入业务资产、不预留配额、不执行业务预检，也不填写 Q20/Q31 尚未确认的字典、冲突域或日期规则。返回 `business_status=CONFIG_PENDING`、`can_import=false`；映射的 `precheck_status=NOT_RUN`。扫描、正式生产批准和保留期限分别为 `UNSCANNED`、`UNVERIFIED`、`null`。
 
 ## 指定测试组件与秘密引用

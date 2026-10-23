@@ -157,13 +157,44 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     @Override public List<Asset> list(String tenantId){return connection(connection->{List<Asset> result=new ArrayList<>();try(PreparedStatement statement=connection.prepareStatement("SELECT * FROM public.mop_asset WHERE tenant_id::text=? ORDER BY created_at,id")){statement.setString(1,tenantId);try(ResultSet rows=statement.executeQuery()){while(rows.next())result.add(asset(rows));}}return result;});}
     @Override public Optional<Asset> find(String tenantId,String id){return connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT * FROM public.mop_asset WHERE tenant_id::text=? AND id::text=?")){statement.setString(1,tenantId);statement.setString(2,id);try(ResultSet rows=statement.executeQuery()){return rows.next()?Optional.of(asset(rows)):Optional.empty();}}});}
     @Override public boolean siteBelongsTo(String tenantId,String siteId){return connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT 1 FROM public.mop_site WHERE tenant_id::text=? AND id=?")){statement.setString(1,tenantId);statement.setString(2,siteId);try(ResultSet rows=statement.executeQuery()){return rows.next();}}});}
-    @Override public Asset insert(String tenantId,String actorId,String name,String type,String ip,String siteId){
-        if(transaction.get()==null)throw new IllegalStateException("Asset writes require idempotent transaction");
-        if(!siteBelongsTo(tenantId,siteId))throw missing();
-        return connection(connection->{try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_asset(id,tenant_id,name,type,management_ip,site_id,status,lifecycle_status,source,unknown_reason,version,created_by,updated_by) VALUES (?::uuid,?::uuid,?,?,?,?,'unknown','DRAFT','manual','尚未接入，未取得监控采样',1,?::uuid,?::uuid) RETURNING *")){
-            statement.setString(1,UUID.randomUUID().toString());statement.setString(2,tenantId);statement.setString(3,name);statement.setString(4,type);statement.setString(5,ip);statement.setString(6,siteId);statement.setString(7,actorId);statement.setString(8,actorId);
-            try(ResultSet rows=statement.executeQuery()){rows.next();return asset(rows);}catch(SQLException exception){if("23505".equals(exception.getSQLState()))throw new DomainException(409,"ASSET_NAME_CONFLICT","同租户资产名称已存在");throw exception;}
-        }});
+    /** Register a draft only after the current tenant's explicit device limit permits this transaction. */
+    @Override
+    public Asset insert(String tenantId, String actorId, String name, String type, String ip, String siteId) {
+        if (transaction.get() == null) {
+            throw new IllegalStateException("Asset writes require idempotent transaction");
+        }
+        if (!siteBelongsTo(tenantId, siteId)) {
+            throw missing();
+        }
+        connection(connection -> {
+            PostgresAssetQuota.requireRoom(connection, tenantId);
+            return null;
+        });
+        return connection(connection -> {
+            String sql = "INSERT INTO public.mop_asset(id,tenant_id,name,type,management_ip,site_id,status,"
+                    + "lifecycle_status,source,unknown_reason,version,created_by,updated_by) "
+                    + "VALUES (?::uuid,?::uuid,?,?,?,?,'unknown','DRAFT','manual',"
+                    + "'尚未接入，未取得监控采样',1,?::uuid,?::uuid) RETURNING *";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, UUID.randomUUID().toString());
+                statement.setString(2, tenantId);
+                statement.setString(3, name);
+                statement.setString(4, type);
+                statement.setString(5, ip);
+                statement.setString(6, siteId);
+                statement.setString(7, actorId);
+                statement.setString(8, actorId);
+                try (ResultSet rows = statement.executeQuery()) {
+                    rows.next();
+                    return asset(rows);
+                } catch (SQLException exception) {
+                    if ("23505".equals(exception.getSQLState())) {
+                        throw new DomainException(409, "ASSET_NAME_CONFLICT", "同租户资产名称已存在");
+                    }
+                    throw exception;
+                }
+            }
+        });
     }
     @Override public Object idempotent(String actor,String tenant,String route,String key,String hash,long expectedPermissionVersion,Supplier<Object> command){return idempotentChecked(actor,tenant,route,key,hash,expectedPermissionVersion,()->{},command);}
     @Override public Object idempotentAuthorized(String actor,String tenant,String route,String key,String hash,long expectedPermissionVersion,Runnable authorize,Supplier<Object> command){

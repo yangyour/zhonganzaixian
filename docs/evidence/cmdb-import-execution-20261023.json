@@ -1,0 +1,68 @@
+{
+  "feature": "trusted 33-column source to atomic asset drafts",
+  "date": "2026-10-23",
+  "repository": "https://github.com/yangyour/zhonganzaixian.git",
+  "branch": "codex/launch-assets-20261023",
+  "base_commit": "05ec77ba9fbbca99e2b1e4db739c2c0aafcb645d",
+  "java_reactor": {
+    "command": "mvn -pl server/api -am test",
+    "tests": 4149,
+    "executed": 3122,
+    "skipped": 1027,
+    "failures": 0,
+    "errors": 0,
+    "log_local_ignored": ".local-cmdb-reactor.log"
+  },
+  "contract": {
+    "generation_consistent": true,
+    "tests": 187,
+    "passed": 187,
+    "failed": 0,
+    "log_local_ignored": ".local-cmdb-contract-r3.log"
+  },
+  "postgres": {
+    "environment": "lan-test-20261008",
+    "version": "17.9 (Debian 17.9-1.pgdg12+1)",
+    "transport": "pinned SSH; ephemeral loopback TCP tunnel; existing component",
+    "namespace": "new random tenant per test, invisible outer transaction",
+    "business_role": "mop_test_runtime",
+    "mode": "real SQL under savepoints; outer rollback and tenant absence assertion",
+    "migrations_executed": 0,
+    "tests": 5,
+    "passed": 5,
+    "failures": 0,
+    "errors": 0,
+    "attempt": 3,
+    "scenarios": [
+      "assets, metadata, immutable receipt and authorized idempotent replay",
+      "injected SQL failure after first row rolls back assets, metadata, audit and receipt",
+      "foreign creator and unresolved tenant reference return 404",
+      "quota, canonical address duplicate and stale source rejection",
+      "revoked permission blocks receipt replay"
+    ],
+    "source_seed": "synthetic parsed artifact, not external storage or parser evidence",
+    "log_local_ignored": ".local-cmdb-postgres-r3.log"
+  },
+  "prior_failures": [
+    "PowerShell split unquoted Maven dotted property; corrected argument quoting",
+    "empty parsed artifact already rejected by its constructor; corrected test expectation",
+    "PG attempt 1: test cast replay JsonNode to Map; corrected test adapter",
+    "PG attempt 2: IntNode/LongNode equality; compare serialized JSON without weakening business assertions",
+    "contract test dependency absent in new checkout; installed local package-lock dependencies",
+    "CSRF header spelling did not match existing contract convention; aligned generator spelling"
+  ],
+  "not_run": [
+    "durable commit followed by process restart",
+    "multiple concurrent database connections",
+    "500 rows within 60 seconds",
+    "real HTTP and browser execution of the new command",
+    "object storage and isolated parser worker end-to-end import",
+    "formal contract TC and customer acceptance"
+  ],
+  "customer_confirmation": "UNVERIFIED",
+  "production_approved": false,
+  "monitoring_started": false,
+  "external_notifications_sent": false,
+  "business_tenant_synthetic_writes": false,
+  "historical_test_identities_restored": false
+}

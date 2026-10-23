@@ -41,6 +41,14 @@ class AssetImportHttpSecurityTest {
         @Bean PlatformRepository repository(){return mock(PlatformRepository.class);}
         @Bean AssetImportSourceRepository sources(){return mock(AssetImportSourceRepository.class);}
         @Bean AssetImportObjectStore store(){return mock(AssetImportObjectStore.class);}
+        @Bean
+        cn.mop.domain.assetimport.CmdbImportExecutionRepository executions() {
+            return mock(cn.mop.domain.assetimport.CmdbImportExecutionRepository.class);
+        }
+        @Bean
+        CmdbImportExecutionController executionController(PlatformRepository repository) {
+            return new CmdbImportExecutionController(repository, executions());
+        }
         @Bean ObjectMapper mapper(){return new ObjectMapper().enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION).enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);}
         @Bean AssetImportController imports(PlatformRepository repository,AssetImportSourceRepository sources,AssetImportObjectStore store,ObjectMapper mapper){return new AssetImportController(repository,sources,store,new AssetImportPolicy(),mapper);}
         @Bean FileController photos(PlatformRepository repository,ObjectMapper mapper){return new FileController(repository,new PhotoPolicy("image/png,image/jpeg"),mock(PhotoObjectStore.class),mapper);}
@@ -75,5 +83,18 @@ class AssetImportHttpSecurityTest {
     }
     @Test void largerGlobalImportLimitNeverExpandsPhotoLimit()throws Exception{
         when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"viewer",9,true)));mvc.perform(scoped(multipart("/api/v1/files").part(new MockPart("file","too-large.png",new byte[PhotoPolicy.MAX_SIZE+1]),new MockPart("purpose","customer_report_photo".getBytes(StandardCharsets.UTF_8)))).with(csrf().asHeader())).andExpect(status().isBadRequest()).andExpect(jsonPath("$.error.code").value("VALIDATION_ERROR"));verify(repository,never()).acceptPhoto(anyString(),anyString(),any());
+    }
+    @Test
+    void cmdbExecutionKeepsActualCsrfFilterAndCurrentMemberAuthorization() throws Exception {
+        String url = "/api/v1/assets/import-sources/" + SOURCE + "/cmdb-imports";
+        String body = "{\"expected_version\":1,\"source_parse_hash\":\"" + "a".repeat(64) + "\"}";
+        mvc.perform(scoped(post(url).contentType(MediaType.APPLICATION_JSON).content(body)))
+                .andExpect(status().isForbidden()).andExpect(jsonPath("$.error.code").value("CSRF_INVALID"));
+        when(repository.membership(ACTOR, TENANT)).thenReturn(Optional.of(new Membership(ACTOR, TENANT, "viewer", 9, true)));
+        mvc.perform(scoped(post(url).contentType(MediaType.APPLICATION_JSON).content(body)).with(csrf().asHeader()))
+                .andExpect(status().isForbidden()).andExpect(jsonPath("$.error.code").value("ACTION_FORBIDDEN"));
+        when(repository.membership(ACTOR, TENANT)).thenReturn(Optional.empty());
+        mvc.perform(scoped(post(url).contentType(MediaType.APPLICATION_JSON).content(body)).with(csrf().asHeader()))
+                .andExpect(status().isUnauthorized()).andExpect(jsonPath("$.error.code").value("SESSION_EXPIRED"));
     }
 }

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.web.MockHttpSession;
@@ -37,7 +38,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
-@ActiveProfiles("local_fixture")
+@ActiveProfiles({"local_fixture", "isolated_backup_content_http"})
 @ContextConfiguration(classes = BackupVersionContentHttpSecurityTest.Configuration.class)
 class BackupVersionContentHttpSecurityTest {
     static final String TENANT = UUID.randomUUID().toString(), ACTOR = UUID.randomUUID().toString();
@@ -45,6 +46,7 @@ class BackupVersionContentHttpSecurityTest {
     static final String ROOT = "/api/v1/assets/" + ASSET + "/backup-versions";
 
     @org.springframework.boot.test.context.TestConfiguration
+    @Profile("isolated_backup_content_http")
     @EnableWebMvc
     @EnableWebSecurity
     @Import({SecurityConfiguration.class, ApiExceptionHandler.class})

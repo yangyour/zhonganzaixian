@@ -66,7 +66,9 @@
         "docs/dashboard-alert-bell-20261023.md",
         "docs/evidence/gap-ui03-bell-20261023/validation.json",
         "docs/evidence/gap-ui03-search-20261023/validation.json",
-        "docs/global-search-landmark-fix-20261023.md"
+        "docs/global-search-landmark-fix-20261023.md",
+        "docs/event-read-authorization-20261023.md",
+        "docs/evidence/dot-continuation-20261023/ui03-event-read-authorization.json"
       ],
       "commits": [
         "1e4431b5",

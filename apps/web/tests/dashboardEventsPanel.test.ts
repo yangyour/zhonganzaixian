@@ -26,3 +26,21 @@ it('refresh failure removes old rows and explicit retry uses the same endpoint',
 it.each(['tenant','permission','unmount','switch'])('aborts and discards late response after %s change',async kind=>{let finish!:(v:unknown)=>void;const req=vi.spyOn(api,'request').mockImplementation(()=>new Promise(r=>finish=r));await mount();if(kind==='tenant')session.value=null;if(kind==='permission')session.value={...auth,capabilities:[]};if(kind==='switch')switchingTenant.value=true;if(kind==='unmount'){app!.unmount();app=undefined}await settle();expect(req.mock.calls[0]![1]?.signal?.aborted).toBe(true);finish(sampleWorkspace());await settle();expect(host.querySelector('table')).toBeNull()})
 it('rejects cross-tenant, oversized and unsorted lists instead of silently slicing',async()=>{const req=vi.spyOn(api,'request').mockResolvedValue({...sampleWorkspace(),tenant_id:'ffffffff-ffff-4fff-8fff-ffffffffffff'});await mount();expect(host.querySelector('table')).toBeNull();const many=sampleWorkspace();many.events=Array.from({length:8},(_,n)=>({...many.events[0]!,id:`00000000-0000-4000-8000-${String(100-n).padStart(12,'0')}`}));req.mockResolvedValue(many);button('刷新近期事件').click();await settle();expect(host.querySelector('table')).toBeNull();many.events=many.events.slice(0,2).reverse();req.mockResolvedValue(many);button('刷新近期事件').click();await settle();expect(host.querySelector('table')).toBeNull()})
 it('inflight refresh is disabled and text values cannot become HTML',async()=>{const data=sampleWorkspace();data.events[0]!.rule_name='<img src=x onerror=alert(1)>';const req=vi.spyOn(api,'request').mockResolvedValueOnce(data);await mount();expect(host.querySelector('img')).toBeNull();expect(host.textContent).toContain('<img src=x');let finish!:(v:unknown)=>void;req.mockImplementation(()=>new Promise(r=>finish=r));button('刷新近期事件').click();await settle();expect(button('读取中…').disabled).toBe(true);button('读取中…').click();expect(req).toHaveBeenCalledTimes(2);finish(data);await settle()})
+
+it('account version change aborts the old request and accepts only the new authorized read',async()=>{
+ const completions:Array<(value:unknown)=>void>=[];
+ const req=vi.spyOn(api,'request').mockImplementation(()=>new Promise(resolve=>completions.push(resolve)));
+ await mount();expect(req).toHaveBeenCalledTimes(1);
+ session.value={...auth,account_version:2};await settle();
+ expect(req.mock.calls[0]![1]?.signal?.aborted).toBe(true);expect(req).toHaveBeenCalledTimes(2);
+ const old=sampleWorkspace();old.events[0]!.rule_name='STALE_ACCOUNT_RECORD';completions[0]!(old);await settle();
+ expect(host.textContent).not.toContain('STALE_ACCOUNT_RECORD');expect(host.querySelector('table')).toBeNull();
+ const fresh=sampleWorkspace();fresh.events[0]!.rule_name='CURRENT_ACCOUNT_RECORD';completions[1]!(fresh);await settle();
+ expect(host.textContent).toContain('CURRENT_ACCOUNT_RECORD');expect(host.textContent).not.toContain('STALE_ACCOUNT_RECORD');
+})
+it('account version change clears already rendered records before the next response',async()=>{
+ const req=vi.spyOn(api,'request').mockResolvedValueOnce(sampleWorkspace());await mount();expect(host.querySelector('table')).not.toBeNull();
+ let finish!:(value:unknown)=>void;req.mockImplementation(()=>new Promise(resolve=>finish=resolve));
+ session.value={...auth,account_version:2};await settle();expect(host.querySelector('table')).toBeNull();expect(host.textContent).toContain('正在读取近期事件');
+ finish(sampleWorkspace());await settle();expect(host.querySelector('table')).not.toBeNull();
+})

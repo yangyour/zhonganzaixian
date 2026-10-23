@@ -1,0 +1,22 @@
+{
+  "status": "RETURN_TIME_READ_AUTHORIZATION_CODE_VALIDATED",
+  "independent_main_baseline": "19b2ac3e3cbde97112e546eba87d8e45fc00e1e5",
+  "baseline_new_java_tests": 26,
+  "baseline_new_java_failures": 26,
+  "local_java_tests": 131,
+  "local_java_failures": 0,
+  "main_java_tests": 131,
+  "main_java_failures": 0,
+  "frontend_account_race_tests": 2,
+  "frontend_existing_behavior_already_passed": true,
+  "web_tests": 30,
+  "web_failures": 0,
+  "typecheck": "PASSED",
+  "build": "PASSED_WITH_EXISTING_CHUNK_WARNING",
+  "actual_database": "NOT_RUN_MISSING_PRIVATE_CONFIGURATION",
+  "actual_browser": "NOT_RUN",
+  "formal_acceptance": "NOT_RUN",
+  "api_shape_changes": 0,
+  "migrations": 0,
+  "deployed": false
+}

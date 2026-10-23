@@ -39,13 +39,14 @@ public final class MonitoringEventCenterController {
 
     @GetMapping("/events")
     Object workspace(HttpServletRequest r) {
-        Access a = access(r, "tickets:read", true);
+        var subject = subject(r, "tickets:read", true);
+        Access a = subject.access();
         var q = query(r, Set.of("window", "page_size"));
         String window = q.getOrDefault("window", "24h");
         int limit = size(q.get("page_size"), 25, 50);
         EventCenterWorkspace w = repository.workspace(a, window, limit);
         if (w == null || !a.tenantId().equals(w.tenantId())) throw unavailable();
-        return success(map(
+        var result = map(
             "tenant_id", w.tenantId(),
             "events", w.events().stream().map(x -> eventDto(x, a.tenantId())).toList(),
             "noise_funnel", funnelDto(w.noiseFunnel(), a.tenantId()),
@@ -54,34 +55,42 @@ public final class MonitoringEventCenterController {
             "autoticket_attempts", w.autoTicketAttempts().stream().map(x -> attemptDto(x, a.tenantId())).toList(),
             "observed_at", w.observedAt().toString(),
             "source", "postgresql"
-        ), r);
+        );
+        DashboardReadAuthorization.recheck(r, platform, subject.membership());
+        return success(result, r);
     }
 
     @GetMapping("/events/noise-funnel")
     Object noiseFunnel(HttpServletRequest r) {
-        Access a = access(r, "tickets:read", true);
+        var subject = subject(r, "tickets:read", true);
+        Access a = subject.access();
         var q = query(r, Set.of("window"));
         String window = q.getOrDefault("window", "24h");
         NoiseFunnelView v = repository.noiseFunnel(a, window);
         if (v == null || !a.tenantId().equals(v.tenantId())) throw unavailable();
-        return success(funnelDto(v, a.tenantId()), r);
+        var result = funnelDto(v, a.tenantId());
+        DashboardReadAuthorization.recheck(r, platform, subject.membership());
+        return success(result, r);
     }
 
     @GetMapping("/events/{id}")
     Object eventDetail(@PathVariable("id") String rawId, HttpServletRequest r) {
-        Access a = access(r, "tickets:read", true);
+        var subject = subject(r, "tickets:read", true);
+        Access a = subject.access();
         if (r.getQueryString() != null) throw invalid();
         String id = parseUuid(rawId);
         EventDetailView v = repository.eventDetail(a, id);
         if (v == null || v.event() == null || !a.tenantId().equals(v.event().tenantId())) throw unavailable();
-        return success(map(
+        var result = map(
             "event", eventDto(v.event(), a.tenantId()),
             "members", v.members().stream().map(x -> memberDto(x, a.tenantId())).toList(),
             "noise_records", v.noiseRecords().stream().map(x -> noiseDto(x, a.tenantId())).toList(),
             "autoticket_attempt", v.autoTicketAttempt().map(x -> attemptDto(x, a.tenantId())).orElse(null),
             "observed_at", v.observedAt().toString(),
             "source", "postgresql"
-        ), r);
+        );
+        DashboardReadAuthorization.recheck(r, platform, subject.membership());
+        return success(result, r);
     }
 
     @PostMapping(value = "/events/ingest", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -213,16 +222,23 @@ public final class MonitoringEventCenterController {
         return success(result, r);
     }
 
+    private record Subject(Access access, Membership membership) {}
+
     private Access access(HttpServletRequest r, String capability, boolean internalOnly) {
+        return subject(r, capability, internalOnly).access();
+    }
+
+    private Subject subject(HttpServletRequest r, String capability, boolean internalOnly) {
         if (r.getUserPrincipal() == null || r.getSession(false) == null) throw expired();
         Object t = r.getSession(false).getAttribute("mop.tenant_id");
         if (!(t instanceof String tenant) || tenant.isBlank()) throw expired();
         String actor = r.getUserPrincipal().getName();
         var m = platform.membership(actor, tenant).orElseThrow(MonitoringEventCenterController::expired);
-        if (!m.active() || m.permissionVersion() < 1) throw expired();
+        if (!m.active() || m.permissionVersion() < 1 || m.permissionVersion() > MAX_VERSION
+                || !actor.equals(m.userId()) || !tenant.equals(m.tenantId())) throw expired();
         if (!m.capabilities().contains(capability) || (internalOnly && !Capabilities.internal(m.role())))
             throw new DomainException(403, "ACTION_FORBIDDEN", "当前身份无权操作监控事件中心");
-        return new Access(tenant, actor, m.permissionVersion(), trace(r));
+        return new Subject(new Access(tenant, actor, m.permissionVersion(), trace(r)), m);
     }
 
     private static DomainException expired() {

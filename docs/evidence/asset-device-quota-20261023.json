@@ -25,5 +25,17 @@
   "not_run": ["multiple concurrent connections", "committed crash recovery", "500-row performance", "new-command real HTTP/browser", "formal TC"],
   "not_implemented_by_this_slice": ["durable onboarding reservations", "item and NVPS metering", "tenant provisioning approval", "retention and deletion governance"],
   "customer_quota_values": null,
-  "production_approved": false
+  "production_approved": false,
+  "integration": {
+    "merge_commit": "e7453bbf",
+    "main_base": "927c8821",
+    "java_total": 4215,
+    "java_executed": 3185,
+    "java_skipped": 1030,
+    "java_failures": 0,
+    "java_errors": 0,
+    "contract_passed": 194,
+    "conflicts_resolved": ["append all component inventory sections", "preserve secure-session transport and regenerate API contract"],
+    "deployment": false
+  }
 }

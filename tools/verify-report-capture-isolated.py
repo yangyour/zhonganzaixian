@@ -31,7 +31,8 @@ def protected_fingerprints(connection):
     result = {}
     for table in ('mop_inspection_source_collection', 'mop_inspection_source_collection_item',
                   'mop_inspection_quarterly_report', 'mop_inspection_worksheet',
-                  'mop_inspection_worksheet_revision', 'mop_membership', 'mop_asset'):
+                  'mop_inspection_worksheet_revision', 'mop_membership', 'mop_asset',
+                  'mop_ticket', 'mop_ticket_workflow_event', 'mop_ticket_lifecycle_revision'):
         # Fixed internal identifiers only; actual customer data never leaves the digest query.
         with connection.cursor() as cursor:
             cursor.execute('SELECT count(*), md5(COALESCE(string_agg(row_digest, \'\' ORDER BY row_digest),\'\')) '
@@ -42,7 +43,7 @@ def protected_fingerprints(connection):
     return result
 
 
-def run(output: Path):
+def run(output: Path, suite: str):
     output.mkdir(parents=True, exist_ok=False)
     owner = {'session': 'reports', 'branch': 'codex/launch-reports-20261023',
              'operation': 'isolated-report-capture-pg', 'owner': str(uuid.uuid4()),
@@ -54,12 +55,14 @@ def run(output: Path):
     admin = None
     seeded = False
     actor = str(uuid.uuid4())
+    viewers = [str(uuid.uuid4()), str(uuid.uuid4())] if suite == 'dashboard' else []
     tenants = [str(uuid.uuid4()), str(uuid.uuid4())]
     assets = [str(uuid.uuid4()), str(uuid.uuid4())]
     summary = {'environment': 'lan-test-20261008', 'schema_migrations': 0,
                'actual_tenant_written': False, 'new_local_components': 0,
                'external_messages': 0, 'test_tenants': tenants, 'test_actor': actor,
                'formal_contract_acceptance': 'NOT_RUN', 'status': 'NOT_RUN'}
+    summary['suite'] = suite
     try:
         cfg = json.loads((PRIVATE / 'lan-test-connection.json').read_text(encoding='utf-8-sig'))
         runtime = json.loads((PRIVATE / 'lan-test-runtime.json').read_text(encoding='utf-8-sig'))
@@ -100,9 +103,14 @@ def run(output: Path):
             with admin.cursor() as cursor:
                 cursor.execute('INSERT INTO public.mop_user(id,identity_source,subject,display_name,role_code) '
                                "VALUES(%s,'isolated_report_capture',%s,%s,'padmin')", (actor, marker, marker))
+                for viewer in viewers:
+                    cursor.execute('INSERT INTO public.mop_user(id,identity_source,subject,display_name,role_code) '
+                                   "VALUES(%s,'isolated_report_capture',%s,%s,'viewer')", (viewer, marker + viewer, marker))
                 for index, tenant in enumerate(tenants):
                     cursor.execute('INSERT INTO public.mop_tenant(id,name) VALUES(%s,%s)', (tenant, marker + '_' + str(index)))
                     cursor.execute("INSERT INTO public.mop_membership(tenant_id,user_id,role_code) VALUES(%s,%s,'padmin')", (tenant, actor))
+                    for viewer in viewers:
+                        cursor.execute("INSERT INTO public.mop_membership(tenant_id,user_id,role_code) VALUES(%s,%s,'viewer')", (tenant, viewer))
                     cursor.execute("INSERT INTO public.mop_site(tenant_id,id,name) VALUES(%s,'report-test','SYNTHETIC_REPORT_CAPTURE_SITE')", (tenant,))
                     cursor.execute('INSERT INTO public.mop_asset(id,tenant_id,name,type,management_ip,site_id,source,created_by,updated_by) '
                                    "VALUES(%s,%s,'SYNTHETIC_REPORT_CAPTURE_ASSET','other','192.0.2.1','report-test','manual',%s,%s)",
@@ -115,9 +123,13 @@ def run(output: Path):
                     'MOP_RUN_REPORT_CAPTURE_PG_TESTS': 'true', 'MOP_REPORT_CAPTURE_TENANT': tenants[0],
                     'MOP_REPORT_CAPTURE_FOREIGN_TENANT': tenants[1], 'MOP_REPORT_CAPTURE_ACTOR': actor,
                     'MOP_REPORT_CAPTURE_ASSET': assets[0], 'MOP_REPORT_CAPTURE_FOREIGN_ASSET': assets[1]})
+        if viewers:
+            env.update({'MOP_RUN_DASHBOARD_PENDING_PG_TESTS': 'true', 'MOP_DASHBOARD_TEST_VIEWER': viewers[0],
+                        'MOP_DASHBOARD_TEST_OTHER_VIEWER': viewers[1]})
+        selected_test = 'PostgresDashboardPendingTicketsIntegrationTest' if suite == 'dashboard' else 'PostgresReportCaptureIsolatedIntegrationTest'
         with (output / 'maven.log').open('w', encoding='utf-8') as log:
             result = subprocess.run(['mvn.cmd', '-pl', 'server/persistence', '-am',
-                                     '-Dtest=PostgresReportCaptureIsolatedIntegrationTest',
+                                     '-Dtest=' + selected_test,
                                      '-Dsurefire.failIfNoSpecifiedTests=false', 'test'], cwd=ROOT, env=env,
                                     stdout=log, stderr=subprocess.STDOUT, timeout=600)
         summary['maven_exit_code'] = result.returncode
@@ -139,7 +151,14 @@ def run(output: Path):
                             raise ValueError('Test actor cleanup scope mismatch')
                         cursor.execute('UPDATE public.mop_membership SET active=false,permission_version=permission_version+1 '
                                        'WHERE user_id=%s AND tenant_id IN (%s,%s)', (actor, *tenants))
+                        for viewer in viewers:
+                            cursor.execute("UPDATE public.mop_user SET active=false WHERE id=%s AND identity_source='isolated_report_capture' AND subject=%s", (viewer, marker + viewer))
+                            if cursor.rowcount != 1:
+                                raise ValueError('Test viewer cleanup scope mismatch')
+                            cursor.execute('UPDATE public.mop_membership SET active=false,permission_version=permission_version+1 '
+                                           'WHERE user_id=%s AND tenant_id IN (%s,%s)', (viewer, *tenants))
                 summary['test_principal_deactivated'] = True
+                summary['test_viewers_deactivated'] = len(viewers)
             except Exception as failure:
                 summary.update(status='FAILED', cleanup_failure_type=type(failure).__name__)
         if admin is not None:
@@ -159,5 +178,6 @@ def run(output: Path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--suite', choices=('report', 'dashboard'), default='report')
     args = parser.parse_args()
-    raise SystemExit(run(args.output.resolve()))
+    raise SystemExit(run(args.output.resolve(), args.suite))

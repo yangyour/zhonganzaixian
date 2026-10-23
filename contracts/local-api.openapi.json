@@ -42700,6 +42700,72 @@
           }
         }
       }
+    },
+    "/dashboard/pending-tickets": {
+      "get": {
+        "operationId": "readDashboardPendingTickets",
+        "summary": "当前可见工单的非终态数量与最近五条；未配置流程单列为未知",
+        "x-mop-capabilities": [
+          "dashboard:read",
+          "tickets:read"
+        ],
+        "x-mop-read-only": true,
+        "x-mop-allowed-query-keys": [],
+        "x-mop-customer-scope": "REPORTER_ONLY",
+        "x-mop-snapshot-isolation": "REPEATABLE_READ",
+        "responses": {
+          "200": {
+            "description": "Same-snapshot counts and top five, no customer/SLA rule inference",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardPendingTicketsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid scope, permission, workflow state or dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid scope, permission, workflow state or dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid scope, permission, workflow state or dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid scope, permission, workflow state or dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -86315,6 +86381,257 @@
           "data",
           "trace_id"
         ]
+      },
+      "DashboardPendingTickets": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "permission_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "scope": {
+            "enum": [
+              "CURRENT_TENANT_INTERNAL",
+              "REPORTER_ONLY"
+            ]
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "metric_version": {
+            "const": "MOP_VISIBLE_NONTERMINAL_TICKETS_V1"
+          },
+          "registrations": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "known_pending": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "terminal": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "unconfigured": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "pending_tickets": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "enum": [
+              "AVAILABLE",
+              "PARTIAL"
+            ]
+          },
+          "unavailable_reason": {
+            "enum": [
+              null,
+              "REGISTRATIONS_WITHOUT_WORKFLOW"
+            ]
+          },
+          "item_limit": {
+            "const": 5
+          },
+          "sort": {
+            "const": "REGISTRATION_CREATED_AT_DESC_ID_DESC"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ticket_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "receipt_no": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "registered_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "workflow_model": {
+                  "enum": [
+                    "WORKFLOW_V33",
+                    "LIFECYCLE_V42"
+                  ]
+                },
+                "state": {
+                  "type": "string"
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740990
+                }
+              },
+              "required": [
+                "ticket_id",
+                "receipt_no",
+                "title",
+                "registered_at",
+                "workflow_model",
+                "state",
+                "version"
+              ],
+              "additionalProperties": false,
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "workflow_model": {
+                        "const": "WORKFLOW_V33"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "state": {
+                        "enum": [
+                          "OPEN",
+                          "ACCEPTED",
+                          "IN_PROGRESS",
+                          "RESOLVED"
+                        ]
+                      }
+                    }
+                  },
+                  "else": {
+                    "properties": {
+                      "state": {
+                        "enum": [
+                          "NEW",
+                          "IN_PROGRESS",
+                          "WAITING_VENDOR",
+                          "PENDING_CUSTOMER",
+                          "RESOLVED",
+                          "REOPENED"
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "maxItems": 5
+          },
+          "overdue_sla": {
+            "type": "null"
+          },
+          "writes_performed": {
+            "const": false
+          }
+        },
+        "required": [
+          "tenant_id",
+          "actor_id",
+          "permission_version",
+          "observed_at",
+          "scope",
+          "source",
+          "metric_version",
+          "registrations",
+          "known_pending",
+          "terminal",
+          "unconfigured",
+          "pending_tickets",
+          "state",
+          "unavailable_reason",
+          "item_limit",
+          "sort",
+          "items",
+          "overdue_sla",
+          "writes_performed"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "unconfigured": {
+                  "const": 0
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "pending_tickets": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740990
+                },
+                "state": {
+                  "const": "AVAILABLE"
+                },
+                "unavailable_reason": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "pending_tickets": {
+                  "type": "null"
+                },
+                "state": {
+                  "const": "PARTIAL"
+                },
+                "unavailable_reason": {
+                  "const": "REGISTRATIONS_WITHOUT_WORKFLOW"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "DashboardPendingTicketsResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DashboardPendingTickets"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
       }
     }
   },

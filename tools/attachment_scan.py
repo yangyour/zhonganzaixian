@@ -57,7 +57,7 @@ def scan_bytes(content, expected_sha256, port=None, enabled=False):
               'scan_attempted': False, 'content_sha256': None, 'bytes': None, 'engine_version': None,
               'signature_database_version': None, 'signature_freshness_verified': False,
               'scanner_policy_verified': False, 'release_allowed': False, 'attachment_state_changed': False}
-    if not enabled:
+    if enabled is not True:
         return report
     if (type(port) is not int or not 1 <= port <= 65535 or not isinstance(content, bytes)
             or not 0 < len(content) <= MAX_CONTENT_BYTES or not isinstance(expected_sha256, str)

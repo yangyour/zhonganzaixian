@@ -23,6 +23,8 @@ class AttachmentScanTest(unittest.TestCase):
     def test_disabled_never_opens_connection_or_treats_unknown_as_clean(self):
         with patch.object(scanner.socket, 'create_connection') as connection:
             result = scanner.scan_bytes(CONTENT, SHA, 19310)
+            for flag in [None, False, 'false', 'true', 1]:
+                self.assertFalse(scanner.scan_bytes(CONTENT, SHA, 19310, flag)['scan_attempted'])
         connection.assert_not_called()
         self.assertEqual(result['verdict'], 'UNKNOWN')
         self.assertFalse(result['release_allowed'])

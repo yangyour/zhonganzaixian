@@ -1,5 +1,18 @@
 # production 会话进度
 
+## 缺口清单续作（基线9cdccdc8）
+
+2026-10-23按最新授权继续实际开发，已核对独立绝对目录、规范origin及本线分支，工作树无他人修改后正常快进最新main。`check_implementation_gaps.py`通过（128条／25组／无遗漏映射，completion_verified=false）。下方旧P01–P07是历史切片序号；**本节P01–P03／G01以新版总清单ID为准**，不能用旧切片完成替代总项完成。
+
+- **P01**：既有预检／直接TLS守卫／回退检查复用；生产配置与实际运行隔离装配、管理端接线仍缺，Q02数据库最终方案／生产DDL不自行决定。
+- **P02（实施中）**：新增照片附件持久安全状态仓储、当前租户操作API、幂等/CAS/审计及原图授权前后复核，照片面板接入申请、取消、发布、隔离和未知请求恢复。客户端无扫描结果写入口。前端8项流程测试及构建已通过；Java初次编译修正测试包引用后重跑中，数据库SQL版本等待通知线migration.lock，不占用／删除他人锁。凭据授权审计／安全留存仍缺，未将P02标完成。
+- **P03**：既有证据核对器复用，新增有界只读HTTP执行器，经指定服务器的固定主机密钥SSH发送真实3次live GET，3次200/remote_test/UP；9项单元通过。仅证明执行路径，小样本不外推规模，隔离恢复／故障切换／合同持续压测仍缺。[接口、证据与剩余边界](../gap-p03-readiness-execution.md)。
+- **G01**：保留CUSTOMER_GATED；Q01路线未确认，不连接真实堡垒机或设备，不进入M7正式开发。
+
+本轮只读核验指定服务器项目mop-lan-test／lan-test-20261008，PG17.9、正式测试库mop_test、50条成功迁移／V50，无现成mop_security_test命名空间；未写业务或DDL。新附件结构仅计划在同一服务器的独立安全测试schema核验，不改变当前服务V50谱系；未重跑DEMO初始化、恢复旧身份、外发或部署。
+
+已正常同步main `581f4a6b`，复用集成线的 `tools/demo-api-contract.mjs`，删除本线重复修复；当前生成器只增附件安全契约，保留DEMO定义及0.84。P02补充Java/Worker27+2项、前端照片相关41项及新增8项流程通过，根契约199项通过；后续仍按新迁移与真实数据库验证结果核销，尚未标VERIFIED。
+
 ## 仓库与授权核对
 
 2026-10-23，本线负责众安在线MOP生产安全与验收工具。独立工作目录 `E:\work\wxw9\zhonganzaixian\.parallel\launch-20261023\production`；规范origin `https://github.com/yangyour/zhonganzaixian.git`（`yangyour/zhonganzaixian`）；分支 `codex/launch-production-20261023`，起始上游 `origin/main`，fetch后HEAD及远端基线 `05ec77ba`。依据本检出AGENTS首节和 `docs/parallel-development-20261023.md`。原主目录只读，未编辑现行前端样式／导航／AssetsPage.vue／AppTable.vue。开始时18216／15216无监听，本功能没有启动进程。

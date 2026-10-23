@@ -21,7 +21,7 @@ py -3 tools/production_preflight.py --config .local/production-preflight.json --
 
 ## 本次验证
 
-2026-10-23：17项纯验证／合成传输单元测试通过，覆盖错误响应、证书失败、过期边界、敏感信息隔离、Cookie、重定向及证据防覆盖。命令：`py -3 -m unittest discover -s tools -p test_production_preflight.py -v`。
+2026-10-23：首轮17项纯验证／合成传输单元测试通过；复核补充同一Set-Cookie重复会话声明、带值Secure/HttpOnly和无效重复max-age拒绝，现为19项通过。覆盖错误响应、证书失败、过期边界、敏感信息隔离、Cookie、重定向及证据防覆盖。命令：`py -3 -m unittest discover -s tools -p test_production_preflight.py -v`。
 
 同日06:56 UTC（02:56 EDT）对已有业务域名 `mop.all-online.com.cn` 进行真实无登录探测：证书校验失败，HTTP没有满足永久同源HTTPS跳转；HTTPS依赖就绪、Cookie、HSTS均未越过失败的TLS门禁重测。证据：[public-entry.json](evidence/production-preflight-20261023/public-entry.json)。探测目标是既有测试发布入口，不是新生产环境；组件版本未重新盘点。本轮未启动本地服务、未读写数据库、未安装组件、未部署、未运行正式TC。
 

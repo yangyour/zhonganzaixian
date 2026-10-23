@@ -130,6 +130,15 @@ class PreflightTest(unittest.TestCase):
                         [('Strict-Transport-Security', 'max-age=31536000')] * 2]:
             self.assertFalse(preflight.valid_hsts(headers))
 
+    def test_duplicate_cookie_in_one_header_and_valued_flags_cannot_pass(self):
+        good = 'MOP_SESSION=SYNTHETIC; Secure; HttpOnly; SameSite=Strict; Path=/'
+        for value in [good + '; MOP_SESSION=OTHER', good.replace('Secure;', 'Secure=false;'),
+                      good.replace('HttpOnly;', 'HttpOnly=false;')]:
+            self.assertFalse(preflight.secure_session_cookie([('Set-Cookie', value)]))
+
+    def test_invalid_duplicate_hsts_directive_cannot_hide_behind_valid_one(self):
+        self.assertFalse(preflight.valid_hsts([('Strict-Transport-Security', 'max-age=31536000; max-age=invalid')]))
+
     def test_http_redirect_must_preserve_verified_origin_and_path(self):
         probe = SyntheticProbe()
         for location in ['https://other.example.test' + preflight.READY_PATH, probe.origin, 'http://mop.example.test' + preflight.READY_PATH]:

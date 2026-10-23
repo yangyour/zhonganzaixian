@@ -71,18 +71,20 @@ def headers_named(headers, name):
 
 def secure_session_cookie(headers):
     found = []
+    declarations = 0
     try:
         for raw in headers_named(headers, 'set-cookie'):
+            declarations += len(re.findall(r'(?:^|[;,])\s*MOP_SESSION\s*=', raw))
             cookie = SimpleCookie()
             cookie.load(raw)
             if 'MOP_SESSION' in cookie:
                 found.append(cookie['MOP_SESSION'])
     except Exception:
         return False
-    if len(found) != 1:
+    if len(found) != 1 or declarations != 1:
         return False
     cookie = found[0]
-    return bool(cookie.value and cookie['secure'] and cookie['httponly']
+    return bool(cookie.value and cookie['secure'] is True and cookie['httponly'] is True
                 and cookie['samesite'].lower() == 'strict' and cookie['path'] == '/'
                 and not cookie['domain'] and not cookie['max-age'] and not cookie['expires'])
 
@@ -90,6 +92,8 @@ def secure_session_cookie(headers):
 def valid_hsts(headers):
     values = headers_named(headers, 'strict-transport-security')
     if len(values) != 1:
+        return False
+    if len(re.findall(r'(?:^|;)\s*max-age\s*=', values[0], re.I)) != 1:
         return False
     ages = re.findall(r'(?:^|;)\s*max-age\s*=\s*([0-9]+)\s*(?=;|$)', values[0], re.I)
     return len(ages) == 1 and int(ages[0]) >= 31536000

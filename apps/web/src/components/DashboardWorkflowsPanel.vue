@@ -1,45 +1,87 @@
 <script setup lang="ts">
-import {computed,nextTick,onUnmounted,ref,shallowRef,watch} from 'vue'
-import {api} from '../api/client'
-import {can,contextGeneration,session,switchingTenant} from '../stores/session'
-import {createDashboardWorkflows,emptyDashboardWorkflows} from '../utils/dashboardWorkflows'
-import {workflowLabels,type WorkflowState} from '../utils/ticketWorkflow'
-import {compactTime,displayTime} from '../utils/display'
-import type {TicketWorkflow} from '../utils/ticketWorkflow'
+import { computed, nextTick, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { api } from '../api/client'
+import { can, contextGeneration, session, switchingTenant } from '../stores/session'
+import { createPendingTickets, emptyPendingTickets, pendingTicketLabel, pendingTicketTarget, type PendingTicketState } from '../utils/dashboardPendingTickets'
+import { detachedWorkspaceState } from '../utils/detachedWorkspaceState'
+import { displayTime } from '../utils/display'
 import ApiErrorNotice from './ApiErrorNotice.vue'
-const state=shallowRef(emptyDashboardWorkflows()),status=ref<HTMLElement|null>(null),refreshButton=ref<HTMLButtonElement|null>(null)
-const workspace=createDashboardWorkflows(api,value=>state.value=value)
-let disposed=false
-const customer=computed(()=>['viewer','tadmin'].includes(session.value?.user.role??''))
-const permitted=computed(()=>session.value?.mode==='remote_test'&&can('dashboard:read')&&can('tickets:read')&&!switchingTenant.value)
-const scope=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.user.role,session.value?.permission_version,session.value?.account_version,session.value?.mode,permitted.value]))
-watch(scope,()=>{const s=session.value;workspace.reset(permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,role:s.user.role,permissionVersion:s.permission_version}:null);if(permitted.value)void workspace.refresh()},{immediate:true,flush:'sync'})
-async function read(action:'refresh'|'next'|'previous'|'retry',filter?:WorkflowState){if(!permitted.value||state.value.busy||disposed)return;const owner=scope.value;await(filter?workspace.select(filter):workspace[action]());await nextTick();if(!disposed&&owner===scope.value)status.value?.focus()}
-function select(event:Event){void read('refresh',(event.target as HTMLSelectElement).value as WorkflowState)}
-async function cancel(){workspace.cancel();await nextTick();if(!disposed&&permitted.value)refreshButton.value?.focus()}
-onUnmounted(()=>{disposed=true;workspace.dispose()})
-defineExpose({ refresh: () => workspace.refresh() })
-// M1-6 SLA column: the deadline the server issued for the clock that applies now; overdue is decided server-side.
-function slaDeadline(row:TicketWorkflow){
- if(row.state==='OPEN')return {label:'响应截止',at:row.response_due_at}
- if(row.state==='ACCEPTED'||row.state==='IN_PROGRESS')return {label:'恢复截止',at:row.recovery_due_at}
- if(row.state==='RESOLVED')return {label:'确认截止',at:row.confirm_due_at}
- return {label:'',at:null}
+
+const emit = defineEmits<{ state: [PendingTicketState] }>()
+const state = shallowRef(emptyPendingTickets())
+const status = ref<HTMLElement | null>(null), refreshButton = ref<HTMLButtonElement | null>(null)
+const workspace = createPendingTickets(api, value => {
+  state.value = value
+  emit('state', detachedWorkspaceState(value))
+})
+let disposed = false
+const customer = computed(() => ['viewer', 'tadmin'].includes(session.value?.user.role ?? ''))
+const permitted = computed(() => session.value?.mode === 'remote_test' && can('dashboard:read') && can('tickets:read') && !switchingTenant.value)
+const scope = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version, session.value?.account_version, session.value?.mode, [...(session.value?.capabilities ?? [])].sort(), permitted.value]))
+watch(scope, () => {
+  const current = session.value
+  workspace.reset(permitted.value && current ? { tenantId: current.tenant.id, actorId: current.user.id, role: current.user.role, permissionVersion: current.permission_version } : null)
+  if (permitted.value) void workspace.refresh()
+}, { immediate: true, flush: 'sync' })
+async function read(retry = false) {
+  if (!permitted.value || state.value.busy || disposed) return
+  const owner = scope.value
+  await (retry ? workspace.retry() : workspace.refresh())
+  await nextTick()
+  if (!disposed && owner === scope.value) status.value?.focus()
 }
-const priorityTone:Record<string,string>={P1:'danger',P2:'warn',P3:'info'}
+async function cancel() {
+  workspace.cancel()
+  await nextTick()
+  if (!disposed && permitted.value) refreshButton.value?.focus()
+}
+onUnmounted(() => { disposed = true; workspace.dispose() })
+defineExpose({ refresh: () => workspace.refresh() })
+const summary = computed(() => {
+  const value = state.value
+  if (value.busy) return '正在读取待办汇总…'
+  if (value.cancelled) return '读取已取消，未显示旧列表或数量。'
+  if (value.error) return '读取失败，未显示旧列表或数量。'
+  if (!value.current) return '尚未读取。'
+  const snapshot = value.current
+  return (customer.value ? '仅本人报障范围；' : '当前租户授权范围；')
+    + (snapshot.pending_tickets === null
+      ? '完整待办数未知，已确认未结束 ' + snapshot.known_pending + ' 条，另有 ' + snapshot.unconfigured + ' 条登记未配置流程。'
+      : '待处理 ' + snapshot.pending_tickets + ' 条，按登记时间显示最近 ' + snapshot.items.length + ' 条。')
+})
 </script>
 <template>
-<section v-if="permitted" class="dashboard-workflows" aria-labelledby="dashboard-workflows-title" :aria-busy="state.busy">
- <header><div class="wf-title"><h2 id="dashboard-workflows-title">{{customer?'我的工单处理状态':'待处理工单'}}</h2><span>每页 5 条</span></div><div class="actions"><label class="state-filter"><span class="sr-label">筛选工作流状态</span><select :value="state.filter" :disabled="state.busy" aria-label="筛选工作流状态" @change="select"><option v-for="(label,key) in workflowLabels" :key="key" :value="key">{{label}}</option></select></label><button ref="refreshButton" type="button" :disabled="state.busy" @click="read('refresh')">刷新工单</button><button v-if="state.busy" type="button" @click="cancel">取消读取工单</button><router-link to="/ticket-workflows">工单处理</router-link></div></header>
- <ApiErrorNotice :error="state.error" />
- <p ref="status" tabindex="-1" role="status" class="wf-status">{{state.busy?'正在读取工单工作流…':state.cancelled?'读取已取消，未显示旧列表。':state.error?'读取失败，未显示旧列表。':state.page?`${workflowLabels[state.filter]} · 第 ${state.pageNumber} 页，本页 ${state.page.items.length} 条${state.page.has_more?'，还有更多记录':''}`:'尚未读取。'}}</p>
- <button v-if="state.canRetry" type="button" class="wf-retry" :disabled="state.busy" @click="read('retry')">重试本页工单</button>
- <template v-if="state.page">
-  <p v-if="!state.page.items.length" class="wf-empty">当前状态没有已激活的工单流程（不代表没有报障登记或其他状态工单）。</p>
-  <div v-else class="workflow-scroll" tabindex="0" role="region" aria-label="已激活工单工作流，可横向滚动"><table class="mop-table"><caption>{{workflowLabels[state.filter]}}的已激活工单工作流</caption><thead><tr><th scope="col">工单号 / 标题</th><th scope="col">状态</th><th scope="col">优先级</th><th scope="col">SLA</th><th scope="col">详情</th></tr></thead><tbody><tr v-for="row in state.page.items" :key="row.ticket_id"><td><strong>{{row.title}}</strong><span>{{row.receipt_no}}</span></td><td><span class="wf-state mop-badge info">{{workflowLabels[row.state!]}}</span></td><td><span v-if="row.priority" class="mop-badge plain" :class="priorityTone[row.priority]">{{row.priority}}</span><span v-else>—</span></td><td class="wf-time"><template v-if="slaDeadline(row).at"><span class="wf-due">{{slaDeadline(row).label}}</span><time :datetime="slaDeadline(row).at!" :title="displayTime(slaDeadline(row).at)">{{compactTime(slaDeadline(row).at)}}</time></template><span v-else>—</span></td><td><router-link :to="{path:'/ticket-workflows',query:{ticket_id:row.ticket_id}}" :aria-label="'查看工单处理'+row.receipt_no">查看</router-link></td></tr></tbody></table></div>
- </template>
- <nav class="paging" aria-label="工单工作流分页"><button type="button" :disabled="state.busy||!state.canPrevious" @click="read('previous')">上一页工单</button><button type="button" :disabled="state.busy||!state.page?.has_more" @click="read('next')">下一页工单</button></nav>
-</section>
+  <section v-if="permitted" class="dashboard-workflows" aria-labelledby="dashboard-workflows-title" :aria-busy="state.busy">
+    <header>
+      <div class="wf-title"><h2 id="dashboard-workflows-title">{{ customer ? '我的待处理工单' : '待处理工单' }}</h2><span>跨未结束状态 · 最近5条</span></div>
+      <div class="actions">
+        <button ref="refreshButton" type="button" :disabled="state.busy" @click="read()">刷新工单</button>
+        <button v-if="state.busy" type="button" @click="cancel">取消读取工单</button>
+        <router-link to="/tickets">全部工单登记</router-link>
+      </div>
+    </header>
+    <ApiErrorNotice :error="state.error" />
+    <p ref="status" tabindex="-1" role="status" class="wf-status">{{ summary }}</p>
+    <button v-if="state.canRetry" type="button" class="wf-retry" :disabled="state.busy" @click="read(true)">重试待办汇总</button>
+    <template v-if="state.current">
+      <p class="wf-status">汇总时间 {{ displayTime(state.current.observed_at) }} · SLA状态尚未接入，不将未配置视为未超时。</p>
+      <p v-if="!state.current.items.length" class="wf-empty">{{ state.current.unconfigured ? '暂无已确认的待处理流程；未配置登记仍待核对。' : '当前授权范围没有未结束工单。' }}</p>
+      <div v-else class="workflow-scroll" tabindex="0" role="region" aria-label="跨状态待处理工单，可横向滚动">
+        <table class="mop-table">
+          <caption>当前授权范围内未结束工单的最近五条，按登记时间降序</caption>
+          <thead><tr><th scope="col">工单号</th><th scope="col">标题</th><th scope="col">状态</th><th scope="col">SLA</th><th scope="col">详情</th></tr></thead>
+          <tbody>
+            <tr v-for="row in state.current.items" :key="row.ticket_id">
+              <td>{{ row.receipt_no }}</td><td>{{ row.title }}</td>
+              <td><span class="wf-state mop-badge info">{{ pendingTicketLabel(row) }}</span></td>
+              <td class="wf-time"><span title="当前汇总接口尚未提供正式SLA状态">未知</span></td>
+              <td><router-link :to="pendingTicketTarget(row)" :aria-label="(row.workflow_model === 'WORKFLOW_V33' ? '查看工单处理' : '查看工单登记') + row.receipt_no">{{ row.workflow_model === 'WORKFLOW_V33' ? '查看处理' : '查看登记' }}</router-link></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </template>
+  </section>
 </template>
 <style scoped>
 .dashboard-workflows{display:flex;flex-direction:column;min-width:0;border:1px solid var(--mop-line,#e2e8f0);border-radius:8px;background:#fff;color:var(--mop-text,#2f4157)}

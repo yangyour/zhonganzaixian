@@ -1,0 +1,117 @@
+{
+  "status": "PASSED",
+  "cases": [
+    {
+      "role": "tadmin",
+      "width": 1440,
+      "scope": "REPORTER_ONLY",
+      "pending": 3,
+      "known": 3,
+      "unconfigured": 0,
+      "rows": 3,
+      "http_status": 200,
+      "overflow": false,
+      "errors": 0
+    },
+    {
+      "role": "tadmin",
+      "width": 1024,
+      "scope": "REPORTER_ONLY",
+      "pending": 3,
+      "known": 3,
+      "unconfigured": 0,
+      "rows": 3,
+      "http_status": 200,
+      "overflow": false,
+      "errors": 0
+    },
+    {
+      "role": "padmin",
+      "width": 1440,
+      "scope": "CURRENT_TENANT_INTERNAL",
+      "pending": null,
+      "known": 3,
+      "unconfigured": 2,
+      "rows": 3,
+      "http_status": 200,
+      "overflow": false,
+      "errors": 0
+    },
+    {
+      "role": "padmin",
+      "width": 1024,
+      "scope": "CURRENT_TENANT_INTERNAL",
+      "pending": null,
+      "known": 3,
+      "unconfigured": 2,
+      "rows": 3,
+      "http_status": 200,
+      "overflow": false,
+      "errors": 0
+    },
+    {
+      "role": "msp",
+      "width": 1440,
+      "scope": "CURRENT_TENANT_INTERNAL",
+      "pending": null,
+      "known": 3,
+      "unconfigured": 2,
+      "rows": 3,
+      "http_status": 200,
+      "overflow": false,
+      "errors": 0
+    },
+    {
+      "role": "msp",
+      "width": 1024,
+      "scope": "CURRENT_TENANT_INTERNAL",
+      "pending": null,
+      "known": 3,
+      "unconfigured": 2,
+      "rows": 3,
+      "http_status": 200,
+      "overflow": false,
+      "errors": 0
+    }
+  ],
+  "business_writes": 0,
+  "source": "LOCAL_CANDIDATE_WITH_DESIGNATED_LAN_API",
+  "deployed": false,
+  "harness_history": [
+    "Recovered explicit IPv4 loopback browser after initial REPL timeout; handles now held in one persistent global object.",
+    "Element Plus selected text overlays the combobox input; used its supported keyboard interaction instead of force-clicking."
+  ],
+  "failure_recovery": {
+    "browser_abort_injected": true,
+    "old_count_and_rows_cleared": true,
+    "real_get_retry_passed": true
+  },
+  "axe": [
+    {
+      "width": 1440,
+      "scope": "pending_card_and_list",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "scope": "pending_card_and_list",
+      "violations": []
+    }
+  ],
+  "actual_account": {
+    "scope": "CURRENT_TENANT_INTERNAL",
+    "pending": 0,
+    "known": 0,
+    "unconfigured": 0,
+    "rows": 0,
+    "business_writes": 0
+  },
+  "detail_navigation": {
+    "path": "/ticket-workflows",
+    "has_ticket_query": true,
+    "page_errors": 0,
+    "business_writes": 0
+  },
+  "verified_at": "2026-10-23T14:33:02.441Z",
+  "sla_scope": "V1 does not provide SLA state; UI01 remains IN_PROGRESS pending compatible enhancement"
+}

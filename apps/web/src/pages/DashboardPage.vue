@@ -6,6 +6,7 @@ import { api } from '../api/client'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { createDashboardWorkspace, emptyDashboardState } from '../utils/dashboardWorkspace'
 import { dashboardWindows, type DashboardWindow } from '../utils/dashboardAvailability'
+import { emptyPendingTickets, type PendingTicketState } from '../utils/dashboardPendingTickets'
 import { clockTime, displayTime } from '../utils/display'
 import { routeAllowed } from '../utils/routeAccess'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
@@ -18,18 +19,19 @@ const eventPanel = ref<{ refresh: () => unknown } | null>(null)
 const workflowPanel = ref<{ refresh: () => unknown } | null>(null)
 const resourcePanel = ref<{ refresh: () => unknown } | null>(null)
 const state = shallowRef(emptyDashboardState())
+const pending = shallowRef(emptyPendingTickets())
 const workspace = createDashboardWorkspace(api, value => { state.value = value })
 const autoRefresh = ref(true), now = ref(performance.now()), loadedAt = ref<number | null>(null)
 const permitted = computed(() => Boolean(session.value?.mode === 'remote_test' && ['viewer', 'tadmin', 'msp', 'padmin'].includes(session.value.user.role) && can('dashboard:read') && !switchingTenant.value))
 const eventAccess = computed(() => can('tickets:read') && ['padmin', 'msp'].includes(session.value?.user.role ?? ''))
 const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.account_version, session.value?.user.role, [...(session.value?.capabilities ?? [])].sort(), permitted.value]))
 const windows: Record<DashboardWindow, string> = { HOURS_24: '24小时', DAYS_7: '7天', DAYS_30: '30天' }
-// M1-1: six fixed KPI cards. Values stay unknown until the formal metric readers exist.
+// M1-1: six fixed cards; the pending card and its list share the same authorized server snapshot.
 const kpis = [
   { id: 'ASSET_ONLINE_RATE', title: '资产在线率', route: 'assets', target: '资产列表', parts: [['正常', '—'], ['未知', '—']], note: '未知单独计数，不并入正常' },
   { id: 'CURRENT_PROBLEMS', title: '当前问题', route: 'monitoring-events', target: '事件中心', severities: true, note: '已排除已抑制事件' },
   { id: 'MONTH_SERVICE_AVAILABILITY', title: '本月服务可用率', route: 'sla-reports', target: 'SLA 报表', note: '本月1日至今 · 无样本不视为可用' },
-  { id: 'PENDING_TICKETS', title: '待处理工单', route: 'ticket-workflows', target: '工单处理', parts: [['已超 SLA', '—']] },
+  { id: 'PENDING_TICKETS', title: '待处理工单', route: 'tickets', target: '工单登记', parts: [['已超 SLA', '—']] },
   { id: 'MTTA_24H', title: 'MTTA', period: '近24小时', route: 'monitoring-events', target: '事件中心', note: '首次有效人工确认 · 样本量未知' },
   { id: 'DELIVERY_RATE_24H', title: '通知送达率', period: '近24小时', route: 'ticket-notifications', target: '工单通知', parts: [['受理', '—'], ['送达', '—']] },
 ] as const
@@ -37,6 +39,25 @@ const severities = [['disaster', '灾难'], ['high', '严重'], ['average', '一
 // Drill-down entries follow the same route gates as the menu; the tenant context is the session's.
 const allowedRoutes = computed(() => new Set((router?.getRoutes() ?? []).filter(route => typeof route.name === 'string' && routeAllowed(route.meta, session.value)).map(route => String(route.name))))
 const kpiValue = computed(() => state.value.busy ? '读取中' : state.value.error ? '读取失败' : '未知')
+function updatePending(value: PendingTicketState) {
+  pending.value = permitted.value && can('tickets:read') ? value : emptyPendingTickets()
+}
+function metricValue(id: string) {
+  if (id !== 'PENDING_TICKETS') return kpiValue.value
+  if (!can('tickets:read')) return '无权限'
+  if (pending.value.busy) return '读取中'
+  if (pending.value.cancelled) return '已取消'
+  if (pending.value.error) return '读取失败'
+  return pending.value.current?.pending_tickets ?? '未知'
+}
+function metricFailed(id: string) { return Boolean(id === 'PENDING_TICKETS' ? pending.value.error : state.value.error) }
+function metricUnknown(id: string) { return id === 'PENDING_TICKETS' ? pending.value.current?.pending_tickets == null : !state.value.error }
+const pendingNote = computed(() => {
+  const current = pending.value.current
+  if (!current) return ''
+  return (current.scope === 'REPORTER_ONLY' ? '仅本人报障' : '当前租户')
+    + (current.unconfigured ? ' · 另有 ' + current.unconfigured + ' 条登记未配置流程' : ' · 未结束流程合计')
+})
 const freshness = computed(() => loadedAt.value === null ? '尚未读取首页状态' : `数据 ${Math.max(0, Math.floor((now.value - loadedAt.value) / 1000))} 秒前 · 指标采样未知`)
 // M1-4: a 24-hour axis with 6-hour ticks taken from the server-issued period.
 const timelineTicks = computed(() => {
@@ -59,6 +80,7 @@ function refreshAll() {
 function selectWindow(window: DashboardWindow) { if (!state.value.busy) void refresh(window) }
 watch(contextKey, () => {
   loadedAt.value = null
+  pending.value = emptyPendingTickets()
   const current = session.value
   workspace.reset(permitted.value && current ? { tenantId: current.tenant.id, actorId: current.user.id, permissionVersion: current.permission_version, role: current.user.role, canRead: true } : null)
   if (permitted.value) void refresh()
@@ -89,20 +111,21 @@ onUnmounted(() => { alive = false; clearInterval(timer); workspace.dispose() })
       </div>
       <ApiErrorNotice :error="state.error" :retrying="state.busy" @retry="refresh()" />
       <div class="dashboard-kpis mop-kpis" aria-label="六项运营指标">
-        <article v-for="kpi in kpis" :key="kpi.id" class="dashboard-kpi mop-kpi" :class="{ unknown: !state.error }" :data-kpi="kpi.id">
+        <article v-for="kpi in kpis" :key="kpi.id" class="dashboard-kpi mop-kpi" :class="{ unknown: metricUnknown(kpi.id) }" :data-kpi="kpi.id">
           <div class="mop-kpi-label"><h2>{{ kpi.title }}<span v-if="'period' in kpi" class="kpi-period">{{ kpi.period }}</span></h2></div>
-          <strong class="mop-kpi-value" :class="{ 'kpi-failed': state.error }">{{ kpiValue }}</strong>
+          <strong class="mop-kpi-value" :class="{ 'kpi-failed': metricFailed(kpi.id) }">{{ metricValue(kpi.id) }}</strong>
           <div v-if="'severities' in kpi" class="kpi-severities" aria-label="按严重级别计数">
             <span v-for="[key, label] in severities" :key="key" class="mop-sev" :class="key">{{ label }} —</span>
           </div>
           <p v-else-if="'parts' in kpi" class="mop-kpi-detail kpi-parts"><span v-for="[label, value] in kpi.parts" :key="label">{{ label }} <b>{{ value }}</b></span></p>
           <div class="kpi-foot">
+            <span v-if="kpi.id === 'PENDING_TICKETS' && pending.current" class="mop-kpi-detail">{{ pendingNote }}</span>
             <span v-if="'note' in kpi" class="mop-kpi-detail">{{ kpi.note }}</span>
             <router-link v-if="allowedRoutes.has(kpi.route)" class="mop-kpi-link" :to="{ name: kpi.route }" :aria-label="`${kpi.title}：打开${kpi.target}`">{{ kpi.target }}<ArrowRight aria-hidden="true" /></router-link>
           </div>
         </article>
       </div>
-      <p class="dashboard-source-status">{{ state.current ? '正式指标尚未接入。以下业务记录与设备采样独立读取，不作为上述指标的替代值。' : '尚未取得有效首页状态，未显示缓存指标。' }}</p>
+      <p class="dashboard-source-status">{{ pending.current ? '待处理工单与下方列表来自同一授权汇总；未配置流程单列为未知，其余未接入指标不补值。' : state.current ? '正式指标尚未接入。以下业务记录与设备采样独立读取，不作为上述指标的替代值。' : '尚未取得有效首页状态，未显示缓存指标。' }}</p>
       <div :key="contextKey" class="dashboard-grid">
         <section class="dashboard-card mop-card span-8" data-block="ALERT_TREND" aria-labelledby="alert-trend-title">
           <header class="mop-card-head"><div class="mop-card-title"><h2 id="alert-trend-title">告警趋势</h2><span>原始事件 vs 归并后 · {{ windows[state.window] }}</span></div><span class="mop-badge unknown">降噪率未知</span></header>
@@ -131,7 +154,7 @@ onUnmounted(() => { alive = false; clearInterval(timer); workspace.dispose() })
           <template v-else><header class="mop-card-head"><h2>最近事件</h2></header><p class="mop-empty">当前账号没有事件中心读取权限。</p></template>
         </section>
         <section class="dashboard-card mop-card dashboard-list span-7" data-block="PENDING_TICKETS" aria-label="待处理工单">
-          <DashboardWorkflowsPanel v-if="can('tickets:read')" ref="workflowPanel" />
+          <DashboardWorkflowsPanel v-if="can('tickets:read')" ref="workflowPanel" @state="updatePending" />
           <template v-else><header class="mop-card-head"><h2>待处理工单</h2></header><p class="mop-empty">当前账号没有工单读取权限。</p></template>
         </section>
         <section class="dashboard-card mop-card dashboard-list span-5" data-block="RESOURCE_TOP5" aria-label="资源占用Top5">

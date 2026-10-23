@@ -49,12 +49,13 @@ it('links each permitted KPI to its contract list page and omits unauthorized ta
     { path: '/monitoring-events', name: 'monitoring-events', component: blank, meta: { roles: ['padmin', 'msp'], capability: 'tickets:read' } },
     { path: '/sla-reports', name: 'sla-reports', component: blank, meta: { roles: ['padmin', 'msp'], capability: 'sla_scenarios:read' } },
     { path: '/ticket-workflows', name: 'ticket-workflows', component: blank, meta: { capability: 'tickets:read' } },
+    { path: '/tickets', name: 'tickets', component: blank, meta: { capability: 'tickets:read' } },
     { path: '/ticket-notifications', name: 'ticket-notifications', component: blank, meta: { capability: 'tickets:read' } },
   ] })
   await router.push('/dashboard'); await router.isReady()
   app = createApp({ template: '<router-view />' }); app.use(router); app.mount(host); await settle()
   const links = Object.fromEntries([...host.querySelectorAll('[data-kpi]')].map(card => [card.getAttribute('data-kpi'), card.querySelector('a')?.getAttribute('href') ?? null]))
-  expect(links).toEqual({ ASSET_ONLINE_RATE: '/assets', CURRENT_PROBLEMS: '/monitoring-events', MONTH_SERVICE_AVAILABILITY: null, PENDING_TICKETS: '/ticket-workflows', MTTA_24H: '/monitoring-events', DELIVERY_RATE_24H: '/ticket-notifications' })
+  expect(links).toEqual({ ASSET_ONLINE_RATE: '/assets', CURRENT_PROBLEMS: '/monitoring-events', MONTH_SERVICE_AVAILABILITY: null, PENDING_TICKETS: '/tickets', MTTA_24H: '/monitoring-events', DELIVERY_RATE_24H: '/ticket-notifications' })
   expect([...host.querySelectorAll('[data-kpi] strong')].every(node => node.textContent === '未知')).toBe(true)
 })
 it('keeps KPI drill-down links behind the same route gates as the menu', async () => {

@@ -1,0 +1,28 @@
+{
+  "status": "PASSED",
+  "checklist_id": "UI01",
+  "overall_checklist_status": "IN_PROGRESS",
+  "source_base_commit": "9cdccdc8",
+  "source_sha256": {
+    "apps/web/src/utils/dashboardPendingTickets.ts": "834e91c8f9fa8a1dfba088c875e36b9b85002c332a1539e8675899a8e83be235",
+    "apps/web/src/components/DashboardWorkflowsPanel.vue": "ae8afe294273ffb17af17abf2d11fe756e0285eceaa5c00b731d4cbdb59c649a",
+    "apps/web/src/pages/DashboardPage.vue": "51d1d5b5d087163b15e1dc1392aa095445099d64745447eda8e808c32b4a20e3"
+  },
+  "targeted_tests": 82,
+  "web_files": 302,
+  "web_tests": 5013,
+  "types_build_release_policy": "PASSED",
+  "demo_browser_scope_cases": 6,
+  "real_account_complete_zero": true,
+  "two_viewports_feature_axe_violations": 0,
+  "browser_injected_failure_then_real_retry": true,
+  "business_writes": 0,
+  "new_migrations": 0,
+  "deployed": false,
+  "remaining": [
+    "SLA timing and overdue count V2",
+    "Complete pending-only drilldown across both models",
+    "Real nonempty V42 browser flow",
+    "Formal contract acceptance"
+  ]
+}

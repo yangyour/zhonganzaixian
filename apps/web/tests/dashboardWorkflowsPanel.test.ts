@@ -1,28 +1,131 @@
 // @vitest-environment jsdom
-import {createApp,h,nextTick,type App} from 'vue'
-import {createRouter,createMemoryHistory,RouterView,useRoute,type Router} from 'vue-router'
-import {beforeEach,afterEach,it,expect,vi} from 'vitest'
-import {ElAlert,ElButton} from 'element-plus'
+import { createApp, h, nextTick, type App } from 'vue'
+import { createRouter, createMemoryHistory, RouterView, useRoute, type Router } from 'vue-router'
+import { beforeEach, afterEach, it, expect, vi } from 'vitest'
+import { ElAlert, ElButton } from 'element-plus'
 import Panel from '../src/components/DashboardWorkflowsPanel.vue'
-import {api,ApiError} from '../src/api/client'
-import {session,contextGeneration,switchingTenant} from '../src/stores/session'
-import type {Session} from '../src/api/types'
-import {workflowContext as c,workflow,workflowPage as page,id} from './dashboardWorkflow.fixture'
-import type {WorkflowState} from '../src/utils/ticketWorkflow'
-const auth:Session={user:{id:c.actorId,display_name:'Synthetic',role:'padmin'},tenant:{id:c.tenantId,name:'Synthetic'},allowed_tenants:[],permission_version:c.permissionVersion,capabilities:['dashboard:read','tickets:read'],csrf_token:'SYNTHETIC',mode:'remote_test',identity_source:'synthetic-unit-only'}
-let host:HTMLElement,app:App|undefined,router:Router
-async function settle(){for(let i=0;i<10;i++){await Promise.resolve();await nextTick()}}
-async function mount(){host=document.createElement('div');document.body.append(host);router=createRouter({history:createMemoryHistory(),routes:[{path:'/',component:Panel},{path:'/ticket-workflows',component:{setup(){const r=useRoute();return()=>h('p',{'role':'status'},'Synthetic target '+r.query.ticket_id)}}}]});await router.push('/');await router.isReady();app=createApp({render:()=>h(RouterView)});app.use(router);app.component('ElAlert',ElAlert);app.component('ElButton',ElButton);app.mount(host);await settle()}
-function button(label:string){return [...host.querySelectorAll('button')].find(b=>b.textContent?.trim()===label)!}
-beforeEach(()=>{session.value=structuredClone(auth);switchingTenant.value=false;contextGeneration.value=0})
-afterEach(()=>{app?.unmount();app=undefined;host?.remove();session.value=null;vi.restoreAllMocks()})
-it('loads actual-state rows read-only with semantic table and usable detail link',async()=>{const request=vi.spyOn(api,'request').mockResolvedValue(page());await mount();expect(request.mock.calls[0]?.[0]).toBe('/ticket-workflows?state=OPEN&limit=5');expect(host.querySelectorAll('th[scope="col"]')).toHaveLength(5);expect(host.querySelector('caption')?.textContent).toContain('待接单');expect(host.querySelector('.boundary')).toBeNull();const link=host.querySelector('a[aria-label="查看工单处理SYN-20"]') as HTMLAnchorElement;expect(link.getAttribute('href')).toContain('ticket_id='+id(20));link.click();await vi.waitFor(()=>expect(router.currentRoute.value.query.ticket_id).toBe(id(20)));await settle();expect(request.mock.calls.every(c=>!c[1]?.method)).toBe(true)})
-it('empty state does not claim that no reports or other workflow states exist',async()=>{vi.spyOn(api,'request').mockResolvedValue(page([]));await mount();expect(host.textContent).toContain('不代表没有报障登记或其他状态工单');expect(button('下一页工单').disabled).toBe(true)})
-it('state selection sends only an explicit new filter and restores status focus',async()=>{const request=vi.spyOn(api,'request').mockImplementation(async path=>page([workflow(20,new URL('https://example.test'+path).searchParams.get('state') as WorkflowState)]));await mount();const select=host.querySelector('select')!;select.value='ACCEPTED';select.dispatchEvent(new Event('change'));await settle();expect(request.mock.calls.at(-1)?.[0]).toBe('/ticket-workflows?state=ACCEPTED&limit=5');expect(host.querySelector('caption')?.textContent).toContain('已接单');expect(document.activeElement).toBe(host.querySelector('p[role="status"]'))})
-it('failed refresh removes old table and retry recovers without command requests',async()=>{const request=vi.spyOn(api,'request').mockResolvedValueOnce(page()).mockRejectedValueOnce(new ApiError(503,'UPSTREAM_UNAVAILABLE','synthetic failed read','synthetic')).mockResolvedValueOnce(page());await mount();button('刷新工单').click();await settle();expect(host.querySelector('table')).toBeNull();expect(host.textContent).toContain('读取失败');button('重试本页工单').click();await settle();expect(host.querySelector('table')).not.toBeNull();expect(request.mock.calls.every(c=>!c[1]?.method)).toBe(true)})
-it('cancel returns focus and ignores a late success',async()=>{let finish!:(v:unknown)=>void;const request=vi.spyOn(api,'request').mockImplementation(()=>new Promise(r=>finish=r));await mount();button('取消读取工单').click();await settle();expect(request.mock.calls[0]?.[1]?.signal?.aborted).toBe(true);expect(document.activeElement).toBe(button('刷新工单'));finish(page());await settle();expect(host.querySelector('table')).toBeNull();expect(host.textContent).toContain('读取已取消')})
-it('customer receives a clearly own-only projection',async()=>{session.value={...auth,user:{...auth.user,role:'viewer'}};vi.spyOn(api,'request').mockResolvedValue(page([workflow(20,'OPEN',true)]));await mount();expect(host.textContent).toContain('我的工单处理状态');expect(host.querySelector('tbody tr')).not.toBeNull()})
-it.each(['actor','role','capability','mode','switching','version'])('clears and ignores late rows on %s scope change',async kind=>{let finish!:(v:unknown)=>void;const request=vi.spyOn(api,'request').mockImplementationOnce(()=>new Promise(r=>finish=r)).mockImplementation(()=>new Promise(()=>{}));await mount();if(kind==='actor')session.value={...auth,user:{...auth.user,id:id(9)}};if(kind==='role')session.value={...auth,user:{...auth.user,role:'viewer'}};if(kind==='capability')session.value={...auth,capabilities:['dashboard:read']};if(kind==='mode')session.value={...auth,mode:'local_fixture'};if(kind==='switching')switchingTenant.value=true;if(kind==='version')session.value={...auth,permission_version:8};await settle();expect(request.mock.calls[0]?.[1]?.signal?.aborted).toBe(true);finish(page());await settle();expect(host.querySelector('table')).toBeNull();expect(host.textContent).not.toContain('Synthetic workflow 20')})
-it('missing dashboard read capability never requests work data',async()=>{session.value={...auth,capabilities:['tickets:read']};const request=vi.spyOn(api,'request');await mount();expect(request).not.toHaveBeenCalled();expect(host.querySelector('section')).toBeNull()})
-it('unmount aborts the request and prevents late data display',async()=>{let finish!:(v:unknown)=>void;const request=vi.spyOn(api,'request').mockImplementation(()=>new Promise(r=>finish=r));await mount();app!.unmount();app=undefined;finish(page());await settle();expect(request.mock.calls[0]?.[1]?.signal?.aborted).toBe(true);expect(host.textContent).toBe('')})
-it('next-page failure retries the same cursor and previous returns to page one',async()=>{let fail=true;const request=vi.spyOn(api,'request').mockImplementation(async path=>{if(path.includes('cursor')){if(fail)throw new Error('synthetic');return page([workflow(25)])}return page(Array.from({length:5},(_,i)=>workflow(30-i)),true)});await mount();button('下一页工单').click();await settle();const failed=request.mock.calls.at(-1)?.[0];fail=false;button('重试本页工单').click();await settle();expect(request.mock.calls.at(-1)?.[0]).toBe(failed);expect(host.textContent).toContain('第 2 页');button('上一页工单').click();await settle();expect(host.textContent).toContain('第 1 页');expect(button('上一页工单').disabled).toBe(true)})
+import { api, ApiError } from '../src/api/client'
+import { session, contextGeneration, switchingTenant } from '../src/stores/session'
+import type { Session } from '../src/api/types'
+import type { PendingTicketState } from '../src/utils/dashboardPendingTickets'
+import { pendingContext as c, pendingId as id, pendingSnapshot } from './dashboardPending.fixture'
+
+const auth: Session = {
+  user: { id: c.actorId, display_name: 'Synthetic', role: 'padmin' },
+  tenant: { id: c.tenantId, name: 'Synthetic' }, allowed_tenants: [], permission_version: c.permissionVersion,
+  capabilities: ['dashboard:read', 'tickets:read'], csrf_token: 'SYNTHETIC', mode: 'remote_test', identity_source: 'synthetic-unit-only',
+}
+let host: HTMLElement, app: App | undefined, router: Router, emitted: PendingTicketState[]
+async function settle() { for (let i = 0; i < 10; i++) { await Promise.resolve(); await nextTick() } }
+async function mount() {
+  host = document.createElement('div'); document.body.append(host)
+  const detail = { setup() { const route = useRoute(); return () => h('p', { role: 'status' }, 'Synthetic target ' + route.query.ticket_id) } }
+  router = createRouter({ history: createMemoryHistory(), routes: [
+    { path: '/', component: { render: () => h(Panel, { onState: (value: PendingTicketState) => emitted.push(value) }) } },
+    { path: '/ticket-workflows', component: detail }, { path: '/tickets', component: detail },
+  ] })
+  await router.push('/'); await router.isReady()
+  app = createApp({ render: () => h(RouterView) }); app.use(router); app.component('ElAlert', ElAlert); app.component('ElButton', ElButton)
+  app.mount(host); await settle()
+}
+function button(label: string) { return [...host.querySelectorAll('button')].find(value => value.textContent?.trim() === label)! }
+beforeEach(() => { session.value = structuredClone(auth); switchingTenant.value = false; contextGeneration.value = 0; emitted = [] })
+afterEach(() => { app?.unmount(); app = undefined; host?.remove(); session.value = null; vi.restoreAllMocks() })
+
+it('uses the cross-state summary once and shares the exact snapshot with the parent', async () => {
+  const request = vi.spyOn(api, 'request').mockResolvedValue(pendingSnapshot())
+  await mount()
+  expect(request).toHaveBeenCalledWith('/dashboard/pending-tickets', expect.objectContaining({ method: 'GET' }))
+  expect(host.querySelectorAll('tbody tr')).toHaveLength(2)
+  expect(host.querySelectorAll('th[scope="col"]')).toHaveLength(5)
+  expect(host.querySelector('select')).toBeNull()
+  expect(host.querySelector('caption')?.textContent).toContain('未结束工单')
+  expect(host.textContent).toContain('待处理 2 条')
+  expect(host.textContent).toContain('等待厂商')
+  expect(emitted.at(-1)?.current?.pending_tickets).toBe(2)
+  expect(request.mock.calls.every(([, options]) => options?.method === 'GET')).toBe(true)
+})
+it('links each model to an actually supported view', async () => {
+  vi.spyOn(api, 'request').mockResolvedValue(pendingSnapshot()); await mount()
+  expect(host.querySelector('a[aria-label="查看工单处理SYN-20"]')?.getAttribute('href')).toBe('/ticket-workflows?ticket_id=' + id(20))
+  const registration = host.querySelector('a[aria-label="查看工单登记SYN-19"]') as HTMLAnchorElement
+  expect(registration.getAttribute('href')).toBe('/tickets?ticket_id=' + id(19))
+  registration.click()
+  await vi.waitFor(() => expect(router.currentRoute.value.query.ticket_id).toBe(id(19)))
+})
+it('keeps complete zero separate from partial registrations and unknown SLA', async () => {
+  vi.spyOn(api, 'request').mockResolvedValue(pendingSnapshot({ registrations: 0, known_pending: 0, terminal: 0, pending_tickets: 0, items: [] }))
+  await mount()
+  expect(host.textContent).toContain('当前授权范围没有未结束工单')
+  expect(host.textContent).toContain('SLA状态尚未接入')
+  expect(emitted.at(-1)?.current?.pending_tickets).toBe(0)
+})
+it('reports missing workflow coverage without substituting the known count as total', async () => {
+  vi.spyOn(api, 'request').mockResolvedValue(pendingSnapshot({ registrations: 4, unconfigured: 1, pending_tickets: null, state: 'PARTIAL', unavailable_reason: 'REGISTRATIONS_WITHOUT_WORKFLOW' }))
+  await mount()
+  expect(host.textContent).toContain('完整待办数未知')
+  expect(host.textContent).toContain('已确认未结束 2 条')
+  expect(host.textContent).toContain('1 条登记未配置流程')
+  expect(emitted.at(-1)?.current?.pending_tickets).toBeNull()
+})
+it('clears rows and parent count on failed refresh and restores them only after retry', async () => {
+  const request = vi.spyOn(api, 'request').mockResolvedValueOnce(pendingSnapshot())
+    .mockRejectedValueOnce(new ApiError(503, 'UPSTREAM_UNAVAILABLE', 'synthetic', 'unit')).mockResolvedValueOnce(pendingSnapshot())
+  await mount(); button('刷新工单').click(); await settle()
+  expect(host.querySelector('table')).toBeNull(); expect(emitted.at(-1)?.current).toBeNull()
+  expect(host.textContent).toContain('读取失败')
+  button('重试待办汇总').click(); await settle()
+  expect(host.querySelectorAll('tbody tr')).toHaveLength(2)
+  expect(document.activeElement).toBe(host.querySelector('p[role="status"]'))
+  expect(request.mock.calls.every(([path, options]) => path === '/dashboard/pending-tickets' && options?.method === 'GET')).toBe(true)
+})
+it('cancels, restores focus and rejects late transport success', async () => {
+  let finish!: (value: unknown) => void
+  const request = vi.spyOn(api, 'request').mockImplementation(() => new Promise(resolve => { finish = resolve }))
+  await mount(); button('取消读取工单').click(); await settle()
+  expect(request.mock.calls[0]?.[1]?.signal?.aborted).toBe(true)
+  expect(document.activeElement).toBe(button('刷新工单'))
+  finish(pendingSnapshot()); await settle()
+  expect(host.querySelector('table')).toBeNull()
+  expect(emitted.at(-1)?.current).toBeNull()
+  expect(host.textContent).toContain('读取已取消')
+})
+it('labels customer scope as own reports only', async () => {
+  session.value = { ...auth, user: { ...auth.user, role: 'viewer' } }
+  vi.spyOn(api, 'request').mockResolvedValue(pendingSnapshot({ scope: 'REPORTER_ONLY' }))
+  await mount()
+  expect(host.textContent).toContain('我的待处理工单')
+  expect(host.textContent).toContain('仅本人报障范围')
+})
+it.each(['actor', 'role', 'capability', 'mode', 'switching', 'version', 'account'])('clears stale rows and count after %s changes', async kind => {
+  let finish!: (value: unknown) => void
+  const request = vi.spyOn(api, 'request').mockImplementationOnce(() => new Promise(resolve => { finish = resolve }))
+    .mockImplementation(() => new Promise(() => {}))
+  await mount()
+  if (kind === 'actor') session.value = { ...auth, user: { ...auth.user, id: id(9) } }
+  if (kind === 'role') session.value = { ...auth, user: { ...auth.user, role: 'viewer' } }
+  if (kind === 'capability') session.value = { ...auth, capabilities: ['dashboard:read'] }
+  if (kind === 'mode') session.value = { ...auth, mode: 'local_fixture' }
+  if (kind === 'switching') switchingTenant.value = true
+  if (kind === 'version') session.value = { ...auth, permission_version: 8 }
+  if (kind === 'account') session.value = { ...auth, account_version: 2 }
+  await settle()
+  expect(request.mock.calls[0]?.[1]?.signal?.aborted).toBe(true)
+  finish(pendingSnapshot()); await settle()
+  expect(host.querySelector('table')).toBeNull()
+  expect(host.textContent).not.toContain('Synthetic pending')
+  expect(emitted.at(-1)?.current).toBeNull()
+})
+it('never requests data without both capabilities', async () => {
+  session.value = { ...auth, capabilities: ['tickets:read'] }
+  const request = vi.spyOn(api, 'request'); await mount()
+  expect(request).not.toHaveBeenCalled(); expect(host.querySelector('section')).toBeNull()
+})
+it('unmount aborts in-flight reads without retaining data in the parent', async () => {
+  let finish!: (value: unknown) => void
+  const request = vi.spyOn(api, 'request').mockImplementation(() => new Promise(resolve => { finish = resolve }))
+  await mount(); app!.unmount(); app = undefined; finish(pendingSnapshot()); await settle()
+  expect(request.mock.calls[0]?.[1]?.signal?.aborted).toBe(true)
+  expect(emitted.at(-1)?.current).toBeNull()
+  expect(host.textContent).toBe('')
+})

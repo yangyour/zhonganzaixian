@@ -1,9 +1,9 @@
 {
   "version": 1,
   "scope": "Candidate version coordination only; not a cross-host execution lock or deployment approval",
-  "observed_main": "919969738a3530a988a51265d5fd51a4b62602ce",
-  "remote_branches_inspected": 48,
-  "existing_latest_reserved_version": 52,
+  "observed_main": "d8a9b7c1c45f16e437891c95d63eaa368595c796",
+  "remote_branches_inspected": 50,
+  "existing_latest_reserved_version": 53,
   "existing_v51_sha256": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b",
   "reservations": [
     {
@@ -16,6 +16,13 @@
     {
       "version": 53,
       "purpose": "R02 immutable report publication, artifacts, read receipts and delivery intents",
+      "owner": "current dot continuation",
+      "status": "RESERVED_NOT_APPLIED",
+      "first_application_sha256": null
+    },
+    {
+      "version": 54,
+      "purpose": "M02 durable monitoring target enrollment and controlled registration journal",
       "owner": "current dot continuation",
       "status": "RESERVED_NOT_APPLIED",
       "first_application_sha256": null

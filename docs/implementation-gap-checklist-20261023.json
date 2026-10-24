@@ -107,7 +107,9 @@
         "docs/event-noise-trend-20261023.md",
         "docs/evidence/dot-continuation-20261023/ui02-noise-trend.json",
         "docs/search-monitoring-return-scope-20261024.md",
-        "docs/evidence/search-monitoring-return-scope-20261024/validation.json"
+        "docs/evidence/search-monitoring-return-scope-20261024/validation.json",
+        "docs/runtime-configuration-read-scope-20261024.md",
+        "docs/evidence/runtime-configuration-read-scope-20261024/validation.json"
       ],
       "commits": [
         "1e4431b5",
@@ -118,7 +120,8 @@
         "M1-8 current-tenant PROBLEM/NEW exact bell reader and header, permissions/recovery and designated PG/HTTP/browser verification",
         "M1-8 slash shortcut, local opt-out and account-version invalidation; 65 targeted tests and real browser interaction",
         "Search dialog page-wide landmark duplication fixed and original DOM semantics reproduced with real Element Plus/axe in jsdom; 66 targeted tests",
-        "Global search now rechecks full membership/session/account before return; exact read capabilities align with repository. Event-center and network-monitoring account-only changes cancel old requests and clear private state; red-to-green tests retained, API contract unchanged."
+        "Global search now rechecks full membership/session/account before return; exact read capabilities align with repository. Event-center and network-monitoring account-only changes cancel old requests and clear private state; red-to-green tests retained, API contract unchanged.",
+        "运行配置目录/当前/历史/纯校验返回前完整成员与账号复核；页面account-version变更清空迟到读取；已核查工单10键实际消费链并提供权限化入口。9后端/1前端失败先复现，修复后通过。"
       ],
       "remaining_subitems": [
         "Review M1-5 recent events, M1-7 tenant switching, remaining M1-8 search groups and M7 gate",

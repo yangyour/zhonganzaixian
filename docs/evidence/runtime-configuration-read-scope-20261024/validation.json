@@ -1,0 +1,41 @@
+{
+  "status": "VALIDATED_BRANCH_ONLY_MAIN_INTEGRATION_PENDING",
+  "red_before_fix": {
+    "java_failures": 9,
+    "web_failures": 1,
+    "scope": "return-time authorization and account-version invalidation"
+  },
+  "green_targeted": {
+    "java": 40,
+    "web": 20
+  },
+  "full_java": {
+    "command": "mvn -o verify",
+    "total": 5560,
+    "passed": 4375,
+    "skipped": 1185,
+    "failures": 0,
+    "errors": 0,
+    "packaging": "PASSED"
+  },
+  "full_web": {
+    "passed": 5720,
+    "typecheck": "PASSED",
+    "build": "PASSED"
+  },
+  "contracts": {
+    "passed": 241,
+    "shape_changed": false,
+    "generation_consistency": "PASSED"
+  },
+  "offline_demo": {
+    "passed": 18,
+    "provisioning": false
+  },
+  "pg": "NOT_RUN_DESIGNATED_CONFIGURATION_MISSING",
+  "browser": "NOT_RUN_EXISTING_PERMISSION_LIMIT",
+  "runtime_writes": false,
+  "deployment": false,
+  "migrations": false,
+  "publication_scope": "Independent feature branch only until user confirms main coordination method"
+}

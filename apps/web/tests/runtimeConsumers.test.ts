@@ -1,0 +1,5 @@
+import {it,expect} from 'vitest'
+import {readFileSync} from 'node:fs'
+import {runtimeConsumer,ticketRuntimeKeys} from '../src/utils/runtimeConsumers'
+it('ticket adoption keys stay aligned with the exact backend fixed-key reader',()=>{const source=readFileSync('../../server/domain/src/main/java/cn/mop/domain/configuration/RuntimeConfigurationRepository.java','utf8');const declaration=source.match(/TICKET_KEYS=List\.of\(([^;]+)\)/)![1]!;expect([...declaration.matchAll(/"([^"]+)"/g)].map(m=>m[1])).toEqual([...ticketRuntimeKeys]);for(const key of ticketRuntimeKeys){expect(runtimeConsumer(key).title).toContain('工单运行策略');expect(runtimeConsumer(key).detail).toContain('不代表已有工单采用');expect(runtimeConsumer(key).path).toBe('/ticket-workflows')}})
+it('keeps unknown consumers explicit and does not claim actual collection or retention changes',()=>{expect(runtimeConsumer('invented.key').path).toBeNull();expect(runtimeConsumer('notification.provider_credentials').title).toContain('尚未接入');expect(runtimeConsumer('retention.history_days').detail).toContain('不改变实际采集周期');expect(runtimeConsumer('monitor.page_refresh_sec').title).toContain('监控界面刷新')})

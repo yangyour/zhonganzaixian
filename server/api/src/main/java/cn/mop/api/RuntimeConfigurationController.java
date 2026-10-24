@@ -5,6 +5,7 @@ import cn.mop.domain.configuration.RuntimeConfigurationRepository;
 import cn.mop.domain.configuration.RuntimeConfigurationRepository.*;
 import com.fasterxml.jackson.databind.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.*;
 import java.security.MessageDigest;
@@ -17,10 +18,11 @@ import static cn.mop.api.ApiResponse.*;
 public class RuntimeConfigurationController {
     private final PlatformRepository platform;private final RuntimeConfigurationRepository repository;private final RuntimeConfigurationCatalog catalog;private final ObjectMapper mapper;
     public RuntimeConfigurationController(PlatformRepository platform,RuntimeConfigurationRepository repository,RuntimeConfigurationCatalog catalog,ObjectMapper mapper){this.platform=platform;this.repository=repository;this.catalog=catalog;this.mapper=mapper;}
-    @GetMapping("/catalog") Object catalog(HttpServletRequest r){access(r,false);noQuery(r);return success(map("items",catalog.definitions(),"question_count",31,"source","code_catalog","scope","CURRENT_TENANT","production_approved",false),r);}
-    @GetMapping("/{key}") Object current(@PathVariable String key,HttpServletRequest r){Access a=access(r,false);noQuery(r);catalog.entry(key);var value=new LinkedHashMap<String,Object>(repository.read(a,key));String hash=catalog.hash(key);value.put("definition_hash",hash);if("ACTIVE".equals(value.get("status"))&&value.get("selected_release") instanceof Map<?,?> selected&&!hash.equals(selected.get("definition_hash"))){value.put("status","DEFINITION_CHANGED");value.put("effective_value",null);}return success(value,r);}
-    @GetMapping("/{key}/history") Object history(@PathVariable String key,HttpServletRequest r){Access a=access(r,false);if(r.getParameterMap().size()>1||r.getParameterMap().keySet().stream().anyMatch(k->!k.equals("before_version"))||r.getParameterValues("before_version")!=null&&r.getParameterValues("before_version").length!=1)throw invalid("仅允许单个before_version");long before=9007199254740991L;if(r.getParameter("before_version")!=null)try{String v=r.getParameter("before_version");if(!v.matches("[1-9][0-9]{0,15}"))throw invalid("版本无效");before=Long.parseLong(v);if(before>9007199254740990L)throw invalid("版本超出范围");}catch(NumberFormatException e){throw invalid("版本无效");}catalog.entry(key);return success(map("items",repository.history(a,key,before),"page_size",25,"source","postgresql"),r);}
-    @PostMapping("/{key}/validate") Object validate(@PathVariable String key,@RequestBody JsonNode body,HttpServletRequest r){access(r,true);noQuery(r);fields(body,Set.of("value"));catalog.validate(key,body.get("value"));return success(map("configuration_key",key,"valid",true,"definition_hash",catalog.hash(key),"saved",false),r);}
+    @ModelAttribute void headers(HttpServletResponse response){response.setHeader("Cache-Control","no-store");response.setHeader("Referrer-Policy","no-referrer");}
+    @GetMapping("/catalog") Object catalog(HttpServletRequest r){var subject=subject(r,false);noQuery(r);return readResponse(subject,r,map("items",catalog.definitions(),"question_count",31,"source","code_catalog","scope","CURRENT_TENANT","production_approved",false));}
+    @GetMapping("/{key}") Object current(@PathVariable String key,HttpServletRequest r){var subject=subject(r,false);Access a=subject.access();noQuery(r);catalog.entry(key);var value=new LinkedHashMap<String,Object>(repository.read(a,key));String hash=catalog.hash(key);value.put("definition_hash",hash);if("ACTIVE".equals(value.get("status"))&&value.get("selected_release") instanceof Map<?,?> selected&&!hash.equals(selected.get("definition_hash"))){value.put("status","DEFINITION_CHANGED");value.put("effective_value",null);}return readResponse(subject,r,value);}
+    @GetMapping("/{key}/history") Object history(@PathVariable String key,HttpServletRequest r){var subject=subject(r,false);Access a=subject.access();if(r.getParameterMap().size()>1||r.getParameterMap().keySet().stream().anyMatch(k->!k.equals("before_version"))||r.getParameterValues("before_version")!=null&&r.getParameterValues("before_version").length!=1)throw invalid("仅允许单个before_version");long before=9007199254740991L;if(r.getParameter("before_version")!=null)try{String v=r.getParameter("before_version");if(!v.matches("[1-9][0-9]{0,15}"))throw invalid("版本无效");before=Long.parseLong(v);if(before>9007199254740990L)throw invalid("版本超出范围");}catch(NumberFormatException e){throw invalid("版本无效");}catalog.entry(key);return readResponse(subject,r,map("items",repository.history(a,key,before),"page_size",25,"source","postgresql"));}
+    @PostMapping("/{key}/validate") Object validate(@PathVariable String key,@RequestBody JsonNode body,HttpServletRequest r){var subject=subject(r,true);noQuery(r);fields(body,Set.of("value"));catalog.validate(key,body.get("value"));return readResponse(subject,r,map("configuration_key",key,"valid",true,"definition_hash",catalog.hash(key),"saved",false));}
     @PostMapping("/{key}/releases") Object publish(@PathVariable String key,@RequestBody JsonNode body,HttpServletRequest r){
         Access a=access(r,true);noQuery(r);fields(body,Set.of("expected_version","expected_definition_hash","action","revision_id","revision_version","target_release_id","activation","effective_at","expires_at","reason"));catalog.entry(key);
         String expectedDefinition=text(body,"expected_definition_hash",64);if(!expectedDefinition.matches("[a-f0-9]{64}"))throw invalid("配置定义摘要无效");
@@ -38,7 +40,20 @@ public class RuntimeConfigurationController {
             return repository.publish(a,key,command,catalog.hash(key));
         }),r);
     }
-    private Access access(HttpServletRequest r,boolean write){if(r.getUserPrincipal()==null||r.getSession(false)==null)throw new DomainException(401,"SESSION_EXPIRED","会话已失效");String actor=r.getUserPrincipal().getName(),tenant=(String)r.getSession(false).getAttribute("mop.tenant_id");var m=platform.membership(actor,tenant).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","成员关系已失效"));if(!m.active()||!"padmin".equals(m.role())||!m.capabilities().contains(write?"configurations:write":"configurations:read"))throw new DomainException(403,"ACTION_FORBIDDEN","没有运行配置权限");return new Access(tenant,actor,m.permissionVersion(),trace(r));}
+    private record Subject(Access access,Membership membership){}
+    private Object readResponse(Subject subject,HttpServletRequest request,Object data){DashboardReadAuthorization.recheck(request,platform,subject.membership());return success(data,request);}
+    private Access access(HttpServletRequest request,boolean write){return subject(request,write).access();}
+    private Subject subject(HttpServletRequest r,boolean write){
+        if(r.getUserPrincipal()==null||r.getSession(false)==null)throw expired();
+        String actor=r.getUserPrincipal().getName();Object selected=r.getSession(false).getAttribute("mop.tenant_id");
+        if(!(selected instanceof String tenant)||!NetworkMonitoringService.uuid(tenant)||!NetworkMonitoringService.uuid(actor))throw expired();
+        var m=platform.membership(actor,tenant).orElseThrow(RuntimeConfigurationController::expired);
+        if(!m.active()||!actor.equals(m.userId())||!tenant.equals(m.tenantId())||m.permissionVersion()<1)throw expired();
+        if(!"padmin".equals(m.role())||!m.capabilities().contains(write?"configurations:write":"configurations:read"))throw new DomainException(403,"ACTION_FORBIDDEN","没有运行配置权限");
+        return new Subject(new Access(tenant,actor,m.permissionVersion(),trace(r)),m);
+    }
+    private static DomainException expired(){return new DomainException(401,"SESSION_EXPIRED","会话或成员权限已失效");}
+
     private static void fields(JsonNode b,Set<String> fields){if(b==null||!b.isObject()||b.size()!=fields.size())throw invalid("请求字段不完整或包含未知字段");b.fieldNames().forEachRemaining(k->{if(!fields.contains(k))throw invalid("未知字段");});}
     private static String text(JsonNode b,String k,int n){return ConfigurationRevisionController.text(b,k,n);}
     private static long version(JsonNode b,String k,int min){var v=b.get(k);if(v==null||!v.isIntegralNumber()||!v.canConvertToLong()||v.longValue()<min||v.longValue()>9007199254740990L)throw invalid(k+"版本无效");return v.longValue();}

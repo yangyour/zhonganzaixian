@@ -107,7 +107,7 @@ defineExpose({ hasUnresolved: workspace.unresolved, canLeave, inputSnapshot, can
         <el-button :disabled="Boolean(state.busy) || !state.history?.has_more" @click="workspace.show(state.selected!.id, true)">加载更早修订</el-button>
       </section>
       <section v-if="writable" class="worklog-section">
-        <h3>{{ editingId ? '修改工时记录' : '新增工时记录' }}</h3><p v-if="editingId" class="worklog-id">{{ editingId }} · 修改后将生成新版本并保留历史记录</p>
+        <h3>{{ editingId ? '修改工时记录' : '新增工时记录' }}</h3><p v-if="editingId" class="worklog-id">{{ editingId }} · 修改后将保存为新版本并保留历史记录</p>
         <el-form label-position="top" @submit.prevent="save">
           <el-form-item label="工作类型"><el-select v-model="kind" :disabled="locked" aria-label="实填工时类型" placeholder="请选择工作类型"><el-option v-for="(label, value) in labels" :key="value" :label="label" :value="value" /></el-select></el-form-item>
           <el-form-item label="实际开始时间（含秒和时区）"><el-input v-model="startedAt" :disabled="locked" aria-label="实填开始时间" placeholder="例如 2026-10-02T09:00:00+08:00" /></el-form-item>

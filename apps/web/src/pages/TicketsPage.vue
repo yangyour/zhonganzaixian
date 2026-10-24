@@ -269,7 +269,7 @@ onUnmounted(() => { unregisterContextGuard(); unregisterRouteResolve?.(); unregi
     <h1 class="page-title-sr">报障与受理 </h1>
     
     
-    <el-alert v-if="acceptedOperationId" class="page-note" type="success" :closable="false" show-icon title="故障申报已受理，系统正在生成正式工单，可点击下方按钮刷新处理进度。" />
+    <el-alert v-if="acceptedOperationId" class="page-note" type="success" :closable="false" show-icon title="故障申报已受理，系统正在创建正式工单，可点击下方按钮刷新处理进度。" />
     <RetainedPhotoNotice v-if="retainedPhotos" :target-id="photoTargetId" :ticket="appendTicket" :count="detailPhotos.rows.value.length" :can-discard="photoWorkspace.canDiscard.value" @resume="openDetail(photoTargetId)" @discard="discardRetainedPhotos" />
     <div class="panel ticket-register-panel">
       <div class="proto-section-head content-toolbar"><h2>{{ customerView ? '我的故障申报' : '全部故障申报' }}</h2><span class="proto-sub">{{ customerView ? '仅本人可见' : '当前租户范围' }} · 支持按关键词、分类与紧急程度筛选</span><div class="content-actions"><el-button v-if="mayReport" type="primary" @click="createOpen = true">故障申报登记</el-button></div></div>

@@ -32,7 +32,7 @@ const revisionTarget=computed(()=>{
 const revisionReady=computed(()=>writable.value&&revisionTarget.value&&selected.value
  &&selected.value.state.document.id===revisionTarget.value.id&&selected.value.state.version===revisionTarget.value.version
  &&['RETURNED','PUBLISHED'].includes(selected.value.state.phase)&&isUuid(source.value)&&!!sourceHash.value&&/^[a-f0-9]{64}$/.test(sourceHash.value))
-const phases:Record<string,string>={DRAFT:'草稿',GENERATING:'生成中',REVIEW_REQUIRED:'待审核',APPROVED:'已审核，未发布',PUBLISHED:'已发布',RETURNED:'已退回',FAILED:'生成失败'}
+const phases:Record<string,string>={DRAFT:'草稿',GENERATING:'制作中',REVIEW_REQUIRED:'待审核',APPROVED:'已审核，未发布',PUBLISHED:'已发布',RETURNED:'已退回',FAILED:'制作失败'}
 let epoch=0,abort:AbortController|null=null
 async function browse(cursor:{before:string;before_id:string}|null=null){if(!allowed.value||locked.value)return;const turn=++epoch,current=scope.value,controller=new AbortController();abort=controller;loading.value=true;items.value=[];next.value=null;selected.value=null;error.value=null
  try{const result=await api.request<{items:unknown[];next:{before:string;before_id:string}|null;external_dispatch_enabled:false}>('/report-publications'+(cursor?'?'+new URLSearchParams(cursor):''),{signal:controller.signal});if(turn!==epoch||current!==scope.value||controller.signal.aborted)return
@@ -119,14 +119,14 @@ onUnmounted(()=>{epoch++;abort?.abort();command.dispose();unregister();window.re
    <div v-if="writable&&['RETURNED','PUBLISHED'].includes(selected.state.phase)">
     <router-link class="report-revision-link" :to="{path:'/inspection-quarterly-reports',query:{revision_id:selected.state.document.id,revision_version:String(selected.state.version)}}">选择冻结来源并创建新修订</router-link>
     <div v-if="revisionReady">
-     <p>已选择冻结来源。新修订需重新生成和审核，原报告及阅读记录保留。</p>
+     <p>已选择冻结来源。新修订需重新制作并审核，原报告及阅读记录保留。</p>
      <label>更正原因<input v-model="reason" maxlength="3000" :disabled="locked" /></label>
      <button :disabled="locked||!reason.trim()" @click="revise">创建新修订</button>
     </div>
     <p v-else-if="revisionTarget?.id===selected.state.document.id&&selected.state.version!==revisionTarget.version" role="alert">原报告状态已变化，请重新选择修订来源。</p>
    </div>
    <details v-if="selected.state.document.incomplete_reasons.length"><summary>待补全事项（{{selected.state.document.incomplete_reasons.length}}）</summary><ul><li v-for="reason in selected.state.document.incomplete_reasons" :key="reason">{{reason}}</li></ul></details>
-   <div class="actions"><button v-if="writable&&['DRAFT','FAILED'].includes(selected.state.phase)" :disabled="locked" @click="action('RENDER')">生成同源 HTML / PDF</button>
+   <div class="actions"><button v-if="writable&&['DRAFT','FAILED'].includes(selected.state.phase)" :disabled="locked" @click="action('RENDER')">准备 HTML / PDF</button>
    <button v-if="manager&&selected.state.phase==='REVIEW_REQUIRED'" :disabled="locked" @click="action('APPROVE')">审核通过</button><button v-if="manager&&selected.state.phase==='APPROVED'" :disabled="locked" @click="action('PUBLISH')">发布给配置中的接收人</button><button v-if="manager&&selected.state.phase==='PUBLISHED'" :disabled="locked" @click="action('RESEND')">登记重发意图（不外发）</button></div>
    <div v-if="manager&&['REVIEW_REQUIRED','APPROVED'].includes(selected.state.phase)"><label>退回原因<input v-model="reason" maxlength="3000" :disabled="locked" /></label><button :disabled="locked||!reason.trim()" @click="action('RETURN')">退回</button></div>
    <div class="actions"><button v-if="selected.state.html" :disabled="locked" @click="download('html')">{{writable?'下载 HTML':'登记阅读并下载 HTML'}}</button><button v-if="selected.state.pdf" :disabled="locked" @click="download('pdf')">{{writable?'下载 PDF':'登记阅读并下载 PDF'}}</button></div>

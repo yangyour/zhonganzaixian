@@ -4,7 +4,7 @@ export const CMDB_FINDING_EXPORT_MAX_BYTES=8*1024*1024
 interface Finding {record:number;sourceRow:number|null;column:number|null;level:string;code:string;message:string}
 interface Metadata {scope:string;catalog:string;records:number;errors:number;warnings:number;database:string;tenant:string;source:string;version:number|null;parseHash:string}
 export interface CmdbFindingExport {csv:string;filename:'cmdb-local-findings.csv'|'cmdb-source-findings.csv';findingCount:number}
-const fail=():never=>{throw Error('问题清单结构不完整或超过 8 MiB，未生成截断文件。请保留原检查结果并分批修正源文件。')}
+const fail=():never=>{throw Error('问题清单结构不完整或超过 8 MiB，未导出不完整文件。请保留原检查结果并分批修正源文件。')}
 function cell(value:unknown):string{
  let s=value===null?'':String(value)
  if(s.length>1000||/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]|[\uD800-\uDFFF]/u.test(s))fail()

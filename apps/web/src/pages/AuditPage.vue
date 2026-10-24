@@ -50,7 +50,7 @@ async function verifyNext() {
 }
 function toggleRecord(value: boolean) { if (!value) selected.value = null }
 function chooseRecordRange(row: AuditRecord) { from.value = String(row.sequence); to.value = String(row.sequence); rangeError.value = ''; selected.value = { ...row } }
-const proofTitle = computed(() => state.value.proof?.status === 'VALID' ? '所选区间在本次数据库快照中校验一致' : state.value.proof?.status === 'INVALID' ? '区间校验未通过，请保留证据并排查' : '当前快照区间暂无记录，未生成校验结果')
+const proofTitle = computed(() => state.value.proof?.status === 'VALID' ? '所选区间在本次数据库快照中校验一致' : state.value.proof?.status === 'INVALID' ? '区间校验未通过，请保留证据并排查' : '当前快照区间暂无记录，尚无校验结果')
 async function retryList(){focusEpoch++;listStatus.value='';selected.value=null;return workspace.retryList()}
 async function retryProof(){focusEpoch++;proofStatus.value='';rangeError.value='';return workspace.retryProof()}
 async function cancelList(){if(!workspace.cancelList())return false;const turn=++focusEpoch;selected.value=null;listStatus.value='已取消列表读取；可重试原查询参数，续页仍使用原快照上界。';await nextTick();if(turn===focusEpoch)listNotice.value?.focus();return true}

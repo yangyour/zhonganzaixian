@@ -145,7 +145,7 @@ export function createWorklogWorkspace(client: Pick<ApiClient, 'request'>, chang
     const payload = JSON.stringify({ [edit ? 'expected_version' : 'expected_ticket_version']: version, ...copy(input) })
     const current=epoch,target=path(scope)+(baseline?'/'+baseline.id:'')
     try {const key=newKey();if(current!==epoch||disposed||!scope?.canWrite||state.busy||unresolved())return false;if(typeof key!=='string'||!/^[A-Za-z0-9._:-]{1,128}$/.test(key))throw Error('INVALID_KEY');return send({path:target,method:edit?'PATCH':'POST',key,payload,baseline,state:'uncertain'})}
-    catch {if(current===epoch&&!disposed){state={...state,error:new ApiError(0,'REQUEST_ID_UNAVAILABLE','无法生成有效请求标识；没有发送工时保存请求，请稍后重试','—')};emit()}return false}
+    catch {if(current===epoch&&!disposed){state={...state,error:new ApiError(0,'REQUEST_ID_UNAVAILABLE','无法创建有效请求标识；没有发送工时保存请求，请稍后重试','—')};emit()}return false}
   }
   function canRetryRead(){return !!scope&&!disposed&&!state.busy&&lastRead!==null}
   function cancelRead(){if(disposed||state.busy!=='read')return false;++epoch;controller?.abort();controller=undefined;state={...state,busy:null,error:null};emit();return true}

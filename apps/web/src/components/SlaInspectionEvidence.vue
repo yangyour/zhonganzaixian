@@ -9,7 +9,7 @@ type EvidenceSection={key:SectionKey;title:string;columns:string[];rows:string[]
 const size=25,pages=ref<Record<SectionKey,number>>({tasks:0,missing:0,references:0}),prefix=useId()
 const regions=new Map<SectionKey,HTMLElement>();let epoch=0,alive=true
 const kindLabels:Record<string,string>={SLA:'SLA 提醒',CONFIRMATION_REMINDER:'客户确认提醒',AUTO_CLOSE:'自动关闭核查'}
-const outcomeLabels:Record<string,string>={EMITTED:'已生成内部事件（非外部送达）',OBSOLETE:'已过时',AUTO_CLOSED:'已自动关闭工单'}
+const outcomeLabels:Record<string,string>={EMITTED:'已登记内部事件（非外部送达）',OBSOLETE:'已过时',AUTO_CLOSED:'已自动关闭工单'}
 const missingLabels:Record<string,string>={response:'响应时限',recovery:'恢复时限',confirmation:'客户确认期限'}
 const sections=computed<EvidenceSection[]>(()=>[
  {key:'tasks',title:'耐久时钟任务',columns:['任务键','任务类型','计划时间','处理回执','完成时间'],rows:props.inspection.clock_tasks.map(t=>[t.clock_key,monitoringRecurrenceLabel(t.clock_key)??kindLabels[t.kind]??t.kind,displayTime(t.due_at),t.outcome===null?'未见处理回执':outcomeLabels[t.outcome]??t.outcome,t.completed_at===null?'未见完成时间':displayTime(t.completed_at)]),empty:'此快照未返回时钟任务，不表示通知已经送达，也不能据此判断后台处理器是否运行。',guidance:'仅核对本次接口返回的内部任务。复发周期沿用原 SLA 截止；EMITTED 不表示邮件、企业微信或短信送达，未见回执不等于执行失败。'},

@@ -52,7 +52,7 @@ async function exportServices(){
  try{await nextTick();if(!current())return false
   const file=slaServiceReviewExport(report,{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,canWriteInternal:canWriteInternal.value,canWriteConfig:canWriteConfig.value},report.period)
   if(!current()||!downloadSlaServiceReview(file,current))return false
-  if(current())exportStatus.value=`已生成 ${file.period} 的 ${file.serviceCount} 条已加载服务核对清单并请求下载；是否保存由浏览器确认。不是正式报告或账单。`
+  if(current())exportStatus.value=`已准备 ${file.period} 的 ${file.serviceCount} 条已加载服务核对清单并请求下载；是否保存由浏览器确认。不是正式报告或账单。`
   return true
  }catch(error){if(current())exportError.value=error;return false}finally{if(turn===exportTurn)exporting.value=false}
 }
@@ -129,7 +129,7 @@ const demoExample = useDemoExample<{month:string}>('sla-reports', permitted, () 
    <p v-if="state.busy" role="status" aria-live="polite">{{ state.busy==='write'?'正在保存/冻结月度 SLA 快照…':'正在计算 SLA 月报…' }}</p>
 
    <template v-if="state.report">
-    <div class="review-export"><button type="button" :disabled="locked||periodInput!==state.report.period" aria-describedby="sla-review-export-note" @click="exportServices">{{exporting?'正在生成服务核对 CSV…':'导出当前服务核对 CSV'}}</button><p id="sla-review-export-note">仅导出当前已加载的 {{state.report.services.length}} 条服务可用性及观察时间；不包含赔付金额、工单明细或冻结快照，不是正式报告或账单。下载不会保存或冻结月报。</p><ApiErrorNotice :error="exportError" /><p v-if="exportStatus" role="status">{{exportStatus}}</p></div>
+    <div class="review-export"><button type="button" :disabled="locked||periodInput!==state.report.period" aria-describedby="sla-review-export-note" @click="exportServices">{{exporting?'正在导出服务核对 CSV…':'导出当前服务核对 CSV'}}</button><p id="sla-review-export-note">仅导出当前已加载的 {{state.report.services.length}} 条服务可用性及观察时间；不包含赔付金额、工单明细或冻结快照，不是正式报告或账单。下载不会保存或冻结月报。</p><ApiErrorNotice :error="exportError" /><p v-if="exportStatus" role="status">{{exportStatus}}</p></div>
     <div class="compact-result-summary">
      <div>
       <span>{{state.report.kpis.availability_aggregate?'按有效时长汇总可用率':'已核验可用性均值'}}</span>
@@ -254,7 +254,7 @@ const demoExample = useDemoExample<{month:string}>('sla-reports', permitted, () 
          同时冻结本月度 SLA 快照（冻结后不可覆盖，M5-10）
         </label>
         <button type="submit" class="primary" :disabled="locked||periodInput!==state.report.period">
-         {{ state.report.monthly_result?'更新月度 SLA 快照':'生成月度 SLA 快照' }}
+         {{ state.report.monthly_result?'更新月度 SLA 快照':'保存月度 SLA 快照' }}
         </button>
        </form>
       </div>

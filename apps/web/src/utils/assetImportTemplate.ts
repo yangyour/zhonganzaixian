@@ -3,7 +3,7 @@ import spec from '../../../../contracts/asset-import-template.json'
 import { ApiError, StaleRequestError } from '../api/client'
 
 export const assetImportTemplateSpec = Object.freeze({ ...spec })
-const invalid = () => new ApiError(200, 'INVALID_TEMPLATE_RESPONSE', '模板下载的类型、版本、长度或摘要不符，未生成下载文件', '—')
+const invalid = () => new ApiError(200, 'INVALID_TEMPLATE_RESPONSE', '模板下载的类型、版本、长度或摘要不符，未准备下载文件', '—')
 async function bounded(response: Response, maximum: number): Promise<Uint8Array<ArrayBuffer>> {
   if (!response.body) throw invalid()
   const reader = response.body.getReader(), chunks: Uint8Array[] = []; let size = 0

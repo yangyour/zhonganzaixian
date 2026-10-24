@@ -1,0 +1,80 @@
+{
+  "status": "RESTORED_AND_REVALIDATED_CODE_CHECKS_PASSED",
+  "base_commit": "4b41cb6a48591c321102e9578279d25fcf7825d3",
+  "source_files_updated": 29,
+  "tests_and_specs_updated": 5,
+  "static_copy_scan": {
+    "files": 320,
+    "findings": 0,
+    "scope": "Static Vue/TypeScript product copy only; comments/protocols/user data unchanged"
+  },
+  "web": {
+    "files": 349,
+    "passed": 5636
+  },
+  "node": {
+    "passed": 288
+  },
+  "offline_demo": {
+    "passed": 18,
+    "initialization_performed": false
+  },
+  "typecheck": "PASSED",
+  "build": "PASSED",
+  "static_policy": "PASSED",
+  "copy_build_gate": "PASSED",
+  "api_contract": "UNCHANGED_GENERATION_CHECK_PASSED",
+  "browser": "NOT_RUN",
+  "backend_runtime_changes": false,
+  "placeholder_function_completion_claimed": false,
+  "deployed": false,
+  "environment_recovery": {
+    "observed_at": "2026-10-24T13:29:41Z",
+    "cause": "UNKNOWN",
+    "fresh_checkout": "4b41cb6a48591c321102e9578279d25fcf7825d3",
+    "node": "22.23.4",
+    "npm": "10.9.9",
+    "tests_rerun_after_restore": true
+  },
+  "source_sha256": {
+    "apps/web/src/pages/AuditPage.vue": "c8f657d76dc9d5396c6168a31bc36fc935f981730cd863c18091433c7d284e2a",
+    "apps/web/src/pages/SlaReportsPage.vue": "964d2dc4bf4df4014d51955fd5396fa6a475929ab5f725d9e5ac3511361f8d9a",
+    "apps/web/src/pages/OwnWorklogsPage.vue": "d0bb5f698d01c53ebe646e3311768a61bb4c56b61655f6c4512c2ad95786a1f0",
+    "apps/web/src/pages/AssetExportJobsPage.vue": "43b9bc5f5670bc3e6006a9c8085088e30c9bf0ab8bdd8fd736dce14a7dc38559",
+    "apps/web/src/pages/TicketNotificationsPage.vue": "21e7bea2fcf75275394ecfbdc833ea22ac1a7aba82dd787f33e71f3f728da872",
+    "apps/web/src/pages/ReportPublicationsPage.vue": "3c0b5c72805fb33dab3f87bb1c50c76caee9bb7808a2dbfffd7bcf4db147cb99",
+    "apps/web/src/pages/TicketsPage.vue": "fc60ae07f311bda67a63834af39c380c2a9d4e1611664e49e40b8cd4a9f8a5af",
+    "apps/web/src/pages/RuntimeConfigurationsPage.vue": "3d215633117d8104296bf83d02014c3d41a7bcd64386486fda963d38c38e094a",
+    "apps/web/src/pages/InspectionQuarterlyReportsPage.vue": "aafd3296d1e1cc66b29daecc5bc4875f9d65c379e68fbfbc1e9a0b26cf1f1578",
+    "apps/web/src/pages/MonitoringOnboardingPage.vue": "8b4dc2f45373222e5c00ce8a9e5e2158b1e32f53c8475df580f90d0814740938",
+    "apps/web/src/pages/ContactImportsPage.vue": "22ef21cc56949b4ba6c8a6ede24282c558b462ea398988d94ac737ea54dab169",
+    "apps/web/src/pages/InspectionSourceCollectionsPage.vue": "ef2cfa8829e64685e773c5ba8a6b8e60547259bb6f086ea09b0bfb866b3b4db9",
+    "apps/web/src/components/WorklogWorkspace.vue": "1e267f3073c8791141e2256cdee474cafa4675a9fdfb11a54e0398637b8a6213",
+    "apps/web/src/components/SlaInspectionEvidence.vue": "17e751ef1841fff974a1ddead96c95871051e90774b4a2865af28c3c377e9fbb",
+    "apps/web/src/components/LiveMonitoringPanel.vue": "ffef5ff663c34f4952c6d47dfaba49ac5e2064169fead04bdd91b63d2548de73",
+    "apps/web/src/components/DeliveryDeadLetterPanel.vue": "5a1984b350f19b2d35cac94d10caaebc275ad54ba359e51887eae4da0503a3ad",
+    "apps/web/src/components/ManualRecoveryPanel.vue": "465ba0135054f31cc293d06b2d4e91c2c7ed8f5081318c48a71443039d79d90b",
+    "apps/web/src/components/TicketReportForm.vue": "db9132945af6fb66753ae7c536a779063dd9b6b1b12b430a216bc5364d43584d",
+    "apps/web/src/utils/roleMatrixPrint.ts": "4a12a9bd79fc863a49ecf79f1a0683ca68616afefdc22063c5488a8c92e9301d",
+    "apps/web/src/utils/slaServiceReviewExport.ts": "2ff3f8ff2c3aca20174efa2e1ef3e707304f81549845e62df7d98033a4e2d041",
+    "apps/web/src/utils/inspectionReportPreview.ts": "392c49a842423676eca330c632f7e1e1f11841efecd06b3e62b0b831261a49c8",
+    "apps/web/src/utils/assetExportPublication.ts": "c7854460a632928e30162383c10db95e169aaf86385af6a10014405bb5d44315",
+    "apps/web/src/utils/manualRecoveryWorkspace.ts": "ed57cdae8205fe11098fc9193aeb1c44dfb40e2e4e537f49b3421e6636d54a67",
+    "apps/web/src/utils/manualIncidentWriter.ts": "5f2413fe6383f2dff89d9c284e5ee0fd9385a610529f02d219874e95bb683354",
+    "apps/web/src/utils/ticketCommentWorkspace.ts": "0e4623e824b223969bf37c0b5b768ae0011b020a131971b772b6e66369d38f6a",
+    "apps/web/src/utils/assetImportTemplate.ts": "9a4eaeef44140d4d2e34b9bea71836f3e8bad89277f35f30ae83b3d40e2ebb63",
+    "apps/web/src/utils/internalNoteWorkspace.ts": "9bf132f5e64ba4119bd625643c960b81cb4b5f2b1b1554135273d6a40219d5de",
+    "apps/web/src/utils/cmdbFindingExport.ts": "8c22784dd76ae7b19aae8c50a57d1f1860de5dfd9c66a2426608d452e2de2b3a",
+    "apps/web/src/utils/worklogWorkspace.ts": "15b0e38ed825c6ebdfa9fc4a81e9b10f5fa7cf9adfe2a213f0d6a22cf0c53b67",
+    "apps/web/tests/liveMonitoringPanel.test.ts": "05affb4cf9012315ec8537a18d31427d5ac3f08e8d1e9568da9391af70b21c25",
+    "apps/web/tests/inspectionSourceCollectionsPage.test.ts": "c93fed7fa7eae93714fc1738d0b5b2e94aed92fe54921b3c458a6302ecf1db0e",
+    "apps/web/tests/slaInspectionEvidence.test.ts": "e28b5682fb360d4d7c070b41c506c5511230ca5a8358a03b014804d1ebe6dba2",
+    "apps/web/tests/ownWorklogsPage.test.ts": "33a808f3220af1c2d7c3bcb60d9e7170e8ab5f7bbf1787cbdad3e2fd9a1e2d42",
+    "apps/web/qa/own-worklog-page.http.ts": "624641102229db0bfbe6f06c00d71b3b4c9edf0bbbe690123931818ce42d807c",
+    "AGENTS.md": "923b7d65ea420419c48c75cb62fd87c4d7fae2a40e80c0dfa1bb5e0075995f49",
+    "apps/web/package.json": "ed2fb710c85b574ca28ba61e972a0d87ae6fd8c007b02869e4dd6cdb6ea02412",
+    "tools/check-product-copy.mjs": "d9a8c4a33d7e0ab025faa441bab1b333654adfaa8a5b24237e00dd577fd5eb19",
+    "tests/product-copy.test.mjs": "684534d3dafde1064858e16f589d082570b10714776aecad420df37db4edc50b",
+    "docs/product-language-20261024.md": "bb8ec4d12e5319c0669107d11f78c7ab4830871ca4a7e5807212b8d8154e683a"
+  }
+}

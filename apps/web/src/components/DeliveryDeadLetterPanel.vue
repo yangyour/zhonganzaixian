@@ -22,7 +22,7 @@ async function submit(){if(!candidate.value||!valid.value||locked.value||!select
  const c:DeadLetterCommand={command_id:createRequestId(),tenant_id:session.value!.tenant.id,actor_id:session.value!.user.id,delivery_id:candidate.value.id,resource_pool_id:candidate.value.pool,expected_version:candidate.value.version,reason:reason.value}
  if(await commands.submit(c)){modal.value=false;notice.value='已记录人工死信处置；这是原命令回执，不代表供应商送达、当前头状态或允许重发。';emit('changed',c.delivery_id)}
 }
-async function recover(){const id=commands.pending.value?.delivery_id;if(await commands.retry()){modal.value=false;notice.value='已核对原处置命令，未生成新的发送请求。';if(id)emit('changed',id)}}
+async function recover(){const id=commands.pending.value?.delivery_id;if(await commands.retry()){modal.value=false;notice.value='已核对原处置命令，未创建新的发送请求。';if(id)emit('changed',id)}}
 async function cancelWait(){commands.cancel();commands.reset();notice.value="已停止等待，原命令保留；结果仍需核对。";await nextTick();(modal.value?modalRetry.value:retry.value)?.focus()}
 function mayLeave(){if(commands.pending.value||commands.busy.value){notice.value='请先按原命令核对未确认的处置结果。';return false}return true}
 onBeforeRouteLeave(mayLeave);const unregister=contextTransitionGuards.register(mayLeave)

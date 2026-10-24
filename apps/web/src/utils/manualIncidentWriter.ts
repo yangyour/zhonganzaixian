@@ -75,7 +75,7 @@ export function createManualIncidentWriter(client: Pick<ApiClient, 'request'>, c
     const current = copy(state.asset)
     const turn=epoch,payload=JSON.stringify({title:input.title,severity:input.severity,asset_id:current.id,expected_asset_version:current.version})
     try{const key=newKey();if(turn!==epoch||disposed||!context||!state.editing||state.busy||state.attempt)return Promise.resolve(false);if(typeof key!=='string'||!/^[A-Za-z0-9._:-]{1,128}$/.test(key))throw Error('INVALID_KEY');return send({payload,key,asset:current,state:'uncertain'})}
-    catch{if(turn===epoch&&!disposed){state={...state,error:new ApiError(0,'REQUEST_ID_UNAVAILABLE','无法生成有效请求标识；没有发送手工登记请求，请稍后重试','—')};emit()}return Promise.resolve(false)}
+    catch{if(turn===epoch&&!disposed){state={...state,error:new ApiError(0,'REQUEST_ID_UNAVAILABLE','无法创建有效请求标识；没有发送手工登记请求，请稍后重试','—')};emit()}return Promise.resolve(false)}
   }
   function canRetryRead(){return !!context&&!disposed&&!state.busy&&lastRead!==null}
   function cancelRead(){if(disposed||state.busy!=='read')return false;++epoch;abort?.abort();abort=undefined;state={...state,busy:null,error:null};emit();return true}

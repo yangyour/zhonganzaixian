@@ -159,7 +159,7 @@ async function submitReport() {
 <template>
   <el-dialog v-model="open" title="故障申报登记" width="650px" class="responsive-dialog ticket-report-dialog" :close-on-click-modal="!busy && !uncertain" :close-on-press-escape="!busy" :show-close="!busy" destroy-on-close>
     <p class="ticket-form-intro">申报租户：<strong>{{ session?.tenant.name }}</strong></p>
-    <el-alert v-if="acceptedOperationId" type="info" :closable="false" show-icon title="故障申报已受理，系统正在生成正式工单，可点击下方按钮刷新处理进度。" />
+    <el-alert v-if="acceptedOperationId" type="info" :closable="false" show-icon title="故障申报已受理，系统正在创建正式工单，可点击下方按钮刷新处理进度。" />
     <el-alert v-else-if="uncertain" type="warning" :closable="false" show-icon title="提交结果待确认：系统已锁定当前填写内容，请先刷新列表核对是否已生效，或点击“重试提交”继续处理。" />
     <ApiErrorNotice :error="submitError" pending-message="系统已保留当前填写内容，请刷新或重试以确认受理结果。" />
     <ApiErrorNotice :error="operationError" />
@@ -170,15 +170,15 @@ async function submitReport() {
       <ApiErrorNotice :error="assetsError"><el-button size="small" :disabled="locked" @click="loadAssets">重试设备查询</el-button></ApiErrorNotice>
       <el-form-item label="影响范围" :error="fieldErrors.impact_scope"><el-radio-group v-model="form.impact_scope" class="ticket-choice-group" aria-label="影响范围"><el-radio v-for="(label, value) in impactScopeLabel" :key="value" :value="value">{{ label }}</el-radio></el-radio-group></el-form-item>
       <el-form-item label="描述（必填，最多 3000 个字符）" :error="fieldErrors.description"><AutoTextarea v-model="form.description" placeholder="请描述故障发生时间、具体现象与受影响业务，请勿填写密码或密钥信息" aria-label="报障描述" /></el-form-item>
-      <el-form-item label="标题（选填）" :error="fieldErrors.title"><el-input v-model="form.title" placeholder="留空时系统将按故障分类与关联设备自动生成" aria-label="报障标题" /></el-form-item>
+      <el-form-item label="标题（选填）" :error="fieldErrors.title"><el-input v-model="form.title" placeholder="留空时系统将按故障分类与关联设备自动填写" aria-label="报障标题" /></el-form-item>
       <div class="ticket-contact-fields"><el-form-item label="联系人" :error="fieldErrors.contact_name"><el-input v-model="form.contact_name" placeholder="本次故障申报联系人" aria-label="报障联系人" /></el-form-item><el-form-item label="联系电话" :error="fieldErrors.contact_phone"><el-input v-model="form.contact_phone" type="tel" placeholder="例如：+86 138 0000 0000" aria-label="报障联系电话" /></el-form-item></div>
       <p class="field-help">请填写现场或业务联系人信息，以便工程师及时核实故障现象。</p>
       <el-form-item label="紧急程度（填报参考）" :error="fieldErrors.urgency"><el-radio-group v-model="form.urgency" class="ticket-choice-group" aria-label="紧急程度"><el-radio v-for="(label, value) in urgencyLabel" :key="value" :value="value">{{ label }}</el-radio></el-radio-group></el-form-item>
       
     </el-form>
-    <el-alert v-if="registeredTicket" type="success" :closable="false" :title="`工单已生成（单号：${registeredTicket.receipt_no} · v${registeredTicket.version}），可查看工单详情或继续关联现场照片。`" />
+    <el-alert v-if="registeredTicket" type="success" :closable="false" :title="`工单已创建（单号：${registeredTicket.receipt_no} · v${registeredTicket.version}），可查看工单详情或继续关联现场照片。`" />
     <ReportPhotoPanel :queue="photos" :existing="registeredTicket?.attachments || []" :disabled="submitting || uncertain" :appender="registeredTicket ? appender : undefined" />
-    <p v-if="acceptedOperationId && !registeredTicket" class="field-help">故障申报已受理，请先刷新处理进度，待正式工单生成后即可追加现场照片。</p>
+    <p v-if="acceptedOperationId && !registeredTicket" class="field-help">故障申报已受理，请先刷新处理进度，待正式工单创建完成后即可追加现场照片。</p>
     <template #footer><el-button :disabled="busy" @click="open = false">{{ uncertain || acceptedOperationId ? '关闭窗口（保留当前内容）' : '取消' }}</el-button><el-button v-if="acceptedOperationId" type="primary" :loading="operationLoading" :disabled="submitting" @click="readRegistration">刷新处理进度</el-button><el-button v-else type="primary" :loading="submitting" :disabled="!permitted" @click="submitReport">{{ uncertain ? '重试提交' : '提交故障申报' }}</el-button></template>
   </el-dialog>
 </template>

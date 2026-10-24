@@ -64,7 +64,7 @@ export function createManualRecoveryWorkspace(client: Pick<ApiClient, 'request'>
     validateInternalNoteText(note); const time = reportedRecoveredAt === null ? null : new Date(worklogInstant(reportedRecoveredAt)).toISOString()
     const turn=epoch,parentId=state.parent.id,payload=JSON.stringify({expected_version:0,note,reported_recovered_at:time})
     try{const key=newKey();if(turn!==epoch||disposed||!context?.canWrite||state.busy||state.attempt||state.parent?.id!==parentId)return Promise.resolve(false);if(typeof key!=='string'||!/^[A-Za-z0-9._:-]{1,128}$/.test(key))throw Error('INVALID_KEY');return send({parentId,payload,key,state:'uncertain'})}
-    catch{if(turn===epoch&&!disposed){state={...state,error:new ApiError(0,'REQUEST_ID_UNAVAILABLE','无法生成有效请求标识；没有发送人工恢复确认，请稍后重试','—')};emit()}return Promise.resolve(false)}
+    catch{if(turn===epoch&&!disposed){state={...state,error:new ApiError(0,'REQUEST_ID_UNAVAILABLE','无法创建有效请求标识；没有发送人工恢复确认，请稍后重试','—')};emit()}return Promise.resolve(false)}
   }
   function canRetryRead(){return !!context&&!disposed&&!state.busy&&lastRead!==null&&lastRead===state.parent?.id}
   function cancelRead(){if(disposed||state.busy!=='read')return false;++epoch;abort?.abort();abort=undefined;state={...state,busy:null,error:null};emit();return true}

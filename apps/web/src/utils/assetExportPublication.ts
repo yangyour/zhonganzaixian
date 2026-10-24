@@ -63,7 +63,7 @@ export function createExportPublicationWorkspace(transport:Transport,changed:(s:
   if(!p.publication_enabled||kind==='publication'&&(!p.prepared||p.status!=='NOT_PUBLISHED')||kind==='content-grants'&&(!p.download_grant_available||p.status!=='PUBLISHED'))return false
   const body:Record<string,unknown>=kind==='publication'?{expected_version:p.version,file_sha256:p.file_sha256,action:'PUBLISH_PREPARED_FILE'}:{}
   try{const key=createRequestId();if(turn!==epoch||!active()||state.busy||state.attempt)return false;if(typeof key!=='string'||key.length<1||key.length>128||/[^A-Za-z0-9._:-]/.test(key))throw invalid();return perform({kind,key,body,baseline:p,uncertain:false})}
-  catch{if(turn===epoch&&!disposed){state.error=new ApiError(0,'REQUEST_ID_UNAVAILABLE','无法生成有效请求标识；没有发送发布或下载授权请求，请稍后重试','—');emit()}return false}
+  catch{if(turn===epoch&&!disposed){state.error=new ApiError(0,'REQUEST_ID_UNAVAILABLE','无法创建有效请求标识；没有发送发布或下载授权请求，请稍后重试','—');emit()}return false}
  }
  return{reset,read,publish:()=>start('publication'),grant:()=>start('content-grants'),retry:()=>state.attempt?perform(structuredClone(state.attempt)):Promise.resolve(false),unresolved:()=>state.busy||state.attempt!==null,dispose:()=>{disposed=true;reset(null,null)}}
 }

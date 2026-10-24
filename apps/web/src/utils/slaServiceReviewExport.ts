@@ -2,7 +2,7 @@ import {readSlaReport,type OnCallContext} from './onCallBoard'
 export const SLA_REVIEW_MAX_BYTES=8*1024*1024
 export const SLA_REVIEW_SCOPE='CURRENT_LOADED_LIVE_SERVICES_ONLY'
 export interface SlaServiceReviewExport {csv:string;filename:string;serviceCount:number;period:string}
-const fail=():never=>{throw Error('服务核对清单无效或超过 8 MiB，未生成截断文件；原月报仍保留。')}
+const fail=():never=>{throw Error('服务核对清单无效或超过 8 MiB，未导出不完整文件；原月报仍保留。')}
 function cell(value:unknown):string{
  let s=value===null||value===undefined?'':String(value)
  if(s.length>10000||/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\uD800-\uDFFF]/u.test(s))fail()

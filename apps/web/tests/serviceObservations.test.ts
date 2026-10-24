@@ -17,3 +17,6 @@ describe('configured service observations',()=>{
 })
 
 it('rejects positive-health evidence while the source explicitly reports no positive-health adapter',()=>{const s=sample();Object.assign(s.services[0]!,{known_available_millis:86400000,effective_millis:86400000,unknown_millis:0,verified_availability_pct:100,target_pct:99,health_state:'MET',coverage_status:'SUFFICIENT'});s.services[0]!.timeline[0]!.kind='AVAILABLE';expect(()=>readServiceObservations(s,scope)).toThrow()})
+
+it.each(['percentage','effective_service_millis','service_count','qualified_service_count','coverage_status'])('rejects contradictory monthly summary %s',key=>{const s=sample();(s.monthly_summary as Record<string,unknown>)[key]='forged';expect(()=>readServiceObservations(s,scope)).toThrow()})
+it('does not convert incomplete service coverage into a portfolio percentage',()=>{const s=sample();Object.assign(s.monthly_summary,{percentage:0,qualified_service_count:1,coverage_status:'ALL_SERVICES_QUALIFIED'});expect(()=>readServiceObservations(s,scope)).toThrow()})

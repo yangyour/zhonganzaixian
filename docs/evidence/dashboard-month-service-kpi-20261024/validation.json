@@ -1,0 +1,38 @@
+{
+  "status": "CODE_VALIDATED_RUNTIME_NOT_RUN",
+  "java": {
+    "total": 5519,
+    "passed": 4340,
+    "skipped": 1179,
+    "failures": 0,
+    "errors": 0,
+    "command": "mvn -o test"
+  },
+  "web": {
+    "passed": 5677,
+    "failed": 0,
+    "full_suite": true,
+    "build": "PASSED"
+  },
+  "contracts": {
+    "passed": 231,
+    "generated_consistency": "PASSED"
+  },
+  "offline_demo": {
+    "tests": 18,
+    "passed": 18,
+    "runtime_provisioning": false,
+    "catalog_and_golden_reviewed": true
+  },
+  "new_domain_tests": 3,
+  "real_postgresql": "NOT_RUN_DESIGNATED_CONFIGURATION_MISSING",
+  "actual_browser": "NOT_RUN_EXISTING_PERMISSION_LIMIT",
+  "backend_package": "NOT_RUN_OFFLINE_PLUGIN_MISSING",
+  "deployment": false,
+  "migrations": false,
+  "remaining": [
+    "Positive-health evidence adapter",
+    "Explicit service mapping and customer targets",
+    "Other KPI sources and formal acceptance"
+  ]
+}

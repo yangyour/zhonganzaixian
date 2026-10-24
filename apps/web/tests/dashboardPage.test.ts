@@ -13,6 +13,7 @@ import { session, switchingTenant, contextGeneration } from '../src/stores/sessi
 import type { Session } from '../src/api/types'
 import { scope, row } from './dashboard.fixture'
 import {eventMetrics} from './eventOperationalMetrics.fixture'
+import {sample as serviceSample} from './serviceObservations.fixture'
 import {noiseTrend} from './eventNoiseTrend.fixture'
 const response=(path:string)=>path.startsWith('/metrics/event-noise-trend?')?noiseTrend(new URL('https://unit'+path).searchParams.get('window') as any):path.startsWith('/metrics/monitoring-events?')?eventMetrics():row(new URL('http://unit'+path).searchParams.get('window') as any)
 const auth: Session = { user: { id: scope.actorId, role: 'padmin', display_name: '合成用户' }, tenant: { id: scope.tenantId, name: '合成租户' }, allowed_tenants: [], permission_version: 7, csrf_token: 'SYNTHETIC_NOT_CREDENTIAL', capabilities: ['dashboard:read', 'assets:read', 'tickets:read'], mode: 'remote_test', identity_source: 'synthetic-unit-only' }
@@ -29,7 +30,7 @@ it('renders the six contract KPIs and fixed panel order without invented values'
   await settle()
   expect(host.querySelectorAll('[data-kpi]')).toHaveLength(6)
   expect([...host.querySelectorAll('[data-block]')].map(node => node.getAttribute('data-block'))).toEqual(order)
-  expect([...host.querySelectorAll('[data-kpi] strong')].map(node=>node.textContent)).toEqual(['未知','0','未知','未知','—','未知'])
+  expect([...host.querySelectorAll('[data-kpi] strong')].map(node=>node.textContent)).toEqual(['未知','0','无权限','未知','—','未知'])
   expect(host.textContent).not.toContain('100%')
   expect(host.querySelector('[data-mode="ranking"]')).not.toBeNull()
 })
@@ -62,7 +63,7 @@ it('links each permitted KPI to its contract list page and omits unauthorized ta
   app = createApp({ template: '<router-view />' }); app.use(router); app.mount(host); await settle()
   const links = Object.fromEntries([...host.querySelectorAll('[data-kpi]')].map(card => [card.getAttribute('data-kpi'), card.querySelector('a')?.getAttribute('href') ?? null]))
   expect(links).toEqual({ ASSET_ONLINE_RATE: '/assets', CURRENT_PROBLEMS: '/event-metrics?window=HOURS_24&view=CURRENT_PROBLEMS', MONTH_SERVICE_AVAILABILITY: null, PENDING_TICKETS: '/dashboard/actionable-tickets', MTTA_24H: '/event-metrics?window=HOURS_24&view=RECENT_PROBLEMS', DELIVERY_RATE_24H: '/ticket-notifications' })
-  expect([...host.querySelectorAll('[data-kpi] strong')].map(node=>node.textContent)).toEqual(['未知','0','未知','未知','—','未知'])
+  expect([...host.querySelectorAll('[data-kpi] strong')].map(node=>node.textContent)).toEqual(['未知','0','无权限','未知','—','未知'])
 })
 it('keeps KPI drill-down links behind the same route gates as the menu', async () => {
   await settle()
@@ -113,4 +114,13 @@ it.each(['account','tenant','revoke','unmount'])('discards pending service obser
   else if(change==='revoke')session.value={...auth};
   else app.unmount();
   await settle();expect(old!.aborted).toBe(true);complete({services:[{name:'STALE_SECRET'}]});await settle();expect(host.textContent).not.toContain('STALE_SECRET');
+})
+
+it('monthly service card uses the same verified duration snapshot as the service panels',async()=>{
+ await settle();const data=serviceSample();Object.assign(data,{tenant_id:scope.tenantId,actor_id:scope.actorId});
+ const service=data.services[0]!;Object.assign(service,{effective_millis:86400000,unavailable_millis:86400000,unknown_millis:0,verified_availability_pct:0,coverage_status:'SUFFICIENT'});Object.assign(service.timeline[0]!,{kind:'FAULT',severity:'HIGH'});Object.assign(data.monthly_summary,{percentage:0,effective_service_millis:86400000,qualified_service_count:1,coverage_status:'ALL_SERVICES_QUALIFIED'});
+ vi.mocked(api.request).mockImplementation(async path=>path==='/dashboard/service-observations'?data:response(path));
+ session.value={...auth,capabilities:[...auth.capabilities,'sla_scenarios:read']};await settle();
+ expect(host.querySelector('[data-kpi="MONTH_SERVICE_AVAILABILITY"] strong')?.textContent).toBe('0.0000%');expect(host.querySelector('[data-block="SERVICE_HEALTH"]')?.textContent).toContain('0.0000%');expect(host.querySelector('[data-kpi="MONTH_SERVICE_AVAILABILITY"]')?.textContent).toContain('1/1 个服务');
+ vi.mocked(api.request).mockImplementation(async path=>{if(path==='/dashboard/service-observations')throw Error('service read failed');return response(path)});host.querySelector<HTMLButtonElement>('button.dashboard-refresh')!.click();await settle();expect(host.querySelector('[data-kpi="MONTH_SERVICE_AVAILABILITY"] strong')?.textContent).toBe('读取失败');expect(host.querySelector('[data-block="SERVICE_HEALTH"] .service-row')).toBeNull();
 })

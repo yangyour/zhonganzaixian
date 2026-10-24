@@ -51,7 +51,7 @@ it('shows the same authoritative complete total as the cross-state list', async 
   expect(host.querySelectorAll('.dashboard-workflows tbody tr')).toHaveLength(2)
   expect(host.querySelector('.dashboard-workflows [role="status"]')?.textContent).toContain('待处理 2 条')
   expect(vi.mocked(api.request).mock.calls.filter(([path]) => path === '/dashboard/actionable-tickets?page=1&page_size=5')).toHaveLength(1)
-  expect([...host.querySelectorAll('[data-kpi]:not([data-kpi="PENDING_TICKETS"]) .mop-kpi-value')].map(node => node.textContent)).toEqual(['未知','0','未知','—','未知'])
+  expect([...host.querySelectorAll('[data-kpi]:not([data-kpi="PENDING_TICKETS"]) .mop-kpi-value')].map(node => node.textContent)).toEqual(['未知','0','无权限','—','未知'])
 })
 it('renders a verified zero and a verified zero overdue SLA', async () => {
   response = fixture({ registrations: 0, known_pending: 0, excluded: 0, pending_tickets: 0, evaluated_pending: 0, total_pages: 0, items: [] })

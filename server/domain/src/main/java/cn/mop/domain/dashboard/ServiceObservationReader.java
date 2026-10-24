@@ -2,6 +2,7 @@ package cn.mop.domain.dashboard;
 
 import cn.mop.domain.DomainException;
 import cn.mop.domain.sla.SlaAvailabilityAndCompensation;
+import cn.mop.domain.sla.ServiceAvailabilityAggregate;
 import cn.mop.domain.time.BusinessDates;
 import cn.mop.domain.time.IntervalSets;
 import cn.mop.domain.time.IntervalSets.Interval;
@@ -48,12 +49,13 @@ public interface ServiceObservationReader {
         public Service { assets=List.copyOf(assets);timeline=List.copyOf(timeline); }
     }
     record Snapshot(UUID tenantId,UUID actorId,long permissionVersion,Instant observedAt,Instant monthStart,
-                    Instant timelineStart,String mappingSha256,List<Service> services) {
+                    Instant timelineStart,String mappingSha256,List<Service> services,ServiceAvailabilityAggregate.Result monthlySummary) {
         public Snapshot {
             new Access(tenantId,actorId,permissionVersion);Objects.requireNonNull(observedAt);
             if(monthStart==null||monthStart.isAfter(observedAt)||!observedAt.minusSeconds(86400).equals(timelineStart)
                 ||mappingSha256==null||!mappingSha256.matches("[0-9a-f]{64}"))throw invalid();
-            services=List.copyOf(services);
+            services=List.copyOf(services);Objects.requireNonNull(monthlySummary);
+            if(monthlySummary.serviceCount()!=services.size())throw invalid();
             if(services.isEmpty()||services.size()>100||services.stream().map(Service::id).distinct().count()!=services.size())throw invalid();
         }
     }
@@ -65,7 +67,7 @@ public interface ServiceObservationReader {
         var timelineStart=observedAt.minusSeconds(86400);
         var window=new Interval(month.isBefore(timelineStart)?month:timelineStart,observedAt);
         if(definitions==null||definitions.isEmpty()||definitions.size()>100||definitions.stream().map(Definition::id).distinct().count()!=definitions.size())throw invalid();
-        var services=new ArrayList<Service>();int totalSpans=0;
+        var services=new ArrayList<Service>();var evaluations=new ArrayList<SlaAvailabilityAndCompensation.ServiceEvaluation>();int totalSpans=0;
         for(var definition:definitions.stream().sorted(Comparator.comparing(Definition::id)).toList()) {
             var assets=new ArrayList<Asset>();var inputs=new ArrayList<Evidence>();
             var active=new HashSet<UUID>();var high=new HashSet<UUID>();
@@ -79,6 +81,7 @@ public interface ServiceObservationReader {
                 var monthWindow=new Interval(month,observedAt);
                 var evaluation=SlaAvailabilityAndCompensation.evaluateServiceEvidence(definition.id().toString(),definition.name(),definition.targetPct(),monthWindow,
                     result.maintenance(),result.unavailable(),result.unknown(),List.of(),result.healthy());
+                evaluations.add(evaluation);
                 pct=evaluation.service().verifiedAvailabilityPct(); available=evaluation.knownAvailableMillis();effective=evaluation.effectiveServiceMillis();
                 var included=IntervalSets.subtract(List.of(monthWindow),result.maintenance());
                 down=IntervalSets.duration(IntervalSets.intersection(result.unavailable(),included)).toMillis();
@@ -93,7 +96,7 @@ public interface ServiceObservationReader {
             services.add(new Service(definition.id(),definition.name(),assets,definition.failureMode(),definition.maintenanceMode(),definition.targetPct(),pct,
                 available,effective,down,unknown,excluded,active.size(),high.size(),state,coverage,included,spans));
         }
-        return new Snapshot(access.tenantId(),access.actorId(),access.permissionVersion(),observedAt,month,timelineStart,mappingSha256,services);
+        return new Snapshot(access.tenantId(),access.actorId(),access.permissionVersion(),observedAt,month,timelineStart,mappingSha256,services,month.equals(observedAt)?new ServiceAvailabilityAggregate.Result(null,0,0,services.size(),0,"EMPTY_MONTH_WINDOW"):ServiceAvailabilityAggregate.calculate(evaluations));
     }
     private static DomainException invalid(){return new DomainException(503,"SERVICE_OBSERVATION_INVALID","服务定义或观测证据无效");}
 }

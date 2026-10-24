@@ -40,7 +40,7 @@ const windows: Record<DashboardWindow, string> = { HOURS_24: '24小时', DAYS_7:
 const kpis = [
   { id: 'ASSET_ONLINE_RATE', title: '资产在线率', route: 'assets', target: '资产列表', parts: [['正常', '—'], ['未知', '—']], note: '未知单独计数，不并入正常' },
   { id: 'CURRENT_PROBLEMS', title: '当前问题', route: 'event-metrics', target: '问题明细', severities: true, note: '已排除已抑制事件' },
-  { id: 'MONTH_SERVICE_AVAILABILITY', title: '本月服务可用率', route: 'sla-reports', target: 'SLA 报表', note: '本月1日至今 · 无样本不视为可用' },
+  { id: 'MONTH_SERVICE_AVAILABILITY', title: '本月服务可用率', route: 'sla-reports', target: '本页服务明细', note: '本月1日至今 · 无样本不视为可用' },
   { id: 'PENDING_TICKETS', title: '待处理工单', route: 'actionable-tickets', target: '全部待处理与SLA' },
   { id: 'MTTA_24H', title: 'MTTA', period: '近24小时', route: 'event-metrics', target: '时长明细', note: '首次有效人工确认 · 样本量未知' },
   { id: 'DELIVERY_RATE_24H', title: '通知送达率', period: '近24小时', route: 'ticket-notifications', target: '工单通知', parts: [['受理', '—'], ['送达', '—']] },
@@ -62,6 +62,7 @@ function metricValue(id: string) {
     if(!value)return '未知'
     return id==='CURRENT_PROBLEMS'?value.current_problems.total:value.mtta.status==='CALCULATED'?elapsedMetricLabel(value.mtta.mean_millis):value.mtta.status==='NO_ACKNOWLEDGED_SAMPLES'?'—':'未知'
   }
+  if(id==='MONTH_SERVICE_AVAILABILITY'){if(!serviceAccess.value)return '无权限';if(serviceState.value.busy)return '读取中';if(serviceState.value.cancelled)return '已取消';if(serviceState.value.error)return '读取失败';const value=serviceState.value.current?.monthly_summary.percentage;return value==null?'未知':value.toFixed(4)+'%'}
   if (id !== 'PENDING_TICKETS') return kpiValue.value
   if (!can('tickets:read')) return '无权限'
   if (pending.value.busy) return '读取中'
@@ -69,11 +70,11 @@ function metricValue(id: string) {
   if (pending.value.error) return '读取失败'
   return pending.value.current?.pending_tickets ?? '未知'
 }
-function metricFailed(id: string) { return Boolean(['CURRENT_PROBLEMS','MTTA_24H'].includes(id)?eventMetrics.value.error:id === 'PENDING_TICKETS' ? pending.value.error : state.value.error) }
-function metricUnknown(id: string) { if(id==='CURRENT_PROBLEMS')return !eventMetrics.value.current;if(id==='MTTA_24H')return eventMetrics.value.current?.mtta.status!=='CALCULATED';return id === 'PENDING_TICKETS' ? pending.value.current?.pending_tickets == null : !state.value.error }
+function metricFailed(id: string) { if(id==='MONTH_SERVICE_AVAILABILITY')return Boolean(serviceState.value.error);return Boolean(['CURRENT_PROBLEMS','MTTA_24H'].includes(id)?eventMetrics.value.error:id === 'PENDING_TICKETS' ? pending.value.error : state.value.error) }
+function metricUnknown(id: string) { if(id==='MONTH_SERVICE_AVAILABILITY')return serviceState.value.current?.monthly_summary.percentage==null;if(id==='CURRENT_PROBLEMS')return !eventMetrics.value.current;if(id==='MTTA_24H')return eventMetrics.value.current?.mtta.status!=='CALCULATED';return id === 'PENDING_TICKETS' ? pending.value.current?.pending_tickets == null : !state.value.error }
 function severityCount(key:string){return eventMetrics.value.current?.current_problems.by_severity[key.toUpperCase() as keyof EventMetricSnapshot['current_problems']['by_severity']]??'未知'}
-function metricLink(id:string,name:string){return name==='event-metrics'?{name,query:{window:'HOURS_24',view:id==='CURRENT_PROBLEMS'?'CURRENT_PROBLEMS':'RECENT_PROBLEMS'}}:{name}}
-function metricNote(id:string,fallback:string){const m=eventMetrics.value.current?.mtta;if(id!=='MTTA_24H'||!m)return fallback;return m.status==='SAMPLE_BUDGET_EXCEEDED'?'超过完整样本核算预算':`确认样本 ${m.sample_count??'未知'} · 未确认 ${m.unacknowledged_count??'未知'} · 异常 ${m.invalid_count??'未知'}`}
+function metricLink(id:string,name:string){if(id==='MONTH_SERVICE_AVAILABILITY')return {hash:'#service-health-title'};return name==='event-metrics'?{name,query:{window:'HOURS_24',view:id==='CURRENT_PROBLEMS'?'CURRENT_PROBLEMS':'RECENT_PROBLEMS'}}:{name}}
+function metricNote(id:string,fallback:string){if(id==='MONTH_SERVICE_AVAILABILITY'){const summary=serviceState.value.current?.monthly_summary;return summary?`已满足覆盖 ${summary.qualified_service_count}/${summary.service_count} 个服务 · 按有效时长汇总`:'本月1日至今 · 无样本不视为可用'}const m=eventMetrics.value.current?.mtta;if(id!=='MTTA_24H'||!m)return fallback;return m.status==='SAMPLE_BUDGET_EXCEEDED'?'超过完整样本核算预算':`确认样本 ${m.sample_count??'未知'} · 未确认 ${m.unacknowledged_count??'未知'} · 异常 ${m.invalid_count??'未知'}`}
 
 const pendingNote = computed(() => {
   const current = pending.value.current

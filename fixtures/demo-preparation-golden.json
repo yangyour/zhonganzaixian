@@ -5,11 +5,11 @@
   "namespace_id": "79000000-0000-4000-8000-000000000090",
   "username": "demo",
   "anchor_time": "2026-10-22T12:00:00Z",
-  "catalog_sha256": "6ecbc0f57ff70ad707b855a99f07c8955b4969ca9059580f50757099e42a09a9",
+  "catalog_sha256": "b87f6162763c5a69e3d7ed7dd67b6bd2252c926b0d51d3c7fbc46a77db33110a",
   "source_sha256": {
     "apps/web/src/router.ts": "d91d2927f0b84ab3e85aef4139bef57efb749c6dd7c205d5613180709460c938",
     "server/domain/src/main/java/cn/mop/domain/Capabilities.java": "6f97ea30fd15e067db3eb6fe72d55c2dedf12a07b5e09678164384c04b366d1f",
-    "contracts/local-api.openapi.json": "9e92b2458c7cb39dca9afccfb9b9b79c119a3ceb28487e6b6aa9bbc75e0520fa"
+    "contracts/local-api.openapi.json": "c809992c23dd21adc50993195fcbcea729d691d0d4359c67f2cafe487f662ee3"
   },
   "contexts": [
     {
@@ -238,7 +238,10 @@
       "allowed_roles": [],
       "scenarios": [
         "由演示台账和工单派生总览",
-        "缺少来源时保留未知"
+        "缺少来源时保留未知",
+        "显式服务映射与真实故障/维护时间线，正向健康缺失保持未知",
+        "本月可用率卡片与服务列表共享快照、完整覆盖与有效时长加权",
+        "服务读取取消、重复刷新、账号或租户切换清空迟到响应"
       ],
       "acceptance_status": "NOT_RUN",
       "proposed_contexts": [
@@ -2264,5 +2267,5 @@
     "ADVANCED_SCENARIOS_NOT_INITIALIZED",
     "GLOBAL_POLICY_SCOPE_UNRESOLVED"
   ],
-  "plan_sha256": "07979d25a6804dde65afb0dfe6f65dce713c9f4827ddc930e36be35408ffa7ee"
+  "plan_sha256": "3b384a5594f1ac411afd55a0c3f4fd7f1bad0a5d5368d4a35a131af32ec34ff9"
 }

@@ -1,3 +1,4 @@
+import {addDeliveryDeadLetterContract} from './delivery-dead-letter-contract.mjs';
 import {addDeliveryJournalReadContract} from './delivery-journal-read-contract.mjs';
 import {addEventNoiseTrendContract} from './event-noise-trend-contract.mjs';
 import {addBackupRunHistoryContract} from './backup-run-history-contract.mjs';
@@ -1017,6 +1018,7 @@ addDashboardAlertBellContract(contract);
 addMonitoringRecoveryContract(contract);
 addNotificationRoutingContract(contract);
 addDeliveryJournalReadContract(contract);
+addDeliveryDeadLetterContract(contract);
 addProductionReadinessContract(contract);
 addAttachmentSecurityContract(contract);
 addReportPublicationContract(contract);

@@ -123,7 +123,23 @@ public final class PostgresDeliveryReceiptRepository {
     public Receipt append(Access access,Scope scope,Command command){
         matching(access,scope);if(command==null||!command.actorId().equals(access.actorId())||command.permissionVersion()!=access.permissionVersion())throw invalid();
         Operation operation=command.transition() instanceof Started?Operation.START:command.transition() instanceof DeadLettered?Operation.DEAD_LETTER:Operation.RECORD_RECEIPT;
-        return transaction(access,scope,operation,c->{
+        return transaction(access,scope,operation,c->appendCommand(c,access,scope,command));
+    }
+    /** Only manual FAILED-to-DEAD_LETTER can borrow the owning audited/idempotent transaction. */
+    Receipt deadLetterInTransaction(Connection c,Access access,Scope scope,Command command)throws SQLException{
+        matching(access,scope);
+        if(command==null||!(command.transition() instanceof DeadLettered)||!command.actorId().equals(access.actorId())
+            ||command.permissionVersion()!=access.permissionVersion())throw invalid();
+        if(c==null||c.isClosed()||c.getAutoCommit()||c.isReadOnly()||c.getTransactionIsolation()!=Connection.TRANSACTION_READ_COMMITTED)
+            throw new IllegalStateException("Manual dead-letter requires caller-owned read-committed transaction");
+        try{
+            authorize(c,access,scope,Operation.DEAD_LETTER);
+            var result=appendCommand(c,access,scope,command);
+            authorize(c,access,scope,Operation.DEAD_LETTER);
+            return result;
+        }catch(DomainException e){throw safe(e);}
+    }
+    private Receipt appendCommand(Connection c,Access access,Scope scope,Command command)throws SQLException{
             var old=required(load(c,scope,true));
             // Both original and replay require present authorization and trusted prerequisites.
             try{verifier.verify(c,access,scope,command);}catch(SQLException|RuntimeException rejected){throw new DomainException(503,"DELIVERY_JOURNAL_PREREQUISITE_UNAVAILABLE","通知回执前置核验未完成；没有派发请求");}
@@ -132,7 +148,6 @@ public final class PostgresDeliveryReceiptRepository {
             String fingerprint=fingerprint(entry.sha256(),command.commandId(),command.actorId(),command.permissionVersion(),command.traceId(),command.expectedVersion(),old.journal().headSha256());
             insert(c,scope,result.appliedVersion(),command.commandId(),command.actorId(),command.permissionVersion(),command.traceId(),command.expectedVersion(),old.journal().headSha256(),entry.bytes(),entry.sha256(),fingerprint);
             var stored=required(load(c,scope,true));if(!stored.journal().headSha256().equals(result.journal().headSha256()))throw unavailable();return new Receipt(stored.journal(),result.appliedVersion(),false);
-        });
     }
     /** Borrowed read only; caller must hold current authorization and scope locks in the same transaction. */
     record ReadJournal(DeliveryReceiptJournal journal,UUID queueCommandId,Instant firstRecordedAt,Map<UUID,Instant> commandRecordedAt){ReadJournal{commandRecordedAt=Map.copyOf(commandRecordedAt);}}

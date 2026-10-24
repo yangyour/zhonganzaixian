@@ -160,8 +160,8 @@ public final class PostgresDeliveryJournalReader implements DeliveryJournalReade
   }return List.copyOf(out);
  }
  private Set<UUID> configured(UUID tenant){var value=pools.apply(tenant);if(value==null||value.isEmpty())throw new DomainException(503,"DELIVERY_JOURNAL_SCOPE_PENDING","投递日志的明确资源池读取范围尚未配置");if(value.size()>100||value.stream().anyMatch(Objects::isNull))throw unavailable();return Set.copyOf(value);}
- private static void runtime(Connection c)throws SQLException{try(var q=query(c,"SELECT current_user='mop_test_runtime' AND session_user='mop_test_runtime'");var r=q.executeQuery()){if(!r.next()||!r.getBoolean(1))throw unavailable();}}
- private static void authority(Connection c,Access a)throws SQLException{
+ static void runtime(Connection c)throws SQLException{try(var q=query(c,"SELECT current_user='mop_test_runtime' AND session_user='mop_test_runtime'");var r=q.executeQuery()){if(!r.next()||!r.getBoolean(1))throw unavailable();}}
+ static void authority(Connection c,Access a)throws SQLException{
   for(String cap:List.of("ticket_notes:read_internal","audit:read"))PostgresAuthorization.require(c,a.actorId().toString(),a.tenantId().toString(),a.permissionVersion(),cap);
   try(var q=query(c,"SELECT m.role_code FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id=? AND m.user_id=? AND m.active AND u.active AND m.permission_version=? FOR SHARE OF m,u")){q.setObject(1,a.tenantId());q.setObject(2,a.actorId());q.setLong(3,a.permissionVersion());try(var r=q.executeQuery()){if(!r.next())throw new DomainException(401,"SESSION_EXPIRED","投递日志读取授权已变化");if(!"padmin".equals(r.getString(1)))throw new DomainException(403,"DELIVERY_JOURNAL_FORBIDDEN","当前角色不能读取内部投递日志");}}
  }

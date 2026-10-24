@@ -1,0 +1,12 @@
+import {test,expect} from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
+import {deliveryScope as s} from '../../tests/deliveryJournal.fixture'
+import {receipt} from '../../tests/deliveryDeadLetter.fixture'
+for(const width of [1440,1024])test(`manual dead-letter explicit confirmation and original-key recovery ${width}`,async({page})=>{
+ await page.setViewportSize({width,height:1000});const calls:{key:string;body:unknown}[]=[],errors:string[]=[];page.on('pageerror',e=>errors.push(e.message))
+ await page.route('**/api/v1/**',async route=>{const request=route.request();expect(request.method()).toBe('POST');expect(new URL(request.url()).pathname).toBe('/api/v1/notification-deliveries/'+s.id+'/dead-letter');const key=request.headers()['idempotency-key'];const body=request.postDataJSON();calls.push({key,body});if(calls.length===1)return route.abort('failed');expect(calls[1]).toEqual(calls[0]);return route.fulfill({json:{data:receipt({command_id:key,tenant_id:s.tenant,actor_id:s.actor,delivery_id:s.id,resource_pool_id:s.pool,expected_version:body.expected_version,reason:body.reason}),trace_id:'SYNTHETIC_DISPOSITION'}})})
+ await page.goto('/qa/delivery-dead-letter.fixture.html');await page.getByRole('button',{name:'将失败记录转为死信'}).click();const dialog=page.getByRole('dialog',{name:'确认人工死信处置'});await expect(dialog).toBeVisible();await expect(dialog.getByRole('button',{name:'确认转为死信',exact:true})).toBeDisabled();expect(calls).toHaveLength(0)
+ await dialog.getByLabel('处置原因',{exact:true}).fill('Synthetic manual review only');await dialog.getByRole('checkbox').check();expect((await new AxeBuilder({page}).include('[role="dialog"]').withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze()).violations).toEqual([])
+ await dialog.getByRole('button',{name:'确认转为死信',exact:true}).click();await expect(dialog.getByRole('button',{name:'确认转为死信',exact:true})).toBeDisabled();await dialog.getByRole('button',{name:'核对原处置',exact:true}).click();await expect(dialog).not.toBeVisible();await expect(page.getByRole('status')).toContainText('已核对原处置命令');expect(calls).toHaveLength(2)
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);await page.screenshot({path:`../../tests/artifacts/delivery-dead-letter-${width}.png`,fullPage:true});await page.getByRole('button',{name:'模拟撤权'}).click();await expect(page.locator('section[aria-label="投递失败人工处置"]')).toHaveCount(0);expect(errors).toEqual([])
+})

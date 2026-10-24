@@ -18,4 +18,15 @@ class DeliveryReceiptRepositoryTest {
  @Test void accessVersionIsBounded(){for(long v:new long[]{0,-1,9_007_199_254_740_992L})assertThrows(DomainException.class,()->new Access(tenant,actor,v));}
  @Test void connectionFailureIsSafeAndHasNoSecretCause()throws Exception{var source=mock(DataSource.class);when(source.getConnection()).thenThrow(new java.sql.SQLException("SYNTHETIC_PRIVATE_PASSWORD"));var repo=new PostgresDeliveryReceiptRepository(source,(c,a,s,o)->{},(c,a,s,o)->{});var e=assertThrows(DomainException.class,()->repo.current(access,scope));assertEquals(503,e.status);assertNull(e.getCause());assertFalse(e.getMessage().contains("PRIVATE"));}
  @Test void authorityDenialRollsBackClosesAndDoesNotReadRows()throws Exception{var source=mock(DataSource.class);var c=mock(java.sql.Connection.class);when(source.getConnection()).thenReturn(c);var repo=new PostgresDeliveryReceiptRepository(source,(connection,a,s,o)->{throw new DomainException(403,"SECRET_CODE","SYNTHETIC_PRIVATE_PASSWORD");},(connection,a,s,o)->{});var e=assertThrows(DomainException.class,()->repo.current(access,scope));assertEquals(403,e.status);assertEquals("DELIVERY_JOURNAL_ACCESS_DENIED",e.code);assertNull(e.getCause());verify(c).rollback();verify(c).close();verify(c,never()).prepareStatement(anyString());verify(c,never()).commit();}
+ @Test void borrowedManualAppendRejectsOtherTransitionsAndNeverOwnsCommit()throws Exception{
+  var source=mock(DataSource.class);var c=mock(java.sql.Connection.class);when(c.getTransactionIsolation()).thenReturn(java.sql.Connection.TRANSACTION_READ_COMMITTED);
+  var repo=new PostgresDeliveryReceiptRepository(source,(connection,a,s,o)->{throw new DomainException(403,"DENIED","synthetic");},(connection,a,s,cmd)->{});
+  assertEquals(400,assertThrows(DomainException.class,()->repo.deadLetterInTransaction(c,access,scope,new Command(0,UUID.randomUUID(),actor,1,"trace",new Started(UUID.randomUUID(),at)))).status);
+  assertEquals(403,assertThrows(DomainException.class,()->repo.deadLetterInTransaction(c,access,scope,new Command(2,UUID.randomUUID(),actor,1,"trace",new DeadLettered(at)))).status);
+  verifyNoInteractions(source);verify(c,never()).commit();verify(c,never()).rollback();verify(c,never()).close();verify(c,never()).prepareStatement(anyString());
+ }
+ @Test void borrowedAppendRejectsAutocommitAndWrongIsolation()throws Exception{
+  var source=mock(DataSource.class);var c=mock(java.sql.Connection.class);var repo=new PostgresDeliveryReceiptRepository(source,(connection,a,s,o)->{},(connection,a,s,cmd)->{});var command=new Command(2,UUID.randomUUID(),actor,1,"trace",new DeadLettered(at));
+  when(c.getAutoCommit()).thenReturn(true);assertThrows(IllegalStateException.class,()->repo.deadLetterInTransaction(c,access,scope,command));when(c.getAutoCommit()).thenReturn(false);when(c.getTransactionIsolation()).thenReturn(java.sql.Connection.TRANSACTION_REPEATABLE_READ);assertThrows(IllegalStateException.class,()->repo.deadLetterInTransaction(c,access,scope,command));verifyNoInteractions(source);
+ }
 }

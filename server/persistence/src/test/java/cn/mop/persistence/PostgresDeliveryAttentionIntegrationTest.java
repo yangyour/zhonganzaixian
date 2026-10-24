@@ -286,4 +286,56 @@ class PostgresDeliveryAttentionIntegrationTest {
             )
         );
     }
+
+    /** Explicit isolated synthetic FAILED statement only; this test never invokes a provider. */
+    @Test
+    void manualDispositionAndSameCommandReplayHaveOneJournalAppendAndAudit() throws Exception {
+        var scope=failed(false);var mapper=new com.fasterxml.jackson.databind.ObjectMapper().findAndRegisterModules();
+        var platform=new PostgresPlatformRepository(source,mapper);
+        var service=new DeliveryDeadLetterService(source,platform,true,t->t.equals(tenant)?Set.of(pool):Set.of(),t->t.equals(tenant)?Set.of(pool):Set.of());
+        UUID command=UUID.randomUUID();String reason="SYNTHETIC_MANUAL_DISPOSITION";
+        var first=mapper.valueToTree(service.dispose(writeAccess(),scope.deliveryId(),2,command,reason,"disposition-pg"));
+        var replay=mapper.valueToTree(service.dispose(writeAccess(),scope.deliveryId(),2,command,reason,"replay-pg"));
+        assertEquals(first,replay);assertEquals(3,first.path("applied_version").asInt());assertFalse(first.path("fresh_send_authorized").asBoolean());
+        assertEquals("DEAD_LETTER",reader().detail(readAccess(tenant),scope.deliveryId(),null,100).entry().recordedStatus());
+        assertEquals(1,dispositionRows("audit",scope.deliveryId(),command));assertEquals(1,dispositionRows("command",scope.deliveryId(),command));
+        assertEquals(409,assertThrows(DomainException.class,()->service.dispose(writeAccess(),scope.deliveryId(),2,command,"DIFFERENT", "unit")).status);
+        var unknown=queue();start(unknown);assertEquals(409,assertThrows(DomainException.class,()->service.dispose(writeAccess(),unknown.deliveryId(),1,UUID.randomUUID(),reason,"unit")).status);
+    }
+
+    @Test
+    void concurrentOriginalDispositionConvergesWithoutDuplicateAudit() throws Exception {
+        var scope=failed(false);var mapper=new com.fasterxml.jackson.databind.ObjectMapper().findAndRegisterModules();
+        var service=new DeliveryDeadLetterService(source,new PostgresPlatformRepository(source,mapper),true,t->Set.of(pool),t->Set.of(pool));
+        UUID command=UUID.randomUUID();var executor=java.util.concurrent.Executors.newFixedThreadPool(2);
+        try{
+            var ready=new java.util.concurrent.CountDownLatch(1);var results=new ArrayList<java.util.concurrent.Future<com.fasterxml.jackson.databind.JsonNode>>();
+            for(int i=0;i<2;i++)results.add(executor.submit(()->{ready.await();return mapper.valueToTree(service.dispose(writeAccess(),scope.deliveryId(),2,command,"SYNTHETIC_CONCURRENT_DISPOSITION","unit"));}));
+            ready.countDown();assertEquals(results.get(0).get(30,java.util.concurrent.TimeUnit.SECONDS),results.get(1).get(30,java.util.concurrent.TimeUnit.SECONDS));
+            assertEquals(1,dispositionRows("audit",scope.deliveryId(),command));assertEquals(1,dispositionRows("command",scope.deliveryId(),command));
+        }finally{executor.shutdownNow();}
+    }
+
+    @Test
+    void actualJournalAppendRollsBackIfSameTransactionAuditFails() throws Exception {
+        var scope=failed(false);var mapper=new com.fasterxml.jackson.databind.ObjectMapper().findAndRegisterModules();
+        javax.sql.DataSource fault=(javax.sql.DataSource)java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),new Class[]{javax.sql.DataSource.class},(proxy,method,args)->{
+            Object result;try{result=method.invoke(source,args);}catch(java.lang.reflect.InvocationTargetException e){throw e.getCause();}
+            if(result instanceof java.sql.Connection connection)return java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),new Class[]{java.sql.Connection.class},(p,m,a)->{
+                if(m.getName().equals("prepareStatement")&&a[0] instanceof String sql&&sql.startsWith("INSERT INTO public.mop_audit"))throw new java.sql.SQLException("SYNTHETIC_AUDIT_FAILURE");
+                try{return m.invoke(connection,a);}catch(java.lang.reflect.InvocationTargetException e){throw e.getCause();}
+            });return result;
+        });
+        var service=new DeliveryDeadLetterService(fault,new PostgresPlatformRepository(fault,mapper),true,t->Set.of(pool),t->Set.of(pool));UUID command=UUID.randomUUID();
+        assertThrows(DomainException.class,()->service.dispose(writeAccess(),scope.deliveryId(),2,command,"SYNTHETIC_ROLLBACK_DISPOSITION","unit"));
+        assertEquals("FAILED",reader().detail(readAccess(tenant),scope.deliveryId(),null,100).entry().recordedStatus());
+        assertEquals(0,dispositionRows("audit",scope.deliveryId(),command));assertEquals(0,dispositionRows("command",scope.deliveryId(),command));
+    }
+
+    private long dispositionRows(String kind,UUID delivery,UUID command) throws Exception {
+        String sql=kind.equals("audit")?"SELECT count(*) FROM public.mop_audit WHERE tenant_id=? AND payload->>'action'='notification.delivery.dead_letter' AND payload->>'resource_id'=?":"SELECT count(*) FROM public.mop_idempotency WHERE tenant_id=? AND request_key=?";
+        try(var connection=source.getConnection();var query=connection.prepareStatement(sql)){
+            query.setObject(1,tenant);query.setString(2,kind.equals("audit")?delivery.toString():command.toString());try(var rows=query.executeQuery()){assertTrue(rows.next());return rows.getLong(1);}
+        }
+    }
 }

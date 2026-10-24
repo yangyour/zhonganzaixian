@@ -1,0 +1,88 @@
+{
+  "status": "CODE_CHECKS_PASSED_REAL_COMPONENTS_PENDING",
+  "base_commit": "62d0521683669a51b88aef8558e792e0b80502af",
+  "java": {
+    "discovered": 5468,
+    "executed_passed": 4294,
+    "skipped": 1174,
+    "failures": 0,
+    "errors": 0
+  },
+  "web": {
+    "files": 349,
+    "passed": 5633,
+    "scope": "Vitest/jsdom"
+  },
+  "node_contracts": {
+    "passed": 285
+  },
+  "offline_demo_plan": {
+    "passed": 18,
+    "runtime_initialization": false
+  },
+  "typecheck": "PASSED",
+  "build": "PASSED",
+  "static_policy": "PASSED",
+  "contract_generation": "PASSED",
+  "browser": {
+    "status": "NOT_RUN",
+    "discovered": 2,
+    "executed": 0,
+    "reason": "Existing dot Chromium launch blocked by socket permissions; reviewed escalation could not initialize executor on preceding worklist check; no security-setting change attempted",
+    "synthetic_only": true
+  },
+  "designated_pg": {
+    "status": "NOT_RUN",
+    "new_gated_tests": 3,
+    "gate_present": false,
+    "reason": "Explicit isolated namespaces, trust and restricted designated connection configuration unavailable in this dot"
+  },
+  "boundaries": {
+    "allowed_transition": "LOCAL_FAILED_TO_DEAD_LETTER_ONLY",
+    "unknown_disposition": false,
+    "provider_verification": false,
+    "provider_lookup": false,
+    "fresh_send_authorized": false,
+    "default_enabled": false,
+    "migration_changes": 0,
+    "deployed": false
+  },
+  "initial_failures": [
+    "Java var compound local declaration corrected to separate declarations",
+    "Anonymous HTTP probe originally hit CSRF403 first; valid CSRF added to test anonymous401 without changing security rules",
+    "Unit client double Promise<unknown> narrowed to actual unknown-return request interface; runtime unchanged"
+  ],
+  "formal_acceptance": "NOT_COMPLETED",
+  "source_sha256": {
+    "apps/web/src/components/DeliveryJournalPanel.vue": "5b9cfeabcedc19d26b21b3f647719d6bc7c87015f4bc68c3bfe8fb4337a9359a",
+    "config/demo/catalog.v1.json": "b44366a2a7e18828b7db16e2d21dfac1e4d340548939d11ee2cde822f311631d",
+    "contracts/local-api.openapi.json": "9e92b2458c7cb39dca9afccfb9b9b79c119a3ceb28487e6b6aa9bbc75e0520fa",
+    "docs/implementation-gap-checklist-20261023.json": "0b46280c6f2c38465f1a27e20fc11096e1009176b7191bfde14d9b23fb766133",
+    "docs/implementation-gap-checklist-20261023.md": "f40f7d9f77954734769c3d6853e74925b55b41e437a9f78bde674c1228a568e1",
+    "fixtures/demo-preparation-golden.json": "1edb48f3e9943c9488d6412c938863c6fd4290d91ed172c67946826f03b70515",
+    "server/api/src/test/java/cn/mop/persistence/DeliveryReceiptRepositoryTest.java": "082dab64e745b97cd3fdcabaf80ce02e75a093d729e6c2975c4cf72af9011c5c",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresDeliveryJournalReader.java": "07ce8c7da72d071388d12b8f6460e8f950ed9c03de863928e436f071b4f3d540",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresDeliveryReceiptRepository.java": "65fe21909126a2ef02da744212b6bd45749a96d8f1c30c17fc4f58474f1de935",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresDeliveryAttentionIntegrationTest.java": "c5b4f1251bb008e5453cb6ea69e3c468f7b6f4b9b3a69f313f97a841ee65b79c",
+    "tools/build-api-contract.mjs": "9e8d71e2f8aaca463e054040a319a656c07eb42dd9f535827bc23d87926e1447",
+    "apps/web/qa/browser/delivery-dead-letter.pw.ts": "3e5a3501063a520f4f523f9ef7a21ff9618f01c7493611df6f6a3dec206e1c4d",
+    "apps/web/qa/delivery-dead-letter.fixture.html": "706d9e9cb599a99c925e146a12c9e34bcb518da255b1d8fcfe357d2aad74cf0c",
+    "apps/web/qa/delivery-dead-letter.fixture.ts": "6895938f799d99776cc6600be7994e54877ef87f26f2726b2c79054dbc48cd83",
+    "apps/web/src/components/DeliveryDeadLetterPanel.vue": "4bef71ffde20ebe6623ab91dd02cd6d9be93fb96acb031633d4a6a590db3a443",
+    "apps/web/src/utils/deliveryDeadLetter.ts": "e9e9db61074b066d6a0ae5f137d1249c2155d638703c98f859d0e7785441af2b",
+    "apps/web/tests/deliveryDeadLetter.fixture.ts": "d92365f9b32b8240b368cd192d5caade7080845912fc53f6ca32eff2cf9aca3e",
+    "apps/web/tests/deliveryDeadLetter.test.ts": "1e669d1caa034253a8c330da4ad835861a4da73ce5e21d304f555d454dcb7850",
+    "apps/web/tests/deliveryDeadLetterPanel.test.ts": "4479d915c1ba180031ca7055ee41d3bc0c56990b594b2ea71c16dd9b2d272089",
+    "config/delivery-dead-letter.env.example": "b37a99f1d7c94b2e8652785c11b82bb0f8a4d2ce0a0270987e6c12c36e465280",
+    "docs/delivery-dead-letter-disposition-20261024.md": "5eb203a1143e94ca800888ad11d73311bd5912f4f80ab3daedd3289e66ec0096",
+    "server/api/src/main/java/cn/mop/api/DeliveryDeadLetterConfiguration.java": "81000c08b77a0d0584b892decdb302dc132768dfad6e404d0e2a494b4bfb4f5f",
+    "server/api/src/main/java/cn/mop/api/DeliveryDeadLetterController.java": "79a7d98ec50558b81ffe863bb562ddb27337ec4a2df0ac119e4f213bf7b21ae2",
+    "server/api/src/test/java/cn/mop/api/DeliveryDeadLetterConfigurationTest.java": "9bb8ae6c70ec410fa4c7bb29d55b519cc78bb8455e87b7805f227b04531f403e",
+    "server/api/src/test/java/cn/mop/api/DeliveryDeadLetterControllerTest.java": "bd39772b125ea39583ec86a10a4ab4bc1f4c76d9de1c20e987a87657320089d5",
+    "server/api/src/test/java/cn/mop/api/DeliveryDeadLetterHttpSecurityTest.java": "2f7b2ffb52215c1a0c00f661f2be92c7b08534037cde83408b831984d7734445",
+    "server/api/src/test/java/cn/mop/persistence/DeliveryDeadLetterServiceTest.java": "fd8662360ce45aac3520de89295c4db3904c5675c4d4133276237c04e42a943e",
+    "server/persistence/src/main/java/cn/mop/persistence/DeliveryDeadLetterService.java": "c2b24ab952868db577cfd398e2d70e7a9061ed21e1c2241762920873dc8dd318",
+    "tests/delivery-dead-letter-contract.test.mjs": "8933fb9c94d0bca72c1f3c56f9541e32424d04d5bcf6926d148be9efc13cfb48",
+    "tools/delivery-dead-letter-contract.mjs": "d0e2c1a61a1e5c841bbc2d84f224e543e97fd959937c520265d30a4f6640323b"
+  }
+}

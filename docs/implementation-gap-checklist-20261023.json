@@ -463,7 +463,9 @@
         "docs/delivery-attention-20261024.md",
         "docs/evidence/delivery-attention-20261024/validation.json",
         "docs/notification-request-cancellation-20261024.md",
-        "docs/evidence/notification-request-cancellation-20261024/validation.json"
+        "docs/evidence/notification-request-cancellation-20261024/validation.json",
+        "docs/delivery-dead-letter-disposition-20261024.md",
+        "docs/evidence/delivery-dead-letter-disposition-20261024/validation.json"
       ],
       "commits": [
         "f69fa0dd",
@@ -474,9 +476,9 @@
         "b07b3c3b"
       ],
       "remaining_subitems": [
-        "Actual dispatch, authenticated receipts, controlled retry and recorded manual dead-letter disposition; read-only complete attention queue/API/UI is independently verified",
+        "Actual dispatch, authenticated receipts and controlled retry; manual local dead-letter disposition now has API/page/atomic storage, with real PG/browser verification pending",
         "Formal contract acceptance",
-        "Supplier dispatch/verified receipts/dead-letter manual workflow and remaining portal wiring",
+        "Supplier dispatch/verified receipts/controlled retry and remaining portal wiring; do not repeat implemented local FAILED disposition",
         "Real HTTP/browser routing/preference interaction and continuous scheduler lifecycle; supplier sends/authenticated receipts remain separate"
       ],
       "completed_subitems": [
@@ -486,7 +488,8 @@
         "Six routing GET paths recheck current account/session/membership before releasing results; 54 targeted authorization tests passed",
         "Six real designated retained-V51 PG business checks passed: idempotent durable discovery/routing, explicit publication and synthetic verified binding, preference withdrawal, concurrent CAS/original command, revocation and immutable history; no migrations or external dispatch",
         "Complete bounded current-head attention reader/API/UI for UNKNOWN/FAILED/DEAD_LETTER, same-snapshot count/cursor, strict 1000-root/24002-revision budget, scoped recovery; 3 designated PG, 39 targeted Java, 5564 Web, 219 contracts and 1440/1024 synthetic Edge verified",
-        "Atomic pre-dispatch REQUEST/ROUTE cancellation with original audit chain, V50 queue mutual exclusion, concurrent same-command convergence and strict modal recovery; 8 designated PG, 5570 Web, 221 contracts and 4 synthetic Edge scenes verified; external delivery and dead-letter disposition remain separate"
+        "Atomic pre-dispatch REQUEST/ROUTE cancellation with original audit chain, V50 queue mutual exclusion, concurrent same-command convergence and strict modal recovery; 8 designated PG, 5570 Web, 221 contracts and 4 synthetic Edge scenes verified; external delivery and dead-letter disposition remain separate",
+        "Explicit manual local FAILED-to-DEAD_LETTER command, independently scoped default-off writes, same transaction journal/audit/idempotent receipt, strict confirmation and original-key recovery. Provider verification/send/retry remains unauthorized; designated PG/browser validation still NOT_RUN in this dot."
       ],
       "review_baseline_commit": "dd51b1c4"
     },

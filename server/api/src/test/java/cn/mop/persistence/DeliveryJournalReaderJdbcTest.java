@@ -30,4 +30,108 @@ class DeliveryJournalReaderJdbcTest {
  @Test void schemaDriftPreventsPrivateLedgerReads()throws Exception{schema.when(()->DeliveryReceiptSchemaVerifier.verify(c)).thenThrow(new SQLException("unit drift"));assertEquals(503,assertThrows(DomainException.class,()->reader.list(access,null,null,10)).status);journals.verifyNoInteractions();}
  @Test void privilegedOrImpersonatedDatabaseUserCannotReadPrivateLedger(){runtime=false;assertEquals(503,assertThrows(DomainException.class,()->reader.list(access,null,null,10)).status);journals.verifyNoInteractions();assertEquals(1,queries.size());}
  @Test void rowOutsideRequestedCursorDoesNotEscapeIntoThePage(){var before=new DeliveryJournalReader.Cursor(at.minusSeconds(1),delivery);assertEquals(503,assertThrows(DomainException.class,()->reader.list(access,null,before,10)).status);journals.verifyNoInteractions();}
+    @Test
+    void attentionReplaysNonmatchingHeadsBeforeReturningCompleteZero() throws Exception {
+        var page = reader.attention(access, null, DeliveryJournalReader.AttentionStatus.ATTENTION, null, 10);
+        assertEquals(1, page.scannedRoots());
+        assertEquals(0, page.page().totalCount());
+        assertTrue(page.page().items().isEmpty());
+        journals.verify(() -> PostgresDeliveryReceiptRepository.readVerifiedInTransaction(c, scope));
+        assertTrue(queries.stream().allMatch(sql -> sql.startsWith("SELECT")));
+        verify(c).commit();
+    }
+
+    @Test
+    void attentionOversizedSingleJournalRejectsBeforeReturningPartialResults() {
+        revisions = 12002;
+        assertEquals(
+            503,
+            assertThrows(DomainException.class, () ->
+                reader.attention(access, null, DeliveryJournalReader.AttentionStatus.FAILED, null, 10)
+            ).status
+        );
+        journals.verifyNoInteractions();
+    }
+
+    @Test
+    void attentionForeignPoolNeverReadsJournal() {
+        assertEquals(
+            404,
+            assertThrows(DomainException.class, () ->
+                reader.attention(
+                    access,
+                    UUID.randomUUID(),
+                    DeliveryJournalReader.AttentionStatus.ATTENTION,
+                    null,
+                    10
+                )
+            ).status
+        );
+        journals.verifyNoInteractions();
+    }
+
+    @Test
+    void attentionRootOverflowDoesNotReturnAnIncompleteSuccessfulQueue() throws Exception {
+        attentionRoots(1001);
+        assertEquals(
+            "DELIVERY_ATTENTION_SCAN_LIMIT",
+            assertThrows(DomainException.class, () ->
+                reader.attention(access, null, DeliveryJournalReader.AttentionStatus.ATTENTION, null, 10)
+            ).code
+        );
+        journals.verifyNoInteractions();
+        verify(c).rollback();
+    }
+
+    @Test
+    void attentionTotalReplayBudgetIncludesNonmatchingJournals() throws Exception {
+        attentionRoots(3);
+        revisions = 9000;
+        assertEquals(
+            "DELIVERY_ATTENTION_SCAN_LIMIT",
+            assertThrows(DomainException.class, () ->
+                reader.attention(access, null, DeliveryJournalReader.AttentionStatus.ATTENTION, null, 10)
+            ).code
+        );
+        journals.verify(
+            () -> PostgresDeliveryReceiptRepository.readVerifiedInTransaction(eq(c), any()),
+            times(2)
+        );
+        verify(c).rollback();
+    }
+
+    private void attentionRoots(int count) throws Exception {
+        var ids = new ArrayList<UUID>();
+        for (int index = 0; index < count; index++) {
+            UUID id = UUID.randomUUID();
+            ids.add(id);
+            var selected = new Scope(tenant, id, scope.key());
+            journals
+                .when(() -> PostgresDeliveryReceiptRepository.readVerifiedInTransaction(c, selected))
+                .thenReturn(
+                    new PostgresDeliveryReceiptRepository.ReadJournal(
+                        DeliveryReceiptJournal.queued(selected, at),
+                        command,
+                        at,
+                        Map.of(command, at)
+                    )
+                );
+        }
+        when(c.prepareStatement(contains("LIMIT 1001"))).thenAnswer(call -> {
+            var statement = mock(PreparedStatement.class);
+            var rows = mock(ResultSet.class);
+            var index = new java.util.concurrent.atomic.AtomicInteger(-1);
+            when(statement.executeQuery()).thenReturn(rows);
+            when(rows.next()).thenAnswer(next -> index.incrementAndGet() < count);
+            when(rows.getObject("tenant_id", UUID.class)).thenReturn(tenant);
+            when(rows.getObject("delivery_id", UUID.class)).thenAnswer(value -> ids.get(index.get()));
+            when(rows.getObject("resource_pool_id", UUID.class)).thenReturn(pool);
+            when(rows.getObject("event_id", UUID.class)).thenReturn(event);
+            when(rows.getObject("receiver_id", UUID.class)).thenReturn(receiver);
+            when(rows.getString("channel")).thenReturn("EMAIL");
+            when(rows.getString("stage")).thenReturn("INITIAL");
+            when(rows.getObject("recorded_at", OffsetDateTime.class)).thenReturn(at.atOffset(ZoneOffset.UTC));
+            return statement;
+        });
+    }
 }

@@ -453,7 +453,9 @@
         "docs/notification-routing-return-scope-20261023.md",
         "docs/evidence/local-astra-ut-20261023/upstream-batch/return-guards.json",
         "docs/notification-routing-retained-business-20261024.md",
-        "docs/evidence/local-astra-ut-20261023/n01-retained-business/summary.json"
+        "docs/evidence/local-astra-ut-20261023/n01-retained-business/summary.json",
+        "docs/delivery-attention-20261024.md",
+        "docs/evidence/delivery-attention-20261024/validation.json"
       ],
       "commits": [
         "f69fa0dd",
@@ -464,7 +466,7 @@
         "b07b3c3b"
       ],
       "remaining_subitems": [
-        "Complete actual dispatch, authenticated receipts, controlled retry and dead-letter API/UI",
+        "Actual dispatch, authenticated receipts, controlled retry and recorded manual dead-letter disposition; read-only complete attention queue/API/UI is independently verified",
         "Formal contract acceptance",
         "Supplier dispatch/verified receipts/dead-letter manual workflow and remaining portal wiring",
         "Real HTTP/browser routing/preference interaction and continuous scheduler lifecycle; supplier sends/authenticated receipts remain separate"
@@ -474,9 +476,10 @@
         "Explicit-scope V50 local delivery journal listing, full-chain verification, immutable history and original-command read-only recovery, actual API/notification workspace and context revocation tests; delivered declarations remain unverified and no resend is authorized.",
         "V51 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; historical active mop_test was V50 at that verification; superseded by the 2026-10-24 deployment to active V55",
         "Six routing GET paths recheck current account/session/membership before releasing results; 54 targeted authorization tests passed",
-        "Six real designated retained-V51 PG business checks passed: idempotent durable discovery/routing, explicit publication and synthetic verified binding, preference withdrawal, concurrent CAS/original command, revocation and immutable history; no migrations or external dispatch"
+        "Six real designated retained-V51 PG business checks passed: idempotent durable discovery/routing, explicit publication and synthetic verified binding, preference withdrawal, concurrent CAS/original command, revocation and immutable history; no migrations or external dispatch",
+        "Complete bounded current-head attention reader/API/UI for UNKNOWN/FAILED/DEAD_LETTER, same-snapshot count/cursor, strict 1000-root/24002-revision budget, scoped recovery; 3 designated PG, 39 targeted Java, 5564 Web, 219 contracts and 1440/1024 synthetic Edge verified"
       ],
-      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
+      "review_baseline_commit": "1654838c"
     },
     {
       "id": "N02",

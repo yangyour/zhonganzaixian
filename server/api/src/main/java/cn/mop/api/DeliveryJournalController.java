@@ -10,9 +10,18 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 /** Read-only local journal reconciliation, never provider receipt authentication or a resend endpoint. */
-@RestController @Profile("remote_test") @RequestMapping("/api/v1/notification-deliveries")
+@RestController
+@Profile("remote_test")
+@RequestMapping("/api/v1/notification-deliveries")
 public final class DeliveryJournalController {
- private final PlatformRepository platform;private final DeliveryJournalReader reader;private final ObjectMapper json;private final boolean enabled;
+ /** Current project identity, capabilities and return-boundary revocation checks. */
+ private final PlatformRepository platform;
+ /** Explicitly authorized resource-pool scope and complete V50 journal validation. */
+ private final DeliveryJournalReader reader;
+ /** Public snake-case projection without journal bytes or private recipient addresses. */
+ private final ObjectMapper json;
+ /** Existing explicit read-only runtime switch; no automatic enablement. */
+ private final boolean enabled;
  public DeliveryJournalController(PlatformRepository platform,DeliveryJournalReader reader,ObjectMapper json,Environment env){this.platform=platform;this.reader=reader;this.json=json.copy().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);enabled=MonitoringEnrollmentConfiguration.flag(env,"MOP_DELIVERY_JOURNAL_READ_ENABLED");}
  @ModelAttribute void headers(HttpServletResponse r){r.setHeader("Cache-Control","no-store");r.setHeader("Referrer-Policy","no-referrer");}
  private Membership member(HttpServletRequest r){if(r.getUserPrincipal()==null||r.getSession(false)==null||!(r.getSession(false).getAttribute("mop.tenant_id") instanceof String tenant)||!MonitoringPresetRegistry.uuid(tenant)||!MonitoringPresetRegistry.uuid(r.getUserPrincipal().getName()))throw expired();String actor=r.getUserPrincipal().getName();var m=platform.membership(actor,tenant).orElseThrow(DeliveryJournalController::expired);
@@ -23,6 +32,89 @@ public final class DeliveryJournalController {
   if(q.containsKey("before"))try{var at=Instant.parse(q.get("before"));if(at.getNano()%1000000!=0||!at.toString().equals(q.get("before")))throw invalid();cursor=new Cursor(at,uuid(q.get("before_id")));}catch(Exception e){throw invalid();}
   int size=size(q.get("page_size"),10,20);var page=reader.list(access(m),pool,cursor,size);if(page==null||!access(m).equals(page.access())||page.pageSize()!=size||pool!=null&&page.items().stream().anyMatch(e->!pool.equals(e.resourcePoolId())))throw unavailable();var result=flags();result.put("tenant_id",m.tenantId());result.put("observed_at",page.observedAt().toString());result.put("total_count",page.totalCount());result.put("page_size",size);result.put("items",page.items().stream().map(e->entry(m,e)).toList());result.put("next",page.next()==null?null:Map.of("before",page.next().firstRecordedAt().toString(),"before_id",page.next().deliveryId().toString()));result.put("snapshot_scope","CURRENT_READ_PAGE_NOT_GLOBAL_SNAPSHOT");DashboardReadAuthorization.recheck(r,platform,m);return ApiResponse.success(result,r);
  }
+    /** Read complete verified heads before filtering; unknown results are never relabelled failed or authorized to resend. */
+    @GetMapping("/attention")
+    Object attention(HttpServletRequest request) {
+        var member = member(request);
+        var query = query(request, Set.of("resource_pool_id", "status", "before", "before_id", "page_size"));
+        if (query.containsKey("before") != query.containsKey("before_id")) {
+            throw invalid();
+        }
+        AttentionStatus status;
+        Cursor cursor = null;
+        try {
+            status = AttentionStatus.valueOf(query.getOrDefault("status", "ATTENTION"));
+            if (query.containsKey("before")) {
+                var at = Instant.parse(query.get("before"));
+                if (!at.toString().equals(query.get("before"))) {
+                    throw invalid();
+                }
+                cursor = new Cursor(at, uuid(query.get("before_id")));
+            }
+        } catch (Exception invalidQuery) {
+            throw invalid();
+        }
+        UUID pool = query.containsKey("resource_pool_id") ? uuid(query.get("resource_pool_id")) : null;
+        int size = size(query.get("page_size"), 10, 20);
+        var result = reader.attention(access(member), pool, status, cursor, size);
+        if (
+            result == null ||
+            result.status() != status ||
+            !access(member).equals(result.page().access()) ||
+            result.page().pageSize() != size ||
+            (pool != null &&
+                result
+                    .page()
+                    .items()
+                    .stream()
+                    .anyMatch(row -> !pool.equals(row.resourcePoolId())))
+        ) {
+            throw unavailable();
+        }
+        var page = result.page();
+        for (var row : page.items()) {
+            if (
+                status == AttentionStatus.ATTENTION
+                    ? !Set.of("UNKNOWN", "FAILED", "DEAD_LETTER").contains(row.recordedStatus())
+                    : !status.name().equals(row.recordedStatus())
+            ) {
+                throw unavailable();
+            }
+        }
+        var data = flags();
+        data.put("tenant_id", member.tenantId());
+        data.put("observed_at", page.observedAt().toString());
+        data.put("total_count", page.totalCount());
+        data.put("page_size", size);
+        data.put(
+            "items",
+            page
+                .items()
+                .stream()
+                .map(row -> entry(member, row))
+                .toList()
+        );
+        data.put(
+            "next",
+            page.next() == null
+                ? null
+                : Map.of(
+                      "before",
+                      page.next().firstRecordedAt().toString(),
+                      "before_id",
+                      page.next().deliveryId().toString()
+                  )
+        );
+        data.put("snapshot_scope", "CURRENT_READ_PAGE_NOT_GLOBAL_SNAPSHOT");
+        data.put("status_filter", status.name());
+        data.put("scanned_roots", result.scannedRoots());
+        data.put("population_scope", "COMPLETE_BOUNDED_VERIFIED_JOURNAL_HEADS");
+        data.put("root_scan_limit", 1000);
+        data.put("revision_scan_limit", 24002);
+        DashboardReadAuthorization.recheck(request, platform, member);
+        return ApiResponse.success(data, request);
+    }
+
  @GetMapping("/{id}") Object detail(@PathVariable String id,HttpServletRequest r){var m=member(r);var q=query(r,Set.of("before_version","page_size"));UUID delivery=uuid(id);Long before=q.containsKey("before_version")?(long)size(q.get("before_version"),1,12001):null;int size=size(q.get("page_size"),100,100);var detail=reader.detail(access(m),delivery,before,size);if(detail==null||!access(m).equals(detail.access())||!delivery.equals(detail.entry().deliveryId())||detail.history().size()>size)throw unavailable();var versions=new HashSet<Long>();long prior=before==null?detail.entry().version()+1:before;for(var step:detail.history()){if(step.version()>=prior||step.version()>detail.entry().version()||!versions.add(step.version()))throw unavailable();prior=step.version();}if(detail.nextBeforeVersion()!=null&&(detail.history().size()!=size||detail.nextBeforeVersion()!=prior||prior<1))throw unavailable();
   var result=flags();result.put("tenant_id",m.tenantId());result.put("observed_at",detail.observedAt().toString());result.put("entry",entry(m,detail.entry()));result.put("history",detail.history().stream().map(this::step).toList());result.put("next_before_version",detail.nextBeforeVersion());result.put("history_scope","CURRENT_HEAD_WITH_IMMUTABLE_VERSION_PAGE");DashboardReadAuthorization.recheck(r,platform,m);return ApiResponse.success(result,r);
  }

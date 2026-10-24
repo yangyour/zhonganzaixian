@@ -17,3 +17,11 @@ it('recorded delivered remains explicitly uncertified',async()=>{const page=deli
 it('missing configuration is an error not empty success and retains retry',async()=>{vi.spyOn(api,'request').mockRejectedValue(new ApiError(503,'SCOPE_PENDING','未配置','unit'));await mount();click('读取日志');await settle();expect(host!.textContent).toContain('请勿据此重新发送');expect(host!.textContent).not.toContain('当前页没有本地日志');expect([...host!.querySelectorAll('button')].some(b=>b.textContent==='重试原读取')).toBe(true)})
 it('account revision clears visible results and aborts delayed reads',async()=>{let finish!:(v:unknown)=>void;const request=vi.spyOn(api,'request').mockImplementation(()=>new Promise(resolve=>finish=resolve));await mount();click('读取日志');await settle();session.value={...session.value!,account_version:2};await settle();expect(request.mock.calls[0]![1]?.signal?.aborted).toBe(true);finish(deliveryPage());await settle();expect(host!.querySelector('table')).toBeNull()})
 it('loss of audit privilege removes the workspace',async()=>{vi.spyOn(api,'request').mockResolvedValue(deliveryPage());await mount();click('读取日志');await settle();session.value={...session.value!,capabilities:['ticket_notes:read_internal']};await settle();expect(host!.querySelector('section')).toBeNull()})
+it('attention status changes clear old results and request a complete filtered first page',async()=>{
+ const request=vi.spyOn(api,'request').mockResolvedValue(deliveryPage());await mount();click('读取日志');await settle()
+ const select=[...host!.querySelectorAll('select')].find(value=>[...value.options].some(option=>option.value==='ATTENTION'))!
+ select.value='DEAD_LETTER';select.dispatchEvent(new Event('change'));await settle();expect(host!.querySelector('table')).toBeNull()
+ request.mockResolvedValue({...deliveryPage(),items:[],total_count:0,status_filter:'DEAD_LETTER',scanned_roots:12,root_scan_limit:1000,revision_scan_limit:24002,population_scope:'COMPLETE_BOUNDED_VERIFIED_JOURNAL_HEADS'})
+ click('读取日志');await settle();expect(request.mock.calls.at(-1)![0]).toBe('/notification-deliveries/attention?page_size=10&status=DEAD_LETTER')
+ expect(request.mock.calls.every(([,options])=>options?.method==='GET')).toBe(true)
+})

@@ -15,7 +15,10 @@ import java.util.function.Function;
 /** SELECT-only business footprint, current-scope share locks and complete bounded journal replay. */
 public final class PostgresDeliveryJournalReader implements DeliveryJournalReader {
  private static final long PAGE_REVISION_BUDGET=24002;
- private final DataSource source;private final Function<UUID,Set<UUID>> pools;
+ /** Existing restricted runtime connection source, independently verified for every read. */
+ private final DataSource source;
+ /** Server-controlled per-tenant resource pools; absent configuration is never an empty success. */
+ private final Function<UUID,Set<UUID>> pools;
  public PostgresDeliveryJournalReader(DataSource source,Function<UUID,Set<UUID>> pools){this.source=Objects.requireNonNull(source);this.pools=Objects.requireNonNull(pools);}
  @FunctionalInterface private interface Work<T>{T run(Connection c,Set<UUID> scope,Instant observed)throws SQLException;}
  private <T>T read(Access a,Work<T> work){Objects.requireNonNull(a);try(var c=source.getConnection()){
@@ -34,6 +37,105 @@ public final class PostgresDeliveryJournalReader implements DeliveryJournalReade
   for(var root:roots.subList(0,Math.min(roots.size(),size))){bound(a,allowed,root);if(before!=null&&(root.recordedAt().isAfter(before.firstRecordedAt())||root.recordedAt().equals(before.firstRecordedAt())&&root.scope().deliveryId().toString().compareTo(before.deliveryId().toString())>=0))throw unavailable();budget-=revisionCount(c,root.scope());if(budget<0)throw limit();var journal=PostgresDeliveryReceiptRepository.readVerifiedInTransaction(c,root.scope());if(!root.recordedAt().equals(journal.firstRecordedAt()))throw unavailable();entries.add(entry(journal));}
   Cursor next=null;if(roots.size()>size){var last=entries.get(entries.size()-1);next=new Cursor(last.firstRecordedAt(),last.deliveryId());}return new Page(a,at,size,total,entries,next);
  });}
+    /** Complete bounded replay precedes status filtering, count and pagination in the same repeatable-read transaction. */
+    @Override
+    public AttentionPage attention(
+        Access access,
+        UUID pool,
+        AttentionStatus status,
+        Cursor before,
+        int size
+    ) {
+        if (size < 1 || size > 20 || status == null) {
+            throw invalid();
+        }
+        return read(access, (connection, allowed, observed) -> {
+            if (pool != null && !allowed.contains(pool)) {
+                throw missing();
+            }
+            var selected = pool == null ? allowed : Set.of(pool);
+            var roots = new ArrayList<Root>();
+            try (
+                var statement = query(
+                    connection,
+                    "SELECT tenant_id,delivery_id,resource_pool_id,event_id,channel,receiver_id,stage,recorded_at " +
+                        "FROM public.mop_delivery_receipt_journal WHERE tenant_id=? AND version=0 " +
+                        "AND resource_pool_id=ANY(?::uuid[]) ORDER BY recorded_at DESC,delivery_id DESC LIMIT 1001"
+                )
+            ) {
+                statement.setObject(1, access.tenantId());
+                var poolsArray = connection.createArrayOf("uuid", selected.toArray());
+                try {
+                    statement.setArray(2, poolsArray);
+                    try (var rows = statement.executeQuery()) {
+                        while (rows.next()) {
+                            roots.add(root(rows));
+                        }
+                    }
+                } finally {
+                    poolsArray.free();
+                }
+            }
+            if (roots.size() > 1000) {
+                throw new DomainException(
+                    422,
+                    "DELIVERY_ATTENTION_SCAN_LIMIT",
+                    "待核对读取超过1000条根记录技术预算，请缩小资源池范围"
+                );
+            }
+            var matches = new ArrayList<Entry>();
+            long budget = PAGE_REVISION_BUDGET;
+            for (var root : roots) {
+                bound(access, allowed, root);
+                budget -= revisionCount(connection, root.scope());
+                if (budget < 0) {
+                    throw new DomainException(
+                        422,
+                        "DELIVERY_ATTENTION_SCAN_LIMIT",
+                        "待核对读取超过完整日志重放预算，请缩小资源池范围"
+                    );
+                }
+                var journal = PostgresDeliveryReceiptRepository.readVerifiedInTransaction(
+                    connection,
+                    root.scope()
+                );
+                if (!root.recordedAt().equals(journal.firstRecordedAt())) {
+                    throw unavailable();
+                }
+                var entry = entry(journal);
+                if (
+                    status == AttentionStatus.ATTENTION
+                        ? Set.of("UNKNOWN", "FAILED", "DEAD_LETTER").contains(entry.recordedStatus())
+                        : status.name().equals(entry.recordedStatus())
+                ) {
+                    matches.add(entry);
+                }
+            }
+            var remaining = matches
+                .stream()
+                .filter(
+                    entry ->
+                        before == null ||
+                        entry.firstRecordedAt().isBefore(before.firstRecordedAt()) ||
+                        (entry.firstRecordedAt().equals(before.firstRecordedAt()) &&
+                            entry.deliveryId().toString().compareTo(before.deliveryId().toString()) < 0)
+                )
+                .limit(size + 1L)
+                .toList();
+            var visible = remaining.stream().limit(size).toList();
+            Cursor next = null;
+            if (remaining.size() > size) {
+                var last = visible.get(visible.size() - 1);
+                next = new Cursor(last.firstRecordedAt(), last.deliveryId());
+            }
+            return new AttentionPage(
+                new Page(access, observed, size, matches.size(), visible, next),
+                status,
+                roots.size()
+            );
+        });
+    }
+
  @Override public Detail detail(Access a,UUID id,Long beforeVersion,int size){if(id==null||size<1||size>100||beforeVersion!=null&&(beforeVersion<1||beforeVersion>12001))throw invalid();return read(a,(c,allowed,at)->{
   var loaded=load(c,a,id,allowed);var steps=steps(loaded);long before=beforeVersion==null?loaded.journal().state().version()+1:beforeVersion;
   var selected=steps.stream().filter(s->s.version()<before).sorted(Comparator.comparingLong(Step::version).reversed()).limit(size+1L).toList();boolean more=selected.size()>size;var page=selected.subList(0,Math.min(size,selected.size()));return new Detail(a,at,entry(loaded),page,more?page.get(page.size()-1).version():null);

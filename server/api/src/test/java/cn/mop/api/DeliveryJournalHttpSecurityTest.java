@@ -37,4 +37,51 @@ class DeliveryJournalHttpSecurityTest {
  @Test void noRetryOrSendPostEndpointExists()throws Exception{mvc.perform(post(BASE+"/"+D).session(session()).with(user(A)).with(csrf())).andExpect(status().isMethodNotAllowed());verifyNoInteractions(reader);}
  @Test void foreignDeliveryStays404()throws Exception{when(reader.detail(any(),eq(UUID.fromString(D)),isNull(),eq(100))).thenThrow(new DomainException(404,"DELIVERY_JOURNAL_NOT_FOUND","当前范围未找到"));mvc.perform(get(BASE+"/"+D).session(session()).with(user(A))).andExpect(status().isNotFound()).andExpect(jsonPath("$.error.code").value("DELIVERY_JOURNAL_NOT_FOUND"));}
  @Test void duplicateQueryAndHalfCursorRejected()throws Exception{mvc.perform(get(BASE).param("page_size","10","20").session(session()).with(user(A))).andExpect(status().isBadRequest());mvc.perform(get(BASE).param("before","2026-10-24T00:00:00Z").session(session()).with(user(A))).andExpect(status().isBadRequest());verifyNoInteractions(reader);}
+    @Test
+    void exactAttentionRouteIsReadOnlyAndKeepsWholePopulationMetadata() throws Exception {
+        var access = new cn.mop.domain.notification.DeliveryJournalReader.Access(
+            UUID.fromString(T),
+            UUID.fromString(A),
+            7
+        );
+        when(
+            reader.attention(
+                any(),
+                isNull(),
+                eq(cn.mop.domain.notification.DeliveryJournalReader.AttentionStatus.ATTENTION),
+                isNull(),
+                eq(10)
+            )
+        ).thenReturn(
+            new cn.mop.domain.notification.DeliveryJournalReader.AttentionPage(
+                new cn.mop.domain.notification.DeliveryJournalReader.Page(
+                    access,
+                    java.time.Instant.parse("2026-10-24T00:00:00Z"),
+                    10,
+                    0,
+                    List.of(),
+                    null
+                ),
+                cn.mop.domain.notification.DeliveryJournalReader.AttentionStatus.ATTENTION,
+                12
+            )
+        );
+        mvc.perform(
+            get(BASE + "/attention")
+                .session(session())
+                .with(user(A))
+        )
+            .andExpect(status().isOk())
+            .andExpect(header().string("Cache-Control", "no-store"))
+            .andExpect(jsonPath("$.data.scanned_roots").value(12))
+            .andExpect(jsonPath("$.data.total_count").value(0))
+            .andExpect(jsonPath("$.data.automatic_send_enabled").value(false));
+        verify(reader, never()).detail(any(), any(), any(), anyInt());
+        mvc.perform(
+            post(BASE + "/attention")
+                .session(session())
+                .with(user(A))
+                .with(csrf())
+        ).andExpect(status().isMethodNotAllowed());
+    }
 }

@@ -21,6 +21,26 @@ public interface DeliveryJournalReader {
  record Detail(Access access,Instant observedAt,Entry entry,List<Step> history,Long nextBeforeVersion){public Detail{history=List.copyOf(history);}}
  record Recovery(Access access,Instant observedAt,Entry current,Step original){}
  Page list(Access access,UUID pool,Cursor before,int size);
+    /** Filters verified current heads across the entire bounded authorized population, never just the visible page. */
+    enum AttentionStatus {
+        ATTENTION,
+        UNKNOWN,
+        FAILED,
+        DEAD_LETTER
+    }
+
+    /** The complete scanned population is bounded independently of the requested visible page size. */
+    record AttentionPage(Page page, AttentionStatus status, int scannedRoots) {
+        public AttentionPage {
+            Objects.requireNonNull(page);
+            Objects.requireNonNull(status);
+            if (scannedRoots < 0 || scannedRoots > 1000 || page.totalCount() > scannedRoots) {
+                throw new IllegalArgumentException("Invalid complete attention population");
+            }
+        }
+    }
+
+    AttentionPage attention(Access access, UUID pool, AttentionStatus status, Cursor before, int size);
  Detail detail(Access access,UUID deliveryId,Long beforeVersion,int size);
  Recovery recover(Access access,UUID deliveryId,UUID commandId);
 }

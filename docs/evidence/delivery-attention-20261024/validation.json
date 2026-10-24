@@ -1,0 +1,102 @@
+{
+  "project": "众安在线MOP",
+  "base_commit": "1654838c",
+  "status": "VERIFIED_READ_ONLY_ATTENTION_SLICE_WITH_EXPLICIT_GATES",
+  "created_at": "2026-10-24T10:11:30.235329+00:00",
+  "source_hashes": {
+    "apps/web/src/components/DeliveryJournalPanel.vue": "906ee9ed50b791eb549d104408cd3f4a445991a4ab182fc73682df8d2935cbaf",
+    "apps/web/src/utils/deliveryJournal.ts": "bfd9de94f07313091d63b70252647676d459a9d8e3b83422a34d4b725838015c",
+    "apps/web/tests/deliveryJournalPanel.test.ts": "a23454b98d0b54928ca521f8ec8ffbce38997cbb8a1345700221ab912a6da1c4",
+    "apps/web/tests/deliveryAttention.test.ts": "cfc58aa1d43c456e29e1e4a272e7dd41b037d7676e98c34941e8ba758ade772e",
+    "apps/web/qa/browser/delivery-attention.pw.ts": "0b5778b3fcbf0d39d19f4fea0cd2092df9ad07aa5ed852dfcb2d808c9a3083ee",
+    "apps/web/qa/delivery-attention.fixture.ts": "f6f729e3275fd3ced649baed419f68fbef22cc1fc1c6efa7f442a48ca2f45c9f",
+    "apps/web/qa/delivery-attention.fixture.html": "dd048a55213690112b90725c2b21dac976c95b5869d2f6f02086d4a582be103e",
+    "server/domain/src/main/java/cn/mop/domain/notification/DeliveryJournalReader.java": "f2025ddfeda647b8c31705f1aa0f4b79dbec7e07a06997afdd4e75263e7ccfe9",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresDeliveryJournalReader.java": "7f825387ea102df7fc938c0e114843c111d884c90083c8050b9bb9b7efe809d8",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresDeliveryAttentionIntegrationTest.java": "230eb2b1cd1912eb4c78eae6d4720d8fee3fb760a055062a04b4fdb6449e7c03",
+    "server/api/src/main/java/cn/mop/api/DeliveryJournalController.java": "96b3b45110f5b46c02bf97bab3f935f80fd29fe7b30273f54c9e8559e2135ac9",
+    "server/api/src/test/java/cn/mop/api/DeliveryAttentionControllerTest.java": "9dff0f4a830d19ca9e433650d1c6aa1abed8d7f58e2a60982a381a601a2bbfaa",
+    "server/api/src/test/java/cn/mop/api/DeliveryJournalHttpSecurityTest.java": "4d76f40cfa8e0f06114ca48569ab3a67ecf7bdd318d100eeacd2284cdd1af350",
+    "server/api/src/test/java/cn/mop/persistence/DeliveryJournalReaderJdbcTest.java": "c616527ec871b77a04ae575a24089e679c07ff46dbcfb644262bfc696edabac4",
+    "tools/delivery-journal-read-contract.mjs": "e67bcb142246451dc04f3f5b16a5de51e981f70d07aa0f56a17f655d3005c6b2",
+    "tools/verify-report-capture-isolated.py": "972f00fa81f6ff4f0c508d4864fb2e5e8f47213d3d5d87357b33beface3159f8",
+    "tests/delivery-attention-contract.test.mjs": "b62c6d56deb3e027fa2193445056b506053080617043bc2cc634500a1f0447f5",
+    "contracts/local-api.openapi.json": "702f1ce41cdb6160979cbe1e00a3f4b37a016eba346ad1e1c73bd40497aa880f",
+    "package.json": "13e88ab200576d93e7c983301273c48357e07ea12678677fbf9dae714b7d1d28"
+  },
+  "java_targeted": {
+    "tests": 39,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "scope": "MVC_CURRENT_AUTHORIZATION_JDBC_PROTOCOL_AND_BUDGET"
+  },
+  "web_full": {
+    "files": 343,
+    "tests": 5564,
+    "failures": 0
+  },
+  "web_targeted": {
+    "files": 3,
+    "tests": 16,
+    "failures": 0
+  },
+  "contracts": {
+    "tests": 219,
+    "failures": 0,
+    "reproducible": true
+  },
+  "postgresql": {
+    "environment": "lan-test-20261008",
+    "version": "17.9 (Debian 17.9-1.pgdg12+1)",
+    "active_schema": 55,
+    "junit": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "scope": "FRESH_SYNTHETIC_TENANTS_REAL_PG_NO_PROVIDER",
+    "checks": [
+      "Older abnormal heads beyond newest ordinary page; complete filtered count and UUID/time cursor",
+      "Late declared DELIVERED removes current DEAD_LETTER while retaining immutable prior history",
+      "Foreign pool/tenant and missing membership refused; other-tenant full journal digest unchanged"
+    ],
+    "actual_tenant_fingerprints_unchanged": true,
+    "migration_history_unchanged": true,
+    "test_principal_deactivated": true,
+    "immutable_records_retained": true
+  },
+  "browser": {
+    "engine": "Microsoft Edge",
+    "tests": 2,
+    "viewports": [
+      1440,
+      1024
+    ],
+    "scope": "SYNTHETIC_IDENTITY_INTERCEPTED_API",
+    "axe_violations": 0,
+    "exact_cursor_failure_retry": "PASSED",
+    "filter_scope_clear": "PASSED",
+    "forced_revocation": "PASSED",
+    "visual_review": "TWO_SCREENSHOTS_REVIEWED"
+  },
+  "build": {
+    "typecheck": "PASSED",
+    "production_build": "PASSED",
+    "static_policy": "PASSED"
+  },
+  "schema_migrations": 0,
+  "external_messages": 0,
+  "deployment": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "failures_preserved": [
+    "Initial oversize-single-chain test expected total-budget error; corrected to the existing fail-closed 503, then independently tested 1001-root and combined-chain 24002 budgets"
+  ],
+  "remaining": [
+    "Recorded manual dead-letter disposition and controlled retry",
+    "Trusted provider receipt/query adapters and continuous dispatch",
+    "Actual API/browser integration with explicit runtime enablement/pool scope",
+    "Production scale/performance and formal contract acceptance"
+  ]
+}

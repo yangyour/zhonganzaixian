@@ -7,14 +7,22 @@ import static cn.mop.persistence.TestSchemaMigration.*;
 /** Candidate V53 structural checks, never an implicit migration. */
 final class ReportPublicationSchemaVerifier {
  static final String SCRIPT="V53__report_publication_journal.sql";
- static final String SHA256="42ecf93f54017057db3caf27ac6b4670084866466c3ed1d9d329c362c0ab95a7";
+ static final String SHA256="b9ee9c9724b3bd4156799058ee24876c04e59d413180f4df4db2d5673f4faddb";
  static final List<String> TABLES=List.of("mop_report_publication_document","mop_report_publication_artifact","mop_report_publication_revision","mop_report_publication_read","mop_report_publication_delivery_intent");
  static byte[] sql()throws Exception{try(var in=ReportPublicationSchemaVerifier.class.getResourceAsStream("/db/migration/"+SCRIPT)){if(in==null)throw new IllegalStateException("Missing report candidate");return in.readAllBytes();}}
  static void resource()throws Exception{if(!SHA256.equals(hash(sql())))throw new IllegalStateException("Report candidate changed without review");}
  static String hash(byte[] bytes)throws Exception{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));}
  static void verify(Connection c)throws SQLException{
-  for(var table:TABLES){verifyRuntimeAcl(c,table,Set.of());requireTrue(c,"SELECT relpersistence='p' AND relowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') FROM pg_class WHERE oid=?::regclass","public."+table);
-   requireTrue(c,"SELECT count(*)=1 AND bool_and(tgenabled='O' AND tgtype=31 AND NOT tgdeferrable AND tgfoid='public.mop_report_publication_guard()'::regprocedure) FROM pg_trigger WHERE tgrelid=?::regclass AND NOT tgisinternal","public."+table);}
+  for (var table : TABLES) {
+   // Only the immutable root identity has the column permission PostgreSQL needs for row locks.
+   Set<String> allowedUpdates = table.equals("mop_report_publication_document") ? Set.of("id") : Set.of();
+   verifyRuntimeAcl(c, table, allowedUpdates);
+   requireTrue(c, "SELECT relpersistence='p' AND relowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') "
+       + "FROM pg_class WHERE oid=?::regclass", "public." + table);
+   requireTrue(c, "SELECT count(*)=1 AND bool_and(tgenabled='O' AND tgtype=31 AND NOT tgdeferrable "
+       + "AND tgfoid='public.mop_report_publication_guard()'::regprocedure) FROM pg_trigger "
+       + "WHERE tgrelid=?::regclass AND NOT tgisinternal", "public." + table);
+  }
   requireConstraint(c,TABLES.get(0),"p",List.of("tenant_id","id"),null,List.of(),false);
   requireConstraint(c,TABLES.get(0),"f",List.of("tenant_id","source_report_id"),"mop_inspection_quarterly_report",List.of("tenant_id","id"),false);
   requireConstraint(c,TABLES.get(1),"p",List.of("tenant_id","document_id","format","render_version"),null,List.of(),false);

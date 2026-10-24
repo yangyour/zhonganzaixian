@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "stage": "R02",
+  "database": "mop_report_test_449b59f37319",
+  "database_owner": "mop_test_migrator",
+  "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:R02:a979bbeaf7494742a773273953c55216",
+  "observed_at": "2026-10-24T03:26:14.652058+00:00",
+  "source": "FINAL_READ_ONLY_DATABASE_HISTORY",
+  "migrations": [
+    {
+      "version": "53",
+      "history_status": "APPLIED_FROZEN",
+      "resource_sha256": "b9ee9c9724b3bd4156799058ee24876c04e59d413180f4df4db2d5673f4faddb",
+      "resource_script": "V53__report_publication_journal.sql",
+      "resource_hash_basis": "PRE_RUN_PINNED_WORKSPACE_RESOURCE",
+      "history_rows": [
+        {
+          "installed_rank": 53,
+          "version": "53",
+          "description": "report publication journal",
+          "type": "SQL",
+          "script": "V53__report_publication_journal.sql",
+          "checksum": 1372829874,
+          "installed_by": "mop_test_migrator",
+          "installed_on": "2026-10-23 23:25:26.927154",
+          "execution_time": 834,
+          "success": true
+        }
+      ]
+    }
+  ],
+  "status": "DETERMINATE",
+  "business_validation": "NOT_RUN",
+  "history_determinate_for_cleanup": true,
+  "history_gate_is_not_user_cleanup_authorization": true,
+  "freeze_required_versions": [
+    "53"
+  ]
+}

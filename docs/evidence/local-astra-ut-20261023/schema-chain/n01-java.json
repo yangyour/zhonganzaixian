@@ -1,0 +1,40 @@
+{
+  "schema_version" : 1,
+  "stage" : "N01",
+  "database" : "mop_notification_test_59ca183a056d",
+  "owner_marker" : "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:N01:e8275c231eaa4f6e896ad4135a7d144e",
+  "status" : "PASSED",
+  "pools_closed" : true,
+  "migrations" : [ {
+    "version" : "51",
+    "script" : "V51__notification_routing_control.sql",
+    "sha256" : "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b",
+    "apply_executed" : 1,
+    "repeat_executed" : 0,
+    "history_status" : "APPLIED_FROZEN",
+    "history_script" : "V51__notification_routing_control.sql",
+    "flyway_checksum" : -930297811,
+    "installed_on" : "2026-10-23 23:24:34.839676",
+    "history_success" : true,
+    "schema_verifier" : "PASSED"
+  } ],
+  "schema_validation" : {
+    "status" : "PASSED",
+    "checks" : [ {
+      "immutable_update_sql_state" : "23514",
+      "nonempty_share_lock" : true,
+      "row_unchanged_after_rejected_update" : true,
+      "table_update_granted" : false,
+      "nonempty_update_lock" : true,
+      "root_column_update_only" : "root_version",
+      "table" : "mop_notification_control",
+      "first_revision_inserted" : true,
+      "revision_count" : 1
+    } ]
+  },
+  "business_validation" : {
+    "status" : "NOT_RUN",
+    "test_count" : 0,
+    "limitations" : [ "SCHEMA_ACL_ROW_LOCK_AND_INITIAL_REVISION_ONLY", "NO_HTTP_RENDERING_SCANNER_DELIVERY_OR_MONITORING_COLLECTION_ACCEPTANCE" ]
+  }
+}

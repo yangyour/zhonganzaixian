@@ -85,4 +85,6 @@ CREATE TRIGGER mop_monitoring_object_binding_guard BEFORE INSERT OR UPDATE OR DE
 CREATE TRIGGER mop_monitoring_object_binding_revision_guard BEFORE INSERT OR UPDATE OR DELETE ON public.mop_monitoring_object_binding_revision FOR EACH ROW EXECUTE FUNCTION public.mop_monitoring_object_binding_guard();
 REVOKE ALL ON public.mop_monitoring_object_binding,public.mop_monitoring_object_binding_revision FROM PUBLIC,mop_test_runtime;
 GRANT SELECT,INSERT ON public.mop_monitoring_object_binding,public.mop_monitoring_object_binding_revision TO mop_test_runtime;
+-- Row locking requires one column's UPDATE privilege; the immutable trigger rejects every actual UPDATE.
+GRANT UPDATE(id) ON public.mop_monitoring_object_binding TO mop_test_runtime;
 REVOKE ALL ON FUNCTION public.mop_monitoring_object_binding_guard() FROM PUBLIC;

@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "stage": "M02",
+  "database": "mop_monitoring_test_554a57478666",
+  "database_owner": "mop_test_migrator",
+  "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:M02:bbd0675fb4dd4632a04f8449d7af73a3",
+  "observed_at": "2026-10-24T03:26:15.441906+00:00",
+  "source": "FINAL_READ_ONLY_DATABASE_HISTORY",
+  "migrations": [
+    {
+      "version": "54",
+      "history_status": "APPLIED_FROZEN",
+      "resource_sha256": "447bc4441943dbd3df4ead06915b4c05697dffb8c30cde6524009575c2ab3dc2",
+      "resource_script": "V54__monitoring_enrollment_journal.sql",
+      "resource_hash_basis": "PRE_RUN_PINNED_WORKSPACE_RESOURCE",
+      "history_rows": [
+        {
+          "installed_rank": 54,
+          "version": "54",
+          "description": "monitoring enrollment journal",
+          "type": "SQL",
+          "script": "V54__monitoring_enrollment_journal.sql",
+          "checksum": -1111795243,
+          "installed_by": "mop_test_migrator",
+          "installed_on": "2026-10-23 23:25:54.899993",
+          "execution_time": 597,
+          "success": true
+        }
+      ]
+    },
+    {
+      "version": "55",
+      "history_status": "APPLIED_FROZEN",
+      "resource_sha256": "e55960373428ad10c95fd08d731c349666c92f85f521371de99dbe11600ad36e",
+      "resource_script": "V55__monitoring_object_mapping_journal.sql",
+      "resource_hash_basis": "PRE_RUN_PINNED_WORKSPACE_RESOURCE",
+      "history_rows": [
+        {
+          "installed_rank": 55,
+          "version": "55",
+          "description": "monitoring object mapping journal",
+          "type": "SQL",
+          "script": "V55__monitoring_object_mapping_journal.sql",
+          "checksum": -2145594074,
+          "installed_by": "mop_test_migrator",
+          "installed_on": "2026-10-23 23:26:03.548367",
+          "execution_time": 699,
+          "success": true
+        }
+      ]
+    }
+  ],
+  "status": "DETERMINATE",
+  "business_validation": "NOT_RUN",
+  "history_determinate_for_cleanup": true,
+  "history_gate_is_not_user_cleanup_authorization": true,
+  "freeze_required_versions": [
+    "54",
+    "55"
+  ]
+}

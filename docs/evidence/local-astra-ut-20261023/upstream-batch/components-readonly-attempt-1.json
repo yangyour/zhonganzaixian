@@ -1,0 +1,9 @@
+{
+  "environment": "lan-test-20261008",
+  "read_only": true,
+  "migrations": 0,
+  "lifecycle_changes": 0,
+  "status": "BLOCKED",
+  "failure_type": "AssertionError",
+  "checked_at": "2026-10-24T02:36:54.361566+00:00"
+}

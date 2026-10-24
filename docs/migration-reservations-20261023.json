@@ -1,38 +1,73 @@
 {
   "version": 1,
   "scope": "Candidate version coordination only; not a cross-host execution lock or deployment approval",
-  "observed_main": "1a6688a05bc45c288cac69a49f55e33642477e35",
-  "remote_branches_inspected": 56,
-  "existing_latest_reserved_version": 54,
+  "observed_main": "e8362fd6a6285d7294007e13daa1ed5a25913c91",
+  "remote_branches_inspected": 62,
+  "existing_latest_reserved_version": 55,
   "existing_v51_sha256": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b",
   "reservations": [
     {
       "version": 52,
       "purpose": "P02 immutable attachment quarantine and scanner release journal",
-      "owner": "current dot continuation",
-      "status": "RESERVED_NOT_APPLIED",
-      "first_application_sha256": null
+      "owner": "local-astra-ut-20261023; upstream dot batch stopped",
+      "status": "APPLIED_IN_ISOLATED_DESIGNATED_DATABASE_FROZEN",
+      "first_application_sha256": "ca8140bb6f6958408a7683d41ccb9ba0a03657bcfe3fb76f3f6fede361d103ef",
+      "candidate_sha256": "ca8140bb6f6958408a7683d41ccb9ba0a03657bcfe3fb76f3f6fede361d103ef",
+      "first_application_evidence": "docs/evidence/local-astra-ut-20261023/schema-chain/first-application-freeze.json"
     },
     {
       "version": 53,
       "purpose": "R02 immutable report publication, artifacts, read receipts and delivery intents",
-      "owner": "current dot continuation",
-      "status": "RESERVED_NOT_APPLIED",
-      "first_application_sha256": null
+      "owner": "local-astra-ut-20261023; upstream dot batch stopped",
+      "status": "APPLIED_IN_ISOLATED_DESIGNATED_DATABASE_FROZEN",
+      "first_application_sha256": "b9ee9c9724b3bd4156799058ee24876c04e59d413180f4df4db2d5673f4faddb",
+      "candidate_sha256": "b9ee9c9724b3bd4156799058ee24876c04e59d413180f4df4db2d5673f4faddb",
+      "unapplied_candidate_revisions": [
+        {
+          "previous_sha256": "42ecf93f54017057db3caf27ac6b4670084866466c3ed1d9d329c362c0ab95a7",
+          "new_sha256": "b9ee9c9724b3bd4156799058ee24876c04e59d413180f4df4db2d5673f4faddb",
+          "reason": "Root row locking requires minimal UPDATE(id) privilege; immutable trigger unchanged",
+          "lineage_evidence": "docs/evidence/local-astra-ut-20261023/upstream-batch/migration-lineage-preflight.json",
+          "applied_before_revision": false
+        }
+      ],
+      "first_application_evidence": "docs/evidence/local-astra-ut-20261023/schema-chain/first-application-freeze.json"
     },
     {
       "version": 54,
       "purpose": "M02 durable monitoring target enrollment and controlled registration journal",
-      "owner": "current dot continuation",
-      "status": "RESERVED_NOT_APPLIED",
-      "first_application_sha256": null
+      "owner": "local-astra-ut-20261023; upstream dot batch stopped",
+      "status": "APPLIED_IN_ISOLATED_DESIGNATED_DATABASE_FROZEN",
+      "first_application_sha256": "447bc4441943dbd3df4ead06915b4c05697dffb8c30cde6524009575c2ab3dc2",
+      "candidate_sha256": "447bc4441943dbd3df4ead06915b4c05697dffb8c30cde6524009575c2ab3dc2",
+      "unapplied_candidate_revisions": [
+        {
+          "previous_sha256": "d242e8e482b8a5a08fe47ea2579ea1b9e98596d95834576bac93f0638ced5fb1",
+          "new_sha256": "447bc4441943dbd3df4ead06915b4c05697dffb8c30cde6524009575c2ab3dc2",
+          "reason": "Root row locking requires minimal UPDATE(id) privilege; immutable trigger unchanged",
+          "lineage_evidence": "docs/evidence/local-astra-ut-20261023/upstream-batch/migration-lineage-preflight.json",
+          "applied_before_revision": false
+        }
+      ],
+      "first_application_evidence": "docs/evidence/local-astra-ut-20261023/schema-chain/first-application-freeze.json"
     },
     {
       "version": 55,
       "purpose": "M02 immutable monitoring object mapping drafts, verified activation and revocation history",
-      "owner": "current dot continuation",
-      "status": "RESERVED_NOT_APPLIED",
-      "first_application_sha256": null
+      "owner": "local-astra-ut-20261023; upstream dot batch stopped",
+      "status": "APPLIED_IN_ISOLATED_DESIGNATED_DATABASE_FROZEN",
+      "first_application_sha256": "e55960373428ad10c95fd08d731c349666c92f85f521371de99dbe11600ad36e",
+      "candidate_sha256": "e55960373428ad10c95fd08d731c349666c92f85f521371de99dbe11600ad36e",
+      "unapplied_candidate_revisions": [
+        {
+          "previous_sha256": "03bf7bcc280c0054ad8e52b1d2ff2aa8cafff921a282f2edef04a890faa1b01b",
+          "new_sha256": "e55960373428ad10c95fd08d731c349666c92f85f521371de99dbe11600ad36e",
+          "reason": "Root row locking requires minimal UPDATE(id) privilege; immutable trigger unchanged",
+          "lineage_evidence": "docs/evidence/local-astra-ut-20261023/upstream-batch/migration-lineage-preflight.json",
+          "applied_before_revision": false
+        }
+      ],
+      "first_application_evidence": "docs/evidence/local-astra-ut-20261023/schema-chain/first-application-freeze.json"
     }
   ],
   "active_database_version": 50,
@@ -40,7 +75,20 @@
   "requirements": [
     "Recheck latest Git refs, complete lineage, live migration history and actual coordination before any application",
     "Do not apply unpublished DDL to active mop_test",
-    "V1-V51 executed resources remain byte-frozen",
+    "V1-V55 executed resources remain byte-frozen; corrections require a newly coordinated migration",
     "No automatic API or Worker migration"
-  ]
+  ],
+  "local_coordination": {
+    "lock_owner": "review-v53-v55-25a17013",
+    "checked_at": "2026-10-24T02:57:38.038861+00:00",
+    "active_database_version": 50,
+    "candidate_validation": "Dedicated databases on existing designated PG only; no active mop_test migration"
+  },
+  "isolated_candidate_versions_applied": [
+    52,
+    53,
+    54,
+    55
+  ],
+  "isolated_v51_repeat_verification": true
 }

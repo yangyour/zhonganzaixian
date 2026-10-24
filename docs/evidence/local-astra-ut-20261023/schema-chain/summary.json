@@ -1,0 +1,800 @@
+{
+  "schema_version": 1,
+  "run_id": "d64df838d0dc49ef93066fbf0b886ab8",
+  "environment": "lan-test-20261008",
+  "started_at": "2026-10-24T03:24:13.214338+00:00",
+  "status": "SCHEMA_CHAIN_VALIDATED_BUSINESS_NOT_RUN",
+  "stop_after_stage": "M02",
+  "stages": [
+    {
+      "stage": "N01",
+      "prefix": "mop_notification_test_",
+      "database": "mop_notification_test_59ca183a056d",
+      "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:N01:e8275c231eaa4f6e896ad4135a7d144e",
+      "database_owner": "mop_test_migrator",
+      "versions": [
+        51
+      ],
+      "status": "SCHEMA_VALIDATED_BUSINESS_NOT_RUN",
+      "created": true,
+      "started_at": "2026-10-24T03:24:16.052436+00:00",
+      "business_validation": {
+        "status": "NOT_RUN",
+        "test_count": 0,
+        "limitations": [
+          "SCHEMA_ACL_ROW_LOCK_AND_INITIAL_REVISION_ONLY",
+          "NO_HTTP_RENDERING_SCANNER_DELIVERY_OR_MONITORING_COLLECTION_ACCEPTANCE"
+        ]
+      },
+      "schema_source": "mop_test",
+      "inherited_versions": 50,
+      "inherited_history_sha256": "6fa366487907d87627afb9775740ee68b5d671acb91f829c533f2b1ce2509a69",
+      "inherited_history_reexecuted": false,
+      "schema_only_sha256": "c4a52f43d42e363a6d7960b7dd6495eb59fcd39a392c802e106fcb3e115ac9f5",
+      "metadata_tables_copied": [
+        "flyway_schema_history",
+        "mop_role_capability_limit"
+      ],
+      "business_rows_copied": 0,
+      "empty_public_schema_reused_without_drop": true,
+      "restored_schema_sha256": "04e5cf1a8445b35bf9b19d961824117a87126498fcd5eab3e9429acd8d93440d",
+      "empty_business_tables_verified": 109,
+      "clone_status": "PASSED",
+      "test_class": "CandidateSchemaChainPostgresTest",
+      "test_module": "server/persistence",
+      "java_launch_requested": true,
+      "java_started": true,
+      "java_process_completed": true,
+      "maven_exit_code": 0,
+      "junit": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "observed_history_sha256": "5f5438da50ca8d69893deb1edff5cd1f485096313c58dea6f175cc31520807c3",
+      "observed_history_rows": 51,
+      "observed_candidates": [
+        {
+          "version": "51",
+          "script": "V51__notification_routing_control.sql",
+          "flyway_checksum": -930297811,
+          "installed_at": "2026-10-23 23:24:34.839676",
+          "success": true,
+          "resource_sha256": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b"
+        }
+      ],
+      "freeze_required_versions": [
+        "51"
+      ],
+      "java_evidence": "java-evidence.json",
+      "pools_closed": true,
+      "migrations": [
+        {
+          "version": "51",
+          "script": "V51__notification_routing_control.sql",
+          "sha256": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b",
+          "apply_executed": 1,
+          "repeat_executed": 0,
+          "history_status": "APPLIED_FROZEN",
+          "history_script": "V51__notification_routing_control.sql",
+          "flyway_checksum": -930297811,
+          "installed_on": "2026-10-23 23:24:34.839676",
+          "history_success": true,
+          "schema_verifier": "PASSED"
+        }
+      ],
+      "schema_validation": {
+        "status": "PASSED",
+        "checks": [
+          {
+            "immutable_update_sql_state": "23514",
+            "nonempty_share_lock": true,
+            "row_unchanged_after_rejected_update": true,
+            "table_update_granted": false,
+            "nonempty_update_lock": true,
+            "root_column_update_only": "root_version",
+            "table": "mop_notification_control",
+            "first_revision_inserted": true,
+            "revision_count": 1
+          }
+        ]
+      },
+      "finished_at": "2026-10-24T03:24:42.163173+00:00",
+      "retention_policy": "RETAIN_DATABASES_NO_DROP",
+      "database_removed": false,
+      "open_connections_at_retention_check": 0,
+      "retained_owner_marker_verified": true,
+      "cleanup_history_evidence": {
+        "file": "cleanup-history-evidence.json",
+        "sha256": "c3b07bef8791b9cfdf427b9c714c295a8f4c4b5a504358ca60acdb22873bd7e1",
+        "bytes": 1334,
+        "fsynced_and_readback_verified": true
+      },
+      "cleanup_history_status": "DETERMINATE",
+      "cleanup_freeze_required_versions": [
+        "51"
+      ],
+      "own_java_connections_closed": true,
+      "cleanup": "RETAINED_BY_POLICY",
+      "required_action": "Keep this owned validation database; no cleanup was requested or performed"
+    },
+    {
+      "stage": "P02",
+      "prefix": "mop_attachment_test_",
+      "database": "mop_attachment_test_de85f810020d",
+      "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:P02:0daf8d8d617940d7a98db5f6371a9ae1",
+      "database_owner": "mop_test_migrator",
+      "versions": [
+        52
+      ],
+      "status": "SCHEMA_VALIDATED_BUSINESS_NOT_RUN",
+      "created": true,
+      "started_at": "2026-10-24T03:24:42.183022+00:00",
+      "business_validation": {
+        "test_count": 0,
+        "status": "NOT_RUN",
+        "limitations": [
+          "SCHEMA_ACL_ROW_LOCK_AND_INITIAL_REVISION_ONLY",
+          "NO_HTTP_RENDERING_SCANNER_DELIVERY_OR_MONITORING_COLLECTION_ACCEPTANCE"
+        ]
+      },
+      "schema_source": "mop_notification_test_59ca183a056d",
+      "inherited_versions": 51,
+      "inherited_history_sha256": "5f5438da50ca8d69893deb1edff5cd1f485096313c58dea6f175cc31520807c3",
+      "inherited_history_reexecuted": false,
+      "schema_only_sha256": "61d5a98f0856fbb250665bc72e125645e1afb5542536b44afd263797164bd3eb",
+      "metadata_tables_copied": [
+        "flyway_schema_history",
+        "mop_role_capability_limit"
+      ],
+      "business_rows_copied": 0,
+      "empty_public_schema_reused_without_drop": true,
+      "restored_schema_sha256": "d7b531640573927be13821693874a5ecfbc04196e9fb0d100e8179eaed6aa426",
+      "empty_business_tables_verified": 110,
+      "clone_status": "PASSED",
+      "test_class": "CandidateSchemaChainPostgresTest",
+      "test_module": "server/persistence",
+      "java_launch_requested": true,
+      "java_started": true,
+      "java_process_completed": true,
+      "maven_exit_code": 0,
+      "junit": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "observed_history_sha256": "9e75d15e1158f379f3886a61d85411e83300f2c8b8e1b3311690da6da9357742",
+      "observed_history_rows": 52,
+      "observed_candidates": [
+        {
+          "version": "52",
+          "script": "V52__attachment_security_journal.sql",
+          "flyway_checksum": 1826628147,
+          "installed_at": "2026-10-23 23:25:00.841435",
+          "success": true,
+          "resource_sha256": "ca8140bb6f6958408a7683d41ccb9ba0a03657bcfe3fb76f3f6fede361d103ef"
+        }
+      ],
+      "freeze_required_versions": [
+        "52"
+      ],
+      "java_evidence": "java-evidence.json",
+      "pools_closed": true,
+      "migrations": [
+        {
+          "version": "52",
+          "script": "V52__attachment_security_journal.sql",
+          "sha256": "ca8140bb6f6958408a7683d41ccb9ba0a03657bcfe3fb76f3f6fede361d103ef",
+          "apply_executed": 1,
+          "repeat_executed": 0,
+          "history_status": "APPLIED_FROZEN",
+          "history_script": "V52__attachment_security_journal.sql",
+          "flyway_checksum": 1826628147,
+          "installed_on": "2026-10-23 23:25:00.841435",
+          "history_success": true,
+          "schema_verifier": "PASSED"
+        }
+      ],
+      "schema_validation": {
+        "status": "PASSED",
+        "checks": [
+          {
+            "owner_immutable_update_sql_state": "23514",
+            "nonempty_parent_share_lock": true,
+            "external_scanner_validation": "NOT_RUN",
+            "runtime_update_denied_sql_state": "42501",
+            "table": "mop_attachment_security_revision",
+            "first_revision_inserted": true,
+            "nonempty_parent_update_lock": true,
+            "revision_count": 1
+          }
+        ]
+      },
+      "finished_at": "2026-10-24T03:25:08.160324+00:00",
+      "retention_policy": "RETAIN_DATABASES_NO_DROP",
+      "database_removed": false,
+      "open_connections_at_retention_check": 0,
+      "retained_owner_marker_verified": true,
+      "cleanup_history_evidence": {
+        "file": "cleanup-history-evidence.json",
+        "sha256": "54bf6864269ec4e3882d52903dc756f0ce6c8b06e5e73ef96f5d4c81b0ac4e43",
+        "bytes": 1329,
+        "fsynced_and_readback_verified": true
+      },
+      "cleanup_history_status": "DETERMINATE",
+      "cleanup_freeze_required_versions": [
+        "52"
+      ],
+      "own_java_connections_closed": true,
+      "cleanup": "RETAINED_BY_POLICY",
+      "required_action": "Keep this owned validation database; no cleanup was requested or performed"
+    },
+    {
+      "stage": "R02",
+      "prefix": "mop_report_test_",
+      "database": "mop_report_test_449b59f37319",
+      "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:R02:a979bbeaf7494742a773273953c55216",
+      "database_owner": "mop_test_migrator",
+      "versions": [
+        53
+      ],
+      "status": "SCHEMA_VALIDATED_BUSINESS_NOT_RUN",
+      "created": true,
+      "started_at": "2026-10-24T03:25:08.180343+00:00",
+      "business_validation": {
+        "status": "NOT_RUN",
+        "test_count": 0,
+        "limitations": [
+          "SCHEMA_ACL_ROW_LOCK_AND_INITIAL_REVISION_ONLY",
+          "NO_HTTP_RENDERING_SCANNER_DELIVERY_OR_MONITORING_COLLECTION_ACCEPTANCE"
+        ]
+      },
+      "schema_source": "mop_attachment_test_de85f810020d",
+      "inherited_versions": 52,
+      "inherited_history_sha256": "9e75d15e1158f379f3886a61d85411e83300f2c8b8e1b3311690da6da9357742",
+      "inherited_history_reexecuted": false,
+      "schema_only_sha256": "21ebed6d94510c5529dcae5c455dad38f3d474ed9b70dfb07678f7e000311148",
+      "metadata_tables_copied": [
+        "flyway_schema_history",
+        "mop_role_capability_limit"
+      ],
+      "business_rows_copied": 0,
+      "empty_public_schema_reused_without_drop": true,
+      "restored_schema_sha256": "00a8827ba02ccfe7df4119dbb115e19c61855b4d5d0b78cbe51455c51bee788a",
+      "empty_business_tables_verified": 111,
+      "clone_status": "PASSED",
+      "test_class": "CandidateSchemaChainPostgresTest",
+      "test_module": "server/persistence",
+      "java_launch_requested": true,
+      "java_started": true,
+      "java_process_completed": true,
+      "maven_exit_code": 0,
+      "junit": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "observed_history_sha256": "0f4141b0c23bf250f8f29b6e6707154e1e453db200804a47384ade232e35e384",
+      "observed_history_rows": 53,
+      "observed_candidates": [
+        {
+          "version": "53",
+          "script": "V53__report_publication_journal.sql",
+          "flyway_checksum": 1372829874,
+          "installed_at": "2026-10-23 23:25:26.927154",
+          "success": true,
+          "resource_sha256": "b9ee9c9724b3bd4156799058ee24876c04e59d413180f4df4db2d5673f4faddb"
+        }
+      ],
+      "freeze_required_versions": [
+        "53"
+      ],
+      "java_evidence": "java-evidence.json",
+      "pools_closed": true,
+      "migrations": [
+        {
+          "version": "53",
+          "script": "V53__report_publication_journal.sql",
+          "sha256": "b9ee9c9724b3bd4156799058ee24876c04e59d413180f4df4db2d5673f4faddb",
+          "apply_executed": 1,
+          "repeat_executed": 0,
+          "history_status": "APPLIED_FROZEN",
+          "history_script": "V53__report_publication_journal.sql",
+          "flyway_checksum": 1372829874,
+          "installed_on": "2026-10-23 23:25:26.927154",
+          "history_success": true,
+          "schema_verifier": "PASSED"
+        }
+      ],
+      "schema_validation": {
+        "status": "PASSED",
+        "checks": [
+          {
+            "table": "mop_report_publication_document",
+            "immutable_update_sql_state": "P0001",
+            "nonempty_share_lock": true,
+            "row_unchanged_after_rejected_update": true,
+            "table_update_granted": false,
+            "nonempty_update_lock": true,
+            "root_column_update_only": "id",
+            "first_revision_inserted": true,
+            "revision_count": 1
+          }
+        ]
+      },
+      "finished_at": "2026-10-24T03:25:35.765783+00:00",
+      "retention_policy": "RETAIN_DATABASES_NO_DROP",
+      "database_removed": false,
+      "open_connections_at_retention_check": 0,
+      "retained_owner_marker_verified": true,
+      "cleanup_history_evidence": {
+        "file": "cleanup-history-evidence.json",
+        "sha256": "ab280bb821dcba926767e9369e2a5594fa31fefb229b2f7059de90093137a427",
+        "bytes": 1322,
+        "fsynced_and_readback_verified": true
+      },
+      "cleanup_history_status": "DETERMINATE",
+      "cleanup_freeze_required_versions": [
+        "53"
+      ],
+      "own_java_connections_closed": true,
+      "cleanup": "RETAINED_BY_POLICY",
+      "required_action": "Keep this owned validation database; no cleanup was requested or performed"
+    },
+    {
+      "stage": "M02",
+      "prefix": "mop_monitoring_test_",
+      "database": "mop_monitoring_test_554a57478666",
+      "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:M02:bbd0675fb4dd4632a04f8449d7af73a3",
+      "database_owner": "mop_test_migrator",
+      "versions": [
+        54,
+        55
+      ],
+      "status": "SCHEMA_VALIDATED_BUSINESS_NOT_RUN",
+      "created": true,
+      "started_at": "2026-10-24T03:25:35.785721+00:00",
+      "business_validation": {
+        "status": "NOT_RUN",
+        "test_count": 0,
+        "limitations": [
+          "SCHEMA_ACL_ROW_LOCK_AND_INITIAL_REVISION_ONLY",
+          "NO_HTTP_RENDERING_SCANNER_DELIVERY_OR_MONITORING_COLLECTION_ACCEPTANCE"
+        ]
+      },
+      "schema_source": "mop_report_test_449b59f37319",
+      "inherited_versions": 53,
+      "inherited_history_sha256": "0f4141b0c23bf250f8f29b6e6707154e1e453db200804a47384ade232e35e384",
+      "inherited_history_reexecuted": false,
+      "schema_only_sha256": "73b4dc4ad11cc38af04ee42741b0ee9f615de4a3c5dd459bb455c80c94f7e819",
+      "metadata_tables_copied": [
+        "flyway_schema_history",
+        "mop_role_capability_limit"
+      ],
+      "business_rows_copied": 0,
+      "empty_public_schema_reused_without_drop": true,
+      "restored_schema_sha256": "292b95acda51d3dbf2ead2e7face5e32485f6677d326f83f47c7232197241999",
+      "empty_business_tables_verified": 116,
+      "clone_status": "PASSED",
+      "test_class": "CandidateSchemaChainPostgresTest",
+      "test_module": "server/persistence",
+      "java_launch_requested": true,
+      "java_started": true,
+      "java_process_completed": true,
+      "maven_exit_code": 0,
+      "junit": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "observed_history_sha256": "181bd210fe9503f9db3fc07ec7fc21acc4b95ccddb3e93c4a02f10ae13e9d21b",
+      "observed_history_rows": 55,
+      "observed_candidates": [
+        {
+          "version": "54",
+          "script": "V54__monitoring_enrollment_journal.sql",
+          "flyway_checksum": -1111795243,
+          "installed_at": "2026-10-23 23:25:54.899993",
+          "success": true,
+          "resource_sha256": "447bc4441943dbd3df4ead06915b4c05697dffb8c30cde6524009575c2ab3dc2"
+        },
+        {
+          "version": "55",
+          "script": "V55__monitoring_object_mapping_journal.sql",
+          "flyway_checksum": -2145594074,
+          "installed_at": "2026-10-23 23:26:03.548367",
+          "success": true,
+          "resource_sha256": "e55960373428ad10c95fd08d731c349666c92f85f521371de99dbe11600ad36e"
+        }
+      ],
+      "freeze_required_versions": [
+        "54",
+        "55"
+      ],
+      "java_evidence": "java-evidence.json",
+      "pools_closed": true,
+      "migrations": [
+        {
+          "version": "54",
+          "script": "V54__monitoring_enrollment_journal.sql",
+          "sha256": "447bc4441943dbd3df4ead06915b4c05697dffb8c30cde6524009575c2ab3dc2",
+          "apply_executed": 1,
+          "repeat_executed": 0,
+          "history_status": "APPLIED_FROZEN",
+          "history_script": "V54__monitoring_enrollment_journal.sql",
+          "flyway_checksum": -1111795243,
+          "installed_on": "2026-10-23 23:25:54.899993",
+          "history_success": true,
+          "schema_verifier": "PASSED"
+        },
+        {
+          "version": "55",
+          "script": "V55__monitoring_object_mapping_journal.sql",
+          "sha256": "e55960373428ad10c95fd08d731c349666c92f85f521371de99dbe11600ad36e",
+          "apply_executed": 1,
+          "repeat_executed": 0,
+          "history_status": "APPLIED_FROZEN",
+          "history_script": "V55__monitoring_object_mapping_journal.sql",
+          "flyway_checksum": -2145594074,
+          "installed_on": "2026-10-23 23:26:03.548367",
+          "history_success": true,
+          "schema_verifier": "PASSED"
+        }
+      ],
+      "schema_validation": {
+        "status": "PASSED",
+        "checks": [
+          {
+            "row_unchanged_after_rejected_update": true,
+            "table_update_granted": false,
+            "nonempty_update_lock": true,
+            "root_column_update_only": "id",
+            "table": "mop_monitoring_enrollment",
+            "immutable_update_sql_state": "P0001",
+            "nonempty_share_lock": true,
+            "first_revision_inserted": true,
+            "revision_count": 1,
+            "targets_enabled": false
+          },
+          {
+            "row_unchanged_after_rejected_update": true,
+            "table_update_granted": false,
+            "nonempty_update_lock": true,
+            "root_column_update_only": "id",
+            "table": "mop_monitoring_object_binding",
+            "immutable_update_sql_state": "P0001",
+            "nonempty_share_lock": true,
+            "first_revision_inserted": true,
+            "revision_count": 1,
+            "mapping_activated": false
+          }
+        ]
+      },
+      "finished_at": "2026-10-24T03:26:11.884098+00:00",
+      "retention_policy": "RETAIN_DATABASES_NO_DROP",
+      "database_removed": false,
+      "open_connections_at_retention_check": 0,
+      "retained_owner_marker_verified": true,
+      "cleanup_history_evidence": {
+        "file": "cleanup-history-evidence.json",
+        "sha256": "636ab1c364712f59bc6b2a8e83af06113de3e29235e13f86bd122dea7c6d3fe6",
+        "bytes": 2115,
+        "fsynced_and_readback_verified": true
+      },
+      "cleanup_history_status": "DETERMINATE",
+      "cleanup_freeze_required_versions": [
+        "54",
+        "55"
+      ],
+      "own_java_connections_closed": true,
+      "cleanup": "RETAINED_BY_POLICY",
+      "required_action": "Keep this owned validation database; no cleanup was requested or performed"
+    }
+  ],
+  "live_database_migrated": false,
+  "active_database": "mop_test",
+  "business_rows_copied": 0,
+  "external_messages": 0,
+  "new_services": 0,
+  "roles_created_or_changed": 0,
+  "business_integration_status": "NOT_RUN",
+  "coordination_scope": "LOCAL_HOST_LOCKS_ONLY; no claim of coordination with other hosts",
+  "environment_lock_release_confirms_jvm_termination": false,
+  "retention_policy": "RETAIN_DATABASES_NO_DROP",
+  "formal_contract_acceptance": "NOT_RUN",
+  "cleanup_complete": false,
+  "environment_lock_released": true,
+  "migration_resources": {
+    "1": {
+      "script": "V1__remote_test_platform.sql",
+      "sha256": "1a0fbebcd4d32e899e8d344007ac7ed060550e1deaa04e02706a19210aaf1063"
+    },
+    "2": {
+      "script": "V2__tenant_configuration_revisions.sql",
+      "sha256": "1894b9807a3384bc1818af7019318fbe43cafe2a9656ad163e127a808b638626"
+    },
+    "3": {
+      "script": "V3__configuration_review_test_identity.sql",
+      "sha256": "cbcebf62edb25ce83c47f048efa5fba2f61b11a69a4b43639725dbe450f42237"
+    },
+    "4": {
+      "script": "V4__durable_customer_report_registration.sql",
+      "sha256": "4fefc7470369fa4c4c78318b6e990935e7483fd3d4b3a8a2cd215f58af2567d8"
+    },
+    "5": {
+      "script": "V5__durable_report_photos.sql",
+      "sha256": "5a84f62bdaab9badfd5d87f4d30ae0ac1f9c1ae2f48d0d84e0635485a7bbdc55"
+    },
+    "6": {
+      "script": "V6__asset_import_sources_and_mapping.sql",
+      "sha256": "1f532822668274b7aebd12ea78b57e6be0aa9fd53ceb77023ee8067589cd2b4b"
+    },
+    "7": {
+      "script": "V7__asset_dependency_draft_revisions.sql",
+      "sha256": "5a8ce8d49fe948fc0e9586c102f7c8bfc46cb975a0b5d9f32d4bd1ccc72670bb"
+    },
+    "8": {
+      "script": "V8__manual_worklog_revisions.sql",
+      "sha256": "942ea4dc88a8169b40662edcfd89871e8280a429ac922bd0cc1eb451b82ad2f8"
+    },
+    "9": {
+      "script": "V9__manual_asset_metadata_revisions.sql",
+      "sha256": "a311d8ea11516bb60f2375cafd02b293beb904d07c03c890653dd5bb3751412c"
+    },
+    "10": {
+      "script": "V10__immutable_internal_ticket_notes.sql",
+      "sha256": "ba1ad02e7df8079936288d8712a84062a5bd695885b1e45daacec9f4d35ad198"
+    },
+    "11": {
+      "script": "V11__immutable_ticket_comments.sql",
+      "sha256": "d8535bbf13ca9e35c115278f36232a786b4562c99cc9afd9f5195a416028a8e3"
+    },
+    "12": {
+      "script": "V12__unpublished_working_calendar_drafts.sql",
+      "sha256": "e6e0412e8a96936a6f4e09dc9f96431cd6551dd9c15ebaf7d2ed414467aedb1a"
+    },
+    "13": {
+      "script": "V13__immutable_manual_incident_registrations.sql",
+      "sha256": "80734d0a0dcd436a3008ed76af0b7da3e81956f516a25d778c0717df79665700"
+    },
+    "14": {
+      "script": "V14__immutable_manual_recovery_confirmations.sql",
+      "sha256": "39be55d8759de87c6e2b8f85b3958c60be24ae9e6ece2deb5d849c225050ed72"
+    },
+    "15": {
+      "script": "V15__manual_warranty_details.sql",
+      "sha256": "317b865df601888f2d6ea5324415f469acdeaea4c2b49b6c837fef9954a30baf"
+    },
+    "16": {
+      "script": "V16__immutable_capacity_scenario_drafts.sql",
+      "sha256": "74f095f56ca8735ef6d97405908aa523b554e76316acca052eeaa3cbbe010d05"
+    },
+    "17": {
+      "script": "V17__customer_contact_revisions.sql",
+      "sha256": "3e7d2f89729682f9a51d0ccf4be9738ac25421d94738943d3d5f06461417a10b"
+    },
+    "18": {
+      "script": "V18__durable_contact_import_jobs.sql",
+      "sha256": "75325f0423f788d5a71b71e0b1c8ba3b5c30e628aa3c588437f671954cbb39e9"
+    },
+    "19": {
+      "script": "V19__contact_import_generated_hash_guard.sql",
+      "sha256": "b84a80aa548a7c2d7d3050bb983214353cd3e1951f5d3ac1b04b413cedc2cdc7"
+    },
+    "20": {
+      "script": "V20__durable_asset_export_jobs.sql",
+      "sha256": "5f8114dcdd2bd1cdf0c60fb75a5b521175462f583786602cd2b4a1835f960a83"
+    },
+    "21": {
+      "script": "V21__inspection_template_revisions.sql",
+      "sha256": "85cf043f55b72fa1c06919ccf53705b516643468b97285980d436c3b78a4145b"
+    },
+    "22": {
+      "script": "V22__manual_inspection_worksheet_drafts.sql",
+      "sha256": "ab3f98ddf1c8803b8398347b9bc7d36af8d9741abdcb7591f29f1a2810791dc3"
+    },
+    "23": {
+      "script": "V23__immutable_inspection_source_collections.sql",
+      "sha256": "eabc4cf2512cdea920acf97ba1991499fde9d0901c7b91b5a8cc7b51f13599e8"
+    },
+    "24": {
+      "script": "V24__unpublished_backup_plan_drafts.sql",
+      "sha256": "3b28fe6679d787faafdf0d5ea175712ec622b5017c103650cfa42ff12c73816a"
+    },
+    "25": {
+      "script": "V25__unreviewed_change_notice_drafts.sql",
+      "sha256": "650ce8f83e9fc673cfb6a4838872638149650f735a90f37c5861a6fce771bc67"
+    },
+    "26": {
+      "script": "V26__own_notification_preference_drafts.sql",
+      "sha256": "df3c59cc6c241316b110ae87b3cb7a80aee57b4847f4122e7786b90ac94c23d8"
+    },
+    "27": {
+      "script": "V27__project_identity_and_roles.sql",
+      "sha256": "41e5060d4925e7c8ea761539e4695a6ea5792743240363a7d5f50f24bcb59566"
+    },
+    "28": {
+      "script": "V28__identity_inventory_and_password_formats.sql",
+      "sha256": "5554e23a3aabfe489ae6b9258293d0f33dda0bcc7da19c60bdb873fb16b77ad7"
+    },
+    "29": {
+      "script": "V29__immutable_raw_monitoring_events.sql",
+      "sha256": "2f67b28791d2533934153227a98d6e09aec4e16c7405d4408e9956a9d853e8c3"
+    },
+    "30": {
+      "script": "V30__immutable_monitoring_quarantine.sql",
+      "sha256": "2c13cd68b1d7aff016644266c723c72330868fd6e368f6f19b9fceb17025827f"
+    },
+    "31": {
+      "script": "V31__own_export_inbox.sql",
+      "sha256": "60ae717f032c61fd7cbed98a0ffd15d9df514c501d143ecadc337e8f56a388dc"
+    },
+    "32": {
+      "script": "V32__runtime_configuration_publications.sql",
+      "sha256": "657c0d50e47b3da715265a563af857287337fc923774fd98b4a6b40b8cad0c82"
+    },
+    "33": {
+      "script": "V33__ticket_lifecycle_and_durable_clocks.sql",
+      "sha256": "b867a5756bcda84128dd9d9570bf4bd07ee43714e0508acd0dd95c042cc1ba5f"
+    },
+    "34": {
+      "script": "V34__ticket_notification_intents.sql",
+      "sha256": "7951a0abb91fd94ae6ba3a1b5769e32780b23b08720e2bd17851c64f256cdb51"
+    },
+    "35": {
+      "script": "V35__service_tiers_and_change_history.sql",
+      "sha256": "f8bf2639d6ebb467a0d515147307ceb2e13c425b2337cbad69c88eee91330ed0"
+    },
+    "36": {
+      "script": "V36__oncall_escalation_and_sla_monthly_results.sql",
+      "sha256": "52f43d3f5eb43967ac8ff895da9b5503d2e1e83fc29d52adea2ce6076ab7c0cb"
+    },
+    "37": {
+      "script": "V37__monitoring_events_noise_funnel_and_maintenance_windows.sql",
+      "sha256": "f6f9cc88bcbc4dcbaf1a76a849aa78ed2cf7af91e7fd9b5c80dbde4d9b9ab351"
+    },
+    "38": {
+      "script": "V38__wecom_bindings_deliveries_and_login_state.sql",
+      "sha256": "32dc38c2dab0ad385f79e9e7c886c456c06664f8b740c496a8af7bf2d9e9c0fb"
+    },
+    "39": {
+      "script": "V39__email_bindings_and_delivery_ledger.sql",
+      "sha256": "3d1b4cd557b6c367b2a36e9f49a2154d8a925a8afe249c103cd59373f32a6dea"
+    },
+    "40": {
+      "script": "V40__immutable_change_notice_approval_events.sql",
+      "sha256": "a24085a280ff822da932904c20cb3189fd813ef1d6ddc2f5458723ba48025756"
+    },
+    "41": {
+      "script": "V41__immutable_inspection_quarterly_reports.sql",
+      "sha256": "54b9bd1d0995a248191e8f8f7dafe35fafd7d4ec15699a2ca8a49a7a025c7aa2"
+    },
+    "42": {
+      "script": "V42__ticket_lifecycle_revisions.sql",
+      "sha256": "01923cef9be16d7445b8aa4ada7ee564ad0210a21bad59edca17eb48e9a908e9"
+    },
+    "43": {
+      "script": "V43__ticket_autoclose_jobs.sql",
+      "sha256": "0b3bf01db63bcae757c4b80ba9f10979c342ae95dd339121ce91a979553e47e4"
+    },
+    "44": {
+      "script": "V44__ticket_sla_policy_bindings.sql",
+      "sha256": "f249f843c35eb547da719036db3f35d0168f89cb971a85ddf084191a3c632600"
+    },
+    "45": {
+      "script": "V45__sla_reminder_intents.sql",
+      "sha256": "d9626559c8a74299a703a094689e3dcf153cc54ec139a685d2cad1c7ebbd7507"
+    },
+    "46": {
+      "script": "V46__backup_device_coordination_journal.sql",
+      "sha256": "97d4dec874c03503326fbb609ea1708fa6601fd257fb664ca74cad7fa2032f98"
+    },
+    "47": {
+      "script": "V47__backup_run_event_journal.sql",
+      "sha256": "5ca80f0715369d45b3a7606fb411e962576a15d9f49b8921a70a2c1d0af12f0c"
+    },
+    "48": {
+      "script": "V48__durable_backup_archive_staging.sql",
+      "sha256": "3dcb7d51572b6bad4d655e7814ba9d8b1d3f312b7ea23ad4a8753d1355e310da"
+    },
+    "49": {
+      "script": "V49__atomic_backup_version_registration.sql",
+      "sha256": "67e196ea9e9b6a9586fbae9cf47a040f34bf975e02033793a8d96fc0d60dbf60"
+    },
+    "50": {
+      "script": "V50__delivery_receipt_journal.sql",
+      "sha256": "93813aa97fcb4c19e00f664a91c1f732f51e5eb9e34ec8c35e5938b817cbff36"
+    },
+    "51": {
+      "script": "V51__notification_routing_control.sql",
+      "sha256": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b"
+    },
+    "52": {
+      "script": "V52__attachment_security_journal.sql",
+      "sha256": "ca8140bb6f6958408a7683d41ccb9ba0a03657bcfe3fb76f3f6fede361d103ef"
+    },
+    "53": {
+      "script": "V53__report_publication_journal.sql",
+      "sha256": "b9ee9c9724b3bd4156799058ee24876c04e59d413180f4df4db2d5673f4faddb"
+    },
+    "54": {
+      "script": "V54__monitoring_enrollment_journal.sql",
+      "sha256": "447bc4441943dbd3df4ead06915b4c05697dffb8c30cde6524009575c2ab3dc2"
+    },
+    "55": {
+      "script": "V55__monitoring_object_mapping_journal.sql",
+      "sha256": "e55960373428ad10c95fd08d731c349666c92f85f521371de99dbe11600ad36e"
+    }
+  },
+  "migration_lock_verified": {
+    "owner": "review-v53-v55-25a17013",
+    "session": "local-astra-ut-20261023",
+    "document_sha256": "02182c421ef48fff966025fb4b7610b9016f7d7b2ea972982131c0f19cf0a8c3"
+  },
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "active_history_before_sha256": "6fa366487907d87627afb9775740ee68b5d671acb91f829c533f2b1ce2509a69",
+  "active_schema_version_before": "50",
+  "active_candidate_objects_absent_before": true,
+  "protected_fingerprint_scope": {
+    "tenant_id": "55000000-0000-4000-8000-000000000001",
+    "tables": [
+      "mop_asset",
+      "mop_asset_manual_details",
+      "mop_asset_manual_revision",
+      "mop_inspection_quarterly_report",
+      "mop_inspection_source_collection",
+      "mop_inspection_source_collection_item",
+      "mop_inspection_worksheet",
+      "mop_inspection_worksheet_revision",
+      "mop_membership",
+      "mop_ticket",
+      "mop_ticket_lifecycle_revision",
+      "mop_ticket_workflow_event"
+    ],
+    "other_tenants_included": false,
+    "comparison_kind": "BEFORE_AFTER_POINT_IN_TIME_DIGESTS",
+    "difference_attribution": "UNDETERMINED_IF_DIFFERENT; concurrent external changes are not attributed to this tool"
+  },
+  "active_schema_version_after": "50",
+  "active_history_after_sha256": "6fa366487907d87627afb9775740ee68b5d671acb91f829c533f2b1ce2509a69",
+  "active_candidate_objects_absent_after": true,
+  "active_exact_v50_after": true,
+  "active_history_unchanged": true,
+  "active_capabilities_unchanged": true,
+  "protected_fingerprints_unchanged": true,
+  "retained_database_checks_passed": true,
+  "finished_at": "2026-10-24T03:26:16.456125+00:00",
+  "possible_live_jvm_stages": [],
+  "retained_owned_databases": [
+    {
+      "stage": "N01",
+      "database": "mop_notification_test_59ca183a056d",
+      "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:N01:e8275c231eaa4f6e896ad4135a7d144e",
+      "reason": "RETAINED_BY_POLICY"
+    },
+    {
+      "stage": "P02",
+      "database": "mop_attachment_test_de85f810020d",
+      "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:P02:0daf8d8d617940d7a98db5f6371a9ae1",
+      "reason": "RETAINED_BY_POLICY"
+    },
+    {
+      "stage": "R02",
+      "database": "mop_report_test_449b59f37319",
+      "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:R02:a979bbeaf7494742a773273953c55216",
+      "reason": "RETAINED_BY_POLICY"
+    },
+    {
+      "stage": "M02",
+      "database": "mop_monitoring_test_554a57478666",
+      "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:M02:bbd0675fb4dd4632a04f8449d7af73a3",
+      "reason": "RETAINED_BY_POLICY"
+    }
+  ],
+  "required_action": "Databases intentionally retained for review; no deletion was requested or performed",
+  "evidence_write_failures": []
+}

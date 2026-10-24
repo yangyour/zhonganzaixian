@@ -1,0 +1,18 @@
+{
+  "status": "PASSED",
+  "read_only": true,
+  "ddl_applied": 0,
+  "candidate_owner": "review-v53-v55-25a17013",
+  "databases": [
+    {
+      "name": "mop_test",
+      "latest": "50",
+      "rows": 50,
+      "history_sha256": "9e521446d1999642f0380e37f71d0fd3b758b92bd82db2f8643ebe727ccf3aa3"
+    }
+  ],
+  "admin_project_namespace_creation_available": true,
+  "matching_project_databases_checked": 1,
+  "v52_v55_history_observed": false,
+  "checked_at": "2026-10-24T02:41:21.452427+00:00"
+}

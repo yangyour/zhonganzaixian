@@ -1,0 +1,54 @@
+{
+  "checked_at": "2026-10-24T03:23:14.910677+00:00",
+  "main": "a0dc70afcbe8e70730f194c8f4fdb505665629eb",
+  "remote_refs": 63,
+  "variants": [
+    {
+      "path": "server/persistence/src/main/resources/db/migration/V51__notification_routing_control.sql",
+      "refs": [
+        "origin/codex/local-astra-ut-upstream-batch-20261023",
+        "origin/dot/development-closeout-20261024",
+        "origin/main",
+        "origin/wip/20261023-notifications-n01-n02"
+      ],
+      "sha256": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b"
+    },
+    {
+      "path": "server/persistence/src/main/resources/db/migration/V52__attachment_security_journal.sql",
+      "refs": [
+        "origin/codex/local-astra-ut-upstream-batch-20261023",
+        "origin/dot/development-closeout-20261024",
+        "origin/main"
+      ],
+      "sha256": "ca8140bb6f6958408a7683d41ccb9ba0a03657bcfe3fb76f3f6fede361d103ef"
+    },
+    {
+      "path": "server/persistence/src/main/resources/db/migration/V53__report_publication_journal.sql",
+      "refs": [
+        "origin/codex/local-astra-ut-upstream-batch-20261023",
+        "origin/dot/development-closeout-20261024",
+        "origin/main"
+      ],
+      "sha256": "42ecf93f54017057db3caf27ac6b4670084866466c3ed1d9d329c362c0ab95a7"
+    },
+    {
+      "path": "server/persistence/src/main/resources/db/migration/V54__monitoring_enrollment_journal.sql",
+      "refs": [
+        "origin/codex/local-astra-ut-upstream-batch-20261023",
+        "origin/dot/development-closeout-20261024",
+        "origin/main"
+      ],
+      "sha256": "d242e8e482b8a5a08fe47ea2579ea1b9e98596d95834576bac93f0638ced5fb1"
+    },
+    {
+      "path": "server/persistence/src/main/resources/db/migration/V55__monitoring_object_mapping_journal.sql",
+      "refs": [
+        "origin/codex/local-astra-ut-upstream-batch-20261023",
+        "origin/dot/development-closeout-20261024",
+        "origin/main"
+      ],
+      "sha256": "03bf7bcc280c0054ad8e52b1d2ff2aa8cafff921a282f2edef04a890faa1b01b"
+    }
+  ],
+  "applied_claim": false
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "stage": "N01",
+  "database": "mop_notification_test_59ca183a056d",
+  "database_owner": "mop_test_migrator",
+  "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:N01:e8275c231eaa4f6e896ad4135a7d144e",
+  "observed_at": "2026-10-24T03:26:13.077588+00:00",
+  "source": "FINAL_READ_ONLY_DATABASE_HISTORY",
+  "migrations": [
+    {
+      "version": "51",
+      "history_status": "APPLIED_FROZEN",
+      "resource_sha256": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b",
+      "resource_script": "V51__notification_routing_control.sql",
+      "resource_hash_basis": "PRE_RUN_PINNED_WORKSPACE_RESOURCE",
+      "history_rows": [
+        {
+          "installed_rank": 51,
+          "version": "51",
+          "description": "notification routing control",
+          "type": "SQL",
+          "script": "V51__notification_routing_control.sql",
+          "checksum": -930297811,
+          "installed_by": "mop_test_migrator",
+          "installed_on": "2026-10-23 23:24:34.839676",
+          "execution_time": 599,
+          "success": true
+        }
+      ]
+    }
+  ],
+  "status": "DETERMINATE",
+  "business_validation": "NOT_RUN",
+  "history_determinate_for_cleanup": true,
+  "history_gate_is_not_user_cleanup_authorization": true,
+  "freeze_required_versions": [
+    "51"
+  ]
+}

@@ -94,4 +94,6 @@ CREATE TRIGGER mop_monitoring_enrollment_document_guard BEFORE INSERT OR UPDATE 
 CREATE TRIGGER mop_monitoring_enrollment_revision_guard BEFORE INSERT OR UPDATE OR DELETE ON public.mop_monitoring_enrollment_revision FOR EACH ROW EXECUTE FUNCTION public.mop_monitoring_enrollment_guard();
 REVOKE ALL ON public.mop_monitoring_enrollment,public.mop_monitoring_enrollment_revision FROM PUBLIC,mop_test_runtime;
 GRANT SELECT,INSERT ON public.mop_monitoring_enrollment,public.mop_monitoring_enrollment_revision TO mop_test_runtime;
+-- Row locking requires one column's UPDATE privilege; the immutable trigger rejects every actual UPDATE.
+GRANT UPDATE(id) ON public.mop_monitoring_enrollment TO mop_test_runtime;
 REVOKE ALL ON FUNCTION public.mop_monitoring_enrollment_guard() FROM PUBLIC;

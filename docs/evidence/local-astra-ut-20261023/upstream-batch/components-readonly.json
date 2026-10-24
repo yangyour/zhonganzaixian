@@ -1,0 +1,84 @@
+{
+  "environment": "lan-test-20261008",
+  "read_only": true,
+  "migrations": 0,
+  "lifecycle_changes": 0,
+  "stage": "COMPLETE",
+  "project_containers": [
+    {
+      "Names": "mop-lan-api",
+      "Image": "207ecae0b2b1",
+      "Status": "Up 17 hours"
+    },
+    {
+      "Names": "mop-lan-web",
+      "Image": "df221db836e1",
+      "Status": "Up 17 hours"
+    },
+    {
+      "Names": "mop-lan-import-worker",
+      "Image": "207ecae0b2b1",
+      "Status": "Up 18 hours"
+    },
+    {
+      "Names": "mop-lan-contact-worker",
+      "Image": "207ecae0b2b1",
+      "Status": "Up 18 hours"
+    },
+    {
+      "Names": "mop-lan-af-collector",
+      "Image": "207ecae0b2b1",
+      "Status": "Up 18 hours (healthy)"
+    },
+    {
+      "Names": "mop-lan-photo-worker",
+      "Image": "207ecae0b2b1",
+      "Status": "Up 18 hours"
+    },
+    {
+      "Names": "mop-lan-export-preparation-worker",
+      "Image": "207ecae0b2b1",
+      "Status": "Up 18 hours"
+    },
+    {
+      "Names": "mop-lan-zabbix-web",
+      "Image": "cd216a9968b6",
+      "Status": "Up 2 weeks (healthy)"
+    },
+    {
+      "Names": "mop-lan-zabbix-agent",
+      "Image": "ba55e6d146d0",
+      "Status": "Up 2 weeks"
+    },
+    {
+      "Names": "mop-lan-zabbix-server",
+      "Image": "415452211dea",
+      "Status": "Up 2 weeks"
+    },
+    {
+      "Names": "mop-lan-postgres",
+      "Image": "47f917f7409e",
+      "Status": "Up 2 weeks (healthy)"
+    },
+    {
+      "Names": "mop-lan-rabbitmq",
+      "Image": "e3b55503d81b",
+      "Status": "Up 2 weeks"
+    },
+    {
+      "Names": "mop-lan-minio",
+      "Image": "a16cad481969",
+      "Status": "Up 2 weeks"
+    },
+    {
+      "Names": "mop-lan-redis",
+      "Image": "abbc5faf6f23",
+      "Status": "Up 2 weeks"
+    }
+  ],
+  "running_project_containers": 14,
+  "clamd_project_container_observed": false,
+  "container_tags_not_runtime_version_probe": true,
+  "status": "PASSED",
+  "checked_at": "2026-10-24T02:38:06.644369+00:00"
+}

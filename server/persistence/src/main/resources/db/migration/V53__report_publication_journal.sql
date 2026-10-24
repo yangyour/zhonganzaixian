@@ -144,4 +144,6 @@ CREATE TRIGGER mop_report_publication_read_guard BEFORE INSERT OR UPDATE OR DELE
 CREATE TRIGGER mop_report_publication_delivery_guard BEFORE INSERT OR UPDATE OR DELETE ON public.mop_report_publication_delivery_intent FOR EACH ROW EXECUTE FUNCTION public.mop_report_publication_guard();
 REVOKE ALL ON public.mop_report_publication_document,public.mop_report_publication_artifact,public.mop_report_publication_revision,public.mop_report_publication_read,public.mop_report_publication_delivery_intent FROM PUBLIC,mop_test_runtime;
 GRANT SELECT,INSERT ON public.mop_report_publication_document,public.mop_report_publication_artifact,public.mop_report_publication_revision,public.mop_report_publication_read,public.mop_report_publication_delivery_intent TO mop_test_runtime;
+-- Row locking requires one column's UPDATE privilege; the immutable trigger rejects every actual UPDATE.
+GRANT UPDATE(id) ON public.mop_report_publication_document TO mop_test_runtime;
 REVOKE ALL ON FUNCTION public.mop_report_publication_guard() FROM PUBLIC;

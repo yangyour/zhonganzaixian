@@ -5,14 +5,20 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import static cn.mop.persistence.TestSchemaMigration.*;
 final class MonitoringObjectBindingSchemaVerifier {
- static final String SCRIPT="V55__monitoring_object_mapping_journal.sql",SHA256="03bf7bcc280c0054ad8e52b1d2ff2aa8cafff921a282f2edef04a890faa1b01b";
+ static final String SCRIPT="V55__monitoring_object_mapping_journal.sql",SHA256="e55960373428ad10c95fd08d731c349666c92f85f521371de99dbe11600ad36e";
  static byte[] sql()throws Exception{try(var in=MonitoringObjectBindingSchemaVerifier.class.getResourceAsStream("/db/migration/"+SCRIPT)){if(in==null)throw new IllegalStateException();return in.readAllBytes();}}
  static String hash(byte[] value)throws Exception{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(value));}
  static void resource()throws Exception{if(!SHA256.equals(hash(sql())))throw new IllegalStateException("Monitoring mapping candidate changed without review");}
  static void verify(Connection c)throws SQLException{
-  for(var table:List.of("mop_monitoring_object_binding","mop_monitoring_object_binding_revision")){
-   verifyRuntimeAcl(c,table,Set.of());requireTrue(c,"SELECT relpersistence='p' AND relowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') FROM pg_class WHERE oid=?::regclass","public."+table);
-   requireTrue(c,"SELECT count(*)=1 AND bool_and(tgenabled='O' AND tgtype=31 AND NOT tgdeferrable AND tgfoid='public.mop_monitoring_object_binding_guard()'::regprocedure) FROM pg_trigger WHERE tgrelid=?::regclass AND NOT tgisinternal","public."+table);
+  for (var table : List.of("mop_monitoring_object_binding", "mop_monitoring_object_binding_revision")) {
+   // Only the root id is lockable; actual UPDATE remains rejected by its immutable trigger.
+   Set<String> allowedUpdates = table.equals("mop_monitoring_object_binding") ? Set.of("id") : Set.of();
+   verifyRuntimeAcl(c, table, allowedUpdates);
+   requireTrue(c, "SELECT relpersistence='p' AND relowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') "
+       + "FROM pg_class WHERE oid=?::regclass", "public." + table);
+   requireTrue(c, "SELECT count(*)=1 AND bool_and(tgenabled='O' AND tgtype=31 AND NOT tgdeferrable "
+       + "AND tgfoid='public.mop_monitoring_object_binding_guard()'::regprocedure) FROM pg_trigger "
+       + "WHERE tgrelid=?::regclass AND NOT tgisinternal", "public." + table);
   }
   requireConstraint(c,"mop_monitoring_object_binding","p",List.of("tenant_id","id"),null,List.of(),false);
   requireConstraint(c,"mop_monitoring_object_binding_revision","p",List.of("tenant_id","id","version"),null,List.of(),false);

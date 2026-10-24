@@ -1,0 +1,75 @@
+{
+  "environment": "lan-test-20261008",
+  "api_origin": "http://127.0.0.1:18217",
+  "status": "PASSED",
+  "business_writes": 0,
+  "migrations": 0,
+  "external_messages": 0,
+  "new_local_components": 0,
+  "local_application_candidate": true,
+  "full_readiness_claimed": false,
+  "checks": [
+    {
+      "role": "padmin",
+      "scope": "CURRENT_TENANT_INTERNAL",
+      "visible_items": 3,
+      "known_pending": 3,
+      "known_overdue": 1,
+      "unknown_sla": 3,
+      "overdue_sla": null,
+      "status": "PASSED"
+    },
+    {
+      "role": "padmin",
+      "projection": "asset-ledger-facts",
+      "assets": 7,
+      "single_detail_matches_batch": true,
+      "version_binding_verified": true,
+      "invalid_queries_rejected": 3,
+      "status": "PASSED"
+    },
+    {
+      "role": "msp",
+      "scope": "CURRENT_TENANT_INTERNAL",
+      "visible_items": 3,
+      "known_pending": 3,
+      "known_overdue": 1,
+      "unknown_sla": 3,
+      "overdue_sla": null,
+      "status": "PASSED"
+    },
+    {
+      "role": "msp",
+      "projection": "asset-ledger-facts",
+      "assets": 7,
+      "single_detail_matches_batch": true,
+      "version_binding_verified": true,
+      "invalid_queries_rejected": 3,
+      "status": "PASSED"
+    },
+    {
+      "role": "tadmin",
+      "scope": "REPORTER_ONLY",
+      "visible_items": 3,
+      "known_pending": 3,
+      "known_overdue": 1,
+      "unknown_sla": 1,
+      "overdue_sla": null,
+      "status": "PASSED"
+    },
+    {
+      "role": "tadmin",
+      "projection": "asset-ledger-facts",
+      "assets": 7,
+      "single_detail_matches_batch": true,
+      "version_binding_verified": true,
+      "invalid_queries_rejected": 3,
+      "status": "PASSED"
+    }
+  ],
+  "formal_tc": "NOT_RUN",
+  "jar_sha256": "0027106de643e2a77b8926ab4df0b4f88ff96c6edf85d2702954c1a4812ef67c",
+  "anonymous_read_denied": true,
+  "candidate_stopped": true,
+  "finished_at": "2026-10-24T02:14:34.808194+00:00"
+}

@@ -34,10 +34,11 @@ def require(condition, message):
         raise RuntimeError(message)
 
 
-def verify(output: Path, hold: bool = False, actionable: bool = False, port: int = PORT, artifact: Path | None = None):
+def verify(output: Path, hold: bool = False, actionable: bool = False, port: int = PORT,
+           artifact: Path | None = None, ledger_facts: bool = False):
     output.mkdir(parents=True, exist_ok=False)
-    marker = {'session': 'local-astra-ut' if actionable else 'reports',
-              'operation': 'UI01-actionable-candidate-http' if actionable else 'R03-SLA-candidate-http',
+    marker = {'session': 'local-astra-ut' if actionable or ledger_facts else 'reports',
+              'operation': 'A05-ledger-facts-http' if ledger_facts else 'UI01-actionable-candidate-http' if actionable else 'R03-SLA-candidate-http',
               'token': str(uuid.uuid4())}
     with LOCK.open('x', encoding='utf-8') as stream:
         json.dump(marker, stream)
@@ -182,6 +183,34 @@ def verify(output: Path, hold: bool = False, actionable: bool = False, port: int
                                          'excluded': current['excluded'], 'overdue_sla': current['overdue_sla'],
                                          'unknown_sla': current['unknown_sla'], 'homepage_matches_full_page': True,
                                          'invalid_queries_rejected': 5, 'status': 'PASSED'})
+            if ledger_facts:
+                assets = call('/assets?page_size=100')['items']
+                require(0 < len(assets) <= 100 and all(row['tenant_id'] == tenant for row in assets), 'Unexpected isolated ledger population')
+                selected = {row['id']: row for row in assets}
+                facts = call('/assets/ledger-facts?ids=' + ','.join(selected))
+                require(facts['tenant_id'] == tenant and facts['source'] == 'postgresql'
+                        and facts['scope'] == 'CURRENT_TENANT_PUBLIC_ASSET_FIELDS'
+                        and facts['business_relationship_verified'] is False and facts['proxy_verified'] is False,
+                        'Invalid facts scope or verification claim')
+                require({row['asset_id'] for row in facts['items']} == set(selected), 'Incomplete facts batch')
+                for row in facts['items']:
+                    require(set(row) == {'asset_id', 'asset_version', 'site_id', 'site_name', 'metadata_version',
+                            'metadata_recorded_at', 'metadata_source', 'business_description', 'owner'}, 'Internal metadata leaked')
+                    require(row['asset_version'] == selected[row['asset_id']]['version']
+                            and row['site_id'] == selected[row['asset_id']]['site_id'], 'Stale facts attached to ledger')
+                    detail = call('/assets/ledger-facts?ids=' + row['asset_id'])
+                    require(detail['items'] == [row], 'Detail facts differ from current batch')
+                    if row['metadata_source'] == 'NOT_RECORDED':
+                        require(all(row[key] is None for key in ('metadata_version', 'metadata_recorded_at', 'business_description', 'owner')),
+                                'Missing metadata invented')
+                for query, status in [('ids=' + next(iter(selected)) + ',' + str(uuid.uuid4()), 404),
+                                      ('ids=' + next(iter(selected)) + '&tenant_id=' + tenant, 400),
+                                      ('ids=' + next(iter(selected)) + ',' + next(iter(selected)), 400)]:
+                    denied = http.get(origin + '/api/v1/assets/ledger-facts?' + query, timeout=15)
+                    require(denied.status_code == status and 'data' not in denied.json(), 'Unsafe facts batch accepted')
+                result['checks'].append({'role': role, 'projection': 'asset-ledger-facts', 'assets': len(assets),
+                                         'single_detail_matches_batch': True, 'version_binding_verified': True,
+                                         'invalid_queries_rejected': 3, 'status': 'PASSED'})
             http.close()
         result['status'] = 'PASSED'
         if hold:
@@ -220,5 +249,6 @@ if __name__ == '__main__':
     parser.add_argument('--actionable', action='store_true', help='Also verify the additive full-population M1-6 projection')
     parser.add_argument('--port', type=int, default=PORT)
     parser.add_argument('--jar', type=Path, help='Explicit locally built candidate artifact; does not deploy it')
+    parser.add_argument('--ledger-facts', action='store_true', help='Also verify read-only public asset facts in existing isolated DEMO tenants')
     args = parser.parse_args()
-    raise SystemExit(verify(args.output.resolve(), args.hold, args.actionable, args.port, args.jar))
+    raise SystemExit(verify(args.output.resolve(), args.hold, args.actionable, args.port, args.jar, args.ledger_facts))

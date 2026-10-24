@@ -183,10 +183,24 @@
         "M3-9",
         "M3-12"
       ],
-      "status": "OPEN",
+      "status": "IN_PROGRESS",
       "completion_criterion": "补可信字段投影、来源和关联核验、已实现导出链的合同缺口；未知Proxy/责任人等不造值。",
-      "evidence": [],
-      "commits": []
+      "evidence": [
+        "docs/asset-ledger-public-facts-20261023.md",
+        "docs/evidence/local-astra-ut-20261023/a05/validation.json"
+      ],
+      "commits": [],
+      "completed_subitems": [
+        "Recovered reviewed 3b219461 public-facts batch and list/detail consumers on latest main",
+        "Return-time membership/account checks, same-snapshot four-core-field drift guard, nanosecond future-time rejection",
+        "56 targeted/profile Java, 4 designated PG, 5265 full Web, 209 root contracts, 5 synthetic Edge and 3-role real API/browser checks passed"
+      ],
+      "remaining_subitems": [
+        "100-row designated PG batch and wider historical-corruption cases",
+        "Frozen export files and public reference/name consistency acceptance",
+        "Authoritative business-system/Proxy relationships and actual monitoring inputs",
+        "Formal contract acceptance"
+      ]
     },
     {
       "id": "M01",

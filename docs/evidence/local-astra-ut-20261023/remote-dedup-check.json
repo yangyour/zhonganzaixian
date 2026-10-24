@@ -1,0 +1,100 @@
+{
+  "checked_at": "2026-10-24T02:08:58.905782+00:00",
+  "repository": "https://github.com/yangyour/zhonganzaixian.git",
+  "main": "d53697df57a848c49b843e621cb0c50bf789065b",
+  "main_change_since_last_integration": "0",
+  "remote_refs_checked": 60,
+  "worktree": "E:\\work\\wxw9\\zhonganzaixian\\.parallel\\local-astra-ut-20261023",
+  "branch": "codex/local-astra-ut-a05-20261023",
+  "wip_check": [
+    {
+      "gap_id": "A05",
+      "branch": "wip/20261023-assets-a05",
+      "tip": "3b219461665781b2a492d8f82a96d495701d768d",
+      "matches_handoff": true,
+      "tip_ancestor_of_main": false,
+      "representative_path": "server/api/src/main/java/cn/mop/api/AssetLedgerFactsController.java",
+      "path_present_on_main": false
+    },
+    {
+      "gap_id": "M01",
+      "branch": "wip/20261023-monitoring-m01",
+      "tip": "1b7211190039af081ce87a19ab8adca3c9be5280",
+      "matches_handoff": true,
+      "tip_ancestor_of_main": false,
+      "representative_path": "server/api/src/main/java/cn/mop/api/MonitoringRecoveryController.java",
+      "path_present_on_main": false
+    },
+    {
+      "gap_id": "N01/N02",
+      "branch": "wip/20261023-notifications-n01-n02",
+      "tip": "e7fa879aa52004d311d29367efa878ec6875c459",
+      "matches_handoff": true,
+      "tip_ancestor_of_main": false,
+      "representative_path": "server/api/src/main/java/cn/mop/api/NotificationRoutingController.java",
+      "path_present_on_main": false
+    },
+    {
+      "gap_id": "P01",
+      "branch": "wip/20261023-production-p01",
+      "tip": "db3d58ca93bdacea1ed7b93c703c9718fff641e8",
+      "matches_handoff": true,
+      "tip_ancestor_of_main": false,
+      "representative_path": "server/api/src/main/java/cn/mop/api/ProductionReadinessController.java",
+      "path_present_on_main": false
+    },
+    {
+      "gap_id": "P02",
+      "branch": "wip/20261023-production-p02",
+      "tip": "678a5a16be0cb784662b5abf62225a597e0c61b3",
+      "matches_handoff": true,
+      "tip_ancestor_of_main": false,
+      "representative_path": "server/api/src/main/java/cn/mop/api/AttachmentSecurityController.java",
+      "path_present_on_main": false
+    },
+    {
+      "gap_id": "R02",
+      "branch": "wip/20261023-reports-r02",
+      "tip": "ad7a2fc3ee0fa899b73fe03217049fc7264b29d6",
+      "matches_handoff": true,
+      "tip_ancestor_of_main": false,
+      "representative_path": "server/domain/src/main/java/cn/mop/domain/reporting/ReportPublication.java",
+      "path_present_on_main": false
+    }
+  ],
+  "unmerged_refs": [
+    {
+      "ref": "origin/wip/20261023-assets-a05",
+      "unique_commits": 1,
+      "tip": "3b219461665781b2a492d8f82a96d495701d768d"
+    },
+    {
+      "ref": "origin/wip/20261023-monitoring-m01",
+      "unique_commits": 1,
+      "tip": "1b7211190039af081ce87a19ab8adca3c9be5280"
+    },
+    {
+      "ref": "origin/wip/20261023-notifications-n01-n02",
+      "unique_commits": 1,
+      "tip": "e7fa879aa52004d311d29367efa878ec6875c459"
+    },
+    {
+      "ref": "origin/wip/20261023-production-p01",
+      "unique_commits": 1,
+      "tip": "db3d58ca93bdacea1ed7b93c703c9718fff641e8"
+    },
+    {
+      "ref": "origin/wip/20261023-production-p02",
+      "unique_commits": 1,
+      "tip": "678a5a16be0cb784662b5abf62225a597e0c61b3"
+    },
+    {
+      "ref": "origin/wip/20261023-reports-r02",
+      "unique_commits": 1,
+      "tip": "ad7a2fc3ee0fa899b73fe03217049fc7264b29d6"
+    }
+  ],
+  "conclusion": "No newer remote implementation found for A05/M01/N01/N02/P01/P02/R02; reviewed WIP snapshots unchanged. Existing main improvements and UI01 are reused, not redeveloped.",
+  "working_changes_preserved": true,
+  "no_remote_mutations": true
+}

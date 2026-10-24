@@ -30,4 +30,19 @@
 
 新增兼容投影，在数据库筛选完整人群时排除 `CLOSED/CANCELLED/RESOLVED`，旧V1/V2保持。V42的 `PENDING_CUSTOMER` 仍保留，不根据中文标签扩大过滤。首页前五条、数量与SLA、完整分页使用一致授权谓词和单次数据库快照；分页请求各自重新读取，不声称跨请求仍为同一个冻结快照。SLA以服务端冻结输入和时钟为准，未知不转零、0剩余不自行推断违约。
 
-当前处于实现与验证阶段，尚未标记UI01完成。实际组件、HTTP、浏览器、正式TC分别留证。V1–V51冻结资源不改写；本功能不需要迁移。主干集成前重新fetch并取得本机排他锁，锁不代表与云端写者完成协调。
+UI01功能提交`4e034a71`已通过分层验证，集成提交`d53697df`已推送主干，正常合并最新`f5fc7637`并保留压缩OpenAPI格式。实际组件、HTTP、浏览器、正式TC分别留证；UI01总组仍保留完整V42监控t2和正式验收边界。V1–V51冻结资源未改写；本功能无迁移。集成锁已按归属释放，不把本机锁当作云端协调。
+
+## 2026-10-23 22:08 EDT 远端去重核对
+
+按用户新增要求，在恢复下一项前暂停新增改动并`git fetch origin --prune`。核对全部60个远端引用，`origin/main=d53697df57a848c49b843e621cb0c50bf789065b`，自本轮UI01集成后新增提交0；除以下六份WIP外，所有远端分支提交均为main祖先。
+
+| 范围 | WIP当前提交 | 与交接一致 | 主干新增代表接口／领域类 |
+| --- | --- | --- | --- |
+| A05 | `3b219461` | 是 | 尚无AssetLedgerFactsController |
+| M01 | `1b721119` | 是 | 尚无MonitoringRecoveryController |
+| N01/N02 | `e7fa879a` | 是 | 尚无NotificationRoutingController |
+| P01 | `db3d58ca` | 是 | 尚无ProductionReadinessController |
+| P02 | `678a5a16` | 是 | 尚无AttachmentSecurityController |
+| R02 | `ad7a2fc3` | 是 | 尚无ReportPublication |
+
+每份WIP相对main只有原保留的1个独有草稿提交；这证明没有检测到新的远端实现，不表示草稿可直接发布，也不排除别人尚未推送的工作。本地A05保留原草稿并补已确定的成员复核、核心漂移、时间校验和验证；已在main的安全守卫、打印、搜索、备份模式和UI01不重复实施。后续每功能开始及提交/集成前再次fetch，检测重叠时先比对再继续。精确引用与检查结果见[远端去重证据](evidence/local-astra-ut-20261023/remote-dedup-check.json)。

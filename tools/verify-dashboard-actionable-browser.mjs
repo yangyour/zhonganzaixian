@@ -6,7 +6,8 @@ import { chromium } from 'playwright';
 
 const origin = process.env.MOP_UI01_WEB_ORIGIN ?? 'http://127.0.0.1:15217';
 assert.match(origin, /^http:\/\/127\.0\.0\.1:\d+$/);
-const output = new URL('../.local/ui01-live-browser/', import.meta.url);
+const ledger = process.argv.includes('--assets');
+const output = new URL(ledger ? '../.local/a05-live-browser/' : '../.local/ui01-live-browser/', import.meta.url);
 mkdirSync(output, { recursive: false });
 const privatePath = 'E:/work/wxw9/zhonganzaixian/mop-platform/deploy/private/demo-full-20261023.json';
 const demo = JSON.parse(readFileSync(privatePath, 'utf8').replace(/^\uFEFF/, ''));
@@ -45,6 +46,38 @@ try {
     const page = await context.newPage();
     const pageErrors = [];
     page.on('pageerror', failure => pageErrors.push(failure.name));
+    if (ledger) {
+      const assets = (await call('/assets?page_size=100')).items;
+      assert.ok(assets.length > 0 && assets.length <= 100);
+      const facts = await call('/assets/ledger-facts?ids=' + assets.map(row => row.id).join(','));
+      assert.equal(facts.items.length, assets.length);
+      await page.goto(origin + '/assets');
+      await page.getByText('已读取本页登记资料快照', { exact: false }).waitFor();
+      const workspace = page.locator('.asset-list-workspace');
+      const content = await workspace.textContent();
+      for (const fact of facts.items) {
+        assert.ok(content.includes(fact.site_name), 'Current site name absent');
+        if (fact.owner) assert.ok(content.includes(fact.owner.display_name), 'Current public owner absent');
+        if (fact.business_description) assert.ok(content.includes(fact.business_description), 'Current declaration absent');
+      }
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
+      const selected = facts.items.find(row => row.metadata_source === 'MANUAL_DECLARATION') ?? facts.items[0];
+      await page.locator(`[data-list-record="${selected.asset_id}"]`).first().click();
+      await page.getByText('登记资料快照查询时间', { exact: false }).waitFor();
+      const detail = page.getByRole('region', { name: '资产公开登记资料' });
+      const detailText = await detail.textContent();
+      if (selected.owner) assert.ok(detailText.includes(selected.owner.display_name));
+      if (selected.business_description) assert.ok(detailText.includes(selected.business_description));
+      assert.ok((await page.locator('.asset-detail-hero').textContent()).includes(selected.site_name));
+      await page.screenshot({ path: new URL(role + '-asset-detail.png', output).pathname.replace(/^\/([A-Z]:)/i, '$1'), fullPage: true });
+      await page.getByRole('button', { name: '返回资产列表' }).click();
+      await page.getByText('已读取本页登记资料快照', { exact: false }).waitFor();
+      assert.deepEqual(pageErrors, []);
+      result.checks.push({ role, viewport: '1440x1000', projection: 'asset-ledger-facts', assets: assets.length,
+        list_detail_back_verified: true, public_owner_and_site_matched: true, overflow: false, page_errors: 0, status: 'PASSED' });
+      await context.close();
+      continue;
+    }
     await page.goto(origin + '/dashboard');
     const kpi = page.locator('[data-kpi="PENDING_TICKETS"]');
     await kpi.locator('.mop-kpi-value').filter({ hasText: String(expected.pending_tickets ?? '未知') }).waitFor();

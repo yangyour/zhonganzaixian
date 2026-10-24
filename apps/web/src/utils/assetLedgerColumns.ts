@@ -1,6 +1,7 @@
 import type { Asset } from '../api/types'
 import { isUtcInstant } from './utcInstant'
 import { displayTime, sourceLabel, typeLabel } from './display'
+import type { AssetLedgerFact } from './assetLedgerFacts'
 
 /** M3-2 / T00R027. Fixed order; extra internal metadata remains in its own view. */
 export const assetLedgerColumns = [
@@ -26,11 +27,14 @@ function explicitState(value: string | null | undefined, known: Record<string, s
 }
 
 /** Project only the public Asset DTO. No internal owner lookup, inferred zero or invented metrics. */
-export function assetLedgerCell(asset: Asset, key: AssetLedgerColumnKey): LedgerCell {
+export function assetLedgerCell(asset: Asset, key: AssetLedgerColumnKey, suppliedFacts?: AssetLedgerFact | null): LedgerCell {
+  const facts = suppliedFacts?.asset_id === asset.id && suppliedFacts.asset_version === asset.version && suppliedFacts.site_id === asset.site_id ? suppliedFacts : null
   switch (key) {
     case 'name': return { text: asset.name || '—', detail: `${asset.management_ip || '—'} · ${sourceLabel(asset.source)} · ${asset.lifecycle_status === 'DRAFT' ? '草稿' : asset.lifecycle_status}` }
     case 'type': return { text: typeLabel(asset.type) }
-    case 'site': return { text: asset.site_name || asset.site_id || '—', detail: 'Proxy：— 当前接口未提供' }
+    case 'site': return { text: facts?.site_name || asset.site_name || asset.site_id || '—', detail: 'Proxy：— 当前接口未提供' }
+    case 'business': return facts ? { text: facts.business_description || '—', detail: facts.business_description ? `登记说明 · 资料 v${facts.metadata_version} · 未核验业务系统关联` : '当前未登记业务说明' } : missing()
+    case 'owner': return facts ? facts.owner ? { text: facts.owner.display_name, detail: `${facts.owner.status === 'ACTIVE' ? '当前活动成员' : '已停用成员引用'} · 登记资料 v${facts.metadata_version}` } : { text: '—', detail: '当前未登记负责人' } : missing()
     case 'availability': return explicitState(asset.availability, { UNKNOWN: '未知' })
     case 'sync': return explicitState(asset.sync_state, { PENDING_ONBOARDING: '待接入' })
     case 'sampled': return !asset.sampled_at ? { text: '—', detail: '未取得采样时间' } : !isUtcInstant(asset.sampled_at) ? { text: '—', detail: '采样时间无效' } : { text: displayTime(asset.sampled_at) }

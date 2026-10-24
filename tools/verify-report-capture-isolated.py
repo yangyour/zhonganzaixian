@@ -32,7 +32,8 @@ def protected_fingerprints(connection):
     for table in ('mop_inspection_source_collection', 'mop_inspection_source_collection_item',
                   'mop_inspection_quarterly_report', 'mop_inspection_worksheet',
                   'mop_inspection_worksheet_revision', 'mop_membership', 'mop_asset',
-                  'mop_ticket', 'mop_ticket_workflow_event', 'mop_ticket_lifecycle_revision'):
+                  'mop_ticket', 'mop_ticket_workflow_event', 'mop_ticket_lifecycle_revision',
+                  'mop_asset_manual_details', 'mop_asset_manual_revision'):
         # Fixed internal identifiers only; actual customer data never leaves the digest query.
         with connection.cursor() as cursor:
             cursor.execute('SELECT count(*), md5(COALESCE(string_agg(row_digest, \'\' ORDER BY row_digest),\'\')) '
@@ -45,7 +46,7 @@ def protected_fingerprints(connection):
 
 def run(output: Path, suite: str):
     output.mkdir(parents=True, exist_ok=False)
-    owner = {'session': 'local-astra-ut' if suite == 'dashboard-actionable' else 'reports',
+    owner = {'session': 'local-astra-ut' if suite in ('dashboard-actionable', 'asset-ledger-facts') else 'reports',
              'operation': 'isolated-' + suite + '-pg', 'owner': str(uuid.uuid4()),
              'started_at': datetime.datetime.now(datetime.timezone.utc).isoformat()}
     with LOCK.open('x', encoding='utf-8') as stream:
@@ -58,6 +59,7 @@ def run(output: Path, suite: str):
     viewers = [str(uuid.uuid4()), str(uuid.uuid4())] if suite in ('dashboard', 'dashboard-sla', 'dashboard-actionable') else []
     tenants = [str(uuid.uuid4()), str(uuid.uuid4())]
     assets = [str(uuid.uuid4()), str(uuid.uuid4())]
+    unrecorded_asset = str(uuid.uuid4()) if suite == 'asset-ledger-facts' else None
     summary = {'environment': 'lan-test-20261008', 'schema_migrations': 0,
                'actual_tenant_written': False, 'new_local_components': 0,
                'external_messages': 0, 'test_tenants': tenants, 'test_actor': actor,
@@ -115,6 +117,12 @@ def run(output: Path, suite: str):
                     cursor.execute('INSERT INTO public.mop_asset(id,tenant_id,name,type,management_ip,site_id,source,created_by,updated_by) '
                                    "VALUES(%s,%s,'SYNTHETIC_REPORT_CAPTURE_ASSET','other','192.0.2.1','report-test','manual',%s,%s)",
                                    (assets[index], tenant, actor, actor))
+                if unrecorded_asset is not None:
+                    # Explicit namespace fixture for a read-only projection; never bypass the product quota guard.
+                    # This bootstrap does not claim that a business asset-creation request was accepted.
+                    cursor.execute('INSERT INTO public.mop_asset(id,tenant_id,name,type,management_ip,site_id,source,created_by,updated_by) '
+                                   "VALUES(%s,%s,'SYNTHETIC_LEDGER_UNRECORDED','other','192.0.2.79','report-test','manual',%s,%s)",
+                                   (unrecorded_asset, tenants[0], actor, actor))
         seeded = True
         env = os.environ.copy()
         env.pop('MOP_RUN_REMOTE_TESTS', None)
@@ -130,10 +138,16 @@ def run(output: Path, suite: str):
             env['MOP_RUN_DASHBOARD_SLA_PG_TESTS'] = 'true'
         if suite == 'dashboard-actionable':
             env['MOP_RUN_DASHBOARD_ACTIONABLE_PG_TESTS'] = 'true'
+        if suite == 'asset-ledger-facts':
+            env['MOP_RUN_ASSET_LEDGER_FACTS_PG_TESTS'] = 'true'
+            env['MOP_ASSET_LEDGER_UNRECORDED_ASSET'] = unrecorded_asset
+            summary['additional_isolated_fixture_assets'] = 1
+            summary['asset_creation_api_claimed'] = False
         selected_test = {'report': 'PostgresReportCaptureIsolatedIntegrationTest',
                          'dashboard': 'PostgresDashboardPendingTicketsIntegrationTest',
                          'dashboard-sla': 'PostgresDashboardPendingTicketSlaIntegrationTest',
-                         'dashboard-actionable': 'PostgresDashboardActionableTicketsIntegrationTest'}[suite]
+                         'dashboard-actionable': 'PostgresDashboardActionableTicketsIntegrationTest',
+                         'asset-ledger-facts': 'PostgresAssetLedgerFactsIsolatedIntegrationTest'}[suite]
         with (output / 'maven.log').open('w', encoding='utf-8') as log:
             result = subprocess.run(['mvn.cmd', '-pl', 'server/persistence', '-am',
                                      '-Dtest=' + selected_test,
@@ -185,6 +199,6 @@ def run(output: Path, suite: str):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', required=True, type=Path)
-    parser.add_argument('--suite', choices=('report', 'dashboard', 'dashboard-sla', 'dashboard-actionable'), default='report')
+    parser.add_argument('--suite', choices=('report', 'dashboard', 'dashboard-sla', 'dashboard-actionable', 'asset-ledger-facts'), default='report')
     args = parser.parse_args()
     raise SystemExit(run(args.output.resolve(), args.suite))

@@ -5,6 +5,7 @@ import { addObservationWindowContract } from './observation-window-contract.mjs'
 import { addCmdbSourcePreflightContract } from './cmdb-source-preflight-contract.mjs';
 import { addCmdbImportExecutionContract } from './cmdb-import-execution-contract.mjs';
 import { addDashboardPendingTicketsContract } from './dashboard-pending-tickets-contract.mjs';
+import { addAssetLedgerFactsContract } from './asset-ledger-facts-contract.mjs';
 import { addDemoApiContract } from './demo-api-contract.mjs';
 import { addDashboardAlertBellContract } from './dashboard-alert-bell-contract.mjs';
 import { addCmdbTypeCatalogContract } from './cmdb-type-catalog-contract.mjs';
@@ -997,6 +998,7 @@ contract['x-mop-secure-session-transport'] = {
 };
 addCmdbImportExecutionContract(contract);
 addDashboardPendingTicketsContract(contract);
+addAssetLedgerFactsContract(contract);
 addDemoApiContract(contract);
 addDashboardAlertBellContract(contract);
 const serialized = JSON.stringify(contract) + '\n';

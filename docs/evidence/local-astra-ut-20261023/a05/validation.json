@@ -1,0 +1,104 @@
+{
+  "status": "PASSED_WITH_RECORDED_BOUNDARIES",
+  "baseline": "d53697df",
+  "recovered_wip": "3b219461",
+  "java_targeted": [
+    {
+      "name": "cn.mop.api.AssetLedgerFactsControllerTest",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.persistence.PostgresAssetLedgerFactsRepositoryTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.api.DashboardReadAuthorizationTest",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.api.ProjectReadReturnIdentityTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.api.ProfilePolicyTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "java_executed": 56,
+  "postgres": {
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "first_attempt": "SETUP_FAILED: product asset quota guard correctly rejected missing quota; second unrecorded asset now explicit isolated namespace fixture",
+    "quota_guard_changed": false,
+    "assertions_removed": false
+  },
+  "web_full_regression": {
+    "files": 316,
+    "passed": 5265,
+    "failed": 0
+  },
+  "root_contracts": {
+    "passed": 209,
+    "failed": 0
+  },
+  "demo_contracts": {
+    "passed": 4,
+    "failed": 0
+  },
+  "synthetic_edge": {
+    "passed": 5,
+    "failed": 0,
+    "stats": {
+      "startTime": "2026-10-24T02:11:43.131Z",
+      "duration": 12198.455,
+      "expected": 5,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "viewports": [
+      1024,
+      1440
+    ],
+    "first_attempt": {
+      "passed": 3,
+      "failed": 2,
+      "reason": "Existing type placeholder and table keyboard hint contrast too low; fixed only within AssetsPage scope, axe unchanged"
+    },
+    "source": "SYNTHETIC_ONLY"
+  },
+  "live_browser": "live-browser.json",
+  "live_http": "http.json",
+  "migrations": 0,
+  "deployments": 0,
+  "external_messages": 0,
+  "formal_contract_acceptance": "NOT_RUN",
+  "remaining": [
+    "100-row designated PG batch and broad historical corruption catalog",
+    "Frozen export file and current-name/reference consistency acceptance",
+    "Authority-approved business-system/proxy relationships and real monitoring fields"
+  ],
+  "finished_at": "2026-10-24T02:16:44.403648+00:00",
+  "web_build": {
+    "status": "PASSED",
+    "build_id": "f5b51f1c25f59a10c42cdb0a03e22727d5b70583553cfe7debe2d7977c2979ec",
+    "static_files": 153,
+    "chunk_warning_retained": true
+  }
+}

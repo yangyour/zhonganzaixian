@@ -1,12 +1,12 @@
 {
-  "checked_at": "2026-10-24T03:57:17.105278+00:00",
+  "checked_at": "2026-10-24T04:27:13.831308+00:00",
   "repository": "https://github.com/yangyour/zhonganzaixian.git",
   "worktree": "E:\\work\\wxw9\\zhonganzaixian\\.parallel\\local-astra-ut-20261023",
   "branch": "codex/local-astra-ut-upstream-batch-20261023",
   "upstream": "origin/codex/local-astra-ut-upstream-batch-20261023",
   "remote_refs_checked": 63,
-  "main": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
-  "head": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+  "main": "ecced75cbf057e007afe7263631a1ad7bbc30774",
+  "head": "ecced75cbf057e007afe7263631a1ad7bbc30774",
   "main_head_left_right_count": "0\t0",
   "upstream_batch": "25a170138d3c8b31f5c4a7d0a42209859524033b",
   "upstream_batch_merge": "e8362fd6a6285d7294007e13daa1ed5a25913c91",
@@ -17,7 +17,9 @@
     "ce20a715",
     "d8ba8dff",
     "71bc7a95",
-    "df92a03d"
+    "df92a03d",
+    "b07b3c3b",
+    "ecced75c"
   ],
   "wip_reconciliation": [
     {
@@ -87,5 +89,7 @@
     "apps/web/src/pages/TenantInventoryPage.vue"
   ],
   "scope": "Git source deduplication and verified feature integration only; no deployment or formal acceptance",
-  "main_integration": "Normal fast-forward under exclusive integration lock; no force push; exact committed range only"
+  "main_integration": "Normal fast-forward under exclusive integration lock; no force push; exact committed range only",
+  "previous_checked_main": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+  "later_validation_scope": "N01: six designated retained-PG business tests; R02: one actual-PG scenario, four scoped checks, two FOP PDFs/four visually checked pages. No deployment or formal acceptance."
 }

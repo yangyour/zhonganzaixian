@@ -589,7 +589,8 @@
       ],
       "commits": [
         "25a17013",
-        "ce20a715"
+        "ce20a715",
+        "ecced75c"
       ],
       "completed_subitems": [
         "Quarterly frozen-source publication repository, V53 applied/frozen in designated isolated schema validation, exact XHTML/PDF renderer, authenticated API/report center, durable command recovery and read receipts; no outbound dispatch",
@@ -2296,7 +2297,7 @@
     "commit": "25a17013",
     "main_before_review": "0bcd0e34",
     "merged_by": "e8362fd6",
-    "reviewed_main": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+    "reviewed_main": "ecced75cbf057e007afe7263631a1ad7bbc30774",
     "status": "SOURCE_RECONCILED_INCREMENTAL_VALIDATION_ACTIVE",
     "remote_check_evidence": "docs/evidence/local-astra-ut-20261023/remote-dedup-check-latest.json",
     "resolved_review_items": {
@@ -2305,9 +2306,11 @@
       "V52-V55 schema/ACL first application freeze": "ce20a715",
       "M01 current-cycle source proof and exact t2": "d8ba8dff",
       "P01 diagnostic matrix": "71bc7a95",
-      "A05 same-ID tenant and wire regression": "df92a03d"
+      "A05 same-ID tenant and wire regression": "df92a03d",
+      "N01 retained business transactions": "b07b3c3b",
+      "R02 retained business and actual FOP": "ecced75c"
     },
     "remaining": "See each task; N01 retained business and R02 retained transaction/FOP evidence now recorded separately, full customer/provider/browser gates remain"
   },
-  "reviewed_main_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
+  "reviewed_main_commit": "ecced75cbf057e007afe7263631a1ad7bbc30774"
 }

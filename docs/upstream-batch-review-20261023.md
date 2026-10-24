@@ -2,6 +2,8 @@
 
 ## 最新状态：批次已合入，复用当前主干
 
+2026-10-24补充核对：主干已快进至`ecced75c`，本地HEAD/上游功能分支一致，63个远端引用无新增重叠实现。N01的`b07b3c3b`已补6项指定保留库真实业务检查；R02的`ecced75c`已补1个实际PG场景、4个分层检查及2份实际FOP PDF（共4页，已逐页查看）。两项均0迁移/外发/部署，数据库和记录保留，测试主体停用且锁释放。下方`df92a03d`是首次增量修复的审阅基线；最新精确引用以[去重证据](evidence/local-astra-ut-20261023/remote-dedup-check-latest.json)为准。
+
 已抓取63个远端引用，规范仓库为`https://github.com/yangyour/zhonganzaixian.git`。审阅及功能集成后的`origin/main`与本地HEAD均为`df92a03d`，当前分支`codex/local-astra-ut-upstream-batch-20261023`，上游为同名origin分支；目录为`E:\work\wxw9\zhonganzaixian\.parallel\local-astra-ut-20261023`。`25a17013`已由`e8362fd6`合入main。旧WIP提交不一定是main祖先，但其代表功能已在当前主干，不能仅凭未合并分支判为缺功能。精确时点及对象见[最新去重证据](evidence/local-astra-ut-20261023/remote-dedup-check-latest.json)。
 
 | 已进入main的提交 | 补齐内容 | 验证范围 |
@@ -14,6 +16,8 @@
 | `df92a03d` | A05同ID资产租户变化立即清空，保留远端协议与列表分流 | 51项前端和18项控制器回归；原真实PG/浏览器证据保留 |
 
 主干更新取得排他集成锁，再次fetch、检查origin/分支/暂存范围及祖先关系，正常快进推送。未提交的N01/R02验证准备不在上述提交内。通知路由和报告发布继续使用本次保留的隔离验证库核对真实业务；P02实际扫描、M01实际故障正向连续恢复/V42及浏览器、R02真实来源/模板批准仍单列。不能删除门禁理由来制造发布成功。
+
+上述“未提交的N01/R02验证准备”现已由首段两项提交核销，具体范围见[通知路由](notification-routing-retained-business-20261024.md)及[报告事务/渲染](report-publication-retained-business-20261024.md)。真实来源批准、外部供应商和完整HTTP/浏览器仍按原边界保留，不能把隔离状态机成功合并成真实客户发布通过。
 
 V1–V55均已执行冻结，后续修正须新增协调过的迁移；活动`mop_test`保持V50、0迁移。四个自有隔离数据库按用户要求保留且连接已关闭，普通API/Worker仍不自动迁移。无部署、实际设备操作或外发。原仓库三处用户未提交修改保持原样；云端dot与旧六会话继续停止，当前本地授权会话继续。
 

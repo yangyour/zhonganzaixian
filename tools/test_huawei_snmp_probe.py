@@ -2,6 +2,7 @@ import importlib.util
 import errno
 from pathlib import Path
 import socket
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -167,6 +168,34 @@ class SnmpDiagnosticTest(unittest.TestCase):
     def test_credentials_cannot_be_read_from_public_path(self):
         with self.assertRaises(ValueError):
             cli.private_config(cli.ROOT / 'deploy/device-snmp/example.json')
+
+    def test_main_records_logical_reference_for_shared_private_directory(self):
+        import json
+        import sys
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report_path = root / 'docs/evidence/result.json'
+            credential = root / 'deploy/private/huawei-snmp.json'
+            actual_resolve = Path.resolve
+
+            def resolve(path, *args, **kwargs):
+                # Model a junction to a private directory outside this checkout.
+                if path == root / 'deploy/private':
+                    return root.parent / 'shared-private'
+                if path == credential:
+                    return root.parent / 'shared-private/huawei-snmp.json'
+                return actual_resolve(path, *args, **kwargs)
+            report = {'monitoring_ready': False, 'vantage_points': {
+                'test_server': {'assessment': 'TIMEOUT_NO_RESPONSE'},
+                'zabbix_network_namespace': {'assessment': 'TIMEOUT_NO_RESPONSE'}}}
+            with patch.object(cli, 'ROOT', root), patch.object(cli, 'private_config', return_value={}), \
+                    patch.object(cli, 'inspect', return_value=report), \
+                    patch.object(Path, 'resolve', resolve), \
+                    patch.object(sys, 'argv', ['probe', '--credentials', str(credential), '--output', str(report_path)]):
+                self.assertEqual(2, cli.main())
+            saved = json.loads(report_path.read_text(encoding='utf-8'))
+            self.assertEqual('deploy/private/huawei-snmp.json', saved['credential_reference'])
+            self.assertNotIn('error_class', saved)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,31 @@
+{
+  "checked_at": "2026-10-24T08:11:03.331533936Z",
+  "target": "https://192.168.1.179",
+  "device": "scp",
+  "strict_before": {
+    "state": "TLS_NOT_VERIFIED",
+    "authenticated": false
+  },
+  "selected_mode": {
+    "tls_mode": "TEST_INSECURE",
+    "certificate_verification_enabled": false,
+    "tls_trust_verified": false,
+    "authenticated": true,
+    "protected_read_verified": false,
+    "resource_metrics_verified": false,
+    "state": "ACCESS_DENIED"
+  },
+  "strict_after": {
+    "state": "TLS_NOT_VERIFIED",
+    "authenticated": false
+  },
+  "integration_ready": false,
+  "background_collection_enabled": false,
+  "resource_writes": 0,
+  "credentials_output": false,
+  "environment": "lan-test-20261008",
+  "execution": "existing_api_container_java_cli",
+  "checker_exit_code": 2,
+  "application_restarted": false,
+  "database_migrations": 0
+}

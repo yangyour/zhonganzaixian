@@ -128,7 +128,10 @@ def main():
     try:
         config = private_config(args.credentials)
         report = inspect(config)
-        report['credential_reference'] = str(args.credentials.resolve().relative_to(ROOT)).replace('\\', '/')
+        # The ignored private directory may be a junction to the primary checkout.
+        # Validation uses the resolved private root; evidence records its logical reference.
+        relative = args.credentials.resolve().relative_to((ROOT / 'deploy/private').resolve())
+        report['credential_reference'] = (Path('deploy/private') / relative).as_posix()
         code = 0 if all(v['assessment'] == 'HUAWEI_IDENTITY_READ'
                         for v in report['vantage_points'].values()) else 2
     except FileNotFoundError:

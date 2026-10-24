@@ -173,6 +173,7 @@ public final class OnCallEscalationController {
         return success(result, r);
     }
 
+
     @GetMapping("/sla/reports")
     Object slaReport(HttpServletRequest r) {
         Access a = access(r, "sla_scenarios:read", true);
@@ -180,28 +181,41 @@ public final class OnCallEscalationController {
         String period = q.getOrDefault("period", YearMonth.now(SHANGHAI).toString());
         OnCallEscalationRepository.requireMonth(period);
         SlaReportView v = repository.slaReport(a, period);
-        if (v == null || !a.tenantId().equals(v.tenantId())) throw unavailable();
-        return success(map(
-            "tenant_id", v.tenantId(),
-            "period", v.period(),
-            "current_tier", v.currentTier()==null?null:v.currentTier().name(),
-            "target_availability_pct", v.targetAvailabilityPct(),
-            "kpis", map(
-                "mean_verified_availability_pct", v.meanVerifiedAvailabilityPct(),
-                "unavailable_union_total_sec", v.unavailableUnionTotalSec(),
-                "mtta", latencyDto(v.mtta()),
-                "mttr", latencyDto(v.mttr()),
-                "unrecovered_total_count", v.unrecoveredTotalCount(),
-                "unknown_interval_total_sec", v.unknownIntervalTotalSec()
+        if (v == null || !a.tenantId().equals(v.tenantId())) {
+            throw unavailable();
+        }
+        return success(
+            map(
+                "tenant_id",
+                v.tenantId(),
+                "period",
+                v.period(),
+                "current_tier",
+                v.currentTier() == null ? null : v.currentTier().name(),
+                "target_availability_pct",
+                v.targetAvailabilityPct(),
+                "kpis",
+                reportKpis(v),
+                "services",
+                v.services().stream().map(OnCallEscalationController::serviceDto).toList(),
+                "monthly_result",
+                v
+                    .monthlyResult()
+                    .map(m -> monthlyRecordDto(m, a.tenantId()))
+                    .orElse(null),
+                "live_monthly_evaluation",
+                monthlyEvalDto(v.liveMonthlyEvaluation()),
+                "formula_version",
+                v.formulaVersion(),
+                "timezone",
+                "Asia/Shanghai",
+                "observed_at",
+                v.observedAt().toString(),
+                "source",
+                "postgresql"
             ),
-            "services", v.services().stream().map(OnCallEscalationController::serviceDto).toList(),
-            "monthly_result", v.monthlyResult().map(m -> monthlyRecordDto(m, a.tenantId())).orElse(null),
-            "live_monthly_evaluation", monthlyEvalDto(v.liveMonthlyEvaluation()),
-            "formula_version", v.formulaVersion(),
-            "timezone", "Asia/Shanghai",
-            "observed_at", v.observedAt().toString(),
-            "source", "postgresql"
-        ), r);
+            r
+        );
     }
 
     @GetMapping("/sla/reports/{serviceId}/details")
@@ -342,6 +356,52 @@ public final class OnCallEscalationController {
             "recorded_by", s.recordedBy(),
             "recorded_at", s.recordedAt().toString()
         );
+    }
+
+    /** A tagged exact-duration projection is additive; legacy/frozen fixture shapes stay readable. */
+
+    private static Map<String, Object> reportKpis(SlaReportView view) {
+        var result = map(
+            "mean_verified_availability_pct",
+            view.meanVerifiedAvailabilityPct(),
+            "unavailable_union_total_sec",
+            view.unavailableUnionTotalSec(),
+            "mtta",
+            latencyDto(view.mtta()),
+            "mttr",
+            latencyDto(view.mttr()),
+            "unrecovered_total_count",
+            view.unrecoveredTotalCount(),
+            "unknown_interval_total_sec",
+            view.unknownIntervalTotalSec()
+        );
+        var aggregate = view.availabilityAggregate();
+        if (aggregate != null) {
+            if (
+                !Objects.equals(aggregate.percentage(), view.meanVerifiedAvailabilityPct()) ||
+                aggregate.serviceCount() != view.services().size()
+            ) {
+                throw unavailable();
+            }
+            result.put(
+                "availability_aggregate",
+                map(
+                    "source_version",
+                    cn.mop.domain.sla.ServiceAvailabilityAggregate.SOURCE_VERSION,
+                    "known_available_milliseconds",
+                    aggregate.knownAvailableMillis(),
+                    "effective_service_milliseconds",
+                    aggregate.effectiveServiceMillis(),
+                    "service_count",
+                    aggregate.serviceCount(),
+                    "qualified_service_count",
+                    aggregate.qualifiedServiceCount(),
+                    "coverage_status",
+                    aggregate.coverageStatus()
+                )
+            );
+        }
+        return result;
     }
 
     private static Map<String, Object> latencyDto(LatencyStats l) {

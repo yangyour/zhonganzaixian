@@ -47,3 +47,10 @@ it('unknown monitoring timing explains its missing evidence instead of claiming 
  expect(host.textContent).toContain('恢复待核验 1')
  expect(vm.state.report.kpis.mttr.sample_count).toBe(2)
 })
+
+it('shows the weighted duration basis from the current report and preserves the frozen financial result',async()=>{
+ const {weightedAvailabilityReport}=await import('./slaAvailabilityAggregate.fixture');vi.spyOn(api,'request').mockResolvedValue(weightedAvailabilityReport());await mount();vm.periodInput='2026-10';await vm.workspace.load('2026-10');await settle();expect(host.textContent).toContain('按有效时长汇总可用率');expect(host.textContent).toContain('90.9091%');expect(host.textContent).toContain('合格服务 2 / 2');expect(vm.state.report.monthly_result).toEqual(wire.report.monthly_result)
+})
+it('one insufficient service keeps the fleet card unknown while still showing coverage counts',async()=>{
+ const {insufficientAvailabilityReport}=await import('./slaAvailabilityAggregate.fixture');vi.spyOn(api,'request').mockResolvedValue(insufficientAvailabilityReport());await mount();vm.periodInput='2026-10';await vm.workspace.load('2026-10');await settle();expect(host.querySelector('.compact-result-summary')?.textContent).toContain('样本不足');expect(host.textContent).toContain('合格服务 1 / 2');expect(vm.state.report.kpis.mean_verified_availability_pct).toBeNull()
+})

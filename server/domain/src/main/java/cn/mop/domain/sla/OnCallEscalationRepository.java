@@ -317,6 +317,7 @@ public interface OnCallEscalationRepository {
         }
     }
 
+
     record SlaReportView(
         String tenantId,
         String period,
@@ -332,8 +333,47 @@ public interface OnCallEscalationRepository {
         Optional<MonthlyResultRecord> monthlyResult,
         MonthlyEvaluation liveMonthlyEvaluation,
         String formulaVersion,
-        Instant observedAt
-    ) {}
+        Instant observedAt,
+        ServiceAvailabilityAggregate.Result availabilityAggregate
+    ) {
+        /** Legacy projections retain their original shape and do not acquire fabricated aggregation evidence. */
+        public SlaReportView(
+            String tenantId,
+            String period,
+            Tier currentTier,
+            BigDecimal targetAvailabilityPct,
+            BigDecimal meanVerifiedAvailabilityPct,
+            long unavailableUnionTotalSec,
+            LatencyStats mtta,
+            LatencyStats mttr,
+            int unrecoveredTotalCount,
+            long unknownIntervalTotalSec,
+            List<ServiceRow> services,
+            Optional<MonthlyResultRecord> monthlyResult,
+            MonthlyEvaluation liveMonthlyEvaluation,
+            String formulaVersion,
+            Instant observedAt
+        ) {
+            this(
+                tenantId,
+                period,
+                currentTier,
+                targetAvailabilityPct,
+                meanVerifiedAvailabilityPct,
+                unavailableUnionTotalSec,
+                mtta,
+                mttr,
+                unrecoveredTotalCount,
+                unknownIntervalTotalSec,
+                services,
+                monthlyResult,
+                liveMonthlyEvaluation,
+                formulaVersion,
+                observedAt,
+                null
+            );
+        }
+    }
 
     List<String> readinessProblems();
     void authorizeWrite(Access access);

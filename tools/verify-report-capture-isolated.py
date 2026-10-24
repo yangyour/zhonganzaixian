@@ -16,6 +16,8 @@ import os
 from pathlib import Path
 import subprocess
 import threading
+import time
+import xml.etree.ElementTree as ET
 import uuid
 
 import paramiko
@@ -97,6 +99,8 @@ def run(output: Path, suite: str):
             cursor.execute('SELECT version,checksum FROM public.flyway_schema_history WHERE success ORDER BY installed_rank')
             history = cursor.fetchall()
             summary['schema_latest'] = history[-1][0]
+            if suite == 'sla-availability-aggregate' and (len(history) != 55 or history[-1][0] != '55'):
+                raise ValueError('Required active V55 availability schema unavailable')
             if len(history) < 50:
                 raise ValueError('Required report schema unavailable')
         before = protected_fingerprints(admin)
@@ -134,6 +138,8 @@ def run(output: Path, suite: str):
         if viewers:
             env.update({'MOP_RUN_DASHBOARD_PENDING_PG_TESTS': 'true', 'MOP_DASHBOARD_TEST_VIEWER': viewers[0],
                         'MOP_DASHBOARD_TEST_OTHER_VIEWER': viewers[1]})
+        if suite == 'sla-availability-aggregate':
+            env['MOP_RUN_SLA_AVAILABILITY_AGGREGATE_PG_TESTS'] = 'true'
         if suite == 'dashboard-sla':
             env['MOP_RUN_DASHBOARD_SLA_PG_TESTS'] = 'true'
         if suite == 'dashboard-actionable':
@@ -147,13 +153,23 @@ def run(output: Path, suite: str):
                          'dashboard': 'PostgresDashboardPendingTicketsIntegrationTest',
                          'dashboard-sla': 'PostgresDashboardPendingTicketSlaIntegrationTest',
                          'dashboard-actionable': 'PostgresDashboardActionableTicketsIntegrationTest',
-                         'asset-ledger-facts': 'PostgresAssetLedgerFactsIsolatedIntegrationTest'}[suite]
+                         'asset-ledger-facts': 'PostgresAssetLedgerFactsIsolatedIntegrationTest',
+                         'sla-availability-aggregate': 'PostgresSlaAvailabilityAggregateIntegrationTest'}[suite]
+        java_started_ns = time.time_ns()
         with (output / 'maven.log').open('w', encoding='utf-8') as log:
             result = subprocess.run(['mvn.cmd', '-pl', 'server/persistence', '-am',
                                      '-Dtest=' + selected_test,
                                      '-Dsurefire.failIfNoSpecifiedTests=false', 'test'], cwd=ROOT, env=env,
                                     stdout=log, stderr=subprocess.STDOUT, timeout=600)
         summary['maven_exit_code'] = result.returncode
+        if suite == 'sla-availability-aggregate':
+            reports = list((ROOT / 'server/persistence/target/surefire-reports').glob('TEST-*PostgresSlaAvailabilityAggregateIntegrationTest.xml'))
+            if len(reports) != 1 or reports[0].stat().st_mtime_ns < java_started_ns - 2_000_000_000:
+                raise ValueError('Fresh availability integration report missing')
+            junit = ET.parse(reports[0]).getroot()
+            summary['junit'] = {key: int(junit.get(key, '0')) for key in ('tests','failures','errors','skipped')}
+            if summary['junit'] != {'tests':3,'failures':0,'errors':0,'skipped':0}:
+                raise ValueError('Availability integration scenarios did not all execute')
         after = protected_fingerprints(admin)
         summary['actual_tenant_fingerprints_unchanged'] = before == after
         with admin.cursor() as cursor:
@@ -199,6 +215,6 @@ def run(output: Path, suite: str):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', required=True, type=Path)
-    parser.add_argument('--suite', choices=('report', 'dashboard', 'dashboard-sla', 'dashboard-actionable', 'asset-ledger-facts'), default='report')
+    parser.add_argument('--suite', choices=('report', 'dashboard', 'dashboard-sla', 'dashboard-actionable', 'asset-ledger-facts', 'sla-availability-aggregate'), default='report')
     args = parser.parse_args()
     raise SystemExit(run(args.output.resolve(), args.suite))

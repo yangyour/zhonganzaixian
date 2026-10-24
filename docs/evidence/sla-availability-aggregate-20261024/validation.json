@@ -1,0 +1,84 @@
+{
+  "project": "众安在线MOP",
+  "base_commit": "7f65838f",
+  "status": "VERIFIED_EXACT_DURATION_AGGREGATION_WITH_EXPLICIT_SOURCE_LIMITS",
+  "source_hashes": {
+    "apps/web/qa/browser/sla-availability-aggregate.pw.ts": "501f18cfa000909fa2b6b308330f4f1be881a6edc10e32cf0967278610c193b7",
+    "apps/web/qa/sla-monitoring.fixture.ts": "e43240e9f79dd5958c0826eb13b1d2cce65164bafb9d0f1b0f243dc15ef53d59",
+    "apps/web/src/pages/SlaReportsPage.vue": "2f5bf4f7618a52f717c1c3057acf44517dd7738700b28e8060e2cae79076a8d3",
+    "apps/web/src/utils/onCallBoard.ts": "09ad4bbf3b8181e6cd51ba1a09d66790827448c7e17f833d5ad9c666a2ed2369",
+    "apps/web/src/utils/slaPayloadIntegrity.ts": "c15ee559fe24887a2ba85c8c5ed679777244f83a3ce913e70f79c90304d6c38a",
+    "apps/web/src/utils/slaServiceReviewExport.ts": "b9d873874ce6fddb373237538ee5cec8b9f1eb5f5aaefc69edd353d732970e6a",
+    "apps/web/tests/slaAvailabilityAggregate.fixture.ts": "ba6814e3c575c8466634f85a4a63c07e4609eb9abb988679d6bfbafcf0c17212",
+    "apps/web/tests/slaAvailabilityAggregate.test.ts": "a94470fc0b5669baa24f77e3cb7ba0c1383923336e1a1226b0e09f13198c1d15",
+    "apps/web/tests/slaReportsPage.test.ts": "65181ec778d91f69c420ec554bf020e990572536e49066200cc3d252d368acd6",
+    "server/api/src/main/java/cn/mop/api/OnCallEscalationController.java": "817d65fa3dfa1eadf534b7d8305340b81a2dfe197363ddaac76a0f18a66ffb90",
+    "server/api/src/test/java/cn/mop/api/OnCallEscalationControllerTest.java": "99a68b94016f40ed51a487fa2db66f3b2a5d0fd9362439e7f5ca75c15770536b",
+    "server/api/src/test/java/cn/mop/api/ServiceAvailabilityAggregateTest.java": "faa7d173dbbf28dbdd1999869f722faaa0245721e51dd39d75e8cc61047d190d",
+    "server/domain/src/main/java/cn/mop/domain/sla/OnCallEscalationRepository.java": "e21219a6147db8205e0aa18774f2eaf36338bd222a60c49fea7ca419184b2d7e",
+    "server/domain/src/main/java/cn/mop/domain/sla/ServiceAvailabilityAggregate.java": "b30420b7de50c1a6f3412c04a858eefc8ff47b76f54fa5fc9a016ab81d298cd3",
+    "server/domain/src/main/java/cn/mop/domain/sla/SlaAvailabilityAndCompensation.java": "5d60c5045b140029b3dd6fd0f65d78449a6b85bbae769004e8647f839dd3e400",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresOnCallEscalationRepository.java": "5bfbd609882e4d92637febb99d35be7faf4f0c649de45897600b454408d39408",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresSlaAvailabilityAggregateIntegrationTest.java": "703f55b40b1ae6172dab3d2bd8383323283694497ef0ef33f554df7fd3a6f7af",
+    "tools/oncall-escalation-contract.mjs": "0f40128d82546b28b8ad4064ad7f2098a86191f6fee423537e6b38535622e6da",
+    "tools/verify-report-capture-isolated.py": "c171c2ae273b77cba415257073353a1597fb4e5a7a14b5cfb708662811a3f67d"
+  },
+  "java": {
+    "tests": 29,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "web": {
+    "tests": 137,
+    "files": 5,
+    "failures": 0
+  },
+  "contracts": {
+    "tests": 215,
+    "generation_check": "PASSED"
+  },
+  "postgresql": {
+    "evidence": "postgres-attempt-2.json",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "version": "17.9",
+    "schema": "V55",
+    "positive_health_source": "NOT_CONFIGURED_NOT_CLAIMED",
+    "scope": "FRESH_SYNTHETIC_TENANTS_REAL_READ_TRANSACTIONS"
+  },
+  "browser": {
+    "engine": "Microsoft Edge",
+    "tests": 4,
+    "new_aggregation_scenarios": 2,
+    "existing_timing_regressions": 2,
+    "viewport_widths": [
+      1024,
+      1440
+    ],
+    "axe_violations": 0,
+    "csv_download": "ACTUAL_BROWSER_DOWNLOAD_SYNTHETIC_API",
+    "visual_review": "TWO_SCREENSHOTS_REVIEWED"
+  },
+  "build": {
+    "typecheck": "PASSED",
+    "production_build": "PASSED",
+    "static_policy": "PASSED"
+  },
+  "schema_migrations": 0,
+  "external_messages": 0,
+  "deployment": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "failures_preserved": [
+    "New test context originally omitted capability booleans; corrected without loosening validation",
+    "Local range formatter selected an overlapping record and constructor; compilation rejected the duplicate tail, original semantics restored and formatter selection corrected",
+    "Browser helper required the Node JSON import attribute; corrected and all four scenarios executed"
+  ],
+  "remaining": [
+    "Actual healthy coverage source and completeness validation",
+    "Cross-business same-version snapshots and availability freeze/reconciliation",
+    "Customer compensation policy and formal acceptance"
+  ]
+}

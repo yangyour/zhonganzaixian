@@ -412,16 +412,19 @@
       "evidence": [
         "docs/sla-monitoring-source-20261024.md",
         "docs/evidence/sla-monitoring-source-20261024/validation.json",
-        "docs/remote-release-20261024.md"
+        "docs/remote-release-20261024.md",
+        "docs/sla-availability-aggregate-20261024.md",
+        "docs/evidence/sla-availability-aggregate-20261024/validation.json"
       ],
       "commits": [],
       "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
       "completed_subitems": [
         "Live SLA total/service MTTA and MTTR now use original monitoring event clocks and verified exact t2, with explicit unknown/source metadata; nanosecond recovery comparisons and new monthly freeze/readback verified on designated PG; historic frozen rows retained",
-        "Runtime source b964701b deployed to designated active V55; 462 HTTP checks and seven actual-API desktop reads verified. Empty publication lists and read checks do not complete nonempty write/customer workflows."
+        "Runtime source b964701b deployed to designated active V55; 462 HTTP checks and seven actual-API desktop reads verified. Empty publication lists and read checks do not complete nonempty write/customer workflows.",
+        "SLA可用率按同一人群的已核验可用/有效服务毫秒汇总，替代简单百分比平均；口径、分子分母、覆盖人数接到API/桌面/CSV，保留任一服务不足时null。29Java/137Web/215契约、3指定PG缺来源/隔离及4实际Edge合成场景通过；实际健康来源/可用性冻结未计完成。"
       ],
       "remaining_subitems": [
-        "Unified availability denominators and actual health coverage",
+        "实际来源支持的健康覆盖、完整时间窗口与非空健康数据联调；已实现的精确有效时长汇总不重复列为缺失。",
         "Formal same-version cross-business snapshots, export/reconciliation and compensation approval",
         "Actual lifecycle/provider/browser integration and formal contract acceptance"
       ]
@@ -685,7 +688,9 @@
         "docs/sla-monitoring-source-20261024.md",
         "docs/evidence/sla-monitoring-source-20261024/validation.json",
         "docs/remote-release-20261024.md",
-        "docs/sla-monitoring-source-20261024.md"
+        "docs/sla-monitoring-source-20261024.md",
+        "docs/sla-availability-aggregate-20261024.md",
+        "docs/evidence/sla-availability-aggregate-20261024/validation.json"
       ],
       "commits": [
         "d58ea011",
@@ -693,14 +698,15 @@
         "25a17013"
       ],
       "remaining": [
-        "Designated PostgreSQL and browser integration; formal acceptance",
-        "Remaining source aggregates, effective denominators, frozen reports and customer-confirmed inputs"
+        "指定来源和完整浏览器集成；正式验收。",
+        "其余跨业务来源聚合、同版本快照与冻结/对账，以及客户确认输入；SLA精确有效时长汇总已实现，实际健康来源仍缺。"
       ],
       "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
       "completed_subitems": [
         "Live SLA total/service MTTA and MTTR now use original monitoring event clocks and verified exact t2, with explicit unknown/source metadata; nanosecond recovery comparisons and new monthly freeze/readback verified on designated PG; historic frozen rows retained",
         "Runtime source b964701b deployed to designated active V55; 462 HTTP checks and seven actual-API desktop reads verified. Empty publication lists and read checks do not complete nonempty write/customer workflows.",
-        "b964701b 已统一事件t0、首次确认t1及可信精确t2；真实指定PG与月度冻结回读已验证。剩余健康覆盖、有效分母及对账另验。"
+        "b964701b 已统一事件t0、首次确认t1及可信精确t2；真实指定PG与月度冻结回读已验证。剩余健康覆盖、有效分母及对账另验。",
+        "SLA可用率按同一人群的已核验可用/有效服务毫秒汇总，替代简单百分比平均；口径、分子分母、覆盖人数接到API/桌面/CSV，保留任一服务不足时null。29Java/137Web/215契约、3指定PG缺来源/隔离及4实际Edge合成场景通过；实际健康来源/可用性冻结未计完成。"
       ]
     },
     {

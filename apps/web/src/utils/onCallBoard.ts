@@ -4,7 +4,7 @@ import {createRequestId} from './browserCrypto'
 import {exportExact,exportInteger,exportTime,exportUuid,exportEquals} from './assetExportJobs'
 import {writeFailureUncertain} from './writeFailure'
 import type {ServiceTierCode} from './serviceTiers'
-import {validateSlaService,validateSlaKpis,validateSlaIntervals,validateSlaJudgments,validateSlaMonthlyNumbers,validSlaServiceIdentity,validSlaPercentage} from './slaPayloadIntegrity'
+import {validateSlaService,validateSlaKpis,validateSlaAggregateServices,validateSlaIntervals,validateSlaJudgments,validateSlaMonthlyNumbers,validSlaServiceIdentity,validSlaPercentage} from './slaPayloadIntegrity'
 
 /** On-Call Board, 18:00 Shift Handoff, Configurable Escalation Chain & SLA Monthly Reports (D16 / V36: M5-9, M5-10, M5-12, M5-13, M5-19). */
 export type ShiftCode='DAY'|'NIGHT'|'FULL_DAY'
@@ -95,6 +95,7 @@ export interface SlaReportPayload {
  tenant_id:string;period:string;current_tier:ServiceTierCode|null;target_availability_pct:number|null;
  kpis:{
   mean_verified_availability_pct:number|null;unavailable_union_total_sec:number;
+  availability_aggregate?:{source_version:'mop-availability-effective-milliseconds-v1';known_available_milliseconds:number;effective_service_milliseconds:number;service_count:number;qualified_service_count:number;coverage_status:'NO_SERVICES'|'ALL_SERVICES_QUALIFIED'|'INSUFFICIENT_COVERAGE'};
   mtta:SlaLatencyStats;mttr:SlaLatencyStats;unrecovered_total_count:number;unknown_interval_total_sec:number
  };
  services:SlaServiceRow[];monthly_result:SlaMonthlyResultRecord|null;
@@ -196,6 +197,7 @@ export function readSlaReport(raw:unknown,scope:OnCallContext,expectedPeriod:str
  if(!Array.isArray(raw.services)||raw.services.length>1000)throw invalid()
  validateSlaKpis(raw.kpis);if(!validSlaPercentage(raw.target_availability_pct))throw invalid()
  const services=new Set<string>();for(const service of raw.services){validateSlaService(service);const id=(service as Record<string,unknown>).service_id as string;if(services.has(id))throw invalid();services.add(id)}
+ validateSlaAggregateServices(raw.kpis,raw.services)
  if(!exportExact(raw.live_monthly_evaluation,['tier_snapshot','total_ticket_count','applicable_count','met_count','not_met_count','unresolved_count','not_applicable_count','achievement_numerator','achievement_denominator','achievement_rate_pct','compensation_ratio','monthly_fee_fen','compensation_amount_fen','compensation_status','candidate_fixed_ratio_fen','candidate_shortfall_weighted_fen','formula_version','items']))throw invalid()
  validateMonthlyEvaluation(raw.live_monthly_evaluation)
  if(raw.monthly_result!==null)readSlaMonthlyRecord(raw.monthly_result,scope,expectedPeriod)

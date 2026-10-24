@@ -242,4 +242,82 @@ class OnCallEscalationControllerTest {
         when(platform.membership(ACTOR, TENANT)).thenReturn(Optional.of(new Membership(ACTOR, TENANT, "tadmin", 3, true)));
         assertEquals(403, assertThrows(DomainException.class, () -> controller.board(request("GET", "/oncall/board", ""))).status);
     }
+
+    @Test
+    void exactDurationAggregateIsTaggedAndRejectsAnUnrelatedArithmeticMean() {
+        var start = Instant.parse("2026-10-01T00:00:00Z");
+        var firstWindow = new cn.mop.domain.time.IntervalSets.Interval(start, start.plusSeconds(1000));
+        var secondWindow = new cn.mop.domain.time.IntervalSets.Interval(start, start.plusSeconds(100));
+        var first = SlaAvailabilityAndCompensation.evaluateServiceEvidence(
+            "SERVICE_A",
+            "合成A",
+            new BigDecimal("99.9"),
+            firstWindow,
+            List.of(),
+            List.of(),
+            List.of(),
+            List.of(),
+            List.of(firstWindow)
+        );
+        var second = SlaAvailabilityAndCompensation.evaluateServiceEvidence(
+            "SERVICE_B",
+            "合成B",
+            new BigDecimal("99.9"),
+            secondWindow,
+            List.of(),
+            List.of(secondWindow),
+            List.of(),
+            List.of(),
+            List.of()
+        );
+        var aggregate = cn.mop.domain.sla.ServiceAvailabilityAggregate.calculate(List.of(first, second));
+        var evaluation = SlaAvailabilityAndCompensation.evaluateMonthly(Tier.STANDARD, null, List.of());
+        var report = new SlaReportView(
+            TENANT,
+            "2026-10",
+            Tier.STANDARD,
+            new BigDecimal("99.9"),
+            aggregate.percentage(),
+            100,
+            first.service().mtta(),
+            first.service().mttr(),
+            0,
+            0,
+            List.of(first.service(), second.service()),
+            Optional.empty(),
+            evaluation,
+            SlaAvailabilityAndCompensation.FORMULA_VERSION,
+            AT,
+            aggregate
+        );
+        when(repository.slaReport(any(), eq("2026-10"))).thenReturn(report);
+        var request = request("GET", "/sla/reports", "");
+        request.addParameter("period", "2026-10");
+        var kpis = (Map<?, ?>) data(controller.slaReport(request)).get("kpis");
+        assertEquals(new BigDecimal("90.9091"), kpis.get("mean_verified_availability_pct"));
+        var source = (Map<?, ?>) kpis.get("availability_aggregate");
+        assertEquals(1_100_000L, source.get("effective_service_milliseconds"));
+        assertEquals(cn.mop.domain.sla.ServiceAvailabilityAggregate.SOURCE_VERSION, source.get("source_version"));
+        var invalidReport = new SlaReportView(
+            TENANT,
+            "2026-10",
+            Tier.STANDARD,
+            new BigDecimal("99.9"),
+            new BigDecimal("50"),
+            100,
+            first.service().mtta(),
+            first.service().mttr(),
+            0,
+            0,
+            List.of(first.service(), second.service()),
+            Optional.empty(),
+            evaluation,
+            SlaAvailabilityAndCompensation.FORMULA_VERSION,
+            AT,
+            aggregate
+        );
+        when(repository.slaReport(any(), eq("2026-10"))).thenReturn(invalidReport);
+        assertEquals(503, assertThrows(DomainException.class, () -> controller.slaReport(request)).status);
+    }
+
 }

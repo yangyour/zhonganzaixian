@@ -39,10 +39,87 @@ export function validateSlaService(value:unknown){
  if(Number(value.unknown_interval_sec)>0&&value.unknown_policy_status!=='UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR')bad()
  validateLatencyPair(value.mtta,value.mttr);validateSlaIntervals(value.interval_details)
 }
-export function validateSlaKpis(value:unknown){
- if(!exportExact(value,['mean_verified_availability_pct','unavailable_union_total_sec','mtta','mttr','unrecovered_total_count','unknown_interval_total_sec'])||!pct(value.mean_verified_availability_pct))bad()
- for(const key of ['unavailable_union_total_sec','unrecovered_total_count','unknown_interval_total_sec'])if(!exportInteger(value[key]))bad()
- validateLatencyPair(value.mtta,value.mttr)
+export function validateSlaKpis(value: unknown) {
+  const tagged = typeof value === 'object' && value !== null && Object.hasOwn(value, 'availability_aggregate')
+  if (
+    !exportExact(value, [
+      'mean_verified_availability_pct',
+      'unavailable_union_total_sec',
+      'mtta',
+      'mttr',
+      'unrecovered_total_count',
+      'unknown_interval_total_sec',
+      ...(tagged ? ['availability_aggregate'] : [])
+    ]) ||
+    !pct(value.mean_verified_availability_pct)
+  )
+    bad()
+  for (const key of ['unavailable_union_total_sec', 'unrecovered_total_count', 'unknown_interval_total_sec'])
+    if (!exportInteger(value[key])) bad()
+  validateLatencyPair(value.mtta, value.mttr)
+}
+/** Tagged fleet percentages must reconcile to exact-duration measures and the same service population. */
+export function validateSlaAggregateServices(kpis: unknown, services: unknown[]) {
+  if (typeof kpis !== 'object' || kpis === null || !Object.hasOwn(kpis, 'availability_aggregate')) return
+  const k = kpis as Record<string, unknown>,
+    value = k.availability_aggregate
+  if (
+    !exportExact(value, [
+      'source_version',
+      'known_available_milliseconds',
+      'effective_service_milliseconds',
+      'service_count',
+      'qualified_service_count',
+      'coverage_status'
+    ]) ||
+    value.source_version !== 'mop-availability-effective-milliseconds-v1'
+  )
+    bad()
+  for (const key of [
+    'known_available_milliseconds',
+    'effective_service_milliseconds',
+    'service_count',
+    'qualified_service_count'
+  ])
+    if (!exportInteger(value[key])) bad()
+  if (value.service_count !== services.length || Number(value.service_count) > 1000) bad()
+  let qualified = 0,
+    known = 0n,
+    effective = 0n,
+    unavailable = 0n,
+    unknown = 0n
+  for (const raw of services) {
+    const row = raw as Record<string, unknown>
+    if (row.verified_availability_pct !== null) qualified++
+    known += BigInt(Number(row.known_available_sec)) * 1000n
+    effective += BigInt(Number(row.effective_service_sec)) * 1000n
+    unavailable += BigInt(Number(row.unavailable_union_sec))
+    unknown += BigInt(Number(row.unknown_interval_sec))
+  }
+  if (
+    value.qualified_service_count !== qualified ||
+    BigInt(Number(k.unavailable_union_total_sec)) !== unavailable ||
+    BigInt(Number(k.unknown_interval_total_sec)) !== unknown
+  )
+    bad()
+  const numerator = BigInt(Number(value.known_available_milliseconds)),
+    denominator = BigInt(Number(value.effective_service_milliseconds)),
+    roundingBudget = BigInt(services.length) * 999n
+  if (
+    numerator > denominator ||
+    numerator < known ||
+    numerator > known + roundingBudget ||
+    denominator < effective ||
+    denominator > effective + roundingBudget
+  )
+    bad()
+  const sufficient = services.length > 0 && qualified === services.length && denominator > 0n
+  const status = services.length === 0 ? 'NO_SERVICES' : sufficient ? 'ALL_SERVICES_QUALIFIED' : 'INSUFFICIENT_COVERAGE'
+  if (value.coverage_status !== status) bad()
+  if (sufficient) {
+    const expected = Number((numerator * 1_000_000n + denominator / 2n) / denominator) / 10000
+    if (k.mean_verified_availability_pct !== expected) bad()
+  } else if (k.mean_verified_availability_pct !== null) bad()
 }
 export function validateSlaJudgments(value:unknown){
  if(!Array.isArray(value))bad();const seen=new Set<string>()

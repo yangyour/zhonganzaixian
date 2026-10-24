@@ -132,8 +132,9 @@ const demoExample = useDemoExample<{month:string}>('sla-reports', permitted, () 
     <div class="review-export"><button type="button" :disabled="locked||periodInput!==state.report.period" aria-describedby="sla-review-export-note" @click="exportServices">{{exporting?'正在生成服务核对 CSV…':'导出当前服务核对 CSV'}}</button><p id="sla-review-export-note">仅导出当前已加载的 {{state.report.services.length}} 条服务可用性及观察时间；不包含赔付金额、工单明细或冻结快照，不是正式报告或账单。下载不会保存或冻结月报。</p><ApiErrorNotice :error="exportError" /><p v-if="exportStatus" role="status">{{exportStatus}}</p></div>
     <div class="compact-result-summary">
      <div>
-      <span>已核验可用性均值</span>
-      <b>{{ state.report.kpis.mean_verified_availability_pct!==null?`${state.report.kpis.mean_verified_availability_pct}%`:'待配置' }}</b>
+      <span>{{state.report.kpis.availability_aggregate?'按有效时长汇总可用率':'已核验可用性均值'}}</span>
+      <b>{{ state.report.kpis.mean_verified_availability_pct!==null?`${state.report.kpis.mean_verified_availability_pct}%`:(state.report.kpis.availability_aggregate?'样本不足':'待配置') }}</b>
+      <small v-if="state.report.kpis.availability_aggregate">已核验可用 {{(state.report.kpis.availability_aggregate.known_available_milliseconds/1000).toLocaleString('zh-CN',{maximumFractionDigits:3})}} 秒 / 有效服务 {{(state.report.kpis.availability_aggregate.effective_service_milliseconds/1000).toLocaleString('zh-CN',{maximumFractionDigits:3})}} 秒 · 合格服务 {{state.report.kpis.availability_aggregate.qualified_service_count}} / {{state.report.kpis.availability_aggregate.service_count}}</small>
       <small>目标 {{ state.report.target_availability_pct===null?'未配置':`${state.report.target_availability_pct}%` }} ({{ state.report.current_tier? tierLabels[state.report.current_tier]:'未配置' }})</small>
      </div>
      <div>

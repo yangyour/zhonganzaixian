@@ -71,6 +71,38 @@ public final class SlaAvailabilityAndCompensation {
         }
     }
 
+    /** Exact millisecond measures accompany the legacy second-based service projection. */
+
+    public record ServiceEvaluation(ServiceRow service, long effectiveServiceMillis, long knownAvailableMillis) {
+        public ServiceEvaluation {
+            Objects.requireNonNull(service);
+            if (
+                effectiveServiceMillis < 0 ||
+                knownAvailableMillis < 0 ||
+                knownAvailableMillis > effectiveServiceMillis ||
+                service.effectiveServiceSec() == null ||
+                service.knownAvailableSec() == null ||
+                service.effectiveServiceSec() != effectiveServiceMillis / 1000 ||
+                service.knownAvailableSec() != knownAvailableMillis / 1000 ||
+                (service.verifiedAvailabilityPct() != null && effectiveServiceMillis == 0)
+            ) {
+                throw invalid();
+            }
+            if (
+                service.verifiedAvailabilityPct() != null &&
+                service
+                    .verifiedAvailabilityPct()
+                    .compareTo(
+                        BigDecimal.valueOf(knownAvailableMillis)
+                            .multiply(BigDecimal.valueOf(100))
+                            .divide(BigDecimal.valueOf(effectiveServiceMillis), 4, RoundingMode.HALF_UP)
+                    ) != 0
+            ) {
+                throw invalid();
+            }
+        }
+    }
+
     public record TicketSample(
         String ticketId,
         Priority priority,
@@ -139,6 +171,7 @@ public final class SlaAvailabilityAndCompensation {
         }
     }
 
+
     public static ServiceRow evaluateService(
         String serviceId,
         String serviceName,
@@ -149,27 +182,84 @@ public final class SlaAvailabilityAndCompensation {
         Collection<Interval> unknownIntervals,
         List<TicketSample> tickets
     ) {
-        return evaluateService(serviceId,serviceName,targetPct,agreedWindow,approvedExclusions,
-            unavailableIntervals,unknownIntervals,tickets,List.of());
+        return evaluateService(
+            serviceId,
+            serviceName,
+            targetPct,
+            agreedWindow,
+            approvedExclusions,
+            unavailableIntervals,
+            unknownIntervals,
+            tickets,
+            List.of()
+        );
+    }
+
+    /** Retains the existing service-row API while the report caller can request exact aggregation measures. */
+
+    public static ServiceRow evaluateService(
+        String serviceId,
+        String serviceName,
+        BigDecimal targetPct,
+        Interval agreedWindow,
+        Collection<Interval> approvedExclusions,
+        Collection<Interval> unavailableIntervals,
+        Collection<Interval> unknownIntervals,
+        List<TicketSample> tickets,
+        Collection<Interval> observedCoverage
+    ) {
+        return evaluateServiceEvidence(
+            serviceId,
+            serviceName,
+            targetPct,
+            agreedWindow,
+            approvedExclusions,
+            unavailableIntervals,
+            unknownIntervals,
+            tickets,
+            observedCoverage
+        ).service();
     }
 
     /** Coverage must come from observed sampling intervals, never from the absence of tickets. */
-    public static ServiceRow evaluateService(String serviceId,String serviceName,BigDecimal targetPct,Interval agreedWindow,
-        Collection<Interval> approvedExclusions,Collection<Interval> unavailableIntervals,Collection<Interval> unknownIntervals,
-        List<TicketSample> tickets,Collection<Interval> observedCoverage) {
-        if (serviceId == null || serviceId.isBlank() || serviceName == null || serviceName.isBlank() || agreedWindow == null)
+
+    public static ServiceEvaluation evaluateServiceEvidence(
+        String serviceId,
+        String serviceName,
+        BigDecimal targetPct,
+        Interval agreedWindow,
+        Collection<Interval> approvedExclusions,
+        Collection<Interval> unavailableIntervals,
+        Collection<Interval> unknownIntervals,
+        List<TicketSample> tickets,
+        Collection<Interval> observedCoverage
+    ) {
+        if (
+            serviceId == null ||
+            serviceId.isBlank() ||
+            serviceName == null ||
+            serviceName.isBlank() ||
+            agreedWindow == null
+        ) {
             throw invalid();
-        List<Interval> clippedExclusions = IntervalSets.clip(approvedExclusions == null ? List.of() : approvedExclusions, agreedWindow);
+        }
+        List<Interval> clippedExclusions = IntervalSets.clip(
+            approvedExclusions == null ? List.of() : approvedExclusions,
+            agreedWindow
+        );
         List<Interval> effectiveWindows = IntervalSets.subtract(List.of(agreedWindow), clippedExclusions);
         var coverage = new ArrayList<Interval>(observedCoverage == null ? List.of() : observedCoverage);
         // A confirmed PROBLEM interval is known unavailable evidence, not evidence that any other time was healthy.
         coverage.addAll(unavailableIntervals == null ? List.of() : unavailableIntervals);
         var unknown = new ArrayList<Interval>(unknownIntervals == null ? List.of() : unknownIntervals);
-        unknown.addAll(IntervalSets.subtract(effectiveWindows,coverage));
-        List<Interval> clippedUnknown = IntervalSets.intersection(unknown,effectiveWindows);
-        List<Interval> knownWindows = IntervalSets.subtract(effectiveWindows,clippedUnknown);
-        List<Interval> clippedUnavailable = IntervalSets.intersection(unavailableIntervals == null ? List.of() : unavailableIntervals,knownWindows);
-        List<Interval> knownAvailable = IntervalSets.subtract(knownWindows,clippedUnavailable);
+        unknown.addAll(IntervalSets.subtract(effectiveWindows, coverage));
+        List<Interval> clippedUnknown = IntervalSets.intersection(unknown, effectiveWindows);
+        List<Interval> knownWindows = IntervalSets.subtract(effectiveWindows, clippedUnknown);
+        List<Interval> clippedUnavailable = IntervalSets.intersection(
+            unavailableIntervals == null ? List.of() : unavailableIntervals,
+            knownWindows
+        );
+        List<Interval> knownAvailable = IntervalSets.subtract(knownWindows, clippedUnavailable);
 
         long agreedSec = IntervalSets.duration(List.of(agreedWindow)).toSeconds();
         long exclusionSec = IntervalSets.duration(clippedExclusions).toSeconds();
@@ -180,14 +270,18 @@ public final class SlaAvailabilityAndCompensation {
 
         BigDecimal verifiedPct = null;
         BigDecimal upperBoundPct = null;
-        long serviceMillis=IntervalSets.duration(effectiveWindows).toMillis();
-        long effectiveMillis=IntervalSets.duration(knownWindows).toMillis();
-        long availableMillis=IntervalSets.duration(knownAvailable).toMillis();
-        boolean sufficientCoverage = serviceMillis > 0 && BigDecimal.valueOf(effectiveMillis).multiply(BigDecimal.TEN)
-            .compareTo(BigDecimal.valueOf(serviceMillis).multiply(BigDecimal.valueOf(9))) >= 0;
+        long serviceMillis = IntervalSets.duration(effectiveWindows).toMillis();
+        long effectiveMillis = IntervalSets.duration(knownWindows).toMillis();
+        long availableMillis = IntervalSets.duration(knownAvailable).toMillis();
+        boolean sufficientCoverage =
+            serviceMillis > 0 &&
+            BigDecimal.valueOf(effectiveMillis)
+                .multiply(BigDecimal.TEN)
+                .compareTo(BigDecimal.valueOf(serviceMillis).multiply(BigDecimal.valueOf(9))) >= 0;
         if (effectiveMillis > 0 && sufficientCoverage) {
-            verifiedPct = BigDecimal.valueOf(availableMillis).multiply(BigDecimal.valueOf(100))
-                .divide(BigDecimal.valueOf(effectiveMillis),4,RoundingMode.HALF_UP);
+            verifiedPct = BigDecimal.valueOf(availableMillis)
+                .multiply(BigDecimal.valueOf(100))
+                .divide(BigDecimal.valueOf(effectiveMillis), 4, RoundingMode.HALF_UP);
             upperBoundPct = clippedUnknown.isEmpty() ? verifiedPct : null;
         }
 
@@ -220,44 +314,84 @@ public final class SlaAvailabilityAndCompensation {
         List<ExplainedInterval> details = new ArrayList<>();
         for (Interval i : clippedExclusions) {
             long sec = Duration.between(i.start(), i.end()).toSeconds();
-            if (sec > 0) details.add(new ExplainedInterval("APPROVED_EXCLUSION", i.start(), i.end(), sec,
-                "经批准排除区间（从约定服务时段中扣除，不计入有效服务时间分母）"));
+            if (sec > 0) {
+                details.add(
+                    new ExplainedInterval(
+                        "APPROVED_EXCLUSION",
+                        i.start(),
+                        i.end(),
+                        sec,
+                        "经批准排除区间（从约定服务时段中扣除，不计入有效服务时间分母）"
+                    )
+                );
+            }
         }
         for (Interval i : clippedUnavailable) {
             long sec = Duration.between(i.start(), i.end()).toSeconds();
-            if (sec > 0) details.add(new ExplainedInterval("UNAVAILABLE_UNION", i.start(), i.end(), sec,
-                "不可用时间并集（重叠故障已合并去重，从有效服务时间中扣除）"));
+            if (sec > 0) {
+                details.add(
+                    new ExplainedInterval(
+                        "UNAVAILABLE_UNION",
+                        i.start(),
+                        i.end(),
+                        sec,
+                        "不可用时间并集（重叠故障已合并去重，从有效服务时间中扣除）"
+                    )
+                );
+            }
         }
         for (Interval i : clippedUnknown) {
             long sec = Duration.between(i.start(), i.end()).toSeconds();
-            if (sec > 0) details.add(new ExplainedInterval("UNKNOWN_DATA_GAP", i.start(), i.end(), sec,
-                "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"));
+            if (sec > 0) {
+                details.add(
+                    new ExplainedInterval(
+                        "UNKNOWN_DATA_GAP",
+                        i.start(),
+                        i.end(),
+                        sec,
+                        "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+                    )
+                );
+            }
         }
         for (Interval i : knownAvailable) {
             long sec = Duration.between(i.start(), i.end()).toSeconds();
-            if (sec > 0) details.add(new ExplainedInterval("KNOWN_AVAILABLE", i.start(), i.end(), sec,
-                "已核实可用区间（有效服务时段扣除不可用并集与未知区间后的实际可用时段）"));
+            if (sec > 0) {
+                details.add(
+                    new ExplainedInterval(
+                        "KNOWN_AVAILABLE",
+                        i.start(),
+                        i.end(),
+                        sec,
+                        "已核实可用区间（有效服务时段扣除不可用并集与未知区间后的实际可用时段）"
+                    )
+                );
+            }
         }
 
-        return new ServiceRow(
-            serviceId,
-            serviceName,
-            targetPct,
-            agreedSec,
-            exclusionSec,
-            effectiveSec,
-            unavailableSec,
-            unknownSec,
-            knownAvailableSec,
-            verifiedPct,
-            upperBoundPct,
-            safeTickets.size(),
-            mtta,
-            mttr,
-            unrecovered,
-            status,
-            !clippedUnknown.isEmpty() ? "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR" : "NO_UNKNOWN_GAPS",
-            details
+        return new ServiceEvaluation(
+            new ServiceRow(
+                serviceId,
+                serviceName,
+                targetPct,
+                agreedSec,
+                exclusionSec,
+                effectiveSec,
+                unavailableSec,
+                unknownSec,
+                knownAvailableSec,
+                verifiedPct,
+                upperBoundPct,
+                safeTickets.size(),
+                mtta,
+                mttr,
+                unrecovered,
+                status,
+                !clippedUnknown.isEmpty() ? "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR" : "NO_UNKNOWN_GAPS",
+                details
+            ),
+            effectiveMillis,
+            availableMillis
         );
     }
 

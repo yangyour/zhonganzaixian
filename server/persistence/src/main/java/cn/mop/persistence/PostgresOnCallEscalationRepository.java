@@ -395,6 +395,7 @@ public final class PostgresOnCallEscalationRepository implements OnCallEscalatio
         }
     }
 
+
     @Override
     public SlaReportView slaReport(Access a, String period) {
         OnCallEscalationRepository.requireMonth(period);
@@ -538,8 +539,9 @@ public final class PostgresOnCallEscalationRepository implements OnCallEscalatio
                 }
             }
             List<ServiceRow> services = new ArrayList<>();
+            var availabilityMeasures = new ArrayList<SlaAvailabilityAndCompensation.ServiceEvaluation>();
             for (var asset : assets.entrySet()) {
-                var availability = SlaAvailabilityAndCompensation.evaluateService(
+                var availabilityEvidence = SlaAvailabilityAndCompensation.evaluateServiceEvidence(
                     "ASSET_" + asset.getKey(),
                     asset.getValue(),
                     targetPct,
@@ -550,6 +552,8 @@ public final class PostgresOnCallEscalationRepository implements OnCallEscalatio
                     List.of(),
                     List.of()
                 );
+                availabilityMeasures.add(availabilityEvidence);
+                var availability = availabilityEvidence.service();
                 var assetEvents = latencyEvents
                     .stream()
                     .filter(event -> event.sample().assetId().toString().equals(asset.getKey()))
@@ -567,14 +571,8 @@ public final class PostgresOnCallEscalationRepository implements OnCallEscalatio
                     )
                 );
             }
-            BigDecimal meanAvail = null;
-            if (!services.isEmpty() && services.stream().allMatch(v -> v.verifiedAvailabilityPct() != null)) {
-                meanAvail = services
-                    .stream()
-                    .map(ServiceRow::verifiedAvailabilityPct)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add)
-                    .divide(BigDecimal.valueOf(services.size()), 4, RoundingMode.HALF_UP);
-            }
+            var availabilityAggregate = cn.mop.domain.sla.ServiceAvailabilityAggregate.calculate(availabilityMeasures);
+            BigDecimal meanAvail = availabilityAggregate.percentage();
             long totalUnavailable = services.stream().mapToLong(ServiceRow::unavailableUnionSec).sum();
             long totalUnknown = services.stream().mapToLong(ServiceRow::unknownIntervalSec).sum();
             var latency = MonitoringSlaLatency.calculate(
@@ -604,7 +602,8 @@ public final class PostgresOnCallEscalationRepository implements OnCallEscalatio
                 loadMonthlyResult(c, a.tenantId(), period),
                 liveEval,
                 SlaAvailabilityAndCompensation.FORMULA_VERSION,
-                observed
+                observed,
+                availabilityAggregate
             );
         });
     }

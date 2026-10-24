@@ -25,7 +25,7 @@ session.value = { user: { id: wire.report.monthly_result.evaluated_by, display_n
 const router = createRouter({ history: createWebHistory(), routes: [{ path: '/sla-reports', component: SlaReportsPage }] })
 await router.push('/sla-reports')
 createApp({ render: () => h('div', { class: 'prototype-shell' }, [h('main', {
-  class: 'content', style: 'max-width:1400px;margin:auto',
+  id:'main-content',class: 'content', style: 'max-width:1400px;margin:auto',
 }, [h('p', '合成身份与模拟API，仅验证指标状态和导出，不是指定环境或客户验收。'),
   h('button', { onClick: () => { session.value = null; contextGeneration.value++ } }, '模拟撤销权限'),
   h(RouterView)])]) }).use(router).use(ElementPlus).mount('#fixture')

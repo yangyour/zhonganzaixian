@@ -1,5 +1,5 @@
 export function addOnCallEscalationContract(contract) {
-  const object = properties => ({ type: 'object', properties, required: Object.keys(properties), additionalProperties: false })
+  const object = (properties, required = Object.keys(properties)) => ({ type: 'object', properties, required, additionalProperties: false })
   const ref = name => ({ $ref: `#/components/schemas/${name}` })
   const uuid = { type: 'string', format: 'uuid' }
   const time = { type: 'string', format: 'date-time' }
@@ -290,7 +290,15 @@ export function addOnCallEscalationContract(contract) {
         mttr: latencyClock('mop-monitoring-recovery-t2-v1'),
         unrecovered_total_count: nonNegInt,
         unknown_interval_total_sec: nonNegLong,
-      }),
+        availability_aggregate: object({
+          source_version: { const: 'mop-availability-effective-milliseconds-v1' },
+          known_available_milliseconds: nonNegLong,
+          effective_service_milliseconds: nonNegLong,
+          service_count: { type: 'integer', minimum: 0, maximum: 1000 },
+          qualified_service_count: { type: 'integer', minimum: 0, maximum: 1000 },
+          coverage_status: { enum: ['NO_SERVICES', 'ALL_SERVICES_QUALIFIED', 'INSUFFICIENT_COVERAGE'] },
+        }),
+      }, ['mean_verified_availability_pct','unavailable_union_total_sec','mtta','mttr','unrecovered_total_count','unknown_interval_total_sec']),
       services: { type: 'array', maxItems: 1000, items: ref('SlaServiceRow') },
       monthly_result: nullable(ref('SlaMonthlyResultRecord')),
       live_monthly_evaluation: ref('SlaMonthlyEvaluation'),

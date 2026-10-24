@@ -1,0 +1,422 @@
+{
+  "environment": "lan-test-20261008",
+  "protected_fingerprint": {
+    "mop_asset": {
+      "count": 4,
+      "digest": "63515862daa8ca062a5b782e6c553447"
+    },
+    "mop_membership": {
+      "count": 5,
+      "digest": "9578aab3bd79c66982bdbc2992786b71"
+    },
+    "mop_site": {
+      "count": 2,
+      "digest": "3b0f198fe7c84fdb7d2deb64df2af072"
+    },
+    "mop_project_role": {
+      "count": 8,
+      "digest": "4d47cf9521305834f0712b4481abc64f"
+    },
+    "mop_member_role_assignment": {
+      "count": 1,
+      "digest": "8321c79b8e1935cbae173d70d171ec92"
+    },
+    "mop_email_binding": {
+      "count": 1,
+      "digest": "ce3a7f8056b85339f1082353c183a3a9"
+    },
+    "mop_wecom_binding": {
+      "count": 1,
+      "digest": "95f9525a5a15e7928956833657174af2"
+    }
+  },
+  "schema": [
+    {
+      "installed_rank": 1,
+      "version": "1",
+      "script": "V1__remote_test_platform.sql",
+      "checksum": -1484181377,
+      "success": true
+    },
+    {
+      "installed_rank": 2,
+      "version": "2",
+      "script": "V2__tenant_configuration_revisions.sql",
+      "checksum": 1161094071,
+      "success": true
+    },
+    {
+      "installed_rank": 3,
+      "version": "3",
+      "script": "V3__configuration_review_test_identity.sql",
+      "checksum": -1273598682,
+      "success": true
+    },
+    {
+      "installed_rank": 4,
+      "version": "4",
+      "script": "V4__durable_customer_report_registration.sql",
+      "checksum": 1369050258,
+      "success": true
+    },
+    {
+      "installed_rank": 5,
+      "version": "5",
+      "script": "V5__durable_report_photos.sql",
+      "checksum": 1887903094,
+      "success": true
+    },
+    {
+      "installed_rank": 6,
+      "version": "6",
+      "script": "V6__asset_import_sources_and_mapping.sql",
+      "checksum": -636230002,
+      "success": true
+    },
+    {
+      "installed_rank": 7,
+      "version": "7",
+      "script": "V7__asset_dependency_draft_revisions.sql",
+      "checksum": -545292092,
+      "success": true
+    },
+    {
+      "installed_rank": 8,
+      "version": "8",
+      "script": "V8__manual_worklog_revisions.sql",
+      "checksum": 1211360336,
+      "success": true
+    },
+    {
+      "installed_rank": 9,
+      "version": "9",
+      "script": "V9__manual_asset_metadata_revisions.sql",
+      "checksum": -340432871,
+      "success": true
+    },
+    {
+      "installed_rank": 10,
+      "version": "10",
+      "script": "V10__immutable_internal_ticket_notes.sql",
+      "checksum": -896663071,
+      "success": true
+    },
+    {
+      "installed_rank": 11,
+      "version": "11",
+      "script": "V11__immutable_ticket_comments.sql",
+      "checksum": -1655668462,
+      "success": true
+    },
+    {
+      "installed_rank": 12,
+      "version": "12",
+      "script": "V12__unpublished_working_calendar_drafts.sql",
+      "checksum": -2068183288,
+      "success": true
+    },
+    {
+      "installed_rank": 13,
+      "version": "13",
+      "script": "V13__immutable_manual_incident_registrations.sql",
+      "checksum": 1030816869,
+      "success": true
+    },
+    {
+      "installed_rank": 14,
+      "version": "14",
+      "script": "V14__immutable_manual_recovery_confirmations.sql",
+      "checksum": -30124348,
+      "success": true
+    },
+    {
+      "installed_rank": 15,
+      "version": "15",
+      "script": "V15__manual_warranty_details.sql",
+      "checksum": 836542553,
+      "success": true
+    },
+    {
+      "installed_rank": 16,
+      "version": "16",
+      "script": "V16__immutable_capacity_scenario_drafts.sql",
+      "checksum": 1367595086,
+      "success": true
+    },
+    {
+      "installed_rank": 17,
+      "version": "17",
+      "script": "V17__customer_contact_revisions.sql",
+      "checksum": 2031946591,
+      "success": true
+    },
+    {
+      "installed_rank": 18,
+      "version": "18",
+      "script": "V18__durable_contact_import_jobs.sql",
+      "checksum": -1130281417,
+      "success": true
+    },
+    {
+      "installed_rank": 19,
+      "version": "19",
+      "script": "V19__contact_import_generated_hash_guard.sql",
+      "checksum": -268577672,
+      "success": true
+    },
+    {
+      "installed_rank": 20,
+      "version": "20",
+      "script": "V20__durable_asset_export_jobs.sql",
+      "checksum": -319450001,
+      "success": true
+    },
+    {
+      "installed_rank": 21,
+      "version": "21",
+      "script": "V21__inspection_template_revisions.sql",
+      "checksum": 951051044,
+      "success": true
+    },
+    {
+      "installed_rank": 22,
+      "version": "22",
+      "script": "V22__manual_inspection_worksheet_drafts.sql",
+      "checksum": -650061710,
+      "success": true
+    },
+    {
+      "installed_rank": 23,
+      "version": "23",
+      "script": "V23__immutable_inspection_source_collections.sql",
+      "checksum": 1321810212,
+      "success": true
+    },
+    {
+      "installed_rank": 24,
+      "version": "24",
+      "script": "V24__unpublished_backup_plan_drafts.sql",
+      "checksum": -424372040,
+      "success": true
+    },
+    {
+      "installed_rank": 25,
+      "version": "25",
+      "script": "V25__unreviewed_change_notice_drafts.sql",
+      "checksum": 552033867,
+      "success": true
+    },
+    {
+      "installed_rank": 26,
+      "version": "26",
+      "script": "V26__own_notification_preference_drafts.sql",
+      "checksum": -324766275,
+      "success": true
+    },
+    {
+      "installed_rank": 27,
+      "version": "27",
+      "script": "V27__project_identity_and_roles.sql",
+      "checksum": 511191109,
+      "success": true
+    },
+    {
+      "installed_rank": 28,
+      "version": "28",
+      "script": "V28__identity_inventory_and_password_formats.sql",
+      "checksum": 1559449245,
+      "success": true
+    },
+    {
+      "installed_rank": 29,
+      "version": "29",
+      "script": "V29__immutable_raw_monitoring_events.sql",
+      "checksum": -1977882733,
+      "success": true
+    },
+    {
+      "installed_rank": 30,
+      "version": "30",
+      "script": "V30__immutable_monitoring_quarantine.sql",
+      "checksum": 2028775275,
+      "success": true
+    },
+    {
+      "installed_rank": 31,
+      "version": "31",
+      "script": "V31__own_export_inbox.sql",
+      "checksum": -486321876,
+      "success": true
+    },
+    {
+      "installed_rank": 32,
+      "version": "32",
+      "script": "V32__runtime_configuration_publications.sql",
+      "checksum": -606158601,
+      "success": true
+    },
+    {
+      "installed_rank": 33,
+      "version": "33",
+      "script": "V33__ticket_lifecycle_and_durable_clocks.sql",
+      "checksum": -2063474061,
+      "success": true
+    },
+    {
+      "installed_rank": 34,
+      "version": "34",
+      "script": "V34__ticket_notification_intents.sql",
+      "checksum": -1167997960,
+      "success": true
+    },
+    {
+      "installed_rank": 35,
+      "version": "35",
+      "script": "V35__service_tiers_and_change_history.sql",
+      "checksum": -1509422434,
+      "success": true
+    },
+    {
+      "installed_rank": 36,
+      "version": "36",
+      "script": "V36__oncall_escalation_and_sla_monthly_results.sql",
+      "checksum": -131315136,
+      "success": true
+    },
+    {
+      "installed_rank": 37,
+      "version": "37",
+      "script": "V37__monitoring_events_noise_funnel_and_maintenance_windows.sql",
+      "checksum": 125697472,
+      "success": true
+    },
+    {
+      "installed_rank": 38,
+      "version": "38",
+      "script": "V38__wecom_bindings_deliveries_and_login_state.sql",
+      "checksum": 845758090,
+      "success": true
+    },
+    {
+      "installed_rank": 39,
+      "version": "39",
+      "script": "V39__email_bindings_and_delivery_ledger.sql",
+      "checksum": -373908053,
+      "success": true
+    },
+    {
+      "installed_rank": 40,
+      "version": "40",
+      "script": "V40__immutable_change_notice_approval_events.sql",
+      "checksum": 14806533,
+      "success": true
+    },
+    {
+      "installed_rank": 41,
+      "version": "41",
+      "script": "V41__immutable_inspection_quarterly_reports.sql",
+      "checksum": 1456236875,
+      "success": true
+    },
+    {
+      "installed_rank": 42,
+      "version": "42",
+      "script": "V42__ticket_lifecycle_revisions.sql",
+      "checksum": -956552339,
+      "success": true
+    },
+    {
+      "installed_rank": 43,
+      "version": "43",
+      "script": "V43__ticket_autoclose_jobs.sql",
+      "checksum": 2102398138,
+      "success": true
+    },
+    {
+      "installed_rank": 44,
+      "version": "44",
+      "script": "V44__ticket_sla_policy_bindings.sql",
+      "checksum": 1869511343,
+      "success": true
+    },
+    {
+      "installed_rank": 45,
+      "version": "45",
+      "script": "V45__sla_reminder_intents.sql",
+      "checksum": 1011894633,
+      "success": true
+    },
+    {
+      "installed_rank": 46,
+      "version": "46",
+      "script": "V46__backup_device_coordination_journal.sql",
+      "checksum": -143003885,
+      "success": true
+    },
+    {
+      "installed_rank": 47,
+      "version": "47",
+      "script": "V47__backup_run_event_journal.sql",
+      "checksum": 829577921,
+      "success": true
+    },
+    {
+      "installed_rank": 48,
+      "version": "48",
+      "script": "V48__durable_backup_archive_staging.sql",
+      "checksum": 2106091134,
+      "success": true
+    },
+    {
+      "installed_rank": 49,
+      "version": "49",
+      "script": "V49__atomic_backup_version_registration.sql",
+      "checksum": -655264389,
+      "success": true
+    },
+    {
+      "installed_rank": 50,
+      "version": "50",
+      "script": "V50__delivery_receipt_journal.sql",
+      "checksum": -1248651202,
+      "success": true
+    },
+    {
+      "installed_rank": 51,
+      "version": "51",
+      "script": "V51__notification_routing_control.sql",
+      "checksum": -930297811,
+      "success": true
+    },
+    {
+      "installed_rank": 52,
+      "version": "52",
+      "script": "V52__attachment_security_journal.sql",
+      "checksum": 1826628147,
+      "success": true
+    },
+    {
+      "installed_rank": 53,
+      "version": "53",
+      "script": "V53__report_publication_journal.sql",
+      "checksum": 1372829874,
+      "success": true
+    },
+    {
+      "installed_rank": 54,
+      "version": "54",
+      "script": "V54__monitoring_enrollment_journal.sql",
+      "checksum": -1111795243,
+      "success": true
+    },
+    {
+      "installed_rank": 55,
+      "version": "55",
+      "script": "V55__monitoring_object_mapping_journal.sql",
+      "checksum": -2145594074,
+      "success": true
+    }
+  ],
+  "demo_tenant": "43ad0f67-7d50-5e2d-b1b5-1bd91ff18a26",
+  "demo_site": "6ae98290-7a99-522e-9e9c-4fb0a948e720"
+}

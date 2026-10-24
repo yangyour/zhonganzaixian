@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "targets": [
+    {
+      "id": "47af2b69-3e40-4aa7-a8e2-e15d6efb0e4b",
+      "tenant_id": "43ad0f67-7d50-5e2d-b1b5-1bd91ff18a26",
+      "asset_id": "7a928c86-3487-4ca5-b587-92d1b5479734",
+      "preset_id": "zabbix-snmp",
+      "enabled": false,
+      "endpoint": "udp://192.0.2.60:161",
+      "target": null,
+      "auth_profile": null,
+      "interval_seconds": 60,
+      "timeout_seconds": 5
+    }
+  ]
+}

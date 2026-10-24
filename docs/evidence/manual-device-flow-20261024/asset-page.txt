@@ -1,0 +1,82 @@
+Browser tab: 1, Title: "资产管理 · MOP", URL: "http://mop.all-online.com.cn/assets?q=%E6%89%8B%E5%8A%A8%E6%B7%BB%E5%8A%A0%E4%BA%A4%E6%8D%A2%E6%9C%BA-20261024&page_size=15&asset_id=7a928c86-3487-4ca5-b587-92d1b5479734".
+1 AXWebArea 资产管理 · MOP, URL: mop.all-online.com.cn/assets?q=%E6%89%8B%E5%8A%A8%E6%B7%BB%E5%8A%A0%E4%BA%A4%E6%8D%A2%E6%9C%BA-20261024&page_size=15&asset_id=7a928c86-3487-4ca5-b587-92d1b5479734
+	2 container app
+		4 link Description: 跳过导航，进入主要内容, Value: mop.all-online.com.cn/assets?q=%E6%89%8B%E5%8A%A8%E6%B7%BB%E5%8A%A0%E4%BA%A4%E6%8D%A2%E6%9C%BA-20261024&page_size=15&asset_id=7a928c86-3487-4ca5-b587-92d1b5479734#main-content
+		5 container
+			6 link Description: M MOP 运维托管 网络设备管理平台, Value: mop.all-online.com.cn/assets
+			39 container 模块导航
+				40 link Description: 首页门户, Value: mop.all-online.com.cn/dashboard
+				41 link Description: 租户与权限管理, Value: mop.all-online.com.cn/tenant-inventory
+				42 link Description: 设备台账, Value: mop.all-online.com.cn/assets
+				43 link Description: 监控与告警, Value: mop.all-online.com.cn/network-monitoring
+				44 link Description: 工单与SLA, Value: mop.all-online.com.cn/tickets
+				45 link Description: 配置备份, Value: mop.all-online.com.cn/backup-plan-drafts
+				46 link Description: 客户门户与通知, Value: mop.all-online.com.cn/ticket-notifications
+				47 link Description: 月报与体检报告, Value: mop.all-online.com.cn/inspection-quarterly-reports
+				48 link Description: 经营数据看板, Value: mop.all-online.com.cn/operational-comparison
+				49 link Description: 系统设置, Value: mop.all-online.com.cn/runtime-configurations
+			55 pop up button (collapsed) Description: 当前租户未确认告警 2 条, Secondary Actions: Expand
+			56 button Description: 打开全局搜索，快捷键斜杠、Control K 或 Command K, Help: 搜索当前租户（/ 或 Ctrl+K / ⌘K）
+			20 button 我的账号
+			21 button 退出
+		22 container
+			98 pop up button (collapsed) Description: 打开功能菜单, Secondary Actions: Expand
+				99 image
+			25 container 面包屑
+				34 link 设备台账
+					35 text 设备台账
+				26 text /
+				36 link 资产管理
+					37 text 资产管理
+			27 container
+				28 combo box (collapsed, settable) Description: 切换租户, ID: el-id-1783-9, Secondary Actions: Expand
+				57 text [DEMO] 全功能测试·管理
+				30 image
+		38 container main-content
+			100 container 资产详情
+				101 button 返回资产列表
+					102 text 返回资产列表
+				103 text 本页第 1 / 1 条
+				104 button (disabled) 上一条资产
+				105 button (disabled) 下一条资产
+				106 button 刷新详情
+					107 text 刷新详情
+				108 container
+					109 image
+					110 heading [DEMO] 手动添加交换机-20261024, Value: 1
+						111 text [DEMO] 手动添加交换机-20261024
+					112 text 未知 待接入 192.0.2.60 · 交换机 · [DEMO] 全功能测试·管理 / [DEMO] 隔离测试站点
+					113 button 扩展资料
+					114 button 维保档案
+					115 button 编辑依赖关系
+					116 button 客户拓扑
+					117 button 网络监控
+					118 text 资产标识 7a928c86-3487-4ca5-b587-92d1b5479734 所属站点 [DEMO] 隔离测试站点 资料来源 手动草稿 · 未采集 生命周期 草稿 最近采样 — 登记版本 v1
+				119 container 资产公开登记资料
+					120 text 负责人（登记）
+					121 text —
+					122 text 当前未登记负责人
+					123 text 所属业务（登记说明）
+					124 text —
+					125 text 当前未登记业务说明
+				126 text 登记资料快照查询时间 2026/10/24 16:38:10；未执行监控或关联核验。
+				127 container 资产详情分区
+					128 checkbox 概览, Value: 1
+					129 checkbox 监控项, Value: 0
+					130 checkbox 告警接入, Value: 0
+					131 checkbox 采集检查, Value: 0
+					132 checkbox 图表, Value: 0
+					133 checkbox 资产清单, Value: 0
+					134 checkbox 监控配置, Value: 0
+					135 checkbox 关联, Value: 0
+				136 container 实际设备监控
+					137 heading 设备监控, Value: 2
+						138 text 设备监控
+					139 container 监控自动刷新设置
+						140 text 每30秒 · 合同默认
+					141 button (disabled) 读取中…
+					146 text 正在读取设备绑定与监控采样…
+				144 button (collapsed) 资产登记状态与来源, Secondary Actions: Expand
+					145 text 资产登记状态与来源
+
+The focused UI element is 1 AXWebArea 资产管理 · MOP, URL: mop.all-online.com.cn/assets?q=%E6%89%8B%E5%8A%A8%E6%B7%BB%E5%8A%A0%E4%BA%A4%E6%8D%A2%E6%9C%BA-20261024&page_size=15&asset_id=7a928c86-3487-4ca5-b587-92d1b5479734

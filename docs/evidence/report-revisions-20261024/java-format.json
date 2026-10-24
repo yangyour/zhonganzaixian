@@ -1,0 +1,42 @@
+{
+  "status": "PASSED",
+  "formatter": "prettier-plugin-java 2.11.0 / prettier 3.9.10; tabWidth=4",
+  "rows": [
+    {
+      "file": "server/domain/src/main/java/cn/mop/domain/reporting/ReportPublicationRepository.java",
+      "non_import_non_comment_tokens_except_braces_equal": true,
+      "before_sha256": "a59f18fd8abfbe7e2933b912dd52c9b1a3195b6ef1a98bf1a34ef7b04e3e45a9",
+      "after_sha256": "f7fab756148d63323645f185ae660545b2da97b084b01cb025a9f4eeeacd23d9"
+    },
+    {
+      "file": "server/persistence/src/main/java/cn/mop/persistence/PostgresReportPublicationRepository.java",
+      "non_import_non_comment_tokens_except_braces_equal": true,
+      "before_sha256": "ccad186e8e24ab69b668d2de7aac48c7c75d319906ac5d7c4c763df133384a3a",
+      "after_sha256": "974bef6aea471054a12102c4b597a6182387a9e8c9751ac68cb8e459d5fe5f19"
+    },
+    {
+      "file": "server/api/src/main/java/cn/mop/api/ReportPublicationController.java",
+      "non_import_non_comment_tokens_except_braces_equal": true,
+      "before_sha256": "c06f55cbe89631e01ce521434d3b5404ce0ccc4ac568502f0144819d078e7848",
+      "after_sha256": "c7804bc25bc48214ed004d6b2d64ad6c59fef30f380349d61ffcc45c361fc114"
+    },
+    {
+      "file": "server/api/src/test/java/cn/mop/api/ReportPublicationRevisionControllerTest.java",
+      "non_import_non_comment_tokens_except_braces_equal": true,
+      "before_sha256": "3a0baf4679168aba9b35363ca3e59ad07725e0000ffb0383481c0923d8ff852a",
+      "after_sha256": "f392f51f2ff40b6ff96eb10e29aee850f3b0c0c5ad9d4ab908afa187bdf0a39a"
+    },
+    {
+      "file": "server/api/src/test/java/cn/mop/api/ReportPublicationHttpSecurityTest.java",
+      "non_import_non_comment_tokens_except_braces_equal": true,
+      "before_sha256": "3aeac38f42c8d58a01d3cde50e206258f47e66fbc254178ea26ef925366e8fc1",
+      "after_sha256": "91617b57825e65ab327a8549a9cecbc42ccbf38c17292b91029d2b2b4be60f64"
+    },
+    {
+      "file": "server/api/src/test/java/cn/mop/persistence/PostgresReportPublicationBusinessIntegrationTest.java",
+      "non_import_non_comment_tokens_except_braces_equal": true,
+      "before_sha256": "2965c5f03a587a425961a172ac5f62d81bcaf45f28b8271917d75f20dea893a7",
+      "after_sha256": "e87874cd1a80f7cda609e6da4cf8caed6e7c9447bd472bd7328b0c9b918fc23b"
+    }
+  ]
+}

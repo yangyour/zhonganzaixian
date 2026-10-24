@@ -585,7 +585,9 @@
         "docs/evidence/local-astra-ut-20261023/schema-chain/summary.json",
         "docs/report-publication-retained-business-20261024.md",
         "docs/evidence/local-astra-ut-20261023/r02-retained-business/summary.json",
-        "docs/evidence/local-astra-ut-20261023/r02-retained-business/pdf-qa.json"
+        "docs/evidence/local-astra-ut-20261023/r02-retained-business/pdf-qa.json",
+        "docs/report-revisions-20261024.md",
+        "docs/evidence/report-revisions-20261024/validation.json"
       ],
       "commits": [
         "25a17013",
@@ -597,11 +599,12 @@
         "V53 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50",
         "Designated retained-V53 PG integration scenario passed: real source capture/frozen read and actual HTML/PDF failed-render retry, idempotency and return while source/template approval remains gated",
         "Separate ISOLATED_TEST initial-state fixture verified actual repository/FOP approval/publication/recipient ACL/first read/replay/resend-intent/revocation; no external dispatch or customer approval",
-        "Two actual PDFs (four pages) and three HTML artifacts produced; normalized text equality, bounds and all-page Poppler visual inspection passed; generic technical layout is not a customer-approved template"
+        "Two actual PDFs (four pages) and three HTML artifacts produced; normalized text equality, bounds and all-page Poppler visual inspection passed; generic technical layout is not a customer-approved template",
+        "Immutable report revisions now connect same-quarter frozen sources, parent/version locking, no-fork concurrency, durable replay, API and source-selection UI; designated retained V53 business tests and synthetic real-browser flow verified separately"
       ],
       "remaining_subitems": [
         "Monthly boss/full, health-check and annual source/template adapters",
-        "Revision generation, reader dashboard and unread followup integration",
+        "Reader dashboard and unread followup integration",
         "Source verification, customer approval policy/template gates",
         "Real HTTP/browser integration and formal customer template/layout acceptance; retained-V53 transaction/FOP scope is separately verified"
       ],

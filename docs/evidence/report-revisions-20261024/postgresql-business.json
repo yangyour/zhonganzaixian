@@ -1,0 +1,97 @@
+{
+  "status" : "PASSED_WITH_EXPLICIT_SCOPE_LIMITS",
+  "database" : "mop_report_test_449b59f37319",
+  "owner_marker" : "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:R02:a979bbeaf7494742a773273953c55216",
+  "schema_mode" : "PREAPPLIED_V53",
+  "schema_migrations" : 0,
+  "external_dispatch_enabled" : false,
+  "customer_template_confirmation" : null,
+  "formal_fee_configuration" : null,
+  "formal_contract_acceptance" : "NOT_RUN",
+  "test_tenants" : [ "89d40579-6a1d-46a9-8893-38fc56cd3a52", "d90d7d14-b827-4563-b509-f290e53c39b5" ],
+  "test_actors" : [ "c3ec4d2f-a943-48d3-8943-c8ba2e639435", "8033b929-3567-4b23-a834-e888c009da46", "2c66b1f6-88e8-465e-b3a2-efa4bf4e9e6c", "67ab2090-1ae3-40be-b303-6c1b7068b867", "3671ea28-4656-4c2d-a8c3-ebd0a0b6541a", "f9aca72d-486f-41c8-801c-b247557c7889" ],
+  "identity_source" : "r02_business_validation",
+  "test_actor_memberships" : [ {
+    "role" : "padmin",
+    "tenant_id" : "89d40579-6a1d-46a9-8893-38fc56cd3a52",
+    "subject" : "SYNTHETIC_R02_c3ec4d2f-a943-48d3-8943-c8ba2e639435",
+    "actor_id" : "c3ec4d2f-a943-48d3-8943-c8ba2e639435"
+  }, {
+    "role" : "padmin",
+    "tenant_id" : "89d40579-6a1d-46a9-8893-38fc56cd3a52",
+    "subject" : "SYNTHETIC_R02_8033b929-3567-4b23-a834-e888c009da46",
+    "actor_id" : "8033b929-3567-4b23-a834-e888c009da46"
+  }, {
+    "role" : "padmin",
+    "tenant_id" : "89d40579-6a1d-46a9-8893-38fc56cd3a52",
+    "subject" : "SYNTHETIC_R02_2c66b1f6-88e8-465e-b3a2-efa4bf4e9e6c",
+    "actor_id" : "2c66b1f6-88e8-465e-b3a2-efa4bf4e9e6c"
+  }, {
+    "role" : "viewer",
+    "tenant_id" : "89d40579-6a1d-46a9-8893-38fc56cd3a52",
+    "subject" : "SYNTHETIC_R02_67ab2090-1ae3-40be-b303-6c1b7068b867",
+    "actor_id" : "67ab2090-1ae3-40be-b303-6c1b7068b867"
+  }, {
+    "role" : "viewer",
+    "tenant_id" : "89d40579-6a1d-46a9-8893-38fc56cd3a52",
+    "subject" : "SYNTHETIC_R02_3671ea28-4656-4c2d-a8c3-ebd0a0b6541a",
+    "actor_id" : "3671ea28-4656-4c2d-a8c3-ebd0a0b6541a"
+  }, {
+    "role" : "padmin",
+    "tenant_id" : "d90d7d14-b827-4563-b509-f290e53c39b5",
+    "subject" : "SYNTHETIC_R02_f9aca72d-486f-41c8-801c-b247557c7889",
+    "actor_id" : "f9aca72d-486f-41c8-801c-b247557c7889"
+  } ],
+  "seed_committed" : true,
+  "pools_closed" : true,
+  "identity_cleanup_owner" : "ROOT_RUNNER_AFTER_JVM_EXIT_AND_ZERO_CONNECTIONS",
+  "pdf_mode" : "REQUIRED",
+  "checks" : [ {
+    "status" : "PASSED",
+    "id" : "A_REAL_CAPTURE_AND_PREPARE",
+    "scope" : "Source reasons retained; not approved or published"
+  }, {
+    "status" : "PASSED",
+    "id" : "A_HTML_FAILURE_AND_IDEMPOTENT_REPLAY",
+    "scope" : "Real HTML stored; no replacement PDF"
+  }, {
+    "status" : "PASSED",
+    "id" : "A_REAL_PDF_RETURN_AND_APPROVAL_GATE",
+    "scope" : "Returned output remains frozen and source approval remains blocked"
+  }, {
+    "status" : "PASSED",
+    "id" : "A_REVISION_CAPTURE_CONCURRENCY_AND_RECOVERY",
+    "scope" : "One child per locked parent; original-command recovery, same-period, scope, source gates and immutable parent retained"
+  }, {
+    "status" : "PASSED",
+    "id" : "B_ISOLATED_PUBLICATION_WORKFLOW",
+    "scope" : "Synthetic ISOLATED_TEST initial state; not capture completeness or customer approval"
+  } ],
+  "history_before" : "232f9817a11714d5559d13eb96dcc1673a9057a101cbc622373805a50e78954b",
+  "captured_source_id" : "594860cc-b7a7-42f3-bb42-a53198d6451c",
+  "captured_source_sha256" : "0dc2c99b5b4fc4736e44bf45a5b6b551d0748f57c4863da57e1889b5661405e4",
+  "synthetic-captured-quarter" : {
+    "visual_review" : "NOT_RUN",
+    "document_sha256" : "5adf5dd8aee2cc2526e8c6f8e38465fb687a7cb2219546a4c07f2a47dc65ab6a",
+    "pages" : 2,
+    "pdf_sha256" : "802c17321fae784f89b05785880f38eccd23f10605d05714dca04ce028b4ced7",
+    "html_sha256" : "2b5e51d0393889b67307e73260d6e9cbbfd566244d7fc85f4c17508c16364a05",
+    "font_identity_sha256" : "e172ae05d942cc3ecf3cccc724cbb7c9521759c7cefe4a3e5973bdfff4f90464",
+    "renderer" : "APACHE_FOP_2.12_XHTML_1"
+  },
+  "revision_documents" : [ "de3abebf-62ff-45d8-9ba8-2426cd808a80", "853271a0-c9d0-47e4-9b7d-6a5867c6ff1c", "8f415a5b-784d-4c1e-ab09-7b880b1416f4" ],
+  "isolated_fixture_scope" : "ISOLATED_TEST; initial state injected only for repository workflow validation; source output unchanged",
+  "synthetic-isolated-publication" : {
+    "visual_review" : "NOT_RUN",
+    "document_sha256" : "1b9861a1bf77a1c87043649a59ae4b5e852befdc04421019e252cff314d074c8",
+    "pages" : 2,
+    "pdf_sha256" : "0dc0b41ad38709e07f8757edc8c10075114db43a1158c3046d98d3b885e0926a",
+    "html_sha256" : "5e6f0274e6c13d997208a94266867c8c30b129ba5c15492f3f5b18c3bf3fa629",
+    "font_identity_sha256" : "e172ae05d942cc3ecf3cccc724cbb7c9521759c7cefe4a3e5973bdfff4f90464",
+    "renderer" : "APACHE_FOP_2.12_XHTML_1"
+  },
+  "isolated_publication_id" : "ce7418a1-2a27-48ef-8dc2-5812ba70d6cb",
+  "captured_source_publication" : "BLOCKED_BY_UNVERIFIED_SOURCE_AND_TEMPLATE",
+  "history_after" : "232f9817a11714d5559d13eb96dcc1673a9057a101cbc622373805a50e78954b",
+  "database_retained" : true
+}

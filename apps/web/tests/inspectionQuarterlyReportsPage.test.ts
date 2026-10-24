@@ -5,7 +5,7 @@ import {createApp,nextTick,type App} from 'vue'
 import {webcrypto} from 'node:crypto'
 import {readFileSync} from 'node:fs'
 const mocks=vi.hoisted(()=>({confirm:vi.fn(),leave:null as null|(()=>Promise<boolean>),guard:null as null|(()=>Promise<boolean>),unregister:vi.fn()}))
-vi.mock('vue-router',()=>({onBeforeRouteLeave:(cb:()=>Promise<boolean>)=>{mocks.leave=cb}}))
+vi.mock('vue-router',()=>({onBeforeRouteLeave:(cb:()=>Promise<boolean>)=>{mocks.leave=cb},useRoute:()=>({query:{}})}))
 vi.mock('element-plus',async original=>({...await original<typeof import('element-plus')>(),ElMessageBox:{confirm:mocks.confirm}}))
 vi.mock('../src/utils/contextTransitionGuard',()=>({contextTransitionGuards:{register:(cb:()=>Promise<boolean>)=>{mocks.guard=cb;return mocks.unregister}}}))
 import {ElAlert} from 'element-plus'

@@ -1,0 +1,225 @@
+{
+  "config": {
+    "argv": [
+      "D:\\nodejs\\node.exe",
+      "E:\\work\\wxw9\\zhonganzaixian\\.worktrees\\remaining-gaps-20261024\\apps\\web\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "report-revision.pw.ts",
+      "--max-failures=1"
+    ],
+    "configFile": "E:\\work\\wxw9\\zhonganzaixian\\.worktrees\\remaining-gaps-20261024\\apps\\web\\playwright.config.ts",
+    "rootDir": "E:/work/wxw9/zhonganzaixian/.worktrees/remaining-gaps-20261024/apps/web/qa/browser",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 1,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "E:/work/wxw9/zhonganzaixian/.worktrees/remaining-gaps-20261024/tests/artifacts/frontend-browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "E:/work/wxw9/zhonganzaixian/.worktrees/remaining-gaps-20261024/apps/web/qa/browser",
+        "testIgnore": [],
+        "testMatch": [
+          "*.pw.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "E:\\work\\wxw9\\zhonganzaixian\\.worktrees\\remaining-gaps-20261024\\tests\\artifacts\\frontend-browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "E:\\work\\wxw9\\zhonganzaixian\\.worktrees\\remaining-gaps-20261024\\apps\\web\\qa\\browser",
+        "snapshotDir": "E:\\work\\wxw9\\zhonganzaixian\\.worktrees\\remaining-gaps-20261024\\apps\\web\\qa\\browser",
+        "testIgnore": [],
+        "testMatch": "*.pw.ts",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:28130",
+          "browserName": "chromium",
+          "headless": true,
+          "launchOptions": {
+            "executablePath": "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+          },
+          "screenshot": "only-on-failure",
+          "trace": "retain-on-failure"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../../tests/artifacts/frontend-browser-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev -- --port 28130",
+      "url": "http://127.0.0.1:28130/qa/cmdb-catalog.fixture.html",
+      "reuseExistingServer": false,
+      "timeout": 30000
+    }
+  },
+  "suites": [
+    {
+      "title": "report-revision.pw.ts",
+      "file": "report-revision.pw.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "revision selection and parent history at 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1457,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-24T05:38:20.649Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "84e6836d3a984c7eef91-7a9530518b6edb9ec46b",
+          "file": "report-revision.pw.ts",
+          "line": 45,
+          "column": 35
+        },
+        {
+          "title": "revision selection and parent history at 1024px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1217,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-24T05:38:22.504Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "84e6836d3a984c7eef91-298f039f3904e2b1d71e",
+          "file": "report-revision.pw.ts",
+          "line": 45,
+          "column": 35
+        },
+        {
+          "title": "unknown revision restores the same command without automatically resending",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 990,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-24T05:38:23.731Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "84e6836d3a984c7eef91-703d55251868b6280cdb",
+          "file": "report-revision.pw.ts",
+          "line": 69,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-24T05:38:19.102Z",
+    "duration": 6531.554,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

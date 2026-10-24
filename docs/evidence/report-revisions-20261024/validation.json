@@ -1,0 +1,89 @@
+{
+  "status": "PASSED_WITH_EXPLICIT_SCOPE_LIMITS",
+  "checked_at_utc": "2026-10-24T05:40:10.537918+00:00",
+  "baseline_commit": "b4c40ab35d47802f7fb580915703cda7c3c384d1",
+  "java_full": {
+    "discovered": 5297,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 1131,
+    "executed": 4166
+  },
+  "web_full": {
+    "files": 339,
+    "passed": 5516
+  },
+  "web_final_targeted": {
+    "files": 4,
+    "passed": 93
+  },
+  "node_contracts": {
+    "passed": 269
+  },
+  "typecheck": "PASSED",
+  "build": "PASSED",
+  "python_golden_reproducible": "PASSED",
+  "python_additional_suite": {
+    "discovered": 18,
+    "passed": 17,
+    "errors": 1,
+    "reason": "Windows WinError 1314 in existing symlink creation test"
+  },
+  "designated_pg": {
+    "version": "17.9",
+    "retained_schema": 53,
+    "scenarios": 1,
+    "checks": 5,
+    "status": "PASSED",
+    "migrations": 0,
+    "actual_tenant_unchanged": true,
+    "scope": "Real repository and FOP; source approval gates preserved; isolated workflow fixture separate"
+  },
+  "browser": {
+    "engine": "Microsoft Edge Chromium",
+    "transport": "EXPLICIT_SYNTHETIC_INTERCEPTED_API",
+    "passed": 3,
+    "viewports": [
+      1440,
+      1024
+    ],
+    "scoped_axe_violations": 0,
+    "visual_review": "PASSED_CONTENT_NO_CLIPPING_OR_OVERLAP",
+    "real_api_browser": "NOT_RUN"
+  },
+  "failure_history": [
+    "PG first attempt: incorrect expected missing-policy error name; repaired assertion, second attempt passed",
+    "Browser initial locator named wrong existing source button",
+    "Browser target-size failure on new previous-revision link; scoped 32px target fixed; final three passed",
+    "Node source pin changed with additive endpoint; offline catalog/golden regenerated, 269 passed",
+    "Python symlink privilege unavailable; one additional check not passed",
+    "Final typecheck caught the confirmation test resolver type; corrected to the actual ignored confirm result and final build passed"
+  ],
+  "https": "DEFERRED_BY_USER",
+  "external_dispatch": false,
+  "deployment": false,
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "apps/web/qa/browser/report-revision.pw.ts": "cb24b7bb4db2b51c8fe7b62fafb5db2001f4c1326fa74659499c9e0a3164aefd",
+    "apps/web/qa/report-revision.fixture.html": "b708ad03e8325fa8cf519e6bd0de318d811e75023e0b4aca89588f9bbb99bbea",
+    "apps/web/qa/report-revision.fixture.ts": "1905ea100b9d4defe90657ec9deb401124eec0e75db25c043c70e5a3e105543e",
+    "apps/web/src/pages/InspectionQuarterlyReportsPage.vue": "b62666589d5d0c72b522beb7250a00180bce5ffeea20fec5c8a3783a516667d5",
+    "apps/web/src/pages/ReportPublicationsPage.vue": "9566d322f0e5d1a5a9cceaab92d510c8d3c314f204f5f8a99fe93b8c9ed1e99a",
+    "apps/web/src/utils/reportPublications.ts": "9f77bb3728ab2a44ddd79706fff71a3aee54d6161c9cf5c04a83f08a6455bd3b",
+    "apps/web/tests/inspectionQuarterlyReportsPage.test.ts": "1d049dd4005588daf0ae8ba218d1f37ef78ccbaea189d828af07152c16ddf04e",
+    "apps/web/tests/reportPublications.test.ts": "31f0b1bf9749345246376b6d57d2e68f19ba64ee4fd0f20b8daf5f5f692cb957",
+    "apps/web/tests/reportPublicationsPage.test.ts": "ec2afb3da6809b20f4bb46c7458e51f8784243c5cbf795df1a983969460ef07a",
+    "config/demo/catalog.v1.json": "1d184f083786a0615840262733bd394761fa2dab893c83122158338ec3cdb8c1",
+    "contracts/local-api.openapi.json": "eb0d65b12c35bab5df88d1ece80c7e7f18814a00d47a7c70baa848d27848dbfa",
+    "fixtures/demo-preparation-golden.json": "c246fcffb5fa8e717bf9024db24ee9a720798a98ae0d5e7f3a9c7646d67919fc",
+    "server/api/src/main/java/cn/mop/api/ReportPublicationController.java": "fcbd16fcafbe9627dbbd8e0650173f73be38b6790ed14ca9160920dc2737634a",
+    "server/api/src/test/java/cn/mop/api/ReportPublicationHttpSecurityTest.java": "91617b57825e65ab327a8549a9cecbc42ccbf38c17292b91029d2b2b4be60f64",
+    "server/api/src/test/java/cn/mop/api/ReportPublicationRevisionControllerTest.java": "f392f51f2ff40b6ff96eb10e29aee850f3b0c0c5ad9d4ab908afa187bdf0a39a",
+    "server/api/src/test/java/cn/mop/persistence/PostgresReportPublicationBusinessIntegrationTest.java": "e87874cd1a80f7cda609e6da4cf8caed6e7c9447bd472bd7328b0c9b918fc23b",
+    "server/domain/src/main/java/cn/mop/domain/reporting/ReportPublicationRepository.java": "f7fab756148d63323645f185ae660545b2da97b084b01cb025a9f4eeeacd23d9",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresReportPublicationRepository.java": "974bef6aea471054a12102c4b597a6182387a9e8c9751ac68cb8e459d5fe5f19",
+    "tests/report-publication-contract.test.mjs": "cc41797e4dcaaa13f72070386c59fa8695353a976e8ce1c5891d159410c4f2e7",
+    "tools/report-publication-contract.mjs": "cb9cbfe578420493949f5b866b4f1fe404af4a92290ee268527f3c3282a70a9a"
+  },
+  "build_id": "d2c526984f08646130a5bd6d6ba43c5cebae7104852ebe92dd9610d6a3162ca3"
+}

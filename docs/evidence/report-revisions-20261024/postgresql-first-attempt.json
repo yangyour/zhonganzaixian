@@ -1,0 +1,286 @@
+{
+  "schema_version": 1,
+  "status": "FAILED",
+  "run_id": "4ad2a896e4114186894abe68619a325d",
+  "environment": "lan-test-20261008",
+  "database": "mop_report_test_449b59f37319",
+  "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:R02:a979bbeaf7494742a773273953c55216",
+  "schema_mode": "PREAPPLIED_V53",
+  "source_summary": "docs\\evidence\\local-astra-ut-20261023\\schema-chain\\summary.json",
+  "source_summary_sha256": "0295ff4b9ec23441ebb28b9a839458efa24d90fa5ed5baad1c16a949f894b1a7",
+  "schema_migrations": 0,
+  "database_created": false,
+  "database_removed": false,
+  "records_deleted": 0,
+  "actual_tenant_written": false,
+  "external_messages": 0,
+  "production_approved": false,
+  "pdf_mode": "REQUIRED",
+  "font": {
+    "status": "READ_ONLY_VERIFIED",
+    "path": "C:\\Windows\\Fonts\\simhei.ttf",
+    "sha256": "9b1959db3b3abeb7efdaec26edf7dfe871a6039de8d614af7248575207be629e",
+    "renderer_font_identity_sha256": "e172ae05d942cc3ecf3cccc724cbb7c9521759c7cefe4a3e5973bdfff4f90464",
+    "copied": false
+  },
+  "started_at": "2026-10-24T05:25:15.164117+00:00",
+  "formal_contract_acceptance": "NOT_RUN",
+  "business_validation": {
+    "status": "NOT_RUN",
+    "junit_scenarios": 0,
+    "visual_review": "NOT_RUN"
+  },
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "postgresql_version_observed_before": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "retained_metadata_before": {
+    "history_rows": 53,
+    "history_sha256": "0f4141b0c23bf250f8f29b6e6707154e1e453db200804a47384ade232e35e384",
+    "canonical_history_sha256": "232f9817a11714d5559d13eb96dcc1673a9057a101cbc622373805a50e78954b",
+    "capabilities_sha256": "2b0cc4459a86b81c0bf26937ae4acfb0d30cba5f26070c00efbf3c16a96307d4",
+    "v53_checksum": 1372829874,
+    "v53_installed_on": "2026-10-23T23:25:26.927154"
+  },
+  "active_history_before_sha256": "6fa366487907d87627afb9775740ee68b5d671acb91f829c533f2b1ce2509a69",
+  "active_protected_before": {
+    "mop_inspection_source_collection": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_source_collection_item": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_quarterly_report": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_worksheet": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_worksheet_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_membership": {
+      "count": 1,
+      "md5": "440ffbc5f7524eea75de6adf6212b2e3"
+    },
+    "mop_asset": {
+      "count": 4,
+      "md5": "6fd9eac57b972735155dbe38fde8511c"
+    },
+    "mop_ticket": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_ticket_workflow_event": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_ticket_lifecycle_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_asset_manual_details": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_asset_manual_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    }
+  },
+  "java_started": true,
+  "java_process_completed": true,
+  "test_class": "PostgresReportPublicationBusinessIntegrationTest",
+  "maven_exit_code": 1,
+  "junit": {
+    "tests": 1,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0
+  },
+  "failure_type": "Refused",
+  "reason": "R02_BUSINESS_SCENARIO_NOT_PASSED",
+  "java_business_evidence": {
+    "status": "FAILED",
+    "database": "mop_report_test_449b59f37319",
+    "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:R02:a979bbeaf7494742a773273953c55216",
+    "schema_mode": "PREAPPLIED_V53",
+    "schema_migrations": 0,
+    "external_dispatch_enabled": false,
+    "customer_template_confirmation": null,
+    "formal_fee_configuration": null,
+    "formal_contract_acceptance": "NOT_RUN",
+    "test_tenants": [
+      "db7c4e8e-ab77-4dd4-8ea7-b98cbd2cfdab",
+      "51151f5d-9340-4caa-8a57-653f5f7ceb9b"
+    ],
+    "test_actors": [
+      "6d910d24-78ce-4eb3-aac7-212a7e4af7be",
+      "f05a9f3f-a744-4771-9e16-1a37e82987a4",
+      "6158cb9b-cf20-427c-8cd7-1363a98186a5",
+      "6f4e655e-0ffb-4ba0-b429-197056408912",
+      "3a1ff12c-207b-47bd-b6be-1970fcbc10fb",
+      "8705ec6c-f5de-44b2-b1a1-08fb7f9e09f3"
+    ],
+    "identity_source": "r02_business_validation",
+    "test_actor_memberships": [
+      {
+        "subject": "SYNTHETIC_R02_6d910d24-78ce-4eb3-aac7-212a7e4af7be",
+        "actor_id": "6d910d24-78ce-4eb3-aac7-212a7e4af7be",
+        "role": "padmin",
+        "tenant_id": "db7c4e8e-ab77-4dd4-8ea7-b98cbd2cfdab"
+      },
+      {
+        "subject": "SYNTHETIC_R02_f05a9f3f-a744-4771-9e16-1a37e82987a4",
+        "actor_id": "f05a9f3f-a744-4771-9e16-1a37e82987a4",
+        "role": "padmin",
+        "tenant_id": "db7c4e8e-ab77-4dd4-8ea7-b98cbd2cfdab"
+      },
+      {
+        "subject": "SYNTHETIC_R02_6158cb9b-cf20-427c-8cd7-1363a98186a5",
+        "actor_id": "6158cb9b-cf20-427c-8cd7-1363a98186a5",
+        "role": "padmin",
+        "tenant_id": "db7c4e8e-ab77-4dd4-8ea7-b98cbd2cfdab"
+      },
+      {
+        "subject": "SYNTHETIC_R02_6f4e655e-0ffb-4ba0-b429-197056408912",
+        "actor_id": "6f4e655e-0ffb-4ba0-b429-197056408912",
+        "role": "viewer",
+        "tenant_id": "db7c4e8e-ab77-4dd4-8ea7-b98cbd2cfdab"
+      },
+      {
+        "subject": "SYNTHETIC_R02_3a1ff12c-207b-47bd-b6be-1970fcbc10fb",
+        "actor_id": "3a1ff12c-207b-47bd-b6be-1970fcbc10fb",
+        "role": "viewer",
+        "tenant_id": "db7c4e8e-ab77-4dd4-8ea7-b98cbd2cfdab"
+      },
+      {
+        "subject": "SYNTHETIC_R02_8705ec6c-f5de-44b2-b1a1-08fb7f9e09f3",
+        "actor_id": "8705ec6c-f5de-44b2-b1a1-08fb7f9e09f3",
+        "role": "padmin",
+        "tenant_id": "51151f5d-9340-4caa-8a57-653f5f7ceb9b"
+      }
+    ],
+    "seed_committed": true,
+    "pools_closed": true,
+    "identity_cleanup_owner": "ROOT_RUNNER_AFTER_JVM_EXIT_AND_ZERO_CONNECTIONS",
+    "pdf_mode": "REQUIRED",
+    "checks": [
+      {
+        "scope": "Source reasons retained; not approved or published",
+        "status": "PASSED",
+        "id": "A_REAL_CAPTURE_AND_PREPARE"
+      },
+      {
+        "scope": "Real HTML stored; no replacement PDF",
+        "status": "PASSED",
+        "id": "A_HTML_FAILURE_AND_IDEMPOTENT_REPLAY"
+      },
+      {
+        "scope": "Returned output remains frozen and source approval remains blocked",
+        "status": "PASSED",
+        "id": "A_REAL_PDF_RETURN_AND_APPROVAL_GATE"
+      }
+    ],
+    "history_before": "232f9817a11714d5559d13eb96dcc1673a9057a101cbc622373805a50e78954b",
+    "captured_source_id": "85945664-16d9-4989-abf5-4c7ee92e2bc4",
+    "captured_source_sha256": "bdc7459891345a5437eac92cbdbd90df31fde8412fdefd515b743b8d64b8340d",
+    "synthetic-captured-quarter": {
+      "html_sha256": "5a804c6ff2dbeb31f53a8731545c0d53563a9be800803972afa3556fa5916022",
+      "font_identity_sha256": "e172ae05d942cc3ecf3cccc724cbb7c9521759c7cefe4a3e5973bdfff4f90464",
+      "renderer": "APACHE_FOP_2.12_XHTML_1",
+      "visual_review": "NOT_RUN",
+      "document_sha256": "48ee42cdf40d44c589b713f22214d223c9f4fa5abbaa55859be6b03dccfa9997",
+      "pages": 2,
+      "pdf_sha256": "acff3d406d929a89f46e8f9b8e1d10fa53c6f123fbc55827f0721cf1eeeaccb5"
+    },
+    "failure_type": "AssertionFailedError",
+    "failure_test_method": "assertDomain",
+    "failure_test_line": 739,
+    "history_after": "232f9817a11714d5559d13eb96dcc1673a9057a101cbc622373805a50e78954b",
+    "database_retained": true
+  },
+  "java_lifecycle_confirmed_closed": true,
+  "connections_before_actor_cleanup": 0,
+  "actor_cleanup": {
+    "status": "DEACTIVATED",
+    "users_changed": 6,
+    "memberships_changed": 6,
+    "declared_actors": 6,
+    "declared_memberships": 6,
+    "records_deleted": 0
+  },
+  "retained_metadata_after": {
+    "history_rows": 53,
+    "history_sha256": "0f4141b0c23bf250f8f29b6e6707154e1e453db200804a47384ade232e35e384",
+    "canonical_history_sha256": "232f9817a11714d5559d13eb96dcc1673a9057a101cbc622373805a50e78954b",
+    "capabilities_sha256": "2b0cc4459a86b81c0bf26937ae4acfb0d30cba5f26070c00efbf3c16a96307d4",
+    "v53_checksum": 1372829874,
+    "v53_installed_on": "2026-10-23T23:25:26.927154"
+  },
+  "retained_metadata_unchanged": true,
+  "prior_retained_scope_unchanged": true,
+  "postgresql_version_observed_after": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "active_history_unchanged": true,
+  "active_capabilities_unchanged": true,
+  "active_protected_unchanged": true,
+  "active_protected_after": {
+    "mop_inspection_source_collection": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_source_collection_item": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_quarterly_report": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_worksheet": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_worksheet_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_membership": {
+      "count": 1,
+      "md5": "440ffbc5f7524eea75de6adf6212b2e3"
+    },
+    "mop_asset": {
+      "count": 4,
+      "md5": "6fd9eac57b972735155dbe38fde8511c"
+    },
+    "mop_ticket": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_ticket_workflow_event": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_ticket_lifecycle_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_asset_manual_details": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_asset_manual_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    }
+  },
+  "retained_database_open_connections": 0,
+  "source_summary_unchanged": true,
+  "v53_resource_unchanged": true,
+  "font_unchanged": true,
+  "finished_at": "2026-10-24T05:27:03.158196+00:00",
+  "environment_lock_released": true
+}

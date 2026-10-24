@@ -25,3 +25,5 @@ R02首个功能已完成代码与分层验证，具体范围、失败复测与�
 2026-10-24第二个业务功能补统一SLA有效分母：保留毫秒度量、按分子/分母汇总，API/页面/CSV可核对，任一服务不足仍null；29Java、137Web、215契约、3指定PG缺来源/隔离及4Edge合成场景通过。详见[汇总口径](sla-availability-aggregate-20261024.md)。健康来源和跨业务冻结仍未完成，本轮不部署。
 
 2026-10-24监控后续已迁移至新的独立检出`E:\work\wxw9\zhonganzaixian\.worktrees\monitoring-source-pull-20261024` / `codex/monitoring-source-pull-20261024`，规范origin/组织仍为`https://github.com/yangyour/zhonganzaixian.git` / `yangyour/zhonganzaixian`。原因是旧独立检出出现并发通知代码；只移动本轮四个工具文件，完整保留对方改动。已吸收`1654838c`报告阅读看板与`af261cbe`通知待处理队列，不重复实现。修复无损schema还原，20Python/56Java及13项指定PG场景通过；新库保留、旧损坏库未修写、V1–V55资源未改，见[记录](schema-text-roundtrip-20261024.md)。持续拉取/水位与其余业务继续未完成。
+
+2026-10-24监控增量增加显式有界HOST来源页消费，最多10条，raw/待处理原因/事件/既有工单/审计/回执同事务；预读主机与提交前时效核验、页面UTC窗口和原请求恢复已验证。13指定PG场景逐项通过、153Java、27Web、223契约及3Edge合成场景通过；两轮失败和定向复测单列，见[记录](monitoring-source-page-intake-20261024.md)。本轮无迁移、部署或外发，M02全局水位/持续调度仍待。

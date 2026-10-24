@@ -23,4 +23,21 @@ export function addMonitoringObjectMappingContract(c){
  s.MonitoringMappingProblemReceipt=object({mapping_id:uuid,mapping_version:version,source_event_id:{type:'string',pattern:'^[1-9][0-9]{0,19}$'},record_id:uuid,raw_outcome:{enum:['RAW_STORED','RAW_ALREADY_PRESENT','CONFLICT_HELD','CONFLICT_ALREADY_HELD']},first_received_at:time,business_processed:{type:'boolean'},event_id:nullable(uuid),event_version:nullable(version),ticket_id:nullable(uuid),source_ownership_basis:{const:'CURRENT_MAPPING_AND_SERVER_READ'},recovery_confirmed:{const:false},dispatch_allowed:{const:false},acknowledgement_only:{const:true}});
  c.paths['/monitoring-object-mappings/{id}/problem-intakes']={post:{...write('intakeMappedProblem','显式读取一条当前主机问题，raw/事件成员/建单同事务；冲突仅隔离；拒绝原始恢复及未分类级别。规则身份由pool/trigger确定，级别来自来源，不替代Q14策略批准。','MonitoringMappingCaptureInput',[id]),responses:{200:success(ref('MonitoringMappingProblemReceipt')),...errors},'x-mop-default-enabled':false,'x-mop-recovery-confirmed':false,'x-mop-outbound-dispatch':false}};
 
+ s.MonitoringObjectMapping.properties.page_intake_enabled={type:'boolean'};
+ s.MonitoringObjectMapping.required.push('page_intake_enabled');
+ const sourceId={type:'string',pattern:'^[1-9][0-9]{0,19}$',description:'规范正uint64字符串；上界18446744073709551615，保留精度'},clock={type:'integer',minimum:0,maximum:253402300799};
+ const window={first_event_id:sourceId,last_event_id:sourceId,from_clock:clock,through_clock:clock,page_size:{type:'integer',minimum:1,maximum:10}};
+ s.MonitoringMappingSourceWindow=object(window);
+ s.MonitoringMappingPageInput=object({expected_version:version,expected_source_definition_sha256:hash,...window});
+ s.MonitoringMappingPageItem=object({source_event_id:sourceId,source_phase:{enum:['PROBLEM','RECOVERED']},record_id:uuid,raw_outcome:s.MonitoringMappingProblemReceipt.properties.raw_outcome,first_received_at:time,business_processed:{type:'boolean'},event_id:nullable(uuid),event_version:nullable(version),ticket_id:nullable(uuid),pending_reason:nullable({enum:['SOURCE_KEY_CONFLICT','RECOVERY_OBSERVATION_REQUIRED','SOURCE_SEVERITY_UNCLASSIFIED','SOURCE_CLOCK_AHEAD','EVENT_SIGNAL_OUT_OF_ORDER']})});
+ const rawStored={enum:['RAW_STORED','RAW_ALREADY_PRESENT']},noBusiness={business_processed:{const:false},event_id:{type:'null'},event_version:{type:'null'},ticket_id:{type:'null'}};
+ s.MonitoringMappingPageItem.oneOf=[
+  {properties:{business_processed:{const:true},source_phase:{const:'PROBLEM'},raw_outcome:rawStored,event_id:uuid,event_version:version,pending_reason:{type:'null'}}},
+  {properties:{...noBusiness,raw_outcome:{enum:['CONFLICT_HELD','CONFLICT_ALREADY_HELD']},pending_reason:{const:'SOURCE_KEY_CONFLICT'}}},
+  {properties:{...noBusiness,raw_outcome:rawStored,source_phase:{const:'RECOVERED'},pending_reason:{const:'RECOVERY_OBSERVATION_REQUIRED'}}},
+  {properties:{...noBusiness,raw_outcome:rawStored,source_phase:{const:'PROBLEM'},pending_reason:{enum:['SOURCE_SEVERITY_UNCLASSIFIED','SOURCE_CLOCK_AHEAD','EVENT_SIGNAL_OUT_OF_ORDER']}}}
+ ];
+ s.MonitoringMappingPageReceipt=object({mapping_id:uuid,mapping_version:version,window:ref('MonitoringMappingSourceWindow'),items:{type:'array',maxItems:10,items:ref('MonitoringMappingPageItem')},next_event_id:nullable(sourceId),received_count:{type:'integer',minimum:0,maximum:10},processed_count:{type:'integer',minimum:0,maximum:10},source_ownership_basis:{const:'CURRENT_MAPPING_AND_SERVER_READ'},complete_window_claimed:{const:false},global_checkpoint_advanced:{const:false},recovery_confirmed:{const:false},dispatch_allowed:{const:false},acknowledgement_only:{const:true}});
+ c.paths['/monitoring-object-mappings/{id}/page-intakes']={post:{...write('intakeMappedSourcePage','显式HOST/ID/UTC秒窗口最多10条；raw/待处理事实/事件/工单/幂等回执同事务提交。原始恢复不确认t2，未知级别/时间异常/乱序保留待处理原因，其他错误整页回滚。下一页位置不是全局水位或原子来源快照。','MonitoringMappingPageInput',[id]),responses:{200:success(ref('MonitoringMappingPageReceipt')),...errors},'x-mop-default-enabled':false,'x-mop-global-watermark':false,'x-mop-recovery-confirmed':false,'x-mop-outbound-dispatch':false,'x-mop-reject-unknown-query-keys':true,'x-mop-current-padmin-required':true}};
+
 }

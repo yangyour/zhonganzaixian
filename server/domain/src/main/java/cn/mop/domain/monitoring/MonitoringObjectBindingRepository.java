@@ -14,6 +14,10 @@ public interface MonitoringObjectBindingRepository {
   String definitionSha256(UUID poolId);
   SourceMetadata verify(MonitoringObjectMapping.Key key);
   default FetchedEvent readEvent(MonitoringObjectMapping.Key key,String sourceEventId){throw new cn.mop.domain.DomainException(503,"MAPPING_CAPTURE_UNAVAILABLE","来源事件读取尚未配置");}
+        /** Reads only the explicitly bounded host window; no source write, checkpoint or health conclusion. */
+        default MappedSourcePage.Fetched readPage(MonitoringObjectMapping.Key key, MappedSourcePage.Window window) {
+            throw new cn.mop.domain.DomainException(503, "MAPPING_SOURCE_PAGE_UNAVAILABLE", "有界来源分页读取尚未配置");
+        }
  }
  record FetchedEvent(String sourceEventId,RawMonitoringEvent.Phase phase,Instant occurredAt,String sourceHostId,byte[] payload){
   public FetchedEvent{if(sourceEventId==null||!sourceEventId.matches("[1-9][0-9]{0,19}")||phase==null||occurredAt==null||sourceHostId==null||!sourceHostId.matches("[1-9][0-9]{0,19}")||payload==null||payload.length==0||payload.length>RawMonitoringEvent.MAX_PAYLOAD_BYTES)throw new IllegalArgumentException("Invalid bound source event");payload=payload.clone();}
@@ -39,6 +43,15 @@ public interface MonitoringObjectBindingRepository {
             String sourceEventId,
             String expectedDefinition) {
         throw new cn.mop.domain.DomainException(503, "MAPPING_PROBLEM_INTAKE_DISABLED", "来源问题事件消费尚未配置");
+    }
+    /** Consumes exactly one server-read page under the existing caller-owned durable command transaction. */
+    default MappedSourcePage.Receipt intakePage(
+            Access access,
+            UUID id,
+            long expectedVersion,
+            String expectedDefinition,
+            MappedSourcePage.Window window) {
+        throw new cn.mop.domain.DomainException(503, "MAPPING_PAGE_INTAKE_DISABLED", "有界来源分页消费尚未配置");
     }
  void authorize(Access access,UUID id,boolean write);
  Page list(Access access,UUID assetId,Cursor before);

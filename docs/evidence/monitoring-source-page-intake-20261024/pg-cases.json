@@ -1,0 +1,93 @@
+{
+  "unique_cases": 13,
+  "all_eventually_passed": true,
+  "full_green_run_claimed": false,
+  "second_full_suite": {
+    "passed": 12,
+    "failed": 1
+  },
+  "targeted_replay": {
+    "passed": 1,
+    "failed": 0
+  },
+  "cases": [
+    {
+      "name": "conflictIsDurablyHeldWithoutChangingBusinessEvent",
+      "class_name": "cn.mop.persistence.MappedSourcePagePostgresTest",
+      "phase": "second-full-suite",
+      "passed": true
+    },
+    {
+      "name": "recoveryAndUnknownSeverityNeverCreateBusinessState",
+      "class_name": "cn.mop.persistence.MappedSourcePagePostgresTest",
+      "phase": "second-full-suite",
+      "passed": true
+    },
+    {
+      "name": "commitsRawMemberEventTicketAndSurvivesNewAssemblyReplay",
+      "class_name": "cn.mop.persistence.MappedSourcePagePostgresTest",
+      "phase": "second-full-suite",
+      "passed": true
+    },
+    {
+      "name": "outerFailureRollsBackRawBusinessAndAuditBeforeRetry",
+      "class_name": "cn.mop.persistence.MappedSourcePagePostgresTest",
+      "phase": "second-full-suite",
+      "passed": true
+    },
+    {
+      "name": "concurrentRedeliveryRetriesOriginalCommandsWithoutDuplicateEffects",
+      "class_name": "cn.mop.persistence.MappedSourcePagePostgresTest",
+      "phase": "second-full-suite",
+      "passed": true
+    },
+    {
+      "name": "staleMappingAndForeignTenantFailBeforeAnySourceRead",
+      "class_name": "cn.mop.persistence.MappedSourcePagePostgresTest",
+      "phase": "second-full-suite",
+      "passed": true
+    },
+    {
+      "name": "commitsWholePageAndContinuationThenOverlapDoesNotDuplicateMembers",
+      "class_name": "cn.mop.persistence.MappedSourcePagePostgresTest",
+      "phase": "second-full-suite",
+      "passed": true
+    },
+    {
+      "name": "malformedSecondEnvelopeRollsBackFirstRawMemberTicketAndAudit",
+      "class_name": "cn.mop.persistence.MappedSourcePagePostgresTest",
+      "phase": "second-full-suite",
+      "passed": true
+    },
+    {
+      "name": "pageRejectsStaleVersionAndForeignTenantBeforeReadingSource",
+      "class_name": "cn.mop.persistence.MappedSourcePagePostgresTest",
+      "phase": "second-full-suite",
+      "passed": true
+    },
+    {
+      "name": "originalCommandReceiptSurvivesNewAssemblyWithoutAnotherSourceRead",
+      "class_name": "cn.mop.persistence.MappedSourcePagePostgresTest",
+      "phase": "targeted-replay",
+      "passed": true
+    },
+    {
+      "name": "recoveryAndUnclassifiedFactsRemainDurablePendingWithoutBusinessOrT2",
+      "class_name": "cn.mop.persistence.MappedSourcePagePostgresTest",
+      "phase": "second-full-suite",
+      "passed": true
+    },
+    {
+      "name": "changedRawIsHeldWhileOtherItemsReplayWithoutDuplicateBusiness",
+      "class_name": "cn.mop.persistence.MappedSourcePagePostgresTest",
+      "phase": "second-full-suite",
+      "passed": true
+    },
+    {
+      "name": "outerCommitFailureLeavesNoPartialPageAndRetryCanContinue",
+      "class_name": "cn.mop.persistence.MappedSourcePagePostgresTest",
+      "phase": "second-full-suite",
+      "passed": true
+    }
+  ]
+}

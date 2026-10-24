@@ -67,7 +67,7 @@ def run(source_summary, output, suite):
     locks = Locks('remaining-gaps-20261024', run_id, stage['database'])
     locks.document['operation'] = 'schema-text-raw-business'
     actor, tenant, asset = (str(uuid.uuid4()) for _ in range(3))
-    foreign_tenant=str(uuid.uuid4()) if suite=='mapped-problem' else None
+    foreign_tenant=str(uuid.uuid4()) if suite in ('mapped-problem','page-intake','page-replay') else None
     report = {'environment': 'lan-test-20261008', 'database': stage['database'], 'owner_marker': stage['owner_marker'],
               'status': 'NOT_RUN', 'suite': suite, 'started_at': chain.now(), 'schema_migrations': 0, 'ddl_statements': 0,
               'old_databases_read_only': True, 'actual_tenant_written': False, 'external_messages': 0,
@@ -97,7 +97,7 @@ def run(source_summary, output, suite):
         with pg.connection(stage['database'], readonly=False) as connection:
             pg.assert_owned(connection, stage)
             with connection.transaction(), connection.cursor() as cursor:
-                if suite=='mapped-problem':
+                if suite in ('mapped-problem','page-intake','page-replay'):
                     definitions=json.loads((ROOT/'contracts/config-baseline.json').read_text(encoding='utf-8'))['settings']
                     definition=next(item for item in definitions if item['key']=='ticket.default_dedupe_window_sec')
                     assert definition['contract_value_kind']=='configurable_default' and definition['type']=='integer'
@@ -132,17 +132,18 @@ def run(source_summary, output, suite):
                    MOP_SCHEMA_TEXT_ACTIVE_URL=base + 'mop_test', MOP_SCHEMA_TEXT_PREVIOUS_URL=base + previous['database'],
                    MOP_SCHEMA_TEXT_APPLICATION=application, SPRING_DATASOURCE_URL=base + stage['database'],
                    SPRING_DATASOURCE_PASSWORD=pg.runtime['runtime_password'])
-        if suite=='mapped-problem':
+        if suite in ('mapped-problem','page-intake','page-replay'):
             env.update(MOP_MAPPED_PROBLEM_PG_TEST='retained-v55',MOP_MAPPED_PROBLEM_DATABASE=stage['database'],
                        MOP_MAPPED_PROBLEM_OWNER_MARKER=stage['owner_marker'],MOP_MAPPED_PROBLEM_TENANT=tenant,
                        MOP_MAPPED_PROBLEM_FOREIGN_TENANT=foreign_tenant,MOP_MAPPED_PROBLEM_ACTOR=actor,
                        MOP_MAPPED_PROBLEM_ASSET=asset,MOP_MAPPED_PROBLEM_APPLICATION=application)
-        module_name='server/api' if suite=='mapped-problem' else 'server/persistence'
-        test_class='MappedProblemIntakePostgresTest' if suite=='mapped-problem' else 'PostgresSchemaTextRoundTripIntegrationTest'
-        expected_tests=6 if suite=='mapped-problem' else 7
+        module_name='server/api' if suite in ('mapped-problem','page-intake','page-replay') else 'server/persistence'
+        test_class={'mapped-problem':'MappedProblemIntakePostgresTest','page-intake':'MappedSourcePagePostgresTest','page-replay':'MappedSourcePagePostgresTest','raw-storage':'PostgresSchemaTextRoundTripIntegrationTest'}[suite]
+        expected_tests={'mapped-problem':6,'page-intake':13,'page-replay':1,'raw-storage':7}[suite]
+        selector=test_class+('#originalCommandReceiptSurvivesNewAssemblyWithoutAnotherSourceRead' if suite=='page-replay' else '')
         started = time.time_ns()
         command = ['mvn.cmd' if os.name == 'nt' else 'mvn', '-B', '-pl', module_name, '-am', 'test',
-                   '-Dtest='+test_class, '-Dsurefire.failIfNoSpecifiedTests=false']
+                   '-Dtest='+selector, '-Dsurefire.failIfNoSpecifiedTests=false']
         with chain.open_evidence_log(output / 'maven.log') as log:
             process = subprocess.Popen(command, cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                        text=True, encoding='utf-8', errors='replace')
@@ -210,6 +211,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--clone-summary', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
-    parser.add_argument('--suite',choices=('raw-storage','mapped-problem'),default='raw-storage')
+    parser.add_argument('--suite',choices=('raw-storage','mapped-problem','page-intake','page-replay'),default='raw-storage')
     args = parser.parse_args()
     raise SystemExit(run(args.clone_summary, args.output,args.suite))

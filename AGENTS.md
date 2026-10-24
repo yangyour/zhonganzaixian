@@ -1,3 +1,7 @@
+# 有界来源页消费接续（2026-10-24）
+
+本轮在当前独立监控工作区补显式HOST/ID/UTC秒窗口最多10条的页消费入口，详见`docs/monitoring-source-page-intake-20261024.md`。raw/待处理事实/事件/既有工单/审计/原命令回执同事务，恢复不确认t2；页位置不是全局水位。新开关默认关闭、当前未部署。M02保持IN_PROGRESS，后台持续拉取/全局水位、迟到补读和自动raw/恢复调度继续待做。没有新增迁移，V1–V55冻结资源不改；原工作区改动保持，后到主干通知取消功能复用。
+
 # 当前监控接续工作区（2026-10-24）
 
 本轮发现`.worktrees/remaining-gaps-20261024`出现并发通知改动，仅将自己尚未提交的四个工具文件迁移到`E:\work\wxw9\zhonganzaixian\.worktrees\monitoring-source-pull-20261024`，分支`codex/monitoring-source-pull-20261024`；规范origin/组织仍为`https://github.com/yangyour/zhonganzaixian.git` / `yangyour/zhonganzaixian`。旧检出和原目录三处用户修改不覆盖。已吸收主干报告阅读看板/通知待处理队列。无损schema还原及目录表示兼容见`docs/schema-text-roundtrip-20261024.md`；新验证库保留，旧损坏库不修写，V1–V55 SQL保持冻结。持续拉取和水位尚未完成；不自动部署、外发、启用真实采集、恢复旧会话或创建新聊天/自动化。其余既有边界继续适用。

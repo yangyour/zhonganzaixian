@@ -7,7 +7,7 @@ export interface MappingKey {pool_id:string;object_type:'HOST'|'ITEM';external_i
 export interface ObjectMapping {
  state:{document:{id:string;tenant_id:string;key:MappingKey;provider:string;created_by:string;created_at:string};version:number;draft:MappingDraft|null;
  active:{approved_draft:MappingDraft;activated_by:string;activated_at:string;expires_at:string;policy_reference:string;source:{key:MappingKey;provider:string;source_host_id:string;claimed_pool_id:string;claimed_tenant_id:string;claimed_asset_id:string;definition_sha256:string;metadata_sha256:string}}|null;updated_at:string;reason:string|null}
- source_capture_enabled:boolean;problem_intake_enabled?:boolean;availability:string;draft_asset_current:boolean;current_actor_can_activate:boolean;policy_reference:string|null;source_definition_sha256:string|null;monitoring_applied:false;dispatch_allowed:false;device_identity_verified:false
+ source_capture_enabled:boolean;problem_intake_enabled?:boolean;page_intake_enabled?:boolean;availability:string;draft_asset_current:boolean;current_actor_can_activate:boolean;policy_reference:string|null;source_definition_sha256:string|null;monitoring_applied:false;dispatch_allowed:false;device_identity_verified:false
 }
 export const mappingLabels:Record<string,string>={NO_ACTIVE_MAPPING:'尚无发布记录',POLICY_UNCONFIGURED:'审批配置未完成',POLICY_CHANGED:'审批配置已变化',SOURCE_CONFIGURATION_CHANGED:'来源配置已变化',REVIEWER_REVOKED:'复核人授权已变化',ASSET_CHANGED:'资产版本已变化',PROOF_FROM_FUTURE:'证明时间异常',PROOF_EXPIRED:'归属证明已过期',CURRENT_RECORDED_MAPPING:'读取时归属映射有效'}
 const object=(v:unknown):v is Record<string,unknown>=>!!v&&typeof v==='object'&&!Array.isArray(v)
@@ -23,7 +23,7 @@ const sameKey=(a:MappingKey,b:MappingKey)=>a.pool_id===b.pool_id&&a.object_type=
 export const mappingSourceId=(v:unknown):v is string=>typeof v==='string'&&/^[1-9][0-9]{0,19}$/.test(v)&&BigInt(v)<=18446744073709551615n
 const invalid=()=>new ApiError(200,'INVALID_MONITORING_MAPPING','映射范围、版本或回执未通过核对','—')
 export function readObjectMapping(raw:unknown,tenant:string,id?:string):ObjectMapping{
- if(!object(raw)||raw.problem_intake_enabled!==undefined&&typeof raw.problem_intake_enabled!=='boolean'||typeof raw.source_capture_enabled!=='boolean'||!object(raw.state)||!object(raw.state.document)||!Object.hasOwn(mappingLabels,String(raw.availability))||typeof raw.draft_asset_current!=='boolean'||typeof raw.current_actor_can_activate!=='boolean'||raw.policy_reference!==null&&!ref(raw.policy_reference)||raw.source_definition_sha256!==null&&!hash(raw.source_definition_sha256))throw invalid()
+ if(!object(raw)||raw.page_intake_enabled!==undefined&&typeof raw.page_intake_enabled!=='boolean'||raw.problem_intake_enabled!==undefined&&typeof raw.problem_intake_enabled!=='boolean'||typeof raw.source_capture_enabled!=='boolean'||!object(raw.state)||!object(raw.state.document)||!Object.hasOwn(mappingLabels,String(raw.availability))||typeof raw.draft_asset_current!=='boolean'||typeof raw.current_actor_can_activate!=='boolean'||raw.policy_reference!==null&&!ref(raw.policy_reference)||raw.source_definition_sha256!==null&&!hash(raw.source_definition_sha256))throw invalid()
  for(const flag of ['monitoring_applied','dispatch_allowed','device_identity_verified'])if(raw[flag]!==false)throw invalid()
  const s=raw.state,d=s.document
  if(!object(d)||!mappingUuid(d.id)||d.tenant_id!==tenant||id!==undefined&&d.id!==id||!key(d.key)||typeof d.provider!=='string'||!/^[A-Z][A-Z0-9_]{0,63}$/.test(d.provider)||!mappingUuid(d.created_by)||!date(d.created_at)||!version(s.version)||!date(s.updated_at)||!reason(s.reason)||s.draft!==null&&!draft(s.draft))throw invalid()
@@ -56,11 +56,43 @@ export function readMappingProblemReceipt(raw:unknown,id:string,expected:number,
  return raw as unknown as MappingProblemReceipt
 }
 interface Command {key:string;path:string;body:Record<string,unknown>}
+export interface MappingSourceWindow {first_event_id:string;last_event_id:string;from_clock:number;through_clock:number;page_size:number}
+export interface MappingPageItem {source_event_id:string;source_phase:'PROBLEM'|'RECOVERED';record_id:string;raw_outcome:string;first_received_at:string;business_processed:boolean;event_id:string|null;event_version:number|null;ticket_id:string|null;pending_reason:string|null}
+export interface MappingPageReceipt {mapping_id:string;mapping_version:number;window:MappingSourceWindow;items:MappingPageItem[];next_event_id:string|null;received_count:number;processed_count:number;complete_window_claimed:false;global_checkpoint_advanced:false;recovery_confirmed:false;dispatch_allowed:false;acknowledgement_only:true}
+export const mappingPagePendingLabels:Record<string,string>={SOURCE_KEY_CONFLICT:'来源键冲突，候选已隔离',RECOVERY_OBSERVATION_REQUIRED:'恢复信号等待独立观察证据',SOURCE_SEVERITY_UNCLASSIFIED:'来源级别未分类',SOURCE_CLOCK_AHEAD:'来源时间晚于接收时间',EVENT_SIGNAL_OUT_OF_ORDER:'信号时间早于当前业务状态'}
+export function validMappingSourceWindow(value:unknown):value is MappingSourceWindow {
+ if(!object(value)||!mappingSourceId(value.first_event_id)||!mappingSourceId(value.last_event_id)||BigInt(value.first_event_id)>BigInt(value.last_event_id))return false
+ return Number.isSafeInteger(value.from_clock)&&Number(value.from_clock)>=0&&Number.isSafeInteger(value.through_clock)&&Number(value.through_clock)>=Number(value.from_clock)&&Number(value.through_clock)<=253402300799&&Number.isInteger(value.page_size)&&Number(value.page_size)>=1&&Number(value.page_size)<=10
+}
+/** UTC input is explicit; browser-local timezone and calendar rollover cannot change the requested window. */
+export function mappingUtcClock(value:string):number|null {
+ if(!/^\d{4}-\d\d-\d\dT\d\d:\d\d(?::\d\d(?:\.0{1,3})?)?$/.test(value))return null
+ const seconds=value.replace(/\.0{1,3}$/,''),canonical=seconds.length===16?seconds+':00':seconds,date=new Date(canonical+'Z')
+ return Number.isFinite(date.getTime())&&date.toISOString().slice(0,19)===canonical?date.getTime()/1000:null
+}
+export function readMappingPageReceipt(raw:unknown,id:string,expected:number,window:MappingSourceWindow):MappingPageReceipt {
+ if(!object(raw)||raw.mapping_id!==id||raw.mapping_version!==expected||!validMappingSourceWindow(raw.window)||!Object.keys(window).every(k=>raw.window && (raw.window as unknown as Record<string,unknown>)[k]===window[k as keyof MappingSourceWindow])||!Array.isArray(raw.items)||raw.items.length>window.page_size||raw.received_count!==raw.items.length||raw.source_ownership_basis!=='CURRENT_MAPPING_AND_SERVER_READ'||raw.complete_window_claimed!==false||raw.global_checkpoint_advanced!==false||raw.recovery_confirmed!==false||raw.dispatch_allowed!==false||raw.acknowledgement_only!==true)throw invalid()
+ let previous:bigint|null=null,processed=0
+ for(const item of raw.items){
+  if(!object(item)||!mappingSourceId(item.source_event_id)||BigInt(item.source_event_id)<BigInt(window.first_event_id)||BigInt(item.source_event_id)>BigInt(window.last_event_id)||previous!==null&&BigInt(item.source_event_id)<=previous||!mappingUuid(item.record_id)||!date(item.first_received_at)||!['PROBLEM','RECOVERED'].includes(String(item.source_phase)))throw invalid()
+  previous=BigInt(item.source_event_id)
+  const conflict=['CONFLICT_HELD','CONFLICT_ALREADY_HELD'].includes(String(item.raw_outcome))
+  if(!conflict&&!['RAW_STORED','RAW_ALREADY_PRESENT'].includes(String(item.raw_outcome)))throw invalid()
+  if(item.business_processed===true){
+   if(conflict||item.source_phase!=='PROBLEM'||!mappingUuid(item.event_id)||!version(item.event_version)||item.ticket_id!==null&&!mappingUuid(item.ticket_id)||item.pending_reason!==null)throw invalid()
+   processed++
+  }else if(item.business_processed!==false||item.event_id!==null||item.event_version!==null||item.ticket_id!==null||typeof item.pending_reason!=='string'||!Object.hasOwn(mappingPagePendingLabels,item.pending_reason)||conflict!==(item.pending_reason==='SOURCE_KEY_CONFLICT')||!conflict&&(item.source_phase==='RECOVERED')!==(item.pending_reason==='RECOVERY_OBSERVATION_REQUIRED'))throw invalid()
+ }
+ if(raw.processed_count!==processed||raw.next_event_id!==null&&(!mappingSourceId(raw.next_event_id)||raw.items.length!==window.page_size||previous===null||BigInt(raw.next_event_id)!==previous+1n||BigInt(raw.next_event_id)>BigInt(window.last_event_id)))throw invalid()
+ return raw as unknown as MappingPageReceipt
+}
 const fields=(b:Record<string,unknown>,keys:string[])=>Object.keys(b).sort().join(',')===keys.sort().join(',')
-export function createMappingCommands(scope:()=>string|null,storage:Pick<Storage,'getItem'|'setItem'|'removeItem'>,client:Pick<typeof api,'request'>=api,onCapture:(receipt:MappingCaptureReceipt)=>void=()=>{},onIntake:(receipt:MappingProblemReceipt)=>void=()=>{}){
+export function createMappingCommands(scope:()=>string|null,storage:Pick<Storage,'getItem'|'setItem'|'removeItem'>,client:Pick<typeof api,'request'>=api,onCapture:(receipt:MappingCaptureReceipt)=>void=()=>{},onIntake:(receipt:MappingProblemReceipt)=>void=()=>{},onPage:(receipt:MappingPageReceipt)=>void=()=>{}){
  const commands=createDurableCommand<Command>({scope,prefix:'mop.object-mapping.pending:',storage,
- validate(raw){if(!object(raw)||!mappingUuid(raw.key)||typeof raw.path!=='string'||!object(raw.body)||!raw.path.endsWith('/captures')&&!raw.path.endsWith('/problem-intakes')&&!reason(raw.body.reason))throw invalid();const b=raw.body
-  if(raw.path.endsWith('/captures')||raw.path.endsWith('/problem-intakes')){
+ validate(raw){if(!object(raw)||!mappingUuid(raw.key)||typeof raw.path!=='string'||!object(raw.body)||!raw.path.endsWith('/captures')&&!raw.path.endsWith('/problem-intakes')&&!raw.path.endsWith('/page-intakes')&&!reason(raw.body.reason))throw invalid();const b=raw.body
+  if(raw.path.endsWith('/page-intakes')){
+   const parts=raw.path.split('/');if(parts.length!==4||parts[1]!=='monitoring-object-mappings'||!mappingUuid(parts[2])||!fields(b,['expected_version','expected_source_definition_sha256','first_event_id','last_event_id','from_clock','through_clock','page_size'])||!version(b.expected_version)||!hash(b.expected_source_definition_sha256)||!validMappingSourceWindow(b))throw invalid()
+  }else if(raw.path.endsWith('/captures')||raw.path.endsWith('/problem-intakes')){
    const parts=raw.path.split('/');if(parts.length!==4||parts[1]!=='monitoring-object-mappings'||!mappingUuid(parts[2])||!fields(b,['expected_version','source_event_id','expected_source_definition_sha256'])||!version(b.expected_version)||!mappingSourceId(b.source_event_id)||!hash(b.expected_source_definition_sha256))throw invalid()
   }else if(raw.path==='/monitoring-object-mappings'){
    if(!fields(b,['asset_id','asset_version','pool_id','object_type','external_id','reason'])||!mappingUuid(b.asset_id)||!version(b.asset_version)||!key({pool_id:b.pool_id,object_type:b.object_type,external_id:b.external_id}))throw invalid()
@@ -75,7 +107,7 @@ export function createMappingCommands(scope:()=>string|null,storage:Pick<Storage
    }if(!fields(b,keys))throw invalid()
   }return raw as unknown as Command},
  send:(c,signal)=>client.request(c.path,{method:'POST',body:c.body,idempotencyKey:c.key,signal,timeoutMs:35000}),
- acknowledge(raw,c){if(c.path.endsWith('/problem-intakes')){onIntake(readMappingProblemReceipt(raw,c.path.split('/')[2]!,Number(c.body.expected_version),String(c.body.source_event_id)));return}if(c.path.endsWith('/captures')){onCapture(readMappingCaptureReceipt(raw,c.path.split('/')[2]!,Number(c.body.expected_version),String(c.body.source_event_id)));return}const create=c.path==='/monitoring-object-mappings';if(!object(raw)||!mappingUuid(raw.id)||raw.id!==(create?raw.id:c.path.split('/')[2])||raw.accepted_version!==(create?1:Number(c.body.expected_version)+1)||raw.action!==(create?'CREATE':c.body.action)||raw.acknowledgement_only!==true||raw.current_mapping_claimed!==false||raw.monitoring_applied!==false||raw.dispatch_allowed!==false)throw invalid()}
+ acknowledge(raw,c){if(c.path.endsWith('/page-intakes')){const b=c.body;onPage(readMappingPageReceipt(raw,c.path.split('/')[2]!,Number(b.expected_version),{first_event_id:String(b.first_event_id),last_event_id:String(b.last_event_id),from_clock:Number(b.from_clock),through_clock:Number(b.through_clock),page_size:Number(b.page_size)}));return}if(c.path.endsWith('/problem-intakes')){onIntake(readMappingProblemReceipt(raw,c.path.split('/')[2]!,Number(c.body.expected_version),String(c.body.source_event_id)));return}if(c.path.endsWith('/captures')){onCapture(readMappingCaptureReceipt(raw,c.path.split('/')[2]!,Number(c.body.expected_version),String(c.body.source_event_id)));return}const create=c.path==='/monitoring-object-mappings';if(!object(raw)||!mappingUuid(raw.id)||raw.id!==(create?raw.id:c.path.split('/')[2])||raw.accepted_version!==(create?1:Number(c.body.expected_version)+1)||raw.action!==(create?'CREATE':c.body.action)||raw.acknowledgement_only!==true||raw.current_mapping_claimed!==false||raw.monitoring_applied!==false||raw.dispatch_allowed!==false)throw invalid()}
  })
  return{...commands,send:(path:string,body:Record<string,unknown>)=>commands.submit({key:createRequestId(),path,body})}
 }

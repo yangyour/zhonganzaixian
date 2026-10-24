@@ -146,6 +146,7 @@ public final class PostgresMonitoringObjectBindingRepository implements Monitori
   append(c,a,action,after);return receipt(after,action);
  });}
 
+
     @Override
     public CaptureReceipt capture(Access a, UUID id, long expected, String eventId, String expectedDefinition) {
         return transaction(a, true, c -> capture(c, a, id, expected, eventId, expectedDefinition, false).receipt());
@@ -195,6 +196,150 @@ public final class PostgresMonitoringObjectBindingRepository implements Monitori
     }
 
  private record Captured(CaptureReceipt receipt,RawMonitoringEvent raw,String sourceHost){}
+
+    /** The page, pending raw facts, event members, tickets and receipt share one durable command transaction. */
+
+
+    @Override
+    public MappedSourcePage.Receipt intakePage(
+        Access a,
+        UUID id,
+        long expected,
+        String expectedDefinition,
+        MappedSourcePage.Window window
+    ) {
+        if (events == null) {
+            throw new DomainException(503, "MAPPING_PAGE_INTAKE_DISABLED", "来源分页消费尚未装配");
+        }
+        Objects.requireNonNull(window);
+        return transaction(a, true, c -> {
+            var state = load(c, a, id, true);
+            if (state.version() != expected) {
+                throw changed();
+            }
+            var current = view(c, a, state);
+            if (!"CURRENT_RECORDED_MAPPING".equals(current.availability())) {
+                throw new DomainException(409, "MAPPING_NOT_CURRENT", "映射或归属证明已失效，请重新复核");
+            }
+            var key = state.document().key();
+            if (key.objectType() != MonitoringObjectMapping.ObjectType.HOST) {
+                throw new DomainException(422, "MAPPING_CAPTURE_HOST_REQUIRED", "分页消费须绑定明确主机");
+            }
+            if (!Objects.equals(expectedDefinition, current.sourceDefinitionSha256())) {
+                throw changed();
+            }
+            var policy = policy(a);
+            var metadata = source.verify(key);
+            if (!state.active().source().equals(metadata)) {
+                throw missing();
+            }
+            var page = source.readPage(key, window);
+            if (
+                page == null ||
+                !window.equals(page.window()) ||
+                page
+                    .events()
+                    .stream()
+                    .anyMatch(event -> !metadata.sourceHostId().equals(event.sourceHostId()))
+            ) {
+                throw new DomainException(503, "MAPPING_SOURCE_PAGE_UNAVAILABLE", "来源页范围或主机归属不一致");
+            }
+            // Upstream reads are not atomic. Local ownership must still be current before the first write.
+            if (
+                !Objects.equals(policy, policy(a)) ||
+                !Objects.equals(expectedDefinition, source.definitionSha256(key.poolId())) ||
+                !"CURRENT_RECORDED_MAPPING".equals(view(c, a, state).availability())
+            ) {
+                throw changed();
+            }
+            authority(c, a, true);
+            RawMonitoringEventSchemaVerifier.verify(c);
+            MonitoringQuarantineSchemaVerifier.verify(c);
+            durableSettings(c);
+            var received = now(c);
+            var items = new ArrayList<MappedSourcePage.Item>();
+            for (var fetched : page.events()) {
+                var raw = new RawMonitoringEvent(
+                    new RawMonitoringEvent.Key(key.poolId(), fetched.sourceEventId(), fetched.phase()),
+                    new RawMonitoringEvent.Binding(
+                        state.document().tenantId(),
+                        state.active().approvedDraft().assetId()
+                    ),
+                    fetched.occurredAt(),
+                    received,
+                    fetched.payload()
+                );
+                var capture = store(c, id, expected, fetched, raw);
+                if (capture.outcome().startsWith("CONFLICT")) {
+                    items.add(new MappedSourcePage.Item(capture, null, null, null, "SOURCE_KEY_CONFLICT"));
+                } else if (fetched.phase() == RawMonitoringEvent.Phase.RECOVERED) {
+                    items.add(new MappedSourcePage.Item(capture, null, null, null, "RECOVERY_OBSERVATION_REQUIRED"));
+                } else {
+                    try {
+                        var command = MappedMonitoringProblem.decode(raw, metadata.sourceHostId());
+                        var event = events.ingestMappedProblem(
+                            new MonitoringEventCenterRepository.Access(
+                                a.tenantId(),
+                                a.actorId(),
+                                a.permissionVersion(),
+                                a.traceId()
+                            ),
+                            command,
+                            capture.recordId()
+                        );
+                        items.add(
+                            new MappedSourcePage.Item(capture, event.id(), event.version(), event.ticketId(), null)
+                        );
+                    } catch (DomainException failure) {
+                        // These checks occur before business mutation. Every other error rolls back the entire page.
+                        if (
+                            failure.status != 422 ||
+                            !Set.of(
+                                "SOURCE_SEVERITY_UNCLASSIFIED",
+                                "SOURCE_CLOCK_AHEAD",
+                                "EVENT_SIGNAL_OUT_OF_ORDER"
+                            ).contains(failure.code)
+                        ) {
+                            throw failure;
+                        }
+                        items.add(new MappedSourcePage.Item(capture, null, null, null, failure.code));
+                    }
+                }
+            }
+            // A long page cannot commit using a proof that expired while business effects were assembled.
+            if (
+                !Objects.equals(policy, policy(a)) ||
+                !Objects.equals(expectedDefinition, source.definitionSha256(key.poolId())) ||
+                !"CURRENT_RECORDED_MAPPING".equals(view(c, a, state).availability())
+            ) {
+                throw changed();
+            }
+            platform.audit(
+                a.actorId(),
+                a.tenantId(),
+                "monitoring_mapping.page_intake",
+                "monitoring_mapping",
+                id.toString(),
+                "SUCCEEDED",
+                "VERSION:" +
+                    expected +
+                    ";COUNT:" +
+                    items.size() +
+                    ";PROCESSED:" +
+                    items.stream().filter(MappedSourcePage.Item::businessProcessed).count(),
+                a.traceId()
+            );
+            return new MappedSourcePage.Receipt(
+                state.document().tenantId(),
+                id,
+                expected,
+                window,
+                items,
+                page.nextEventId()
+            );
+        });
+    }
+
 
     private Captured capture(
         Connection c,
@@ -262,12 +407,40 @@ public final class PostgresMonitoringObjectBindingRepository implements Monitori
             received,
             fetched.payload()
         );
+        durableSettings(c);
+        var receipt = store(c, id, expected, fetched, incoming);
+        platform.audit(
+            a.actorId(),
+            a.tenantId(),
+            "monitoring_mapping.capture",
+            "monitoring_mapping",
+            id.toString(),
+            "SUCCEEDED",
+            "UNVERIFIED_RAW_ONLY_" + receipt.outcome(),
+            a.traceId()
+        );
+        return new Captured(receipt, incoming, metadata.sourceHostId());
+    }
+
+
+    private static void durableSettings(Connection c) throws SQLException {
         try (var settings = c.createStatement()) {
             settings.setQueryTimeout(10);
             settings.execute("SET LOCAL synchronous_commit='on'");
             settings.execute("SET LOCAL lock_timeout='10s'");
             settings.execute("SET LOCAL statement_timeout='10s'");
         }
+    }
+
+
+    private static CaptureReceipt store(
+        Connection c,
+        UUID id,
+        long expected,
+        FetchedEvent fetched,
+        RawMonitoringEvent incoming
+    ) throws SQLException {
+        String eventId = fetched.sourceEventId();
         var stored = PostgresMonitoringEventStorageCoordinator.storeInTransaction(c, incoming);
         CaptureReceipt receipt;
         if (stored instanceof PostgresMonitoringEventStorageCoordinator.RawResult raw) {
@@ -299,17 +472,7 @@ public final class PostgresMonitoringObjectBindingRepository implements Monitori
         } else {
             throw unavailable();
         }
-        platform.audit(
-            a.actorId(),
-            a.tenantId(),
-            "monitoring_mapping.capture",
-            "monitoring_mapping",
-            id.toString(),
-            "SUCCEEDED",
-            "UNVERIFIED_RAW_ONLY_" + receipt.outcome(),
-            a.traceId()
-        );
-        return new Captured(receipt, incoming, metadata.sourceHostId());
+        return receipt;
     }
  private void keyAvailable(Connection c,State state)throws SQLException{
   var key=state.document().key();try(var s=query(c,"SELECT pg_advisory_xact_lock(hashtextextended(?,0))")){s.setString(1,"mop.mapping.key|"+key.poolId()+"|"+key.objectType()+"|"+key.externalId());s.execute();}

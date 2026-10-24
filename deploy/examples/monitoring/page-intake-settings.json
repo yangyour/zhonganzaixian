@@ -1,0 +1,19 @@
+{
+  "scope": "EXAMPLE_ONLY_NOT_ACTIVE",
+  "environment": {
+    "MOP_MONITORING_MAPPING_ENABLED": "false",
+    "MOP_MONITORING_MAPPING_CAPTURE_ENABLED": "false",
+    "MOP_MONITORING_MAPPING_PROBLEM_INTAKE_ENABLED": "false",
+    "MOP_MONITORING_MAPPING_PAGE_INTAKE_ENABLED": "false"
+  },
+  "required_configuration": [
+    "Current explicit published HOST mapping, policy, asset version and unexpired source ownership proof",
+    "Configured ZABBIX_7 read endpoint through the approved private connection and secret references",
+    "Designated PostgreSQL V55 and restricted project runtime account",
+    "Explicit positive uint64 event ID bounds, UTC second clock bounds, and a page size from 1 through 10"
+  ],
+  "reference": "docs/monitoring-source-page-intake-20261024.md",
+  "global_checkpoint_enabled": false,
+  "automatic_polling_enabled": false,
+  "recovery_confirmation_enabled": false
+}

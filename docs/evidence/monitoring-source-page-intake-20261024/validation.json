@@ -1,0 +1,344 @@
+{
+  "schema_version": 1,
+  "status": "PASSED_SCOPED_FUNCTION",
+  "date": "2026-10-24",
+  "project": "MOP / zhonganzaixian",
+  "canonical_origin": "https://github.com/yangyour/zhonganzaixian.git",
+  "organization": "yangyour/zhonganzaixian",
+  "branch": "codex/monitoring-source-pull-20261024",
+  "base_commit": "dd51b1c4",
+  "concurrent_main_reused": "abbee034",
+  "feature": "Explicit bounded HOST source page intake; no global checkpoint or background scheduling",
+  "source_protocol": "SYNTHETIC_SERVER_SOURCE",
+  "actual_zabbix_end_to_end": "NOT_RUN",
+  "formal_contract_acceptance": "NOT_RUN",
+  "java": {
+    "status": "PASSED",
+    "tests": 153,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "classes": [
+      {
+        "class_name": "MappedSourcePageTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "ZabbixMappedEventPageReaderTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "MonitoringPageIntakeHttpTest",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "MonitoringProblemIntakeHttpTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "ZabbixMappedEventReaderTest",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "ZabbixEventPullerTest",
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "MappedMonitoringProblemTest",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "PostgresMonitoringObjectBindingRepositoryTest",
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "MonitoringObjectBindingTest",
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "MonitoringObjectBindingHttpSecurityTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "MonitoringObjectBindingControllerTest",
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "MonitoringObjectBindingConfigurationTest",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "RawMonitoringEventStorageSafetyTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "MonitoringQuarantineStorageSafetyTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "MonitoringStorageCoordinatorSafetyTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "RawMonitoringEventTest",
+        "tests": 21,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "QuarantinedMonitoringEventTest",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "MonitoringBorrowedStorageTransactionTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "web": {
+    "passed": 27,
+    "failed": 0,
+    "skipped": 0,
+    "scope": "Vitest utility and component protocol tests"
+  },
+  "node_contract": {
+    "passed": 223,
+    "failed": 0,
+    "skipped": 0
+  },
+  "typecheck": "PASSED",
+  "production_build": "PASSED",
+  "static_release_and_policy": "PASSED",
+  "browser": {
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "engine": "Microsoft Edge",
+    "viewports": [
+      1024,
+      1440
+    ],
+    "api": "EXPLICIT_SYNTHETIC_INTERCEPT",
+    "keyboard": "PASSED",
+    "axe_1024_form_and_receipt_violations": 0,
+    "horizontal_document_overflow": false,
+    "screenshots_visually_reviewed": true
+  },
+  "postgresql": {
+    "environment": "lan-test-20261008",
+    "version": "17.9 (Debian 17.9-1.pgdg12+1)",
+    "suite": "7 page and 6 single-event scenarios",
+    "unique_cases_eventually_passed": 13,
+    "full_green_run_claimed": false,
+    "second_full_run": {
+      "passed": 12,
+      "failed": 1
+    },
+    "targeted_replay_final": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "controlled_parent_concurrency_lock_retries": 3,
+    "metadata_and_protected_rows_unchanged": true,
+    "older_damaged_clone_unchanged": true,
+    "own_runtime_connections_remaining": 0,
+    "own_actor_deactivated": true,
+    "environment_lock_released": true,
+    "verification_coordination_lock_released": true
+  },
+  "schema_migrations": 0,
+  "ddl_statements": 0,
+  "deployments": 0,
+  "external_messages": 0,
+  "real_device_contacts": 0,
+  "global_flags_changed": false,
+  "resources_v1_v55": "UNCHANGED",
+  "migration_resources": {
+    "V10__immutable_internal_ticket_notes.sql": "ba1ad02e7df8079936288d8712a84062a5bd695885b1e45daacec9f4d35ad198",
+    "V11__immutable_ticket_comments.sql": "d8535bbf13ca9e35c115278f36232a786b4562c99cc9afd9f5195a416028a8e3",
+    "V12__unpublished_working_calendar_drafts.sql": "e6e0412e8a96936a6f4e09dc9f96431cd6551dd9c15ebaf7d2ed414467aedb1a",
+    "V13__immutable_manual_incident_registrations.sql": "80734d0a0dcd436a3008ed76af0b7da3e81956f516a25d778c0717df79665700",
+    "V14__immutable_manual_recovery_confirmations.sql": "39be55d8759de87c6e2b8f85b3958c60be24ae9e6ece2deb5d849c225050ed72",
+    "V15__manual_warranty_details.sql": "317b865df601888f2d6ea5324415f469acdeaea4c2b49b6c837fef9954a30baf",
+    "V16__immutable_capacity_scenario_drafts.sql": "74f095f56ca8735ef6d97405908aa523b554e76316acca052eeaa3cbbe010d05",
+    "V17__customer_contact_revisions.sql": "3e7d2f89729682f9a51d0ccf4be9738ac25421d94738943d3d5f06461417a10b",
+    "V18__durable_contact_import_jobs.sql": "75325f0423f788d5a71b71e0b1c8ba3b5c30e628aa3c588437f671954cbb39e9",
+    "V19__contact_import_generated_hash_guard.sql": "b84a80aa548a7c2d7d3050bb983214353cd3e1951f5d3ac1b04b413cedc2cdc7",
+    "V1__remote_test_platform.sql": "1a0fbebcd4d32e899e8d344007ac7ed060550e1deaa04e02706a19210aaf1063",
+    "V20__durable_asset_export_jobs.sql": "5f8114dcdd2bd1cdf0c60fb75a5b521175462f583786602cd2b4a1835f960a83",
+    "V21__inspection_template_revisions.sql": "85cf043f55b72fa1c06919ccf53705b516643468b97285980d436c3b78a4145b",
+    "V22__manual_inspection_worksheet_drafts.sql": "ab3f98ddf1c8803b8398347b9bc7d36af8d9741abdcb7591f29f1a2810791dc3",
+    "V23__immutable_inspection_source_collections.sql": "eabc4cf2512cdea920acf97ba1991499fde9d0901c7b91b5a8cc7b51f13599e8",
+    "V24__unpublished_backup_plan_drafts.sql": "3b28fe6679d787faafdf0d5ea175712ec622b5017c103650cfa42ff12c73816a",
+    "V25__unreviewed_change_notice_drafts.sql": "650ce8f83e9fc673cfb6a4838872638149650f735a90f37c5861a6fce771bc67",
+    "V26__own_notification_preference_drafts.sql": "df3c59cc6c241316b110ae87b3cb7a80aee57b4847f4122e7786b90ac94c23d8",
+    "V27__project_identity_and_roles.sql": "41e5060d4925e7c8ea761539e4695a6ea5792743240363a7d5f50f24bcb59566",
+    "V28__identity_inventory_and_password_formats.sql": "5554e23a3aabfe489ae6b9258293d0f33dda0bcc7da19c60bdb873fb16b77ad7",
+    "V29__immutable_raw_monitoring_events.sql": "2f67b28791d2533934153227a98d6e09aec4e16c7405d4408e9956a9d853e8c3",
+    "V2__tenant_configuration_revisions.sql": "1894b9807a3384bc1818af7019318fbe43cafe2a9656ad163e127a808b638626",
+    "V30__immutable_monitoring_quarantine.sql": "2c13cd68b1d7aff016644266c723c72330868fd6e368f6f19b9fceb17025827f",
+    "V31__own_export_inbox.sql": "60ae717f032c61fd7cbed98a0ffd15d9df514c501d143ecadc337e8f56a388dc",
+    "V32__runtime_configuration_publications.sql": "657c0d50e47b3da715265a563af857287337fc923774fd98b4a6b40b8cad0c82",
+    "V33__ticket_lifecycle_and_durable_clocks.sql": "b867a5756bcda84128dd9d9570bf4bd07ee43714e0508acd0dd95c042cc1ba5f",
+    "V34__ticket_notification_intents.sql": "7951a0abb91fd94ae6ba3a1b5769e32780b23b08720e2bd17851c64f256cdb51",
+    "V35__service_tiers_and_change_history.sql": "f8bf2639d6ebb467a0d515147307ceb2e13c425b2337cbad69c88eee91330ed0",
+    "V36__oncall_escalation_and_sla_monthly_results.sql": "52f43d3f5eb43967ac8ff895da9b5503d2e1e83fc29d52adea2ce6076ab7c0cb",
+    "V37__monitoring_events_noise_funnel_and_maintenance_windows.sql": "f6f9cc88bcbc4dcbaf1a76a849aa78ed2cf7af91e7fd9b5c80dbde4d9b9ab351",
+    "V38__wecom_bindings_deliveries_and_login_state.sql": "32dc38c2dab0ad385f79e9e7c886c456c06664f8b740c496a8af7bf2d9e9c0fb",
+    "V39__email_bindings_and_delivery_ledger.sql": "3d1b4cd557b6c367b2a36e9f49a2154d8a925a8afe249c103cd59373f32a6dea",
+    "V3__configuration_review_test_identity.sql": "cbcebf62edb25ce83c47f048efa5fba2f61b11a69a4b43639725dbe450f42237",
+    "V40__immutable_change_notice_approval_events.sql": "a24085a280ff822da932904c20cb3189fd813ef1d6ddc2f5458723ba48025756",
+    "V41__immutable_inspection_quarterly_reports.sql": "54b9bd1d0995a248191e8f8f7dafe35fafd7d4ec15699a2ca8a49a7a025c7aa2",
+    "V42__ticket_lifecycle_revisions.sql": "01923cef9be16d7445b8aa4ada7ee564ad0210a21bad59edca17eb48e9a908e9",
+    "V43__ticket_autoclose_jobs.sql": "0b3bf01db63bcae757c4b80ba9f10979c342ae95dd339121ce91a979553e47e4",
+    "V44__ticket_sla_policy_bindings.sql": "f249f843c35eb547da719036db3f35d0168f89cb971a85ddf084191a3c632600",
+    "V45__sla_reminder_intents.sql": "d9626559c8a74299a703a094689e3dcf153cc54ec139a685d2cad1c7ebbd7507",
+    "V46__backup_device_coordination_journal.sql": "97d4dec874c03503326fbb609ea1708fa6601fd257fb664ca74cad7fa2032f98",
+    "V47__backup_run_event_journal.sql": "5ca80f0715369d45b3a7606fb411e962576a15d9f49b8921a70a2c1d0af12f0c",
+    "V48__durable_backup_archive_staging.sql": "3dcb7d51572b6bad4d655e7814ba9d8b1d3f312b7ea23ad4a8753d1355e310da",
+    "V49__atomic_backup_version_registration.sql": "67e196ea9e9b6a9586fbae9cf47a040f34bf975e02033793a8d96fc0d60dbf60",
+    "V4__durable_customer_report_registration.sql": "4fefc7470369fa4c4c78318b6e990935e7483fd3d4b3a8a2cd215f58af2567d8",
+    "V50__delivery_receipt_journal.sql": "93813aa97fcb4c19e00f664a91c1f732f51e5eb9e34ec8c35e5938b817cbff36",
+    "V51__notification_routing_control.sql": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b",
+    "V52__attachment_security_journal.sql": "ca8140bb6f6958408a7683d41ccb9ba0a03657bcfe3fb76f3f6fede361d103ef",
+    "V53__report_publication_journal.sql": "b9ee9c9724b3bd4156799058ee24876c04e59d413180f4df4db2d5673f4faddb",
+    "V54__monitoring_enrollment_journal.sql": "447bc4441943dbd3df4ead06915b4c05697dffb8c30cde6524009575c2ab3dc2",
+    "V55__monitoring_object_mapping_journal.sql": "e55960373428ad10c95fd08d731c349666c92f85f521371de99dbe11600ad36e",
+    "V5__durable_report_photos.sql": "5a84f62bdaab9badfd5d87f4d30ae0ac1f9c1ae2f48d0d84e0635485a7bbdc55",
+    "V6__asset_import_sources_and_mapping.sql": "1f532822668274b7aebd12ea78b57e6be0aa9fd53ceb77023ee8067589cd2b4b",
+    "V7__asset_dependency_draft_revisions.sql": "5a8ce8d49fe948fc0e9586c102f7c8bfc46cb975a0b5d9f32d4bd1ccc72670bb",
+    "V8__manual_worklog_revisions.sql": "942ea4dc88a8169b40662edcfd89871e8280a429ac922bd0cc1eb451b82ad2f8",
+    "V9__manual_asset_metadata_revisions.sql": "a311d8ea11516bb60f2375cafd02b293beb904d07c03c890653dd5bb3751412c"
+  },
+  "source_hash_scope": "Final LF source bytes; checked against staged Git blobs before commit",
+  "source_hashes": {
+    "apps/web/qa/browser/monitoring-page-intake.pw.ts": "e48822d6dbdd6c03ca477efc60fde446d3f006238e3bd40f832daea0ac11677d",
+    "apps/web/src/components/AssetMonitoringMappingPanel.vue": "08040ca80c6b58e6330234d31e1960db64d64d246259e195c2eb1fa343f55e23",
+    "apps/web/src/utils/monitoringObjectMappings.ts": "75e88346eebbae75f92217d714823a8fffb3e0d734dc65116ca3c2f8fb03fef0",
+    "apps/web/tests/assetMonitoringMappingPanel.test.ts": "f2b30c6c429523473d93faa4083e7e10681486c7bced950f41d6998f43ce5a69",
+    "apps/web/tests/monitoringObjectMappings.fixture.ts": "6cc6cd393df080ed0d472f9a4476ae9069e9154a8100e614ee3600a22e73fa76",
+    "apps/web/tests/monitoringObjectMappings.test.ts": "10af65614d75bffa1ed4e7fe6f92a6889fffeeb50231295fc7a1ab58b2171d23",
+    "server/adapters/src/main/java/cn/mop/adapters/monitoring/ZabbixMappedEventPageReader.java": "ae860e97209593c2c9f29ad5135fd2ae43e0d859a354c7138630c7ee27d4a106",
+    "server/adapters/src/main/java/cn/mop/adapters/monitoring/ZabbixMappedEventReader.java": "9254eadc4d18c42103152966ac9e005b341812c6a31db47003ae4f86395075d9",
+    "server/api/src/main/java/cn/mop/api/MonitoringObjectBindingConfiguration.java": "bfca4fc9ac1481bc8dd1658724b6cbdb4054ed14c7eefdf9d468bc93ecd52eba",
+    "server/api/src/main/java/cn/mop/api/MonitoringObjectBindingController.java": "8898aba615c6b92c81e9b385339baec5c69b7758e8d62c6562e5e0648215d593",
+    "server/api/src/main/java/cn/mop/api/MonitoringPageIntakeController.java": "42be3c00f319371ec954db2986e5a0dc589209d3d67d5931ab0d944d37e7c0d3",
+    "server/api/src/test/java/cn/mop/adapters/monitoring/ZabbixMappedEventPageReaderTest.java": "286405ed7e17a2f2b03148e2f3f43ccf535c3031146b3daf403adb94b5c3a3f1",
+    "server/api/src/test/java/cn/mop/api/MonitoringPageIntakeHttpTest.java": "2345c327ba307db9a90e3c499764217d9d05018be2f5dffe584ba24e1737f884",
+    "server/api/src/test/java/cn/mop/domain/monitoring/MappedSourcePageTest.java": "3de743697a86a28f3b44c3a00eaedfb8535897321a1bb952dc8d7356215dc614",
+    "server/api/src/test/java/cn/mop/persistence/MappedProblemIntakePostgresTest.java": "1ed4d6fb01e518f724d8909c2d673e0d70a6cbd11394f8ffb48765b02f5d1ce4",
+    "server/api/src/test/java/cn/mop/persistence/MappedSourcePagePostgresTest.java": "9061df958fa7ba3abd7aeda7f6e67352c6c30ad0cb3c81dc708ecd02b516fb21",
+    "server/api/src/test/java/cn/mop/persistence/PostgresMonitoringObjectBindingRepositoryTest.java": "eb30b243af55585b6f16b029caeea17c83b2a75b98ef2646d98897f0de36a46b",
+    "server/domain/src/main/java/cn/mop/domain/monitoring/MappedSourcePage.java": "cc7487081e4f45ef079c9639bec809179343160ed28143c3fcafff4cf9d3da06",
+    "server/domain/src/main/java/cn/mop/domain/monitoring/MonitoringObjectBindingRepository.java": "f0305d2864e3e1f1450af2b4e3e65e16f4f9f805b4f630e6c5f382a461cc4a1b",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresMonitoringObjectBindingRepository.java": "21ba472bd568d418b1a56ed462b4261550e0a8af837fe445ca63f1083ad3aa13",
+    "tests/monitoring-page-intake-contract.test.mjs": "b25d7e29c5c7fe83135a4c1bec910be3be138e3b71a99cdd142a64c90c0ce01e",
+    "tools/monitoring-object-mapping-contract.mjs": "eafe14a951c41ecd25bd179682779a9e201c4f9d0051b589b75de42160456791",
+    "tools/verify-schema-text-business.py": "4cd65ed213ad4c1f708b02482a8c4389a49a1b0445f53933593b03540567982f"
+  },
+  "failures_retained": [
+    {
+      "phase": "java-first",
+      "reason": "PowerShell split unquoted Maven -D property; command corrected; no tests claimed"
+    },
+    {
+      "phase": "web-first",
+      "reason": "Datetime input zero fractions normalized by DOM; whole-second parser corrected",
+      "failed": 1,
+      "passed": 26
+    },
+    {
+      "phase": "browser-first",
+      "reason": "Browser normalized zero seconds; fixture fill corrected",
+      "failed": 2,
+      "passed": 1
+    },
+    {
+      "phase": "browser-second",
+      "reason": "select label locator included option text; role locator corrected",
+      "failed": 2,
+      "passed": 1
+    },
+    {
+      "phase": "node-first",
+      "reason": "New test schema URN lacked namespace component; test identifier corrected",
+      "failed": 1,
+      "passed": 219
+    },
+    {
+      "phase": "postgresql-first-and-second",
+      "reason": "Test directly compared numeric/time JsonNode types; final replay compares actual wire-serialized JSON. No business code relaxation.",
+      "evidence": [
+        "pg-first.json",
+        "pg-second.json",
+        "pg-replay-final.json"
+      ]
+    }
+  ],
+  "remaining": [
+    "Background continuous pull and durable global watermark",
+    "Late-arrival/backfill and automatic pending raw/recovery proof scheduling",
+    "Real device nonempty problem/recovery/ticket chain and complete V42 lifecycle",
+    "Broader provider/catalogue/parameter consumption and customer policy gates"
+  ],
+  "final_http_account_recheck_repeat": {
+    "passed": 12,
+    "failed": 0,
+    "skipped": 0,
+    "scope": "Rechecked account/session inside the durable command before commit and after returning the result"
+  }
+}

@@ -31,3 +31,23 @@ it('held problem receipt never claims a business event and retry keeps original 
  const {problemAck}=await import('./monitoringObjectMappings.fixture');const request=vi.fn().mockRejectedValueOnce(new Error('response lost')).mockResolvedValueOnce({...problemAck(),raw_outcome:'CONFLICT_HELD',business_processed:false,event_id:null,event_version:null,ticket_id:null}),onIntake=vi.fn()
  const command=createMappingCommands(()=>s.tenant,storage(),{request},()=>{},onIntake);await command.send(`/monitoring-object-mappings/${s.id}/problem-intakes`,{expected_version:2,source_event_id:'44',expected_source_definition_sha256:'a'.repeat(64)});expect(await command.retry()).toBe(true);expect(request.mock.calls[0]![1].idempotencyKey).toBe(request.mock.calls[1]![1].idempotencyKey);expect(onIntake).toHaveBeenCalledWith(expect.objectContaining({business_processed:false,event_id:null}))
 })
+
+it('page receipt checks range order counts continuation and pending semantics',async()=>{
+ const {pageIntakeAck,mappingSourceWindow:w}=await import('./monitoringObjectMappings.fixture');const {readMappingPageReceipt}=await import('../src/utils/monitoringObjectMappings');
+ expect(readMappingPageReceipt(pageIntakeAck(),s.id,2,w).next_event_id).toBe('45')
+ for(const bad of [{...pageIntakeAck(),next_event_id:'46'},{...pageIntakeAck(),processed_count:0},{...pageIntakeAck(),global_checkpoint_advanced:true},{...pageIntakeAck(),window:{...w,last_event_id:'100'}},{...pageIntakeAck(),items:[{...pageIntakeAck().items[0],source_phase:'RECOVERED'}]},{...pageIntakeAck(),items:[{...pageIntakeAck().items[0],source_event_id:'100'}]}])expect(()=>readMappingPageReceipt(bad,s.id,2,w)).toThrow()
+})
+it('page pending recovery is distinct from a processed problem and cannot confirm t2',async()=>{
+ const {pageIntakeAck,mappingSourceWindow:w}=await import('./monitoringObjectMappings.fixture');const {readMappingPageReceipt}=await import('../src/utils/monitoringObjectMappings');const ack=pageIntakeAck();const raw={...ack,processed_count:0,items:[{...ack.items[0],source_phase:'RECOVERED',business_processed:false,event_id:null,event_version:null,ticket_id:null,pending_reason:'RECOVERY_OBSERVATION_REQUIRED'}]}
+ expect(readMappingPageReceipt(raw,s.id,2,w).processed_count).toBe(0);expect(()=>readMappingPageReceipt({...raw,recovery_confirmed:true},s.id,2,w)).toThrow()
+})
+it('page command persists original window and key through reload and validates ack before clearing',async()=>{
+ const {pageIntakeAck,mappingSourceWindow:w}=await import('./monitoringObjectMappings.fixture');const journal=storage(),onPage=vi.fn(),request=vi.fn().mockRejectedValueOnce(new Error('lost')).mockResolvedValueOnce(pageIntakeAck()),input={expected_version:2,expected_source_definition_sha256:'a'.repeat(64),...w},path=`/monitoring-object-mappings/${s.id}/page-intakes`
+ let command=createMappingCommands(()=>s.tenant,journal,{request},()=>{},()=>{},onPage);expect(await command.send(path,input)).toBe(false);const original=command.pending.value!;command.dispose();command=createMappingCommands(()=>s.tenant,journal,{request},()=>{},()=>{},onPage);expect(await command.retry()).toBe(true);expect(request.mock.calls[1]![1]).toMatchObject({body:input,idempotencyKey:original.key});expect(onPage).toHaveBeenCalledWith(expect.objectContaining({next_event_id:'45'}))
+})
+it('page command rejects unbounded range caller facts and invalid receipts',async()=>{
+ const {pageIntakeAck,mappingSourceWindow:w}=await import('./monitoringObjectMappings.fixture');const input={expected_version:2,expected_source_definition_sha256:'a'.repeat(64),...w},path=`/monitoring-object-mappings/${s.id}/page-intakes`,request=vi.fn(),command=createMappingCommands(()=>s.tenant,storage(),{request})
+ for(const bad of [{...input,payload:{}},{...input,page_size:11},{...input,first_event_id:'040'},{...input,through_clock:-1}])expect(await command.send(path,bad)).toBe(false)
+ expect(request).not.toHaveBeenCalled();const invalid=createMappingCommands(()=>s.tenant,storage(),{request:vi.fn().mockResolvedValue({...pageIntakeAck(),next_event_id:'50'})});expect(await invalid.send(path,input)).toBe(false);expect(invalid.pending.value).not.toBeNull()
+})
+it('UTC source window rejects invalid dates and calendar rollover',async()=>{const {mappingUtcClock}=await import('../src/utils/monitoringObjectMappings');expect(mappingUtcClock('1970-01-01T00:00:00')).toBe(0);expect(mappingUtcClock('1970-01-01T00:01')).toBe(60);expect(mappingUtcClock('2026-02-30T12:00')).toBeNull();expect(mappingUtcClock('2026-10-24T12:00Z')).toBeNull()})

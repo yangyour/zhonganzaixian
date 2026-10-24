@@ -136,6 +136,7 @@ class MappedProblemIntakePostgresTest {
         );
     }
 
+
     PostgresMonitoringObjectBindingRepository assembly() {
         var policy = new Policy(
             "ISOLATED_TEST:" + HASH,
@@ -175,37 +176,57 @@ class MappedProblemIntakePostgresTest {
 
             public FetchedEvent readEvent(MonitoringObjectMapping.Key sourceKey, String event) {
                 sourceReads.incrementAndGet();
-                try {
-                    var body = new TreeMap<String, Object>();
-                    body.putAll(
-                        Map.of(
-                            "provider",
-                            "ZABBIX_7",
-                            "source_event_id",
-                            event,
-                            "trigger_id",
-                            "93",
-                            "clock",
-                            occurred.getEpochSecond(),
-                            "nanoseconds",
-                            occurred.getNano(),
-                            "value",
-                            phase == RawMonitoringEvent.Phase.PROBLEM ? 1 : 0,
-                            "severity",
-                            severity,
-                            "recovery_event_id",
-                            recovery,
-                            "host_ids",
-                            List.of("23")
-                        )
-                    );
-                    return new FetchedEvent(event, phase, occurred, "23", JSON.writeValueAsBytes(body));
-                } catch (Exception failure) {
-                    throw new IllegalStateException("Synthetic source encoding failed");
-                }
+                return sourceEvent(event);
+            }
+
+            public cn.mop.domain.monitoring.MappedSourcePage.Fetched readPage(
+                MonitoringObjectMapping.Key sourceKey,
+                cn.mop.domain.monitoring.MappedSourcePage.Window window
+            ) {
+                sourceReads.incrementAndGet();
+                return sourcePage(window);
             }
         };
         return new PostgresMonitoringObjectBindingRepository(platform, JSON, tenant -> policy, source, events);
+    }
+
+
+    cn.mop.domain.monitoring.MappedSourcePage.Fetched sourcePage(
+        cn.mop.domain.monitoring.MappedSourcePage.Window window
+    ) {
+        throw new UnsupportedOperationException("Synthetic page not supplied by this single-event suite");
+    }
+
+
+    FetchedEvent sourceEvent(String event) {
+        try {
+            var body = new TreeMap<String, Object>();
+            body.putAll(
+                Map.of(
+                    "provider",
+                    "ZABBIX_7",
+                    "source_event_id",
+                    event,
+                    "trigger_id",
+                    "93",
+                    "clock",
+                    occurred.getEpochSecond(),
+                    "nanoseconds",
+                    occurred.getNano(),
+                    "value",
+                    phase == RawMonitoringEvent.Phase.PROBLEM ? 1 : 0,
+                    "severity",
+                    severity,
+                    "recovery_event_id",
+                    recovery,
+                    "host_ids",
+                    List.of("23")
+                )
+            );
+            return new FetchedEvent(event, phase, occurred, "23", JSON.writeValueAsBytes(body));
+        } catch (Exception failure) {
+            throw new IllegalStateException("Synthetic source encoding failed");
+        }
     }
 
     @BeforeEach

@@ -57,4 +57,108 @@ class PostgresMonitoringObjectBindingRepositoryTest {
  @Test void captureRechecksExpiryAfterBoundReadBeforeAnyStore()throws Exception{published();when(source.readEvent(key,"44")).thenAnswer(call->{databaseTime=at.plusSeconds(100);return new FetchedEvent("44",RawMonitoringEvent.Phase.PROBLEM,at,"23",new byte[]{1});});try(var raw=mockStatic(RawMonitoringEventSchemaVerifier.class);var hold=mockStatic(MonitoringQuarantineSchemaVerifier.class);var storage=mockStatic(PostgresMonitoringEventStorageCoordinator.class)){assertEquals(409,assertThrows(DomainException.class,()->repository.capture(access,id,2,"44",hash)).status);storage.verifyNoInteractions();}}
  @Test void captureRejectsOtherHostBeforeStorage()throws Exception{published();when(source.readEvent(key,"44")).thenReturn(new FetchedEvent("44",RawMonitoringEvent.Phase.PROBLEM,at,"24",new byte[]{1}));try(var raw=mockStatic(RawMonitoringEventSchemaVerifier.class);var hold=mockStatic(MonitoringQuarantineSchemaVerifier.class);var storage=mockStatic(PostgresMonitoringEventStorageCoordinator.class)){assertEquals(404,assertThrows(DomainException.class,()->repository.capture(access,id,2,"44",hash)).status);storage.verifyNoInteractions();}}
  @Test void captureDoesNotUseUnpublishedDraftAsAuthority(){assertEquals(409,assertThrows(DomainException.class,()->repository.capture(access,id,1,"44",hash)).status);verify(source,never()).verify(any());verify(source,never()).readEvent(any(),any());}
+
+
+    MappedSourcePage.Window pageWindow() {
+        return new MappedSourcePage.Window("44", "99", at.getEpochSecond(), at.getEpochSecond(), 1);
+    }
+
+
+    void assemblePage() throws Exception {
+        published();
+        repository = new PostgresMonitoringObjectBindingRepository(
+            platform,
+            json,
+            t -> policy,
+            source,
+            mock(PostgresMonitoringEventCenterRepository.class)
+        );
+        when(c.createStatement()).thenReturn(mock(Statement.class));
+        when(source.readPage(key, pageWindow())).thenReturn(
+            new MappedSourcePage.Fetched(
+                pageWindow(),
+                List.of(new FetchedEvent("44", RawMonitoringEvent.Phase.RECOVERED, at, "23", new byte[] { 1 })),
+                "45"
+            )
+        );
+    }
+
+
+    @Test
+    void pageExpiryDuringSourceReadRejectsBeforeAnyStore() throws Exception {
+        assemblePage();
+        when(source.readPage(key, pageWindow())).thenAnswer(call -> {
+            databaseTime = at.plusSeconds(100);
+            return new MappedSourcePage.Fetched(pageWindow(), List.of(), null);
+        });
+        try (var storage = mockStatic(PostgresMonitoringEventStorageCoordinator.class)) {
+            assertEquals(
+                409,
+                assertThrows(DomainException.class, () ->
+                    repository.intakePage(access, id, 2, hash, pageWindow())
+                ).status
+            );
+            storage.verifyNoInteractions();
+        }
+    }
+
+
+    @Test
+    void pageProofExpiryDuringEffectsPreventsACommittedContinuationReceipt() throws Exception {
+        assemblePage();
+        try (
+            var raw = mockStatic(RawMonitoringEventSchemaVerifier.class);
+            var hold = mockStatic(MonitoringQuarantineSchemaVerifier.class);
+            var storage = mockStatic(PostgresMonitoringEventStorageCoordinator.class)
+        ) {
+            storage
+                .when(() -> PostgresMonitoringEventStorageCoordinator.storeInTransaction(eq(c), any()))
+                .thenAnswer(call -> {
+                    databaseTime = at.plusSeconds(100);
+                    return new PostgresMonitoringEventStorageCoordinator.RawResult(
+                        new PostgresRawMonitoringEventRepository.Receipt(
+                            PostgresRawMonitoringEventRepository.Outcome.STORED,
+                            UUID.randomUUID(),
+                            at.plusSeconds(3)
+                        )
+                    );
+                });
+            assertEquals(
+                409,
+                assertThrows(DomainException.class, () ->
+                    repository.intakePage(access, id, 2, hash, pageWindow())
+                ).status
+            );
+            verify(platform, never()).audit(
+                any(),
+                any(),
+                eq("monitoring_mapping.page_intake"),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+            );
+            verify(c, never()).commit();
+        }
+    }
+
+
+    @Test
+    void sourceDefinitionChangeDuringPageReadRejectsBeforeStorage() throws Exception {
+        assemblePage();
+        when(source.readPage(key, pageWindow())).thenAnswer(call -> {
+            when(source.definitionSha256(pool)).thenReturn("b".repeat(64));
+            return new MappedSourcePage.Fetched(pageWindow(), List.of(), null);
+        });
+        try (var storage = mockStatic(PostgresMonitoringEventStorageCoordinator.class)) {
+            assertEquals(
+                409,
+                assertThrows(DomainException.class, () ->
+                    repository.intakePage(access, id, 2, hash, pageWindow())
+                ).status
+            );
+            storage.verifyNoInteractions();
+        }
+    }
 }

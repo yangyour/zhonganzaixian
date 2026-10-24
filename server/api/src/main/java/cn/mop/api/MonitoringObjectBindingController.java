@@ -24,6 +24,7 @@ public final class MonitoringObjectBindingController {
  private final boolean enabled;
  private final boolean captureEnabled;
  private final boolean problemIntakeEnabled;
+ private final boolean pageIntakeEnabled;
 
     public MonitoringObjectBindingController(
         PlatformRepository platform,
@@ -40,6 +41,7 @@ public final class MonitoringObjectBindingController {
         enabled = MonitoringEnrollmentConfiguration.flag(env, "MOP_MONITORING_MAPPING_ENABLED");
         captureEnabled = MonitoringEnrollmentConfiguration.flag(env, "MOP_MONITORING_MAPPING_CAPTURE_ENABLED");
         problemIntakeEnabled = MonitoringProblemIntakeController.enabled(env);
+        pageIntakeEnabled = MonitoringPageIntakeController.enabled(env);
     }
  private Membership member(HttpServletRequest r,boolean write){var m=MonitoringOnboardingAccess.member(platform,r,write);if(!enabled)throw new DomainException(503,"MONITORING_MAPPING_DISABLED","持久对象映射尚未显式启用");return m;}
  private static Access access(Membership m,HttpServletRequest r){return new Access(m.tenantId(),m.userId(),m.permissionVersion(),ApiResponse.trace(r));}
@@ -97,6 +99,8 @@ public final class MonitoringObjectBindingController {
             captureEnabled,
             "problem_intake_enabled",
             problemIntakeEnabled,
+            "page_intake_enabled",
+            pageIntakeEnabled,
             "monitoring_applied",
             false,
             "dispatch_allowed",

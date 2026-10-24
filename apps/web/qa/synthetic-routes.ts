@@ -134,6 +134,61 @@ function workflowPage({ url }: SyntheticRequest) {
   return { items: items.slice(0, limit), has_more: more, next_cursor: more ? 'synthetic.cursor' : null, source: 'postgresql' }
 }
 
+// ---- Tenant inventory (M2-1) ----
+// Ids ascend as the reader requires; every quota/status field stays the API's explicit null.
+const tenantRows: [string, string, string, string, string][] = [
+  [TENANT, '合成预览租户 A', '16', '7', '4'], [TENANT_B, '合成预览租户 B', '9', '3', '2'],
+  [id('57000000', 1), '合成预览租户 C', '42', '5', '6'], [id('57000000', 2), '合成预览租户 D', '0', '0', '1'], [id('57000000', 3), '合成预览租户 E', '128', '12', '9'],
+]
+const tenantInventory = () => ({
+  context_tenant_id: TENANT,
+  items: tenantRows.map(([tenant, name, assetCount, siteCount, memberCount], index) => ({
+    id: tenant, name, created_at: iso(1440 * (40 - index * 6)), registered_asset_count: assetCount, registered_site_count: siteCount, active_member_count: memberCount,
+    isolation_mode: null, resource_pool: null, lifecycle_status: null, asset_quota: null, monitored_item_count: null, item_quota: null, nvps: null, nvps_quota: null, data_retention_days: null, itsm_integration: null, topology_enabled: null,
+  })),
+  has_more: false, next_after_id: null, source: 'postgresql', scope: 'ACTIVE_PADMIN_MEMBERSHIPS_ONLY', page_size_limit: 100,
+  pagination_consistency: 'CURRENT_REQUEST_SNAPSHOT_ONLY', count_basis: 'RECORDED_ROWS_NOT_MONITORED_OR_LICENSED_USAGE', unknown_fields_policy: 'EXPLICIT_NULL_NO_INFERENCE', new_tenant_creation_enabled: false,
+})
+
+// ---- Audit (M2-12) ----
+// Action codes and results copy the shapes the backend actually writes; hashes are placeholders.
+const AUDIT_SNAPSHOT = 40
+const hex = (n: number) => n.toString(16).padStart(8, '0').repeat(8)
+const auditTemplates: [string, string, string, string][] = [
+  ['local.login', 'session', 'SUCCEEDED', '本地账号登录'], ['session.switch_tenant', 'session', 'SUCCEEDED', '切换到合成预览租户 A'],
+  ['ticket.lifecycle.create', 'ticket', 'SUCCEEDED', '登记工单'], ['ticket.comment.create', 'ticket_comment', 'SUCCEEDED', '新增客户可见评论'],
+  ['asset_export.create', 'asset_export', 'DENIED', '缺少导出授权，已拒绝'], ['worklog.create', 'worklog', 'SUCCEEDED', '记录工时'],
+  ['service_tier.change', 'configuration', 'FAILED', '版本冲突，未写入'], ['local.login', 'session', 'DENIED', '密码错误，已拒绝'],
+  ['ticket.internal_note.create', 'ticket_internal_note', 'SUCCEEDED', '新增内部备注'], ['session.logout', 'session', 'SUCCEEDED', '退出登录'],
+]
+const auditLog = Array.from({ length: AUDIT_SNAPSHOT }, (_, index) => {
+  const sequence = AUDIT_SNAPSHOT - index, [action, resourceType, result, reason] = auditTemplates[sequence % auditTemplates.length]!
+  const anonymous = action === 'local.login' && result === 'DENIED'
+  return {
+    id: id('59000000', sequence), occurred_at: iso(index * 37 + 2), actor_id: anonymous ? null : USER, actor_name: anonymous ? '未认证主体' : roleNames.padmin, tenant_id: TENANT,
+    action, resource_type: resourceType, resource_id: resourceType === 'session' ? null : id('5a000000', sequence), result, reason, trace_id: id('5b000000', sequence),
+    source: 'postgresql', sequence, previous_hash: sequence === 1 ? '0'.repeat(64) : hex(sequence - 1), entry_hash: hex(sequence),
+  }
+})
+function auditRecords({ url }: SyntheticRequest) {
+  const query = url.searchParams, size = Number(query.get('page_size') || 15), snapshot = Number(query.get('snapshot_sequence') || AUDIT_SNAPSHOT), before = Number(query.get('before_sequence') || snapshot + 1)
+  const from = query.get('occurred_from'), until = query.get('occurred_before')
+  const rows = auditLog.filter(row => row.sequence <= snapshot && row.sequence < before && (from === null || row.occurred_at >= from) && (until === null || row.occurred_at < until)
+    && (['actor_id', 'action', 'result', 'resource_type', 'resource_id', 'trace_id'] as const).every(key => query.get(key) === null || row[key] === query.get(key)))
+  const items = rows.slice(0, size), more = rows.length > size
+  return { items, snapshot_sequence: snapshot, next_before_sequence: more ? items.at(-1)!.sequence : null, has_more: more, source: 'postgresql', scope: 'CURRENT_TENANT', page_size_limit: 100, filter_semantics: 'EXACT_MATCH_HALF_OPEN_TIME', integrity_scope: 'EACH_RECORD_LOCAL_HASH_ONLY', externally_anchored: false }
+}
+function auditIntegrity({ url }: SyntheticRequest) {
+  const from = Number(url.searchParams.get('from_sequence') || 1), requested = url.searchParams.get('to_sequence'), to = requested ? Number(requested) : Math.min(AUDIT_SNAPSHOT, from + 999)
+  if (!(from >= 1 && to >= from && to <= AUDIT_SNAPSHOT)) throw new Error('合成：校验区间超出当前快照')
+  const more = to < AUDIT_SNAPSHOT
+  return {
+    status: 'VALID', valid: true, snapshot_sequence: AUDIT_SNAPSHOT, from_sequence: from, to_sequence: to, verified_records: to - from + 1, failure_sequence: null, failure: 'NONE',
+    anchor_hash: from === 1 ? '0'.repeat(64) : hex(from - 1), final_hash: hex(to), has_more: more, next_from_sequence: more ? to + 1 : null, checked_at: iso(0), source: 'postgresql', scope: 'CURRENT_TENANT',
+    verification_scope: 'LOCAL_DATABASE_SNAPSHOT', externally_anchored: false, max_range_records: 1000, hash_algorithm: 'SHA256_TOPLEVEL_SORTED_JSON_V1', whole_snapshot_chain_checked: from === 1 && to === AUDIT_SNAPSHOT,
+  }
+}
+
 export const syntheticRoutes: Route[] = [
   { name: 'session', pattern: /^\/session$/, handle: session },
   { name: 'auth-options', pattern: /^\/auth\/options$/, handle: () => ({ mode: 'remote_test', identity_source: 'project_local', login_url: null, local_enabled: true, sso_enabled: false, local_login_url: '/api/v1/auth/local/login', csrf_url: '/api/v1/auth/csrf', wecom_enabled: false, wecom_start_url: null }) },
@@ -146,6 +201,9 @@ export const syntheticRoutes: Route[] = [
   { name: 'network-history', pattern: /^\/network-monitoring\/([0-9a-f-]{36})\/history$/, handle: networkHistory },
   { name: 'resources', pattern: /^\/network-monitoring\/([0-9a-f-]{36})\/resources$/, handle: resources },
   { name: 'resource-history', pattern: /^\/network-monitoring\/([0-9a-f-]{36})\/resources\/history$/, handle: resourceHistory },
+  { name: 'tenant-inventory', pattern: /^\/tenants\/inventory$/, handle: tenantInventory },
+  { name: 'audit-records', pattern: /^\/audit\/records$/, handle: auditRecords },
+  { name: 'audit-integrity', pattern: /^\/audit\/integrity$/, handle: auditIntegrity },
   { name: 'assets', pattern: /^\/assets$/, handle: assetPage },
   { name: 'asset', pattern: /^\/assets\/([0-9a-f-]{36})$/, handle: asset },
 ]

@@ -58,6 +58,6 @@ export function tenantInventoryCell(row:TenantInventoryRow,key:TenantInventoryCo
     case 'created':return {text:displayTime(row.created_at),detail:row.created_at}
     case 'items':case 'nvps':return {text:'未知 / 配额未知',detail:'当前未接入有效监控或配额来源'}
     case 'status':return {text:'未知',detail:'不能从登记记录推断活跃或接入中'}
-    default:return {text:'未确认',detail:'接口明确null，未采用默认值'}
+    default:return {text:'未确认',detail:'尚无登记值，未采用默认值'}
   }
 }

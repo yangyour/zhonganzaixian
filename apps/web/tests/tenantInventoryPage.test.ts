@@ -17,8 +17,27 @@ async function settle(){for(let i=0;i<8;i++){await Promise.resolve();await nextT
 function mount(){host=document.createElement('div');document.body.appendChild(host);app=createApp(TenantInventoryPage);app.component('ElAlert',ElAlert);app.component('ElButton',ElButton);app.component('ElSkeleton',ElSkeleton);app.mount(host)}
 function button(text:string){const value=[...host.querySelectorAll('button')].find(b=>b.textContent?.trim()===text);if(!value)throw new Error('Missing button');return value}
 beforeEach(()=>{session.value=structuredClone(auth);switchingTenant.value=false;contextGeneration.value=0})
-afterEach(()=>{app?.unmount();app=undefined;host?.remove();session.value=null;vi.restoreAllMocks()})
+afterEach(()=>{app?.unmount();app=undefined;host?.remove();session.value=null;vi.restoreAllMocks();vi.unstubAllGlobals()})
 it('renders twelve columns and explicit unknowns without invented percentages',async()=>{vi.spyOn(api,'request').mockResolvedValue(page());mount();await settle();expect(host.querySelectorAll('thead th')).toHaveLength(12);expect(host.querySelector('tbody')!.textContent).toContain('9 条登记');expect(host.querySelector('tbody')!.textContent).toContain('未知 / 配额未知');expect(host.querySelector('table')!.textContent).not.toContain('0%');expect(host.querySelector('[role="progressbar"]')).toBeNull()})
+// jsdom has no layout: widths and ResizeObserver are synthetic, so this checks wiring, not responsive fit.
+const observers:TestResizeObserver[]=[]
+class TestResizeObserver{targets=new Set<Element>();disconnected=false;constructor(_callback:ResizeObserverCallback){observers.push(this)}observe(target:Element){this.targets.add(target)}unobserve(target:Element){this.targets.delete(target)}disconnect(){this.targets.clear();this.disconnected=true}}
+it('shows the shared overflow hint for the wide table and re-attaches it after a re-read replaces the table',async()=>{
+ observers.length=0;vi.stubGlobal('ResizeObserver',TestResizeObserver)
+ vi.spyOn(Element.prototype,'clientWidth','get').mockReturnValue(400);vi.spyOn(Element.prototype,'scrollWidth','get').mockReturnValue(1000)
+ let release:(value:Page)=>void=()=>{}
+ vi.spyOn(api,'request').mockResolvedValueOnce(page()).mockImplementationOnce(()=>new Promise(resolve=>{release=resolve}))
+ mount();await settle()
+ const first=host.querySelector<HTMLElement>('.inventory-scroll')!,firstObserver=observers.find(item=>item.targets.has(first)&&item.targets.has(first.querySelector('table')!))
+ expect(firstObserver).toBeDefined();expect(host.querySelector('.table-scroll-tools')?.textContent).toContain('右侧还有更多列')
+ expect(first.getAttribute('aria-describedby')).toBe(host.querySelector('.table-scroll-tools>span')!.id);expect(host.querySelector('button[aria-label="向右查看表格列"]')!.getAttribute('aria-controls')).toBe(first.id)
+ const key=new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true,cancelable:true});first.dispatchEvent(key);await settle();expect(key.defaultPrevented).toBe(true);expect(first.scrollLeft).toBe(280)
+ button('重新读取第一页').click();await settle()
+ expect(host.querySelector('.inventory-scroll')).toBeNull();expect(host.querySelector('.table-scroll-tools')).toBeNull();expect(firstObserver!.disconnected).toBe(true)
+ release(page());await settle()
+ const second=host.querySelector<HTMLElement>('.inventory-scroll')!
+ expect(second).not.toBe(first);expect(observers.at(-1)!.targets.has(second)).toBe(true);expect(second.getAttribute('aria-describedby')).toBe(host.querySelector('.table-scroll-tools>span')!.id)
+})
 it('opens and closes one snapshot detail using the same twelve field projections',async()=>{vi.spyOn(api,'request').mockResolvedValue(page());mount();await settle();button(row.name).click();await settle();expect(host.querySelectorAll('.inventory-detail dt')).toHaveLength(12);expect(host.querySelectorAll('.inventory-detail dd')).toHaveLength(12);expect(host.querySelector('.inventory-detail')!.textContent).toContain('9 条登记');button('关闭详情').click();await settle();expect(host.querySelector('.inventory-detail')).toBeNull()})
 it('refresh clears selected detail and old rows before a new response',async()=>{const request=vi.spyOn(api,'request').mockResolvedValue(page());mount();await settle();button(row.name).click();await settle();let finish!:(value:unknown)=>void;request.mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve}));button('重新读取第一页').click();await nextTick();expect(host.querySelector('table')).toBeNull();expect(host.querySelector('.inventory-detail')).toBeNull();finish(page());await settle();expect(host.querySelector('table')).not.toBeNull();expect(host.querySelector('.inventory-detail')).toBeNull()})
 it('non-admin context never requests inventory and exposes no table',async()=>{session.value={...auth,user:{...auth.user,role:'viewer'}};const request=vi.spyOn(api,'request');mount();await settle();expect(request).not.toHaveBeenCalled();expect(host.querySelector('table')).toBeNull();expect(host.textContent).toContain('无租户登记资源读取权限')})

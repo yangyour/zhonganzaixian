@@ -1,0 +1,50 @@
+{
+  "status": "CODE_VALIDATED_REAL_COMPONENTS_NOT_RUN",
+  "source": "V37_CURRENT_AUTHORIZED_MONITORING_EVENTS",
+  "snapshot": "READ_ONLY_REPEATABLE_READ",
+  "current_population": "PROBLEM_AND_SUPPRESSION_NONE",
+  "mtta_population": "PROBLEM_AT_IN_HALF_OPEN_WINDOW_ALL_SUPPRESSION_STATES",
+  "timestamp_basis": "RECORDED_FIRST_ACK_AT_MINUS_PROBLEM_AT",
+  "maximum_complete_samples": 10000,
+  "current_count_derived_from_page": false,
+  "unknown_replaced_with_zero": false,
+  "collection_freshness_verified": false,
+  "clock_accuracy_verified": false,
+  "frozen_report": false,
+  "actual_postgresql": "NOT_RUN_MISSING_PRIVATE_CONFIGURATION",
+  "actual_browser": "NOT_RUN",
+  "formal_acceptance": "NOT_RUN",
+  "migrations": 0,
+  "external_notifications": 0,
+  "deployed": false,
+  "known_remaining": [
+    "Other homepage aggregates",
+    "Legacy SLA timestamp source and effective denominators",
+    "Frozen monthly source unification",
+    "Designated component and browser integration"
+  ],
+  "continuation_tree": {
+    "java_discovered": 4914,
+    "java_executed": 3796,
+    "java_skipped": 1118,
+    "java_failures": 0,
+    "java_errors": 0,
+    "web_files": 329,
+    "web_tests": 5304,
+    "web_failures": 0,
+    "node_tests": 250,
+    "offline_demo_tests": 18,
+    "typecheck": "PASSED",
+    "build": "PASSED_WITH_EXISTING_CHUNK_WARNING",
+    "coverage_requirements": 128,
+    "coverage_tasks": 25,
+    "completion_verified": false
+  },
+  "regressions_diagnosed": [
+    "Return-time authorization deliberately adds second membership read; old single-call expectations updated with seven base-controller revocation scenarios, not removal of guards",
+    "Two legacy homepage test transports returned dashboard DTO for the new independent endpoint; isolated valid event DTO added and actual zeros/unknown latency asserted",
+    "Vue router replace is asynchronous; await actual requested new window rather than fixed microtask count",
+    "Offline page catalog count becomes 47; no account or data initialization"
+  ],
+  "github_integration": "PENDING_EXISTING_LARGE_GENERATED_CONTRACT_UPLOAD_BLOCKER"
+}

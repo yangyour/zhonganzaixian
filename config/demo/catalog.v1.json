@@ -3,9 +3,9 @@
   "scope": "DEMO_PREPARATION_ONLY",
   "reference_api_version": "0.85.0",
   "source_sha256": {
-    "apps/web/src/router.ts": "170299ac467972db389013a78a5138c8b995a7a7b8ef662053888952cb0050dd",
+    "apps/web/src/router.ts": "d91d2927f0b84ab3e85aef4139bef57efb749c6dd7c205d5613180709460c938",
     "server/domain/src/main/java/cn/mop/domain/Capabilities.java": "6f97ea30fd15e067db3eb6fe72d55c2dedf12a07b5e09678164384c04b366d1f",
-    "contracts/local-api.openapi.json": "838233be4d640e7f3b124447b76af75e6edae27a945492a63b795bd81592ccd2"
+    "contracts/local-api.openapi.json": "37b722115d2c9c2d7345c188ee523996c757f24a14654073bb3a28f252b1d468"
   },
   "protected_tenant_ids": [
     "55000000-0000-4000-8000-000000000001",
@@ -98,20 +98,6 @@
       "scenarios": [
         "由演示台账和工单派生总览",
         "缺少来源时保留未知"
-      ],
-      "acceptance_status": "NOT_RUN"
-    },
-    {
-      "path": "/dashboard/actionable-tickets",
-      "title": "待处理工单与SLA",
-      "required_capabilities": [
-        "dashboard:read",
-        "tickets:read"
-      ],
-      "allowed_roles": [],
-      "scenarios": [
-        "与首页一致的未解决工单与全量SLA",
-        "完整分页、未知状态与撤权恢复"
       ],
       "acceptance_status": "NOT_RUN"
     },
@@ -659,6 +645,63 @@
         "当前客户登记依赖图与分页列表",
         "切换客户及撤权后的数据隔离",
         "无关系空态与版本变化恢复"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/dashboard/actionable-tickets",
+      "title": "待处理工单与SLA",
+      "required_capabilities": [
+        "dashboard:read",
+        "tickets:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "与首页一致的未解决工单与全量SLA",
+        "完整分页、未知状态与撤权恢复"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/notification-routing",
+      "title": "通知路由与处理",
+      "required_capabilities": [
+        "ticket_notes:read_internal"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "显式路由配置与持久原命令恢复，不进行外发"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/report-publications",
+      "title": "报告中心",
+      "required_capabilities": [
+        "dashboard:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "当前授权冻结报告、审核发布、同源输出和阅读意图，外发关闭"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/event-metrics",
+      "title": "事件指标明细",
+      "required_capabilities": [
+        "dashboard:read",
+        "tickets:read"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "同源当前问题计数、首次确认时长与完整游标明细；无样本和异常不补值"
       ],
       "acceptance_status": "NOT_RUN"
     }

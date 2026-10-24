@@ -12,6 +12,16 @@ import org.springframework.context.annotation.*;
 @Configuration
 @Profile("remote_test")
 public class DashboardConfiguration {
+    @Bean cn.mop.domain.monitoring.EventNoiseTrendReader eventNoiseTrendReader(DataSource source,PlatformRepository platform){
+        if(!(platform instanceof PostgresPlatformRepository postgres))throw new IllegalStateException("Event noise trend requires designated PostgreSQL");
+        return new cn.mop.persistence.PostgresEventNoiseTrendReader(source,postgres);
+    }
+
+    @Bean cn.mop.domain.operations.EventOperationalMetricsReader eventOperationalMetricsReader(DataSource source,PlatformRepository platform){
+        if(!(platform instanceof PostgresPlatformRepository postgres))throw new IllegalStateException("Event metrics require designated PostgreSQL");
+        return new cn.mop.persistence.PostgresEventOperationalMetricsReader(source,postgres);
+    }
+
     /** M1-6 pagination and full-population SLA use the actual PostgreSQL repositories and feature gates. */
     @Bean
     cn.mop.domain.dashboard.DashboardActionableTicketsReader dashboardActionableTicketsReader(

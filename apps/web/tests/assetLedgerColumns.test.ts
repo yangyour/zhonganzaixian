@@ -20,8 +20,8 @@ describe('M3-2 fixed ledger columns and explicit missing facts', () => {
     expect(page).toContain('v-for="column in assetLedgerColumns"')
     expect(page).toContain(':label="column.label"')
     expect(page).toContain(":fixed=\"column.key === 'actions' ? 'right' : undefined\"")
-    expect(page).toContain('assetLedgerCell(row, column.key).text')
-    expect(page).toContain('assetLedgerCell(row, column.key).detail')
+    expect(page).toContain('assetLedgerCell(row, column.key, ledgerFacts.find(row)).text')
+    expect(page).toContain('assetLedgerCell(row, column.key, ledgerFacts.find(row)).detail')
     expect(page).not.toContain('v-html')
   })
   it('keeps draft/source/address facts without adding columns', () => {

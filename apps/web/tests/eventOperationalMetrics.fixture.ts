@@ -1,0 +1,7 @@
+/** Synthetic DTO for isolated tests only, never a live source. */
+import {scope} from './dashboard.fixture'
+import type {EventMetricSnapshot,EventMetricWindow,EventMetricView} from '../src/utils/eventOperationalMetrics'
+export function eventMetrics(window:EventMetricWindow='HOURS_24',view:EventMetricView='RECENT_PROBLEMS'):EventMetricSnapshot{
+ const observed='2026-10-23T20:00:00.000Z',hours=window==='HOURS_24'?24:window==='DAYS_7'?168:720
+ return {tenant_id:scope.tenantId,actor_id:scope.actorId,permission_version:scope.permissionVersion,observed_at:observed,timezone:'Asia/Shanghai',window,view,period:{from:new Date(Date.parse(observed)-hours*3600000).toISOString(),to:observed},metric_version:'mop-event-acknowledgement-v1',statistics_version:'mop-elapsed-statistics-v1',current_problems:{total:0,by_severity:{DISASTER:0,HIGH:0,AVERAGE:0,WARNING:0,INFO:0},population_basis:'PROBLEM_AND_SUPPRESSION_NONE'},mtta:{status:'NO_ACKNOWLEDGED_SAMPLES',population_count:0,sample_count:0,unacknowledged_count:0,invalid_count:0,mean_millis:null,median_millis:null,p95_millis:null,target_millis:300000,target_breached:null,source_manifest_sha256:'a'.repeat(64),population_basis:'PROBLEM_AT_IN_HALF_OPEN_WINDOW_ALL_SUPPRESSION_STATES',timestamp_source:'RECORDED_FIRST_ACK_AT_NOT_TICKET_ACCEPTANCE',maximum_samples:10000},items:[],next:null,source:'CURRENT_AUTHORIZED_POSTGRESQL_EVENT_PROJECTION',collection_freshness_verified:false,clock_accuracy_verified:false,frozen_report:false,writes_performed:false}
+}

@@ -26,6 +26,15 @@ public final class PostgresRawMonitoringEventRepository {
             c.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);c.setAutoCommit(false);
             try{
                 try(var s=c.createStatement()){s.execute("SET LOCAL synchronous_commit='on'");s.execute("SET LOCAL lock_timeout='10s'");s.execute("SET LOCAL statement_timeout='10s'");}
+                Receipt receipt=storeInTransaction(c,incoming);
+                c.commit();return receipt;
+            }catch(SQLException|RuntimeException failure){try{c.rollback();}catch(SQLException ignored){}throw unavailable();}
+        }catch(SQLException|RuntimeException failure){throw unavailable();}
+    }
+    /** Borrowed owned transaction: never commits, rolls back or closes the caller connection. */
+    static Receipt storeInTransaction(Connection c,RawMonitoringEvent incoming)throws SQLException{
+        Objects.requireNonNull(incoming);
+        if(c.getAutoCommit()||c.getTransactionIsolation()!=Connection.TRANSACTION_READ_COMMITTED)throw unavailable();
                 boolean inserted;
                 try(var s=c.prepareStatement("INSERT INTO public.mop_raw_monitoring_event(id,pool_id,source_event_id,source_phase,tenant_id,asset_id,occurred_epoch_second,occurred_nano,received_epoch_second,received_nano,payload) VALUES (?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(pool_id,source_event_id,source_phase) DO NOTHING RETURNING id")){
                     s.setObject(1,UUID.randomUUID());s.setObject(2,incoming.key().poolId());s.setString(3,incoming.key().sourceEventId());s.setString(4,incoming.key().phase().name());s.setObject(5,incoming.binding().tenantId());s.setObject(6,incoming.binding().assetId());s.setLong(7,incoming.occurredAt().getEpochSecond());s.setInt(8,incoming.occurredAt().getNano());s.setLong(9,incoming.receivedAt().getEpochSecond());s.setInt(10,incoming.receivedAt().getNano());s.setBytes(11,incoming.payload());
@@ -43,9 +52,7 @@ public final class PostgresRawMonitoringEventRepository {
                             :new Receipt(Outcome.CONFLICT_REQUIRES_REVIEW,null,null);
                     }
                 }
-                c.commit();return receipt;
-            }catch(SQLException|RuntimeException failure){try{c.rollback();}catch(SQLException ignored){}throw unavailable();}
-        }catch(SQLException|RuntimeException failure){throw unavailable();}
+        return receipt;
     }
     private static RawMonitoringEvent read(ResultSet r)throws SQLException{
         if(!"UNVERIFIED".equals(r.getString("source_authorization_status"))||!"STORED_ONLY".equals(r.getString("storage_status")))throw unavailable();

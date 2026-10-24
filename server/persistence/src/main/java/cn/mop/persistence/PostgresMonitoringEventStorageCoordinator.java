@@ -42,4 +42,11 @@ public final class PostgresMonitoringEventStorageCoordinator {
             }
         };
     }
+    /** Atomically store or quarantine within the caller's existing authorized idempotency transaction. */
+    static Result storeInTransaction(java.sql.Connection c,RawMonitoringEvent incoming)throws java.sql.SQLException{
+        var result=PostgresRawMonitoringEventRepository.storeInTransaction(c,incoming);
+        if(result.outcome()!=PostgresRawMonitoringEventRepository.Outcome.CONFLICT_REQUIRES_REVIEW)return new RawResult(result);
+        var candidate=new QuarantinedMonitoringEvent(incoming.key(),new QuarantinedMonitoringEvent.Claims(incoming.binding().tenantId(),incoming.binding().assetId()),QuarantinedMonitoringEvent.Reason.SOURCE_KEY_CONFLICT,incoming.occurredAt(),incoming.receivedAt(),incoming.payload());
+        return new HeldResult(PostgresMonitoringQuarantineRepository.holdInTransaction(c,candidate));
+    }
 }

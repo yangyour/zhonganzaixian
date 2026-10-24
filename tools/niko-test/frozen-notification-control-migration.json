@@ -1,0 +1,11 @@
+{
+  "status": "APPLIED_FROZEN",
+  "description": "V51 applied only in an owned schema-only isolated database on designated PG17.9; live mop_test remains V50. Initial business test failure retained.",
+  "sha256": {
+    "V51__notification_routing_control.sql": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b"
+  },
+  "guard_body_sha256": {
+    "mop_notification_control_guard": "496345ecf647973e942acdf5d978d525011a88bc1dd041c421789a5ce3484061"
+  },
+  "first_apply_evidence": "docs/evidence/notification-routing-control-20261023/first-apply-attempt-2.json"
+}

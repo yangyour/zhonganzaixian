@@ -10,6 +10,7 @@ import { api } from '../src/api/client'
 import { contextGeneration, session, switchingTenant } from '../src/stores/session'
 import type { Session } from '../src/api/types'
 import { row, scope } from './dashboard.fixture'
+import { eventMetrics } from './eventOperationalMetrics.fixture'
 import { actionableSnapshot as pendingSnapshot } from './dashboardActionable.fixture'
 import type { ActionableTicketSnapshot } from '../src/utils/dashboardActionableTickets'
 
@@ -36,6 +37,7 @@ beforeEach(() => {
   session.value = structuredClone(auth); switchingTenant.value = false; contextGeneration.value++
   response = fixture(); failed = false
   vi.spyOn(api, 'request').mockImplementation(async path => {
+    if(path.startsWith('/metrics/monitoring-events?'))return eventMetrics()
     if (path === '/dashboard/actionable-tickets?page=1&page_size=5') { if (failed) throw new Error('synthetic pending outage'); return response }
     return row(new URL('http://unit' + path).searchParams.get('window') as any)
   })
@@ -49,7 +51,7 @@ it('shows the same authoritative complete total as the cross-state list', async 
   expect(host.querySelectorAll('.dashboard-workflows tbody tr')).toHaveLength(2)
   expect(host.querySelector('.dashboard-workflows [role="status"]')?.textContent).toContain('待处理 2 条')
   expect(vi.mocked(api.request).mock.calls.filter(([path]) => path === '/dashboard/actionable-tickets?page=1&page_size=5')).toHaveLength(1)
-  expect([...host.querySelectorAll('[data-kpi]:not([data-kpi="PENDING_TICKETS"]) .mop-kpi-value')].every(node => node.textContent === '未知')).toBe(true)
+  expect([...host.querySelectorAll('[data-kpi]:not([data-kpi="PENDING_TICKETS"]) .mop-kpi-value')].map(node => node.textContent)).toEqual(['未知','0','未知','—','未知'])
 })
 it('renders a verified zero and a verified zero overdue SLA', async () => {
   response = fixture({ registrations: 0, known_pending: 0, excluded: 0, pending_tickets: 0, evaluated_pending: 0, total_pages: 0, items: [] })

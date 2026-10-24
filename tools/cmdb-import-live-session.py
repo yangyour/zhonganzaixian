@@ -33,24 +33,26 @@ ROOT = Path(__file__).resolve().parents[1]
 PROTECTED = ['55000000-0000-4000-8000-000000000001', '55000000-0000-4000-8000-000000000002']
 
 
-def run(private: Path, output: Path, api_port: int):
+def run(private: Path, output: Path, api_port: int, suite: str = 'A01'):
+    if suite not in ('A01', 'A05'):
+        raise ValueError('Unsupported isolated suite')
     if private.name != 'private' or private.parent.name != 'deploy':
         raise ValueError('Original ignored deploy/private directory required')
     if subprocess.run(['git', 'check-ignore', '--quiet', str(private / 'lan-test-runtime.json')], cwd=private.parent.parent).returncode:
         raise ValueError('Private runtime file must be ignored')
     output.mkdir(parents=True, exist_ok=False)
     lock = private.parent.parent / '.local/parallel-launch-20261023/environment.lock'
-    owner = {'session': 'assets', 'branch': 'codex/launch-assets-20261023', 'purpose': 'A01 live UI/API isolated verification',
+    owner = {'session': 'assets', 'branch': 'codex/launch-assets-20261023', 'purpose': suite + ' live UI/API isolated verification',
              'at': datetime.now(timezone.utc).isoformat(), 'id': str(uuid.uuid4())}
     with lock.open('x', encoding='utf-8') as stream:
         json.dump(owner, stream)
     ssh = paramiko.SSHClient()
     tunnels, process, admin, seeded = [], None, None, False
     run_id = uuid.uuid4().hex[:12]
-    tenants = [str(uuid.uuid4()), str(uuid.uuid4())]
+    tenants = sorted([str(uuid.uuid4()), str(uuid.uuid4())])
     users = {role: {'id': str(uuid.uuid4()), 'username': f'qa_assets_{run_id}_{role}', 'password': secrets.token_urlsafe(24)}
              for role in ('owner', 'reviewer', 'viewer')}
-    state = {'environment': 'lan-test-20261008', 'run_id': run_id, 'tenants': tenants, 'api_port': api_port,
+    state = {'environment': 'lan-test-20261008', 'suite': suite, 'run_id': run_id, 'tenants': tenants, 'api_port': api_port,
              'migrations': 0, 'deployment': False, 'actual_tenant_writes': False, 'external_messages': 0}
 
     def protected_snapshot():
@@ -138,11 +140,11 @@ def run(private: Path, output: Path, api_port: int):
                 for role, user in users.items():
                     base_role = 'viewer' if role == 'viewer' else 'padmin'
                     cursor.execute("INSERT INTO public.mop_user(id,identity_source,subject,display_name,role_code) VALUES(%s,'project_local',%s,%s,%s)",
-                                   (user['id'], user['username'], 'SYNTHETIC_A01_' + run_id + '_' + role, base_role))
+                                   (user['id'], user['username'], 'SYNTHETIC_' + suite + '_' + run_id + '_' + role, base_role))
                     cursor.execute('INSERT INTO public.mop_local_account(user_id,username,password_hash) VALUES(%s,%s,%s)',
                                    (user['id'], user['username'], '{mop-argon2id-v1}' + hasher.hash(user['password'])))
                 for index, tenant in enumerate(tenants):
-                    cursor.execute('INSERT INTO public.mop_tenant(id,name) VALUES(%s,%s)', (tenant, f'SYNTHETIC_A01_{run_id}_{index}'))
+                    cursor.execute('INSERT INTO public.mop_tenant(id,name) VALUES(%s,%s)', (tenant, f'SYNTHETIC_{suite}_{run_id}_{index}'))
                     cursor.execute("INSERT INTO public.mop_site(tenant_id,id,name) VALUES(%s,'a01-site','SYNTHETIC A01 isolated site')", (tenant,))
                     for role, user in users.items():
                         cursor.execute('INSERT INTO public.mop_membership(tenant_id,user_id,role_code) VALUES(%s,%s,%s)',
@@ -195,7 +197,7 @@ def run(private: Path, output: Path, api_port: int):
                                  headers={'X-CSRF-Token': csrf, 'Idempotency-Key': str(uuid.uuid4())}, timeout=20)
             response.raise_for_status(); csrf = response.json()['data']['csrf_token']
         policy = {'schema_version': 1, 'type_mapping': {'sw_access': 'switch'}, 'site_mapping': {'a01-site': 'a01-site'},
-                  'owner_mapping': {}, 'default_site_id': None, 'date_policy': 'ISO_DATE_ONLY', 'business_description_mode': 'SOURCE_TEXT',
+                  'owner_mapping': {'qa-owner': users['reviewer']['id']} if suite == 'A05' else {}, 'default_site_id': None, 'date_policy': 'ISO_DATE_ONLY', 'business_description_mode': 'SOURCE_TEXT',
                   'preserve_source_columns': [15,19,20,21,22,23,24,25,26,27,28,29,30,31,32],
                   'address_policy': {'domain_mode': 'ASCII_ONLY', 'allow_single_label': False, 'root_dot_mode': 'REJECT',
                     'allow_bracketed_ipv6': False, 'leading_zero_mode': 'REJECT', 'mapped_ipv4_mode': 'CANONICAL_IPV4',
@@ -217,10 +219,12 @@ def run(private: Path, output: Path, api_port: int):
             rows = [[c['label'] for c in schema['columns']]]
             for index in (1, 2):
                 row = [''] * 33
-                row[0], row[1], row[2], row[6], row[14], row[16] = f'SYNTHETIC_A01_{run_id}_{case}_{index}', 'SW', f'192.0.2.{10 + len(state["files"]) * 2 + index}', 'a01-site', 'SYNTHETIC isolated API/browser verification', 'sw_access'
+                row[0], row[1], row[2], row[6], row[14], row[16] = f'SYNTHETIC_{suite}_{run_id}_{case}_{index}', 'SW', f'192.0.2.{10 + len(state["files"]) * 2 + index}', 'a01-site', 'SYNTHETIC isolated API/browser verification', 'sw_access'
+                if suite == 'A05':
+                    row[8], row[9] = 'qa-owner', 'SYNTHETIC business declaration'
                 row[20] = 'SYNTHETIC-RACK'
                 rows.append(row)
-            path = output / f'SYNTHETIC-A01-{case}.csv'
+            path = output / f'SYNTHETIC-{suite}-{case}.csv'
             with path.open('w', encoding='utf-8-sig', newline='') as stream:
                 csv.writer(stream).writerows(rows)
             state['files'].append(str(path))
@@ -230,6 +234,16 @@ def run(private: Path, output: Path, api_port: int):
         while not (output / 'stop').exists():
             if process.poll() is not None:
                 raise RuntimeError('Candidate API exited during verification')
+            if suite == 'A05' and (output / 'disable_reviewer').exists() and not state.get('reviewer_disabled'):
+                with admin.transaction():
+                    with admin.cursor() as cursor:
+                        reviewer = users['reviewer']
+                        cursor.execute("UPDATE public.mop_user SET active=false WHERE id=%s AND identity_source='project_local' AND subject=%s",
+                                       (reviewer['id'], reviewer['username']))
+                        if cursor.rowcount != 1:
+                            raise RuntimeError('Owned reviewer transition mismatch')
+                state['reviewer_disabled'] = True
+                (output / 'state.json').write_text(json.dumps(state, indent=2), encoding='utf-8')
             time.sleep(1)
     except Exception as failure:
         state.update(status='FAILED', error_type=type(failure).__name__)
@@ -272,9 +286,10 @@ if __name__ == '__main__':
     parser.add_argument('--private-directory', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--api-port', type=int, default=18211)
+    parser.add_argument('--suite', choices=['A01', 'A05'], default='A01')
     args = parser.parse_args()
     try:
-        run(args.private_directory.resolve(), args.output.resolve(), args.api_port)
+        run(args.private_directory.resolve(), args.output.resolve(), args.api_port, args.suite)
     except Exception as failure:
         print(json.dumps({'status': 'FAILED', 'error_type': type(failure).__name__, 'details': 'omitted'}))
         raise SystemExit(1)

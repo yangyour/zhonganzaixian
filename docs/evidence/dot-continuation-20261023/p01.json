@@ -1,0 +1,26 @@
+{
+  "status": "DIAGNOSTIC_CODE_VALIDATED_PRODUCTION_NOT_APPROVED",
+  "restored_wip": "db3d58ca93bdacea1ed7b93c703c9718fff641e8",
+  "java": {
+    "executed": 31,
+    "failed": 0,
+    "skipped": 0
+  },
+  "web": {
+    "tests": 8,
+    "failed": 0
+  },
+  "node_contracts": {
+    "tests": 241,
+    "failed": 0
+  },
+  "typecheck": "PASSED",
+  "build": "PASSED_WITH_EXISTING_CHUNK_WARNING",
+  "designated_components": "BLOCKED_MISSING_PRIVATE_CONFIGURATION",
+  "public_tls": "NOT_RUN",
+  "browser": "NOT_RUN",
+  "migrations": 0,
+  "activation": false,
+  "deployed": false,
+  "github": "PENDING_LARGE_CONTRACT_UPLOAD"
+}

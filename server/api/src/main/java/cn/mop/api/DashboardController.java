@@ -25,17 +25,20 @@ public final class DashboardController {
     }
 
     @GetMapping Object read(HttpServletRequest request) {
-        Access access=access(request);
+        var subject=access(request);
+        Access access=subject.access();
         TrendWindow window=window(request);
         DashboardAvailabilitySnapshot snapshot=reader.read(access,window);
         if (snapshot==null || !access.actorId().equals(snapshot.actorId().toString())
                 || !access.tenantId().equals(snapshot.tenantId().toString())
                 || access.permissionVersion()!=snapshot.permissionVersion()
                 || snapshot.requestedWindow()!=window) throw unavailable();
+        DashboardReadAuthorization.recheck(request,platform,subject.membership());
         return success(dto(snapshot),request);
     }
 
-    private Access access(HttpServletRequest request) {
+    private record Subject(Access access,Membership membership) {}
+    private Subject access(HttpServletRequest request) {
         if (request.getUserPrincipal()==null || request.getSession(false)==null) throw expired();
         Object selected=request.getSession(false).getAttribute("mop.tenant_id");
         String actor=request.getUserPrincipal().getName();
@@ -46,7 +49,7 @@ public final class DashboardController {
         if (!membership.capabilities().contains("dashboard:read")) {
             throw new DomainException(403,"ACTION_FORBIDDEN","当前角色不能读取本租户运营首页");
         }
-        return new Access(actor,tenant,membership.permissionVersion());
+        return new Subject(new Access(actor,tenant,membership.permissionVersion()),membership);
     }
 
     private static TrendWindow window(HttpServletRequest request) {

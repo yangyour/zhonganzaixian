@@ -131,6 +131,18 @@ class PostgresDashboardPendingTicketsIntegrationTest {
     }
 
     @Test
+    @Order(1)
+    void actionableProjectionExcludesResolvedBeforeTopFiveAndCounting() {
+        var snapshot = reader.readSnapshot(who(actor, tenant), true, (connection, value) -> value);
+        assertEquals(9, snapshot.registrations());
+        assertEquals(6, snapshot.knownPending());
+        assertEquals(2, snapshot.terminal()); // Closed/cancelled OR resolved are excluded for M1-6.
+        assertEquals(1, snapshot.unconfigured());
+        assertEquals(5, snapshot.items().size());
+        assertTrue(snapshot.items().stream().noneMatch(item -> "RESOLVED".equals(item.state())));
+    }
+
+    @Test
     @Order(2)
     void customerOnlySeesOwnRegistrationsAndWorkflowHeads() {
         var own = reader.read(who(viewer, tenant));

@@ -1,0 +1,19 @@
+package cn.mop.persistence;
+import cn.mop.domain.notification.*;
+import cn.mop.domain.notification.DeliveryReceiptState.*;
+import cn.mop.persistence.DeliveryReceiptSnapshotCodec.Scope;
+import java.time.*;
+import java.util.*;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+class DeliveryJournalReadProjectionTest {
+ final UUID tenant=UUID.randomUUID(),delivery=UUID.randomUUID(),actor=UUID.randomUUID(),request=UUID.randomUUID(),startId=UUID.randomUUID(),queueId=UUID.randomUUID();final Instant at=Instant.parse("2026-10-24T00:00:00Z");
+ final Scope scope=new Scope(tenant,delivery,new Deduplication(UUID.randomUUID(),UUID.randomUUID(),Channel.EMAIL,UUID.randomUUID(),"INITIAL"));
+ DeliveryReceiptJournal started(){return DeliveryReceiptJournal.queued(scope,at).append(new DeliveryReceiptJournal.Command(0,startId,actor,1,"unit",new Started(request,at.plusSeconds(1)))).journal();}
+ PostgresDeliveryReceiptRepository.ReadJournal wrapped(DeliveryReceiptJournal j){var times=new HashMap<UUID,Instant>();times.put(queueId,at);for(var c:j.commands())times.put(c.commandId(),at.plusSeconds(10));return new PostgresDeliveryReceiptRepository.ReadJournal(j,queueId,at,times);}
+ @Test void orderedOriginalCommandsExposeNoFreshSendPermission(){var j=started();UUID receipt=UUID.randomUUID(),receiptCommand=UUID.randomUUID();j=j.append(new DeliveryReceiptJournal.Command(1,receiptCommand,actor,1,"unit",new ReceiptRecorded(new Receipt(tenant,delivery,request,receipt,ReceiptStatus.ACCEPTED,at.plusSeconds(2)),at.plusSeconds(3)))).journal();assertEquals(List.of(startId,receiptCommand),j.commands().stream().map(DeliveryReceiptJournal.Command::commandId).toList());var summary=PostgresDeliveryJournalReader.entry(wrapped(j));assertEquals("ACCEPTED",summary.recordedStatus());assertEquals(request,summary.lastRequestId());assertEquals(startId,summary.lastStartCommandId());assertFalse(j.providerReceiptVerified());assertFalse(j.automaticSendEnabled());}
+ @Test void logicalDeliveredDeclarationNeverVerifiesProvider(){var j=started().append(new DeliveryReceiptJournal.Command(1,UUID.randomUUID(),actor,1,"unit",new ReceiptRecorded(new Receipt(tenant,delivery,request,UUID.randomUUID(),ReceiptStatus.DELIVERED,at.plusSeconds(2)),at.plusSeconds(3)))).journal();var summary=PostgresDeliveryJournalReader.entry(wrapped(j));assertEquals("DELIVERED",summary.recordedStatus());assertFalse(j.providerReceiptVerified());assertEquals(1,summary.receiptCount());}
+ @Test void queueRootAndTransitionAreSeparatelyRecoverable(){var steps=PostgresDeliveryJournalReader.steps(wrapped(started()));assertEquals(2,steps.size());assertEquals(queueId,steps.get(0).commandId());assertEquals("QUEUE",steps.get(0).kind());assertNull(steps.get(0).requestId());assertEquals(startId,steps.get(1).commandId());assertEquals(request,steps.get(1).requestId());assertEquals(at.plusSeconds(10),steps.get(1).recordedAt());assertEquals(at.plusSeconds(1),steps.get(1).observedAt());}
+ @Test void missingDatabaseRecordingTimeCannotBecomeAnInventedTime(){var loaded=new PostgresDeliveryReceiptRepository.ReadJournal(started(),queueId,at,Map.of());assertThrows(cn.mop.domain.DomainException.class,()->PostgresDeliveryJournalReader.steps(loaded));}
+ @Test void pageRejectsCrossTenantDuplicateAndWrongCursor(){var entry=PostgresDeliveryJournalReader.entry(wrapped(started()));var a=new DeliveryJournalReader.Access(tenant,actor,1);assertThrows(IllegalArgumentException.class,()->new DeliveryJournalReader.Page(a,at,2,2,List.of(entry,entry),null));assertThrows(IllegalArgumentException.class,()->new DeliveryJournalReader.Page(new DeliveryJournalReader.Access(UUID.randomUUID(),actor,1),at,1,1,List.of(entry),null));assertThrows(IllegalArgumentException.class,()->new DeliveryJournalReader.Page(a,at,1,1,List.of(entry),new DeliveryJournalReader.Cursor(at,UUID.randomUUID())));}
+}

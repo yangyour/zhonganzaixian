@@ -62,5 +62,10 @@ public interface DashboardPendingTicketsReader {
         };
     }
 
+    /** M1-6: unresolved and not closed. Legacy pending() intentionally retains V1 semantics. */
+    static boolean actionable(String model, String state) {
+        return pending(model, state) && !"RESOLVED".equals(state);
+    }
+
     Snapshot read(Access access);
 }

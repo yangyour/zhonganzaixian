@@ -1,0 +1,41 @@
+{
+  "status": "DURABLE_DISABLED_REGISTRATION_CODE_VALIDATED_EXTERNAL_APPLICATION_PENDING",
+  "web": {
+    "files": 325,
+    "tests": 5267,
+    "failed": 0
+  },
+  "node_contracts": {
+    "tests": 249,
+    "failed": 0
+  },
+  "demo_plan_tests": 18,
+  "typecheck": "PASSED",
+  "build": "PASSED_WITH_EXISTING_CHUNK_WARNING",
+  "migration_candidate": "V54",
+  "candidate_sha256": "d242e8e482b8a5a08fe47ea2579ea1b9e98596d95834576bac93f0638ced5fb1",
+  "candidate_applied": false,
+  "candidate_frozen": false,
+  "reservation_remote_commit": "bb00bc90bbea82e8c79129f1a94f97010eea1669",
+  "sql_parser": {
+    "library": "pglast 8.7",
+    "statements": 10,
+    "plpgsql_blocks": 2,
+    "database_execution": false
+  },
+  "designated_postgresql": "BLOCKED_MISSING_PRIVATE_CONFIGURATION",
+  "real_probe": "NOT_RUN",
+  "browser": "NOT_RUN",
+  "external_configuration_applied": false,
+  "continuous_collection_verified": false,
+  "migrations_applied": 0,
+  "deployed": false,
+  "github": "PENDING_LARGE_CONTRACT_UPLOAD",
+  "java": {
+    "tests": 4856,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1118,
+    "executed": 3738
+  }
+}

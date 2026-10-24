@@ -1,0 +1,29 @@
+{
+  "status": "CODE_VALIDATED_REAL_INTEGRATION_PENDING",
+  "restored_wip": "3b219461665781b2a492d8f82a96d495701d768d",
+  "java": {
+    "executed": 24,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "scope": "Controller/JDBC doubles and existing export projection"
+  },
+  "web": {
+    "tests": 42,
+    "files": 4,
+    "failed": 0
+  },
+  "root_contracts": {
+    "tests": 237,
+    "failed": 0
+  },
+  "typecheck": "PASSED",
+  "production_build": "PASSED_WITH_EXISTING_CHUNK_WARNING",
+  "designated_postgresql": "BLOCKED_MISSING_PRIVATE_CONFIGURATION",
+  "browser": "NOT_RUN",
+  "migration_count": 0,
+  "actual_tenant_writes": false,
+  "demo_initialization": false,
+  "deployed": false,
+  "github_upload": "BLOCKED_LARGE_GENERATED_CONTRACT_UPLOAD; local feature commit retained"
+}

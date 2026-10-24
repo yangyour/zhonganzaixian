@@ -1,0 +1,36 @@
+{
+  "status": "CODE_VALIDATED_REAL_INTEGRATION_PENDING",
+  "restored_wip": "1b7211190039af081ce87a19ab8adca3c9be5280",
+  "java": {
+    "discovered": 4724,
+    "executed": 3628,
+    "skipped": 1096,
+    "failed": 0
+  },
+  "targeted_recovery_java": {
+    "discovered": 35,
+    "executed": 25,
+    "skipped_designated_pg": 10,
+    "failed": 0
+  },
+  "web": {
+    "files": 314,
+    "tests": 5203,
+    "failed": 0
+  },
+  "node": {
+    "tests": 237,
+    "failed": 0
+  },
+  "typecheck": "PASSED",
+  "build": "PASSED_WITH_EXISTING_CHUNK_WARNING",
+  "known_pg_receipt_failure": "LongNode/IntNode wire round-trip reproduction passed; designated PG rerun BLOCKED",
+  "customer_t2": "B13.R4 and B113.R7-R8 source candidate after N samples, confirm after subsequent hold; preserve raw nanos, event stop millis",
+  "earlier_web_failure": "9 assertions in two list/detail navigation suites observed new independent enrichment GETs; route-specific transport mocks added without changing list/guard expectations",
+  "designated_components": "BLOCKED_MISSING_PRIVATE_CONFIGURATION",
+  "browser": "NOT_RUN",
+  "migrations_applied": 0,
+  "external_messages": 0,
+  "deployed": false,
+  "github": "PENDING_LARGE_CONTRACT_UPLOAD"
+}

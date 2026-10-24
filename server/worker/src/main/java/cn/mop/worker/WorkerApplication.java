@@ -27,6 +27,20 @@ public class WorkerApplication {
             cn.mop.worker.backup.BackupWorkerMain.run(args[0].endsWith("-check"),args[0].startsWith("--backup-reconcile-only")?cn.mop.worker.backup.BackupTaskScheduler.Mode.RECONCILE_ONLY:cn.mop.worker.backup.BackupTaskScheduler.Mode.POSTPROCESS);
             return;
         }
+        if (java.util.Arrays.asList(args).contains("--notification-routing")) {
+            if (args.length != 1) {
+                throw new IllegalArgumentException("Notification routing mode accepts no other arguments");
+            }
+            cn.mop.worker.notification.NotificationRoutingMain.run();
+            return;
+        }
+        if (java.util.Arrays.asList(args).contains("--attachment-scan-once")) {
+            if (args.length != 1) {
+                throw new IllegalArgumentException("Attachment scan mode accepts no other arguments");
+            }
+            AttachmentScanOnce.run();
+            return;
+        }
         if (java.util.Arrays.asList(args).contains("--notification-relay")) {
             if (args.length != 1) {
                 throw new IllegalArgumentException("Notification relay mode accepts no other arguments");

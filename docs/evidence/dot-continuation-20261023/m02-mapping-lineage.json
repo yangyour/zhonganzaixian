@@ -1,0 +1,351 @@
+{
+  "scope": "Git source lineage only, not a live database lock or migration execution",
+  "observed_main": "1a6688a05bc45c288cac69a49f55e33642477e35",
+  "remote_refs": [
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "commit": "1a6688a05bc45c288cac69a49f55e33642477e35",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/codex/demo-account-20261023",
+      "commit": "f45891bad39f7964b462a18fb5cc4f93ba2957d0",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/codex/export-auto-preparation",
+      "commit": "c75b00aff99040b694fb74995805a3c9f864c9fe",
+      "maximum_sql_version": 30,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/codex/export-inbox",
+      "commit": "4dc17ee0179cdc0cb3836297881b03f03837ad21",
+      "maximum_sql_version": 31,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/codex/export-message-recovery",
+      "commit": "15905434909404e50b811d1ddbbd28034b596c13",
+      "maximum_sql_version": 31,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/codex/gap-completion-20261023",
+      "commit": "10e8de550a2e4c0dfae7e111ab5fac267cbfd6e2",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/codex/impeccable-ui-20261014",
+      "commit": "fe131c5d156fce8ae3643d28f0b2f2132d6b26e7",
+      "maximum_sql_version": 31,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/codex/launch-assets-20261023",
+      "commit": "e3af77cb7ebfb7b9f98ff0037574ba3bb3595336",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/codex/launch-backups-20261023",
+      "commit": "02770d82f90a4561e28323c32378dc9effabc1f7",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/codex/launch-monitoring-20261023",
+      "commit": "395b732861ffd0b01d19d35af666364fafd9675f",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/codex/launch-notifications-20261023",
+      "commit": "a8bce10b8494f12903a2eb4e8770d6ad34ee3d9e",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/codex/launch-production-20261023",
+      "commit": "d29817ef770aae22e1d27574d237b9b26bdac2ce",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/codex/launch-reports-20261023",
+      "commit": "e2ca53763c065eb3c42289eb2802d7005d01c080",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/codex/page-ui-refinement-20261014",
+      "commit": "7935975746d9694aea5b74d3ef523c286e8b30da",
+      "maximum_sql_version": 31,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/codex/ticket-detail-reference-20261015",
+      "commit": "a1f31a4f302aeb710616425d559b6b46861990e5",
+      "maximum_sql_version": 32,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/b01-reconciliation-only-20261023",
+      "commit": "ae5142c1951dcf20f1a9aed2b552a6d4c2680dc4",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/backup-runtime-guard-20261023",
+      "commit": "31b92d2bc6f2da06af8008eb7cf642f5d6f11134",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/continue-development-20261020",
+      "commit": "8bb50c01d84d5b338d7cfdc72ecdf74dbf08f2e4",
+      "maximum_sql_version": 32,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/d09-inspection-report-20261019",
+      "commit": "8b7a6c165e2617be2335083f2faf3d32329b9104",
+      "maximum_sql_version": 37,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/d10-change-approval-20261019",
+      "commit": "10f9ebcfaa4ad2b566c34de38a5aea8188f0e697",
+      "maximum_sql_version": 37,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/d11-notification-channel-20261019",
+      "commit": "cdbdf774afad621fa1d1444c970519f13a33ca33",
+      "maximum_sql_version": 37,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/event-handling-state-20261021",
+      "commit": "9114ca5985fe627d4f329f11e9e0adc845ef8728",
+      "maximum_sql_version": 36,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/identity-matrix-a03-20261023",
+      "commit": "19b2ac3e3cbde97112e546eba87d8e45fc00e1e5",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/migration-v52-reservation-20261023",
+      "commit": "919969738a3530a988a51265d5fd51a4b62602ce",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/migration-v53-reservation-20261023",
+      "commit": "73b2b83b6464ccf337f081373b7e84e879553644",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/migration-v54-reservation-20261023",
+      "commit": "bb00bc90bbea82e8c79129f1a94f97010eea1669",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/notification-routing-evidence-20261021",
+      "commit": "b925403cc4a42c6c8fd1e71acf4045bc50ccc014",
+      "maximum_sql_version": 36,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/notification-routing-plan-20261021",
+      "commit": "04f3a89e2dccb030dfa842ff65851781ca053117",
+      "maximum_sql_version": 36,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/p01-read-return-account-20261023",
+      "commit": "1a6688a05bc45c288cac69a49f55e33642477e35",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/parallel-integration-20261019",
+      "commit": "28e8da23b93aced8f51bf21f5087425c85aa1250",
+      "maximum_sql_version": 41,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/public-webhook-transport-20261021",
+      "commit": "a23646059cf666b5d4f9e3f95c1033ae222a4f36",
+      "maximum_sql_version": 36,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/sla-clock-20261020",
+      "commit": "4219e01fe41a2fefbf09619448c898dbdc274f62",
+      "maximum_sql_version": 32,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/sla-reminder-intents-20261020",
+      "commit": "0d2b7b1c877597d76a87d8793a3149ea9f58e829",
+      "maximum_sql_version": 36,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ticket-api-20261020",
+      "commit": "317e7a2effc38b9b07fc212b9ce9c6362675c532",
+      "maximum_sql_version": 33,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ticket-autoclose-20261020",
+      "commit": "b5b41e2a5fa3d6ad6eaadaec2ed5d6b44722ad33",
+      "maximum_sql_version": 34,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ticket-opening-20261020",
+      "commit": "a1c977982ca5b0a164d9b1590cf084bdcfcd9bd0",
+      "maximum_sql_version": 33,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ticket-sla-policy-20261020",
+      "commit": "eb38e8776db77b98f591f629c92c3688798fdd96",
+      "maximum_sql_version": 35,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ticket-sla-projection-20261020",
+      "commit": "44dcae9211854abac3cb961edad732805514a658",
+      "maximum_sql_version": 34,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ticket-storage-20261020",
+      "commit": "75fc0a76976c38faa50fed0b52a385d41543df5e",
+      "maximum_sql_version": 33,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ticket-ui-20261020",
+      "commit": "19945a6bfd4a4ffde64cd228a275b7986f3d3154",
+      "maximum_sql_version": 33,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/topology-batch-review-20261023",
+      "commit": "585bb5626ab5ce31d1cf4ff43f02857ec859e166",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ui01-read-guard-20261023",
+      "commit": "84d6d4e68613ccfe8407017765b66b10e9664f81",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ui03-event-read-guard-20261023",
+      "commit": "0888887d5b03fa720605316b8d36f4e76c290200",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/ui03-search-a11y-20261023",
+      "commit": "d8a9b7c1c45f16e437891c95d63eaa368595c796",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/zabbix-event-puller-20261021",
+      "commit": "5acc5ddbb35e12662233c2a089f8652a91d27bf4",
+      "maximum_sql_version": 36,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/dot/zabbix-read-envelope-20261021",
+      "commit": "b9ee49d249b16a2e7be0fe6310d07f2bbd13371e",
+      "maximum_sql_version": 36,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/feat/d07-ticket-lifecycle",
+      "commit": "4b126e98d4c4237193a058d68bc4d3cbcc9ef92a",
+      "maximum_sql_version": 41,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/handoff/cloud-20261001-photos",
+      "commit": "cca471d68064f212c506d033d056a381e2ef256d",
+      "maximum_sql_version": 32,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "commit": "1a6688a05bc45c288cac69a49f55e33642477e35",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/web-redesign",
+      "commit": "251ea43c0f162298b93f92d0a81fb2826a066761",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/wip/20261023-assets-a05",
+      "commit": "3b219461665781b2a492d8f82a96d495701d768d",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/wip/20261023-monitoring-m01",
+      "commit": "1b7211190039af081ce87a19ab8adca3c9be5280",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/wip/20261023-notifications-n01-n02",
+      "commit": "e7fa879aa52004d311d29367efa878ec6875c459",
+      "maximum_sql_version": 51,
+      "later_paths": [
+        "server/persistence/src/main/resources/db/migration/V51__notification_routing_control.sql"
+      ]
+    },
+    {
+      "ref": "refs/remotes/origin/wip/20261023-production-p01",
+      "commit": "db3d58ca93bdacea1ed7b93c703c9718fff641e8",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/wip/20261023-production-p02",
+      "commit": "678a5a16be0cb784662b5abf62225a597e0c61b3",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    },
+    {
+      "ref": "refs/remotes/origin/wip/20261023-reports-r02",
+      "commit": "ad7a2fc3ee0fa899b73fe03217049fc7264b29d6",
+      "maximum_sql_version": 50,
+      "later_paths": []
+    }
+  ],
+  "highest_remote_sql": 51,
+  "highest_existing_reserved": 54,
+  "reserved_candidate": 55,
+  "shared_environment_lock_verified": false,
+  "live_database_history_verified": false,
+  "active_database_version_from_handoff": 50,
+  "migrations_applied": 0
+}

@@ -16,7 +16,7 @@ class PostgresMonitoringQuarantineIntegrationTest {
     static HikariDataSource pool;static String rawBefore;
     static final Instant SOURCE=Instant.ofEpochSecond(-1,999999999),RECEIVED=Instant.parse("2026-10-07T02:00:00.123456789Z");
     @BeforeAll static void connect()throws Exception{
-        String url=System.getenv("SPRING_DATASOURCE_URL");assertNotNull(url);assertTrue(url.matches("jdbc:postgresql://127\\.0\\.0\\.1:[0-9]+/mop_test"));assertEquals("mop_test_runtime",System.getenv("SPRING_DATASOURCE_USERNAME"));var cfg=new HikariConfig();cfg.setJdbcUrl(url);cfg.setUsername(System.getenv("SPRING_DATASOURCE_USERNAME"));cfg.setPassword(System.getenv("SPRING_DATASOURCE_PASSWORD"));cfg.setMaximumPoolSize(12);cfg.setConnectionTimeout(5000);pool=new HikariDataSource(cfg);rawBefore=rawSnapshot();
+        String url=System.getenv("SPRING_DATASOURCE_URL");assertNotNull(url);MonitoringSimulationGuard.requireTestConfiguration(url,System.getenv("MOP_MONITORING_TEST_TENANT_ID"));assertEquals("mop_test_runtime",System.getenv("SPRING_DATASOURCE_USERNAME"));var cfg=new HikariConfig();cfg.setJdbcUrl(url);cfg.setUsername(System.getenv("SPRING_DATASOURCE_USERNAME"));cfg.setPassword(System.getenv("SPRING_DATASOURCE_PASSWORD"));cfg.setMaximumPoolSize(12);cfg.setConnectionTimeout(5000);pool=new HikariDataSource(cfg);rawBefore=rawSnapshot();
     }
     @AfterAll static void close()throws Exception{if(pool!=null){try{assertEquals(rawBefore,rawSnapshot());}finally{pool.close();}}}
     static String rawSnapshot()throws Exception{try(var c=pool.getConnection();var s=c.createStatement();var r=s.executeQuery("SELECT md5(COALESCE(string_agg(to_jsonb(t)::text,'|' ORDER BY id),'')) FROM public.mop_raw_monitoring_event t")){r.next();return r.getString(1);}}

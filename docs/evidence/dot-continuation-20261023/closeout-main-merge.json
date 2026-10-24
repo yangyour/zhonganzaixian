@@ -1,0 +1,53 @@
+{
+  "status": "CODE_CHECKS_PASSED",
+  "scope": "CURRENT_BATCH_CLOSEOUT_ONLY",
+  "integrated_main": "d53697df57a848c49b843e621cb0c50bf789065b",
+  "java": {
+    "discovered": 5184,
+    "executed_passed": 4060,
+    "skipped": 1124,
+    "failures": 0,
+    "errors": 0
+  },
+  "web": {
+    "files": 339,
+    "passed": 5441
+  },
+  "node": {
+    "passed": 263
+  },
+  "offline_demo": {
+    "passed": 18,
+    "accounts_created": false
+  },
+  "typecheck": "PASSED",
+  "build": "PASSED",
+  "static_release_policy": "PASSED",
+  "contract": {
+    "paths": 271,
+    "schemas": 507,
+    "removed_paths": [],
+    "changed_existing_paths": [
+      "/dashboard/actionable-tickets"
+    ],
+    "changed_existing_schemas": [
+      "DashboardActionableTickets"
+    ]
+  },
+  "initial_failures": [
+    "Superseded offset Java test still called removed reader method",
+    "UI01 page fixture omitted existing event metric response",
+    "Offline DEMO golden source hashes stale after merged contract/router"
+  ],
+  "corrections": [
+    "Retargeted Java test to canonical reader and preserved authorization/unknown-param assertions",
+    "Restored explicit event metric fixture and exact KPI assertions",
+    "Regenerated preparation-only golden with final catalog sources"
+  ],
+  "real_component_tests_this_dot": "NOT_RUN",
+  "other_session_evidence": "docs/evidence/local-astra-ut-20261023/",
+  "deployed": false,
+  "migrations_applied": 0,
+  "formal_acceptance": "NOT_COMPLETED",
+  "execution_status": "STOPPED_BY_USER"
+}

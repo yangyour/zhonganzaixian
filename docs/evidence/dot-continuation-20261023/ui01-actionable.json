@@ -1,0 +1,43 @@
+{
+  "status": "CODE_VALIDATED_REAL_INTEGRATION_PENDING",
+  "java": {
+    "tests": 4674,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1086,
+    "executed": 3588
+  },
+  "web": {
+    "files": 310,
+    "tests": 5158,
+    "failures": 0
+  },
+  "node_contracts": {
+    "tests": 237,
+    "failures": 0
+  },
+  "offline_demo": {
+    "tests": 18,
+    "failures": 0,
+    "accounts_created": false
+  },
+  "typecheck": "PASSED",
+  "build": "PASSED_WITH_EXISTING_LARGE_CHUNK_WARNING",
+  "coverage": {
+    "requirements": 128,
+    "groups": 25,
+    "unassigned": 0,
+    "formal_acceptance": "NOT_RUN"
+  },
+  "designated_postgresql": "BLOCKED_MISSING_PRIVATE_CONFIGURATION",
+  "browser": "NOT_RUN",
+  "migration_count": 0,
+  "deployed": false,
+  "failures_resolved": [
+    "Root node dependency link absent, reused existing approved installed dependencies",
+    "Two updated page fixtures and a mock signature needed matching TypeScript types",
+    "Navigation/drilldown expectations updated to new authorized detail route",
+    "Offline demo declared page count updated from43to44; no runtime initialization"
+  ],
+  "validation_scope": "Pure Java/JDBC mock/MVC, jsdom components, generated contracts and static build; no real component or browser claims"
+}

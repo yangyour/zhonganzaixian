@@ -323,7 +323,9 @@
         "docs/designated-candidate-schema-chain-20261023.md",
         "docs/evidence/local-astra-ut-20261023/schema-chain/summary.json",
         "docs/mapped-problem-intake-20261024.md",
-        "docs/evidence/mapped-problem-intake-20261024/validation.json"
+        "docs/evidence/mapped-problem-intake-20261024/validation.json",
+        "docs/schema-text-roundtrip-20261024.md",
+        "docs/evidence/schema-text-roundtrip-20261024/validation.json"
       ],
       "commits": [
         "25a17013",
@@ -335,7 +337,8 @@
         "Public event intake rejects deliberate auto-ticket failure; internal simulation is limited to explicit isolated PostgreSQL and non-protected tenants, with historical customer-tenant fixture fallback removed. No real component run.",
         "Explicit one-event HOST source capture from current published mapping, bound metadata/event reads, shared raw/quarantine/audit/idempotency transaction and asset-detail original-command recovery; V29/V30 remain UNVERIFIED and never process recovery or dispatch.",
         "V54/V55 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; historical active mop_test was V50 at that verification; superseded by the 2026-10-24 deployment to active V55",
-        "显式当前主机问题消费入口：raw/成员/事件/现有建单同事务，来源严格校验与冲突隔离，原请求恢复及桌面入口；6项指定PG、191+23定向Java、114Web、215契约和3实际Edge合成场景通过。实时设备来源、持续水位及自动消费仍待。"
+        "显式当前主机问题消费入口：raw/成员/事件/现有建单同事务，来源严格校验与冲突隔离，原请求恢复及桌面入口；6项指定PG、191+23定向Java、114Web、215契约和3实际Edge合成场景通过。实时设备来源、持续水位及自动消费仍待。",
+        "修复schema克隆对SQL字面量换行的破坏，新增前后字面量/函数证明；新指定PG55空业务还原库通过7项raw/隔离守卫及6项映射问题事务，旧损坏库继续拒绝。20Python和56Java回归通过，0客户业务数据复制/迁移重跑；持续水位和全应用/正式验收另列。"
       ],
       "remaining_subitems": [
         "Complete continuous pull/watermarks, source-proof journal and durable raw-to-business consumption; one-event HOST capture now wired but unverified storage is not business authority",
@@ -348,7 +351,7 @@
       "remaining": [
         "持续来源拉取、耐久水位、完整来源运行日志和自动待消费raw调度；当前周期恢复证明的持续处理。",
         "实际设备非空问题到恢复证据/工单的完整链、V42生命周期、客户规则与正式TC。显式单条问题事务入口已验证，不再重复列作缺失。",
-        "保留V55克隆库的raw约束守卫阻塞须另行处理；不放宽守卫或修写原库。",
+        "旧V55损坏克隆库保持拒绝；新无损还原库的raw/隔离及显式问题事务已验证，其他完整运行/来源联调另验，不修写旧库。",
         "外部采集器/规则发布与独立核验的首值消费。",
         "OID/参数及完整234项目录消费。",
         "持久采集器生命周期和更广的监控提供者；指定来源探测和完整浏览器联调。"
@@ -802,7 +805,9 @@
       "status": "IN_PROGRESS",
       "completion_criterion": "完善有界安全执行工具与真实隔离演练/压测条件、逐项验收证据；不能用验证器或空数据当实际恢复/规模达标。",
       "evidence": [
-        "docs/parallel/production-progress.md"
+        "docs/parallel/production-progress.md",
+        "docs/schema-text-roundtrip-20261024.md",
+        "docs/evidence/schema-text-roundtrip-20261024/validation.json"
       ],
       "commits": [
         "c2b8f0d7"
@@ -810,6 +815,9 @@
       "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
       "remaining": [
         "真实规模和持续时间压测、故障切换、隔离恢复及RPO/RTO演练；同一制品上的128条正式TC与签收。现有备份和回退守卫不能替代实际恢复演练。"
+      ],
+      "completed_subitems": [
+        "修复schema克隆对SQL字面量换行的破坏，新增前后字面量/函数证明；新指定PG55空业务还原库通过7项raw/隔离守卫及6项映射问题事务，旧损坏库继续拒绝。20Python和56Java回归通过，0客户业务数据复制/迁移重跑；持续水位和全应用/正式验收另列。"
       ]
     },
     {

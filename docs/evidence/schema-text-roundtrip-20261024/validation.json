@@ -1,0 +1,77 @@
+{
+  "project": "众安在线MOP",
+  "base_commit": "af261cbe",
+  "workspace": "E:/work/wxw9/zhonganzaixian/.worktrees/monitoring-source-pull-20261024",
+  "branch": "codex/monitoring-source-pull-20261024",
+  "status": "VERIFIED_LOSSLESS_SCHEMA_AND_EXACT_RAW_CATALOGUE_COMPATIBILITY",
+  "source_byte_basis": "Git index canonical LF bytes; identical to tested working-tree source",
+  "source_hashes": {
+    "server/api/src/test/java/cn/mop/persistence/MappedProblemIntakePostgresTest.java": "6a977b5f847ecb51b943958c4792d96744071660acc21c2126b688a8e3d9763e",
+    "server/persistence/src/main/java/cn/mop/persistence/MonitoringQuarantineSchemaVerifier.java": "1864561d3d10414b194f9f1e849eeb1d3f072b0783f6f927c734826cd183e212",
+    "server/persistence/src/main/java/cn/mop/persistence/RawMonitoringEventSchemaVerifier.java": "0db3b14b5a1c652ca2b704e008d800238bb9ab617cc56c3f9110dd23970f3a2e",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresSchemaTextRoundTripIntegrationTest.java": "e335227d228f2c70cc247c8171fc94cc777510c8dfc53d2db27493f99dcc11fc",
+    "tools/postgres_schema_text.py": "33b638e0aae8b106ed68246116b5e0bc36bb6482b72e77435a32324e1f3230d1",
+    "tools/test_postgres_schema_text.py": "0528001c7db0e421b6c15d8c8cbd83b5a4f09ce029baae8d108e5c379d7e3951",
+    "tools/verify-candidate-schema-chain.py": "2a65e6b4b1e464255e0b6b91d40125c86dbf22caa9be096fe0cbba6ba420ca00",
+    "tools/verify-schema-text-business.py": "bcb151d65e5e54e435c25b66a010bd3ce9c472fced6a290db9b448b61cbc8676",
+    "tools/verify-schema-text-roundtrip.py": "3a6fafa7d401541badc89140d0ea892de5ad81a28c05450f5b5fac9841c0cac7"
+  },
+  "python_unit": {
+    "tests": 20,
+    "failures": 0,
+    "errors": 0
+  },
+  "java_regression": {
+    "tests": 56,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "postgres_raw": {
+    "evidence": "raw-business-final.json",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "postgres_problem_intake": {
+    "evidence": "mapped-final.json",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "source_protocol": "ISOLATED_SYNTHETIC"
+  },
+  "schema_clone": {
+    "evidence": "owned-clone.json",
+    "database": "mop_monitoring_test_41146388e361",
+    "owner_marker": "MOP_SCHEMA_TEXT_ROUNDTRIP:c7377f4f20ef4115a9ec04664b66600f",
+    "version": "V55",
+    "empty_business_tables_before_tests": 120,
+    "copied_business_rows": 0,
+    "migration_runs": 0,
+    "retained": true
+  },
+  "damaged_previous_objects": 26,
+  "old_databases_repaired": 0,
+  "old_damaged_catalogue_still_rejected": true,
+  "sql_resources_changed": false,
+  "reviewed_guard_forms": {
+    "active": {
+      "mop_raw_monitoring_event": "162c421f9552d45f7210ffccc62bb888d0acf1518ac7bca952709bdc7797f39b",
+      "mop_monitoring_quarantine": "c1ef47536df14ff8c6e7e9725aa7b92ed7fe4ee69a3ded2d44a1654dd7439226"
+    },
+    "lossless_restored": {
+      "mop_raw_monitoring_event": "0367287efb710751452bd8c6cca1cdd97cc39203ab1bffb2261f8f9666afd283",
+      "mop_monitoring_quarantine": "c3a4a2ea9bdb76f317c6169ab5148d86220bba97c1f329526754c22da85e99c0"
+    },
+    "definitions": "check-definitions.json",
+    "all_literal_and_function_fingerprints_equal": true
+  },
+  "deployment": false,
+  "external_messages": 0,
+  "new_components": 0,
+  "formal_contract_acceptance": "NOT_RUN",
+  "full_runtime_schema_and_application_startup": "NOT_CLAIMED",
+  "continuous_pull_watermarks": "REMAINING"
+}

@@ -1,0 +1,246 @@
+{
+  "mop_test": [
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_dispatch_allowed_check",
+      "CHECK ((NOT dispatch_allowed))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_occurred_epoch_second_check",
+      "CHECK (((occurred_epoch_second >= '-31557014167219200'::bigint) AND (occurred_epoch_second <= '31556889864403199'::bigint)))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_occurred_nano_check",
+      "CHECK (((occurred_nano >= 0) AND (occurred_nano <= 999999999)))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_payload_check",
+      "CHECK (((octet_length(payload) >= 1) AND (octet_length(payload) <= 1048576)))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_quarantine_reason_check",
+      "CHECK (((quarantine_reason)::text = ANY ((ARRAY['UNKNOWN_MAPPING'::character varying, 'CROSS_TENANT_CLAIM'::character varying, 'SOURCE_KEY_CONFLICT'::character varying])::text[])))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_quarantine_status_check",
+      "CHECK (((quarantine_status)::text = 'HELD_UNVERIFIED'::text))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_received_epoch_second_check",
+      "CHECK (((received_epoch_second >= '-31557014167219200'::bigint) AND (received_epoch_second <= '31556889864403199'::bigint)))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_received_nano_check",
+      "CHECK (((received_nano >= 0) AND (received_nano <= 999999999)))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_source_authorized_check",
+      "CHECK ((NOT source_authorized))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_source_event_id_check",
+      "CHECK ((((char_length(source_event_id) >= 1) AND (char_length(source_event_id) <= 256)) AND ((char_length(source_event_id) + regexp_count(source_event_id, '[\ud800\udc00-\udbff\udfff]'::text)) <= 256)))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_source_event_id_check1",
+      "CHECK ((source_event_id !~ '[\u0001-\u001f\u007f-\u009f]'::text))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_source_event_id_check2",
+      "CHECK ((source_event_id !~ '^[\t-\r\u001c- \u1680\u2000-\u2006\u2008-\u200a\u2028\u2029\u205f\u3000]|[\t-\r\u001c- \u1680\u2000-\u2006\u2008-\u200a\u2028\u2029\u205f\u3000]$'::text))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_source_phase_check",
+      "CHECK (((source_phase)::text = ANY ((ARRAY['PROBLEM'::character varying, 'RECOVERED'::character varying])::text[])))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_occurred_epoch_second_check",
+      "CHECK (((occurred_epoch_second >= '-31557014167219200'::bigint) AND (occurred_epoch_second <= '31556889864403199'::bigint)))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_occurred_nano_check",
+      "CHECK (((occurred_nano >= 0) AND (occurred_nano <= 999999999)))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_payload_check",
+      "CHECK (((octet_length(payload) >= 1) AND (octet_length(payload) <= 1048576)))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_received_epoch_second_check",
+      "CHECK (((received_epoch_second >= '-31557014167219200'::bigint) AND (received_epoch_second <= '31556889864403199'::bigint)))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_received_nano_check",
+      "CHECK (((received_nano >= 0) AND (received_nano <= 999999999)))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_source_authorization_status_check",
+      "CHECK (((source_authorization_status)::text = 'UNVERIFIED'::text))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_source_event_id_check",
+      "CHECK ((((char_length(source_event_id) >= 1) AND (char_length(source_event_id) <= 256)) AND ((char_length(source_event_id) + regexp_count(source_event_id, '[\ud800\udc00-\udbff\udfff]'::text)) <= 256)))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_source_event_id_check1",
+      "CHECK ((source_event_id !~ '[\u0001-\u001f\u007f-\u009f]'::text))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_source_event_id_check2",
+      "CHECK ((source_event_id !~ '^[\t-\r\u001c- \u1680\u2000-\u2006\u2008-\u200a\u2028\u2029\u205f\u3000]|[\t-\r\u001c- \u1680\u2000-\u2006\u2008-\u200a\u2028\u2029\u205f\u3000]$'::text))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_source_phase_check",
+      "CHECK (((source_phase)::text = ANY ((ARRAY['PROBLEM'::character varying, 'RECOVERED'::character varying])::text[])))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_storage_status_check",
+      "CHECK (((storage_status)::text = 'STORED_ONLY'::text))"
+    ]
+  ],
+  "mop_monitoring_test_41146388e361": [
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_dispatch_allowed_check",
+      "CHECK ((NOT dispatch_allowed))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_occurred_epoch_second_check",
+      "CHECK (((occurred_epoch_second >= '-31557014167219200'::bigint) AND (occurred_epoch_second <= '31556889864403199'::bigint)))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_occurred_nano_check",
+      "CHECK (((occurred_nano >= 0) AND (occurred_nano <= 999999999)))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_payload_check",
+      "CHECK (((octet_length(payload) >= 1) AND (octet_length(payload) <= 1048576)))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_quarantine_reason_check",
+      "CHECK (((quarantine_reason)::text = ANY (ARRAY[('UNKNOWN_MAPPING'::character varying)::text, ('CROSS_TENANT_CLAIM'::character varying)::text, ('SOURCE_KEY_CONFLICT'::character varying)::text])))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_quarantine_status_check",
+      "CHECK (((quarantine_status)::text = 'HELD_UNVERIFIED'::text))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_received_epoch_second_check",
+      "CHECK (((received_epoch_second >= '-31557014167219200'::bigint) AND (received_epoch_second <= '31556889864403199'::bigint)))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_received_nano_check",
+      "CHECK (((received_nano >= 0) AND (received_nano <= 999999999)))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_source_authorized_check",
+      "CHECK ((NOT source_authorized))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_source_event_id_check",
+      "CHECK (((char_length(source_event_id) >= 1) AND (char_length(source_event_id) <= 256) AND ((char_length(source_event_id) + regexp_count(source_event_id, '[\ud800\udc00-\udbff\udfff]'::text)) <= 256)))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_source_event_id_check1",
+      "CHECK ((source_event_id !~ '[\u0001-\u001f\u007f-\u009f]'::text))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_source_event_id_check2",
+      "CHECK ((source_event_id !~ '^[\t-\r\u001c- \u1680\u2000-\u2006\u2008-\u200a\u2028\u2029\u205f\u3000]|[\t-\r\u001c- \u1680\u2000-\u2006\u2008-\u200a\u2028\u2029\u205f\u3000]$'::text))"
+    ],
+    [
+      "mop_monitoring_quarantine",
+      "mop_monitoring_quarantine_source_phase_check",
+      "CHECK (((source_phase)::text = ANY (ARRAY[('PROBLEM'::character varying)::text, ('RECOVERED'::character varying)::text])))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_occurred_epoch_second_check",
+      "CHECK (((occurred_epoch_second >= '-31557014167219200'::bigint) AND (occurred_epoch_second <= '31556889864403199'::bigint)))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_occurred_nano_check",
+      "CHECK (((occurred_nano >= 0) AND (occurred_nano <= 999999999)))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_payload_check",
+      "CHECK (((octet_length(payload) >= 1) AND (octet_length(payload) <= 1048576)))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_received_epoch_second_check",
+      "CHECK (((received_epoch_second >= '-31557014167219200'::bigint) AND (received_epoch_second <= '31556889864403199'::bigint)))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_received_nano_check",
+      "CHECK (((received_nano >= 0) AND (received_nano <= 999999999)))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_source_authorization_status_check",
+      "CHECK (((source_authorization_status)::text = 'UNVERIFIED'::text))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_source_event_id_check",
+      "CHECK (((char_length(source_event_id) >= 1) AND (char_length(source_event_id) <= 256) AND ((char_length(source_event_id) + regexp_count(source_event_id, '[\ud800\udc00-\udbff\udfff]'::text)) <= 256)))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_source_event_id_check1",
+      "CHECK ((source_event_id !~ '[\u0001-\u001f\u007f-\u009f]'::text))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_source_event_id_check2",
+      "CHECK ((source_event_id !~ '^[\t-\r\u001c- \u1680\u2000-\u2006\u2008-\u200a\u2028\u2029\u205f\u3000]|[\t-\r\u001c- \u1680\u2000-\u2006\u2008-\u200a\u2028\u2029\u205f\u3000]$'::text))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_source_phase_check",
+      "CHECK (((source_phase)::text = ANY (ARRAY[('PROBLEM'::character varying)::text, ('RECOVERED'::character varying)::text])))"
+    ],
+    [
+      "mop_raw_monitoring_event",
+      "mop_raw_monitoring_event_storage_status_check",
+      "CHECK (((storage_status)::text = 'STORED_ONLY'::text))"
+    ]
+  ]
+}

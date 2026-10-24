@@ -23,6 +23,7 @@ from pathlib import Path
 import re
 import shlex
 import subprocess
+import sys
 import threading
 import time
 import urllib.parse
@@ -132,7 +133,13 @@ def load_module(name: str, filename: str):
     if spec is None or spec.loader is None:
         raise Refused('LOCAL_HELPER_UNAVAILABLE')
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    sys.modules[name] = module
+    try:
+        spec.loader.exec_module(module)
+    except BaseException:
+        if sys.modules.get(name) is module:
+            del sys.modules[name]
+        raise
     return module
 
 
@@ -372,16 +379,11 @@ class DesignatedPostgres:
                 raise Refused('SCHEMA_SOURCE_NOT_ACTIVE_OR_OWNED')
         dump = self.remote(['docker', 'exec', 'mop-lan-postgres', 'pg_dump', '-U', 'postgres',
                             '--dbname', database, '--schema-only', '--schema=public'], privileged=True)
-        lines = []
-        for line in dump.splitlines():
-            if line.startswith('\\restrict ') or line.startswith('\\unrestrict '):
-                continue  # pg_dump 17 client guards; all other psql metacommands are forbidden.
-            if line.startswith('\\'):
-                raise Refused('UNEXPECTED_DUMP_METACOMMAND')
-            if re.match(r'^\s*(?:CREATE|ALTER|DROP)\s+(?:DATABASE|ROLE|USER|SYSTEM)\b', line, re.IGNORECASE):
-                raise Refused('CLUSTER_OR_DATABASE_COMMAND_IN_SCHEMA_DUMP')
-            lines.append(line)
-        return '\n'.join(lines) + '\n'
+        helper = load_module('candidate_schema_text', 'postgres_schema_text.py')
+        try:
+            return helper.filter_schema_dump(dump)
+        except helper.SchemaTextError as failure:
+            raise Refused(str(failure)) from None
 
     def close(self) -> None:
         if self.tunnel is not None:
@@ -435,15 +437,17 @@ def ensure_empty_business_tables(pg: DesignatedPostgres, connection) -> int:
 
 
 def create_clone(pg: DesignatedPostgres, stage: dict, predecessor: dict | None, base_version: int) -> None:
+    helper = load_module('candidate_schema_text', 'postgres_schema_text.py')
     source_name = predecessor['database'] if predecessor else 'mop_test'
     with pg.connection(source_name, readonly=True) as source:
         if predecessor:
             pg.assert_owned(source, predecessor)
         history, capabilities = metadata(source, base_version)
+        source_literals = helper.catalog_literal_fingerprints(source)
     schema = pg.dump(source_name, predecessor)
     with pg.connection(source_name, readonly=True) as source:
-        if metadata(source, base_version) != (history, capabilities):
-            raise Refused('CLONE_SOURCE_METADATA_CHANGED')
+        if metadata(source, base_version) != (history, capabilities) or helper.catalog_literal_fingerprints(source) != source_literals:
+            raise Refused('CLONE_SOURCE_METADATA_OR_LITERALS_CHANGED')
     stage.update(schema_source=source_name, inherited_versions=base_version, inherited_history_sha256=digest(history),
                  inherited_history_reexecuted=False, schema_only_sha256=hashlib.sha256(schema.encode()).hexdigest(),
                  metadata_tables_copied=sorted(METADATA_TABLES), business_rows_copied=0)
@@ -478,7 +482,10 @@ def create_clone(pg: DesignatedPostgres, stage: dict, predecessor: dict | None, 
             else:
                 cursor.execute('CREATE SCHEMA public AUTHORIZATION mop_test_migrator')
             # template0 may already provide an empty public schema. Never DROP it or any business objects.
-            restored_schema = '\n'.join(line for line in schema.splitlines() if line.strip() != 'CREATE SCHEMA public;')
+            try:
+                restored_schema = helper.reuse_empty_public_schema(schema)
+            except helper.SchemaTextError as failure:
+                raise Refused(str(failure)) from None
             stage['empty_public_schema_reused_without_drop'] = True
             stage['restored_schema_sha256'] = hashlib.sha256(restored_schema.encode()).hexdigest()
             cursor.execute(restored_schema, prepare=False)
@@ -487,6 +494,13 @@ def create_clone(pg: DesignatedPostgres, stage: dict, predecessor: dict | None, 
             cursor.executemany('INSERT INTO public.mop_role_capability_limit(base_role,capability) VALUES(%s,%s)', capabilities)
         if metadata(target, base_version) != (history, capabilities):
             raise Refused('CLONED_METADATA_NOT_IDENTICAL')
+        restored_literals = helper.catalog_literal_fingerprints(target)
+        stage['source_literal_catalogue_sha256'] = digest(source_literals)
+        stage['restored_literal_catalogue_sha256'] = digest(restored_literals)
+        stage['literal_catalogue_scope'] = 'EXPRESSION_LITERAL_VALUES_AND_EXACT_FUNCTION_SOURCE_NOT_FULL_RUNTIME_SCHEMA_APPROVAL'
+        if restored_literals != source_literals:
+            raise Refused('CLONED_LITERAL_OR_FUNCTION_SOURCE_CHANGED')
+        stage['literal_and_function_source_preserved'] = True
         stage['empty_business_tables_verified'] = ensure_empty_business_tables(pg, target)
     stage['clone_status'] = 'PASSED'
 

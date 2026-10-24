@@ -1,3 +1,7 @@
+# 当前监控接续工作区（2026-10-24）
+
+本轮发现`.worktrees/remaining-gaps-20261024`出现并发通知改动，仅将自己尚未提交的四个工具文件迁移到`E:\work\wxw9\zhonganzaixian\.worktrees\monitoring-source-pull-20261024`，分支`codex/monitoring-source-pull-20261024`；规范origin/组织仍为`https://github.com/yangyour/zhonganzaixian.git` / `yangyour/zhonganzaixian`。旧检出和原目录三处用户修改不覆盖。已吸收主干报告阅读看板/通知待处理队列。无损schema还原及目录表示兼容见`docs/schema-text-roundtrip-20261024.md`；新验证库保留，旧损坏库不修写，V1–V55 SQL保持冻结。持续拉取和水位尚未完成；不自动部署、外发、启用真实采集、恢复旧会话或创建新聊天/自动化。其余既有边界继续适用。
+
 # 当前远程测试发布与活动V55（2026-10-24）
 
 用户明确要求“部署远程”，并继续后置HTTPS。本次已将main运行源码b964701b统一发布7应用，14服务就绪；活动mop_test通过独立CLI从V50逐项升级V55（每步apply=1/repeat=0/check=0），应用启动0迁移。原50条历史、110张旧业务表和7基础组件生命周期保持；新增11张表为空，私有备份保留，临时迁移凭据删除。462实际HTTP及7真实API桌面读取通过。当前版本/回退事务见[发布记录](docs/remote-release-20261024.md)。下文活动V50及隔离候选描述为此前历史；V1–V55全部冻结，后续SQL追加协调版本。既有业务门禁及生产/正式验收未完成状态保持。

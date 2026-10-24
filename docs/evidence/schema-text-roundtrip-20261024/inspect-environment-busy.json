@@ -1,0 +1,16 @@
+{
+  "environment": "lan-test-20261008",
+  "started_at": "2026-10-24T10:00:38.928449+00:00",
+  "status": "FAILED",
+  "schema_migrations": 0,
+  "database_creation_requested": false,
+  "old_database_repairs": 0,
+  "business_rows_copied": 0,
+  "roles_changed": 0,
+  "services_changed": 0,
+  "external_messages": 0,
+  "database_deletions": 0,
+  "formal_contract_acceptance": "NOT_RUN",
+  "failure_type": "FileExistsError",
+  "finished_at": "2026-10-24T10:00:39.280645+00:00"
+}

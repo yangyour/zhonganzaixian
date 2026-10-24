@@ -10,6 +10,9 @@ final class RawMonitoringEventSchemaVerifier {
     static final String SCRIPT="V29__immutable_raw_monitoring_events.sql";
     static final String SHA256="2f67b28791d2533934153227a98d6e09aec4e16c7405d4408e9956a9d853e8c3";
     static final String FUNCTION_SHA256="67ec7f320ae54fe58afbbf1534ba1779ba0432bc51749870e07666fb8730159b";
+    /** Exact reviewed PostgreSQL17 forms; restored casts/grouping differ, literal values remain identical. */
+    static final String ORIGINAL_CHECK_CATALOGUE = "162c421f9552d45f7210ffccc62bb888d0acf1518ac7bca952709bdc7797f39b";
+    static final String RESTORED_CHECK_CATALOGUE = "0367287efb710751452bd8c6cca1cdd97cc39203ab1bffb2261f8f9666afd283";
     private RawMonitoringEventSchemaVerifier(){}
     static void resource()throws Exception{
         try(var in=RawMonitoringEventSchemaVerifier.class.getResourceAsStream("/db/migration/"+SCRIPT)){
@@ -34,9 +37,18 @@ final class RawMonitoringEventSchemaVerifier {
         requireConstraint(c,table,"f",List.of("tenant_id","asset_id"),"mop_asset",List.of("tenant_id","id"),false);
         requireTrue(c,"SELECT count(*)=11 FROM pg_constraint WHERE conrelid='public.mop_raw_monitoring_event'::regclass AND contype='c'");
         requireTrue(c,"SELECT count(*)=0 FROM pg_trigger WHERE tgrelid='public.mop_raw_monitoring_event'::regclass AND NOT tgisinternal");
-        // Exact PostgreSQL 17 catalog definitions: no substring matches or whitespace removal inside literals.
-        requireTrue(c,"SELECT encode(sha256(convert_to(string_agg(conname||'='||pg_get_constraintdef(oid),chr(10) ORDER BY conname),'UTF8')),'hex')=? FROM pg_constraint WHERE conrelid='public.mop_raw_monitoring_event'::regclass AND contype='c'","162c421f9552d45f7210ffccc62bb888d0acf1518ac7bca952709bdc7797f39b");
+        // Exact PostgreSQL 17 catalogue forms; corrupt literals and all unreviewed definitions still fail.
+        verifyCheckCatalogue(c);
         requireTrue(c,"SELECT encode(sha256(convert_to(string_agg(a.attname||'='||pg_get_expr(d.adbin,d.adrelid),chr(10) ORDER BY a.attname),'UTF8')),'hex')=? FROM pg_attribute a JOIN pg_attrdef d ON d.adrelid=a.attrelid AND d.adnum=a.attnum WHERE a.attrelid='public.mop_raw_monitoring_event'::regclass AND a.attgenerated='s'","08bfc2cc48b35103a0287df83cddc07773666ae42e2c9cb4edbf6742df0e6fca");
         requireTrue(c,"SELECT NOT p.prosecdef AND p.proisstrict AND p.provolatile='i' AND p.proowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') AND encode(sha256(convert_to(p.prosrc,'UTF8')),'hex')=? AND p.proconfig=ARRAY['search_path=pg_catalog'] AND has_function_privilege('mop_test_runtime',p.oid,'EXECUTE') AND NOT EXISTS(SELECT 1 FROM aclexplode(COALESCE(p.proacl,acldefault('f',p.proowner))) a WHERE a.grantee<>p.proowner AND (a.is_grantable OR a.privilege_type<>'EXECUTE' OR a.grantee<>(SELECT oid FROM pg_roles WHERE rolname='mop_test_runtime'))) FROM pg_proc p WHERE p.oid=to_regprocedure('public.mop_raw_event_fingerprint(uuid,text,text,uuid,uuid,bigint,integer,bytea)')",FUNCTION_SHA256);
     }
+    /** No SQL/literal normalization: only the two exact catalogues verified against the frozen source are accepted. */
+    private static void verifyCheckCatalogue(Connection connection) throws SQLException {
+        requireTrue(connection,
+                "SELECT encode(sha256(convert_to(string_agg(conname||'='||pg_get_constraintdef(oid),chr(10) "
+                        + "ORDER BY conname),'UTF8')),'hex') IN (?,?) FROM pg_constraint "
+                        + "WHERE conrelid='public.mop_raw_monitoring_event'::regclass AND contype='c'",
+                ORIGINAL_CHECK_CATALOGUE, RESTORED_CHECK_CATALOGUE);
+    }
+
 }

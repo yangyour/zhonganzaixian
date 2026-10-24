@@ -1,0 +1,31 @@
+{
+  "environment": "lan-test-20261008",
+  "database": "mop_monitoring_test_41146388e361",
+  "owner_marker": "MOP_SCHEMA_TEXT_ROUNDTRIP:c7377f4f20ef4115a9ec04664b66600f",
+  "status": "PASSED_REAL_PG_SOURCE_CLONE_AND_NEGATIVE_GUARDS",
+  "started_at": "2026-10-24T10:16:38.172878+00:00",
+  "schema_migrations": 0,
+  "ddl_statements": 0,
+  "old_databases_read_only": true,
+  "actual_tenant_written": false,
+  "external_messages": 0,
+  "database_removed": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "maven_exit_code": 0,
+  "junit": {
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "own_runtime_connections_remaining": 0,
+  "active_metadata_unchanged": true,
+  "actual_tenant_protected_rows_unchanged": true,
+  "older_damaged_clone_unchanged": true,
+  "frozen_resources_unchanged": true,
+  "own_connections_closed": true,
+  "own_test_actor_deactivated": true,
+  "environment_lock_released": true,
+  "finished_at": "2026-10-24T10:17:05.440884+00:00"
+}

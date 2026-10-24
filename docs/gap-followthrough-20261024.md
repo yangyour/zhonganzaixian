@@ -23,3 +23,5 @@ R02首个功能已完成代码与分层验证，具体范围、失败复测与�
 2026-10-24新增显式映射问题消费事务：raw、事件成员、业务事件和现有建单同事务，当前来源/版本重核、冲突隔离、原请求恢复及桌面入口已验证。6项指定PG和分层结果见[实施记录](mapped-problem-intake-20261024.md)。该功能不包含持续水位、自动raw调度或完整V42；运行开关保持原值，本轮未部署。
 
 2026-10-24第二个业务功能补统一SLA有效分母：保留毫秒度量、按分子/分母汇总，API/页面/CSV可核对，任一服务不足仍null；29Java、137Web、215契约、3指定PG缺来源/隔离及4Edge合成场景通过。详见[汇总口径](sla-availability-aggregate-20261024.md)。健康来源和跨业务冻结仍未完成，本轮不部署。
+
+2026-10-24监控后续已迁移至新的独立检出`E:\work\wxw9\zhonganzaixian\.worktrees\monitoring-source-pull-20261024` / `codex/monitoring-source-pull-20261024`，规范origin/组织仍为`https://github.com/yangyour/zhonganzaixian.git` / `yangyour/zhonganzaixian`。原因是旧独立检出出现并发通知代码；只移动本轮四个工具文件，完整保留对方改动。已吸收`1654838c`报告阅读看板与`af261cbe`通知待处理队列，不重复实现。修复无损schema还原，20Python/56Java及13项指定PG场景通过；新库保留、旧损坏库未修写、V1–V55资源未改，见[记录](schema-text-roundtrip-20261024.md)。持续拉取/水位与其余业务继续未完成。

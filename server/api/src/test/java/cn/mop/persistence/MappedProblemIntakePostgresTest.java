@@ -74,6 +74,11 @@ class MappedProblemIntakePostgresTest {
         config.setUsername("mop_test_runtime");
         config.setPassword(System.getenv("SPRING_DATASOURCE_PASSWORD"));
         config.setMaximumPoolSize(10);
+        String application = System.getenv("MOP_MAPPED_PROBLEM_APPLICATION");
+        if (application != null) {
+            assertTrue(application.matches("mop-schema-text-[a-f0-9]{32}"));
+            config.addDataSourceProperty("ApplicationName", application);
+        }
         pool = new HikariDataSource(config);
         try (
             Connection c = pool.getConnection();

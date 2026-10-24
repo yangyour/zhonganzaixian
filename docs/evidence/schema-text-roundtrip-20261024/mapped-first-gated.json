@@ -1,0 +1,27 @@
+{
+  "environment": "lan-test-20261008",
+  "database": "mop_monitoring_test_41146388e361",
+  "owner_marker": "MOP_SCHEMA_TEXT_ROUNDTRIP:c7377f4f20ef4115a9ec04664b66600f",
+  "status": "FAILED",
+  "suite": "mapped-problem",
+  "started_at": "2026-10-24T10:23:37.079237+00:00",
+  "schema_migrations": 0,
+  "ddl_statements": 0,
+  "old_databases_read_only": true,
+  "actual_tenant_written": false,
+  "external_messages": 0,
+  "database_removed": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "maven_exit_code": 1,
+  "junit": {
+    "tests": 6,
+    "failures": 2,
+    "errors": 2,
+    "skipped": 0
+  },
+  "failure_type": "AssertionError",
+  "own_test_actor_deactivated": true,
+  "environment_lock_released": true,
+  "finished_at": "2026-10-24T10:25:27.957803+00:00"
+}

@@ -1,6 +1,6 @@
 # 剩余实现总清单（持续核销）
 
-**2026-10-23 16:28 UTC 用户已明确恢复当前 dot 开发。** 不恢复原六个本地会话，不创建新会话/自动化或自动部署；后文六会话为历史责任分类。最新接续状态见[dot记录](dot-continuation-20261023.md)，历史收尾与剩余项入口继续保留。UI01 新兼容投影/页面已接线，指定组件及浏览器验证仍待完成，正式TC未核销。
+**最新远端去重：** 已抓取63个远端引用；dot批次`25a17013`已通过`e8362fd6`进入main，后续复用最新主干，不从旧WIP重复恢复。审阅后的主干`df92a03d`包含N01/P02返回守卫、M01来源证明与精确t2、P01诊断矩阵、A05隔离回归及V51–V55指定PG隔离schema冻结。各层真实业务/浏览器验证按功能单列，25组状态未因此整体升级为VERIFIED。见[远端接续审阅](upstream-batch-review-20261023.md)与[最新Git证据](evidence/local-astra-ut-20261023/remote-dedup-check-latest.json)。
 
 **2026-10-23最新指示已恢复一个本地新会话继续开发。** 旧六会话保持停止；执行位置、真实环境及核销证据见[本地接续](local-astra-ut-continuation-20261023.md)。[开发收尾与全部剩余工作](development-closeout-and-remaining-20261023.md)是历史快照，结合后续提交核销，不能重复计为缺口或成果。UI01新增未解决人群、全量SLA及分页/页面已验证，正式TC和剩余V42闭环仍单列。
 
@@ -25,10 +25,10 @@
 
 本次基线为规范仓库`yangyour/zhonganzaixian`的`origin/main f45891ba`。独立DEMO新增资料以最新AGENTS为准，演示样例不计作正式业务完成。原主目录仍有审计页、租户台账页、合成预览的未提交修改，各会话不得覆盖。
 
-当前集成会话使用独立目录`E:\work\wxw9\zhonganzaixian\.parallel\release-20261023`、功能分支`codex/gap-completion-20261023`。只改功能必要内容，沿用已定桌面样式；当前实际部署版本与开发主干分别记录。本轮实施不自动授权真实外发、设备操作、生产启用或重跑演示初始化。
+当前本地会话使用独立目录`E:\work\wxw9\zhonganzaixian\.parallel\local-astra-ut-20261023`、功能分支`codex/local-astra-ut-upstream-batch-20261023`，上游为同名origin分支。只改功能必要内容，沿用已定桌面样式；当前实际部署版本与开发主干分别记录。本轮实施不自动授权真实外发、设备操作、生产启用或重跑演示初始化。
 
 ## dot UI02 / R03 事件来源接线（2026-10-23）
 
 UI02 由 OPEN 更新为 IN_PROGRESS，R03 继续 IN_PROGRESS。当前问题/五级计数、事件首次确认 MTTA、完整人群预算、均值/中位数/P95、首页与游标下钻已接线；见 [实现与剩余边界](event-operational-metrics-20261023.md)。旧 SLA 真实时间来源及有效分母、其余指标、真实 PG/浏览器和正式验收仍未完成；没有把整组核销。
 
-M02新增持久对象映射切片：草稿/发布分离、显式自身标签归属核验、当前资产/复核资格/时效、API与资产详情操作、幂等回执及恢复已接线。V55仅预约/本地候选，未执行；采集器消费、正式派发、更多提供者及真实PG/浏览器验收仍未完成。详见[对象映射说明](monitoring-object-mapping-20261023.md)，不能将此切片记为M02全项VERIFIED。
+M02新增持久对象映射切片：草稿/发布分离、显式自身标签归属核验、当前资产/复核资格/时效、API与资产详情操作、幂等回执及恢复已接线。V54/V55已在指定PG隔离库首次应用并冻结，schema/ACL/非空行锁/首revision通过；采集器消费、正式派发、更多提供者及完整业务PG/浏览器验收仍未完成。详见[对象映射说明](monitoring-object-mapping-20261023.md)和[schema链验证](designated-candidate-schema-chain-20261023.md)，不能将此切片记为M02全项VERIFIED。

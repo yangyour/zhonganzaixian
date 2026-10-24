@@ -36,7 +36,8 @@
         "Formal SLA policy and production performance qualification",
         "Formal contract acceptance"
       ],
-      "integration_note": "Latest origin/main d53697df UI01 full-population pagination supersedes the earlier dot offset projection. Real component evidence belongs to the independent local session; this dot reruns code checks only."
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "integration_note": "Feature 4e034a71 integrated by d53697df; reused by upstream batch, full V42 and formal acceptance remain separate"
     },
     {
       "id": "UI02",
@@ -57,12 +58,15 @@
         "docs/event-noise-trend-20261023.md",
         "docs/evidence/dot-continuation-20261023/ui02-noise-trend.json"
       ],
-      "commits": [],
+      "commits": [
+        "25a17013"
+      ],
       "remaining": [
         "Designated PostgreSQL and browser integration; formal acceptance",
         "Remaining source aggregates, effective denominators, frozen reports and customer-confirmed inputs",
         "Existing SLA workflow timestamps are not yet replaced by event problem/first-ack timestamps; shared math alone is not full source unification"
-      ]
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "UI03",
@@ -89,7 +93,8 @@
       ],
       "commits": [
         "1e4431b5",
-        "7b42969b"
+        "7b42969b",
+        "25a17013"
       ],
       "completed_subitems": [
         "M1-8 current-tenant PROBLEM/NEW exact bell reader and header, permissions/recovery and designated PG/HTTP/browser verification",
@@ -102,7 +107,8 @@
         "Review M1-11 fixed dashboard layout contract",
         "Formal contract acceptance",
         "Real browser revalidation of search landmark fix; formal accessibility acceptance"
-      ]
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "A01",
@@ -120,7 +126,8 @@
       "commits": [
         "08a3a47c",
         "494400cf"
-      ]
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "A02",
@@ -135,7 +142,8 @@
       "status": "OPEN",
       "completion_criterion": "实现申请/审核/开通/失败补偿、预留与释放、配额计量；实际租户/限额配置化，生产物理隔离待Q02。",
       "evidence": [],
-      "commits": []
+      "commits": [],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "A03",
@@ -167,7 +175,8 @@
         "Large role-set pagination/partitioning beyond complete-print technical limit",
         "Review tenant inventory/quota, invitation/MFA and menu badge contract gaps",
         "Contact delivery and remaining A03 contract acceptance"
-      ]
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "A04",
@@ -181,7 +190,8 @@
       "status": "OPEN",
       "completion_criterion": "补定期到期处理、通知意图、退役/迁移及保留/删除状态机和历史可追溯；真实删除默认关闭。",
       "evidence": [],
-      "commits": []
+      "commits": [],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "A05",
@@ -204,12 +214,15 @@
         "docs/asset-ledger-facts-20261023.md"
       ],
       "commits": [
-        "8dc5d412"
+        "8dc5d412",
+        "25a17013",
+        "df92a03d"
       ],
       "completed_subitems": [
         "Recovered reviewed 3b219461 public-facts batch and list/detail consumers on latest main",
         "Return-time membership/account checks, same-snapshot four-core-field drift guard, nanosecond future-time rejection",
-        "56 targeted/profile Java, 4 designated PG, 5265 full Web, 209 root contracts, 5 synthetic Edge and 3-role real API/browser checks passed"
+        "56 targeted/profile Java, 4 designated PG, 5265 full Web, 209 root contracts, 5 synthetic Edge and 3-role real API/browser checks passed",
+        "Reused upstream snake_case serialization and list request routing; same-ID tenant replacement clears stale facts; 51 frontend and 18 controller regressions passed"
       ],
       "remaining_subitems": [
         "100-row designated PG batch and wider historical-corruption cases",
@@ -217,7 +230,8 @@
         "Authoritative business-system/Proxy relationships and actual monitoring inputs",
         "Formal contract acceptance"
       ],
-      "integration_note": "Preserve main 0bcd0e34 A05 improvements and its independently recorded PG/browser evidence; retain dot explicit ISO/snake-case serialization and its regression test. Dot stopped after closeout."
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "integration_note": "Feature 8dc5d412 and evidence 0bcd0e34 preserved by e8362fd6; df92a03d supplements same-ID tenant/wire regressions"
     },
     {
       "id": "M01",
@@ -243,22 +257,30 @@
       "completion_criterion": "实际样本/有效策略→观察确认→t2与事件/工单；复发重新安排必要任务及耐久通知意图，证明缺失不得提前停钟。",
       "evidence": [
         "docs/parallel/monitoring-progress.md",
-        "docs/monitoring-recovery-observation-20261023.md"
+        "docs/monitoring-recovery-observation-20261023.md",
+        "docs/monitoring-recovery-source-proof-v2-20261023.md",
+        "docs/evidence/local-astra-ut-20261023/upstream-batch/m01-postgres.json",
+        "docs/evidence/local-astra-ut-20261023/upstream-batch/java-full.json"
       ],
       "commits": [
         "4a62c0a3",
-        "87016702"
+        "87016702",
+        "25a17013",
+        "d8ba8dff"
       ],
       "completed_subitems": [
         "Restored server-bound recovery observation POST/receipt and event panel",
         "Reproduced receipt numeric-node mismatch; exact wire comparison retains all business checks",
-        "Corrected source t2 versus observation confirmation using customer timeline, preserving raw sample precision"
+        "Corrected source t2 versus observation confirmation using customer timeline, preserving raw sample precision",
+        "Current-cycle full history/summary consistency and source proof v2; original-actor receipt and legacy close guard; exact nanosecond t2 propagated through V33 SLA consumers with no summary fallback",
+        "11 designated PG tests passed with source/receipt atomicity, nonzero hold, rollback and read-only actual-source rejection; positive cases use explicitly synthetic source samples with real PG"
       ],
       "remaining_subitems": [
-        "Designated PG rerun including source/receipt atomicity, nonzero hold and concurrent rollback",
-        "Actual continuous source integration and browser validation",
+        "Actual device failure-to-recovery positive continuous-source integration and real lifecycle browser validation",
+        "Enabled V42 lifecycle source-clock integration; legacy unproved records remain ineligible",
         "Formal contract acceptance"
-      ]
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "M02",
@@ -284,14 +306,20 @@
         "docs/monitoring-simulation-boundary-20261024.md",
         "docs/evidence/dot-continuation-20261023/m02-simulation-boundary.json",
         "docs/mapped-source-capture-20261024.md",
-        "docs/evidence/dot-continuation-20261023/m02-source-capture.json"
+        "docs/evidence/dot-continuation-20261023/m02-source-capture.json",
+        "docs/designated-candidate-schema-chain-20261023.md",
+        "docs/evidence/local-astra-ut-20261023/schema-chain/summary.json"
       ],
-      "commits": [],
+      "commits": [
+        "25a17013",
+        "ce20a715"
+      ],
       "completed_subitems": [
-        "Durable server-plan application, explicit policy approval, disabled registration, cancellation and server one-shot probe journal, real API/page wiring and original-command recovery; V54 candidate NOT_APPLIED",
-        "Persistent pool/HOST-or-ITEM object mapping draft/activation/revocation journal, bound own-host Zabbix metadata verification, current-authority/expiry checks, idempotent acknowledgment-only API and asset-detail actions; V55 candidate NOT_APPLIED, real component validation pending",
+        "Durable server-plan application, explicit policy approval, disabled registration, cancellation and server one-shot probe journal, real API/page wiring and original-command recovery; V54 applied/frozen in designated isolated schema validation",
+        "Persistent pool/HOST-or-ITEM object mapping draft/activation/revocation journal, bound own-host Zabbix metadata verification, current-authority/expiry checks, idempotent acknowledgment-only API and asset-detail actions; V55 applied/frozen in designated isolated schema validation; business integration pending",
         "Public event intake rejects deliberate auto-ticket failure; internal simulation is limited to explicit isolated PostgreSQL and non-protected tenants, with historical customer-tenant fixture fallback removed. No real component run.",
-        "Explicit one-event HOST source capture from current published mapping, bound metadata/event reads, shared raw/quarantine/audit/idempotency transaction and asset-detail original-command recovery; V29/V30 remain UNVERIFIED and never process recovery or dispatch."
+        "Explicit one-event HOST source capture from current published mapping, bound metadata/event reads, shared raw/quarantine/audit/idempotency transaction and asset-detail original-command recovery; V29/V30 remain UNVERIFIED and never process recovery or dispatch.",
+        "V54/V55 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50"
       ],
       "remaining_subitems": [
         "Complete continuous pull/watermarks, source-proof journal and durable raw-to-business consumption; one-event HOST capture now wired but unverified storage is not business authority",
@@ -299,7 +327,8 @@
         "OID/parameter and full 234-catalog consumption",
         "Persistent collector lifecycle and broader providers",
         "Designated PostgreSQL/probe/browser integration and formal acceptance"
-      ]
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "M03",
@@ -313,7 +342,8 @@
       "status": "OPEN",
       "completion_criterion": "补版本/摘要、分批发布/观察/回退、站点与Proxy/资源池生命周期和容量校验；真实外部操作另行受控。",
       "evidence": [],
-      "commits": []
+      "commits": [],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "M04",
@@ -334,7 +364,8 @@
       "status": "OPEN",
       "completion_criterion": "核销已有流转后补正式激活、外部ITSM补偿接口、升级/提醒/关单/重开及工时合同遗漏；外发由通知线接收意图。",
       "evidence": [],
-      "commits": []
+      "commits": [],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "M05",
@@ -349,7 +380,8 @@
       "status": "OPEN",
       "completion_criterion": "补统一快照、正式导出和对账审批/舍入，费用和未确认口径可配置且缺失为空；不自动支付。",
       "evidence": [],
-      "commits": []
+      "commits": [],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "N01",
@@ -369,22 +401,32 @@
         "docs/parallel/notifications-progress.md",
         "docs/notification-routing-continuation-20261023.md",
         "docs/delivery-journal-read-recovery-20261024.md",
-        "docs/evidence/dot-continuation-20261023/n01-journal-read.json"
+        "docs/evidence/dot-continuation-20261023/n01-journal-read.json",
+        "docs/designated-candidate-schema-chain-20261023.md",
+        "docs/evidence/local-astra-ut-20261023/schema-chain/summary.json",
+        "docs/notification-routing-return-scope-20261023.md",
+        "docs/evidence/local-astra-ut-20261023/upstream-batch/return-guards.json"
       ],
       "commits": [
         "f69fa0dd",
-        "64d02b08"
+        "64d02b08",
+        "25a17013",
+        "ce20a715",
+        "b4b739cb"
       ],
       "remaining_subitems": [
         "Complete actual dispatch, authenticated receipts, controlled retry and dead-letter API/UI",
         "Formal contract acceptance",
-        "Designated V51 component/browser verification blocked by private configuration",
-        "Supplier dispatch/verified receipts/dead-letter manual workflow and remaining portal wiring"
+        "Supplier dispatch/verified receipts/dead-letter manual workflow and remaining portal wiring",
+        "Retained V51 database business/worker and real browser verification; previous private/network blockage resolved, schema-only success does not verify business"
       ],
       "completed_subitems": [
         "Restored immutable V51 routing/preference controls and actual API/page/explicit worker wiring, keeping external dispatch disabled",
-        "Explicit-scope V50 local delivery journal listing, full-chain verification, immutable history and original-command read-only recovery, actual API/notification workspace and context revocation tests; delivered declarations remain unverified and no resend is authorized."
-      ]
+        "Explicit-scope V50 local delivery journal listing, full-chain verification, immutable history and original-command read-only recovery, actual API/notification workspace and context revocation tests; delivered declarations remain unverified and no resend is authorized.",
+        "V51 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50",
+        "Six routing GET paths recheck current account/session/membership before releasing results; 54 targeted authorization tests passed"
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "N02",
@@ -403,17 +445,24 @@
       "status": "IN_PROGRESS",
       "completion_criterion": "先核对已有门户/扫码/偏好/工单入口，补桌面可实现的链路；报告入口接报告线，移动专项按后续安排，不外发真实消息。",
       "evidence": [
-        "docs/notification-routing-continuation-20261023.md"
+        "docs/notification-routing-continuation-20261023.md",
+        "docs/designated-candidate-schema-chain-20261023.md",
+        "docs/evidence/local-astra-ut-20261023/schema-chain/summary.json"
       ],
-      "commits": [],
+      "commits": [
+        "25a17013",
+        "ce20a715"
+      ],
       "completed_subitems": [
-        "Restored immutable V51 routing/preference controls and actual API/page/explicit worker wiring, keeping external dispatch disabled"
+        "Restored immutable V51 routing/preference controls and actual API/page/explicit worker wiring, keeping external dispatch disabled",
+        "V51 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50"
       ],
       "remaining_subitems": [
-        "Designated V51 component/browser verification blocked by private configuration",
         "Supplier dispatch/verified receipts/dead-letter manual workflow and remaining portal wiring",
-        "Formal contract acceptance"
-      ]
+        "Formal contract acceptance",
+        "Retained V51 database business/worker and real browser verification; previous private/network blockage resolved, schema-only success does not verify business"
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "B01",
@@ -433,7 +482,8 @@
         "docs/evidence/backup-version-content-20261023/validation.json",
         "docs/backup-worker-runtime-guard-20261023.md",
         "docs/backup-reconciliation-only-20261023.md",
-        "docs/evidence/dot-continuation-20261023/b01-reconciliation-only.json"
+        "docs/evidence/dot-continuation-20261023/b01-reconciliation-only.json",
+        "docs/backup-version-content-20261023.md"
       ],
       "commits": [
         "735be359",
@@ -444,13 +494,16 @@
       ],
       "completed_subitems": [
         "Independent version-inventory grant provider and explicit configuration wiring",
-        "Backup postprocessing entry now uses the shared restricted runtime datasource/privilege guard before dependency and scheduler work; targeted configuration/wiring tests only"
+        "Backup postprocessing entry now uses the shared restricted runtime datasource/privilege guard before dependency and scheduler work; targeted configuration/wiring tests only",
+        "Protected envelope/plaintext download and redacted diff API/asset-detail panel implemented with independent grants and audits; existing Java/frontend/contracts and synthetic desktop evidence reused",
+        "Explicit no-upload reconciliation-only worker mode for existing uncertain dispatches; no object PUT, version registration or restore authorization"
       ],
       "remaining_subitems": [
-        "Worker lifecycle and postprocessing integration",
-        "Protected download/decryption and diff",
-        "Complete nonempty real workflow verification"
-      ]
+        "Real worker lifecycle/postprocessing with approved source proof and KMS configuration",
+        "Nonempty real version-to-OSS/KMS/download/diff/browser workflow verification; existing implementation is reused",
+        "Formal contract acceptance"
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "B02",
@@ -468,12 +521,18 @@
         "docs/backup-run-history-20261023.md",
         "docs/evidence/dot-continuation-20261023/b02-run-history.json"
       ],
-      "commits": [],
+      "commits": [
+        "25a17013"
+      ],
       "remaining": [
         "Q22 published failure/reset semantics, durable deduplicated ticket intent and real consumer",
         "Restore request/approval/manual outcome, drill records and attachment authorization",
         "Retention cleanup and version diff/change-notice linkage",
         "Designated component/browser integration and formal acceptance"
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "completed_subitems": [
+        "Independent RUN_HISTORY authorization, same-snapshot latest-run count/cursor reader and asset-detail failure facts panel; known failed attempts and final run failures remain distinct, Q22 counter and automatic ticket remain unconfigured"
       ]
     },
     {
@@ -494,7 +553,8 @@
       "commits": [
         "cbc6d874",
         "d86a913f"
-      ]
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "R02",
@@ -512,18 +572,25 @@
       "completion_criterion": "补模板、审核发布、报告中心/阅读记录和交付意图；评分/重生成/品牌未决值配置化，年度二期条件单列。",
       "evidence": [
         "docs/report-publication-continuation-20261023.md",
-        "docs/evidence/dot-continuation-20261023/r02.json"
+        "docs/evidence/dot-continuation-20261023/r02.json",
+        "docs/designated-candidate-schema-chain-20261023.md",
+        "docs/evidence/local-astra-ut-20261023/schema-chain/summary.json"
       ],
-      "commits": [],
+      "commits": [
+        "25a17013",
+        "ce20a715"
+      ],
       "completed_subitems": [
-        "Quarterly frozen-source publication repository, V53 NOT_APPLIED candidate, exact XHTML/PDF renderer, authenticated API/report center, durable command recovery and read receipts; no outbound dispatch"
+        "Quarterly frozen-source publication repository, V53 applied/frozen in designated isolated schema validation, exact XHTML/PDF renderer, authenticated API/report center, durable command recovery and read receipts; no outbound dispatch",
+        "V53 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50"
       ],
       "remaining_subitems": [
         "Monthly boss/full, health-check and annual source/template adapters",
         "Revision generation, reader dashboard and unread followup integration",
         "Source verification, customer approval policy/template gates",
-        "Designated PostgreSQL/fonts/browser integration and formal acceptance"
-      ]
+        "Retained V53 real business transactions, actual font/rendering and browser integration; formal acceptance"
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "R03",
@@ -552,13 +619,15 @@
       ],
       "commits": [
         "d58ea011",
-        "b5b9d765"
+        "b5b9d765",
+        "25a17013"
       ],
       "remaining": [
         "Designated PostgreSQL and browser integration; formal acceptance",
         "Remaining source aggregates, effective denominators, frozen reports and customer-confirmed inputs",
         "Existing SLA workflow timestamps are not yet replaced by event problem/first-ack timestamps; shared math alone is not full source unification"
-      ]
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "P01",
@@ -575,20 +644,28 @@
         "docs/read-return-account-revision-20261023.md",
         "docs/evidence/dot-continuation-20261023/p01-account-read-return.json",
         "docs/json-read-account-guard-20261024.md",
-        "docs/evidence/dot-continuation-20261023/p01-json-read-guard.json"
+        "docs/evidence/dot-continuation-20261023/p01-json-read-guard.json",
+        "docs/production-readiness-evidence-matrix-20261023.md",
+        "docs/evidence/local-astra-ut-20261023/upstream-batch/p01-http.json",
+        "docs/evidence/local-astra-ut-20261023/upstream-batch/p01-live-browser.json"
       ],
       "commits": [
-        "7e05923d"
+        "7e05923d",
+        "25a17013",
+        "71bc7a95"
       ],
       "completed_subitems": [
         "Restored live-database read-only diagnostic API and compact operator panel, with post-read authorization and explicit non-production gates",
-        "Shared successful standard-JSON GET/HEAD account revision/session/forced-password return guard, sanitized denial and success-header removal; tenant/object and stream authorization remain separate."
+        "Shared successful standard-JSON GET/HEAD account revision/session/forced-password return guard, sanitized denial and success-header removal; tenant/object and stream authorization remain separate.",
+        "Strict observed/unobserved check ID/status/code matrix and JSON contract; 45 frontend and 2 contract tests",
+        "Designated PG17.9/V50 real HTTP returns 9 observed checks to padmin and denies msp/tadmin; real Edge desktop diagnostics verified with production_ready=false"
       ],
       "remaining_subitems": [
-        "Actual designated configuration/TLS/browser verification",
+        "Public TLS and actual production configuration verification",
         "Production approval and Q02 isolation decision",
         "Formal contract acceptance"
-      ]
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "P02",
@@ -604,20 +681,30 @@
       "evidence": [
         "docs/parallel/production-progress.md",
         "docs/attachment-security-continuation-20261023.md",
-        "docs/evidence/dot-continuation-20261023/p02.json"
+        "docs/evidence/dot-continuation-20261023/p02.json",
+        "docs/designated-candidate-schema-chain-20261023.md",
+        "docs/evidence/local-astra-ut-20261023/schema-chain/summary.json",
+        "docs/file-content-return-scope-20261023.md",
+        "docs/evidence/local-astra-ut-20261023/upstream-batch/return-guards.json"
       ],
       "commits": [
         "3fcf9323",
-        "bd9c86bb"
+        "bd9c86bb",
+        "25a17013",
+        "ce20a715",
+        "a0dc70af"
       ],
       "completed_subitems": [
-        "Attachment quarantine repository/API/download revalidation and actual photo panel with durable unknown-command recovery; explicit scan-once worker; V52 candidate NOT_APPLIED"
+        "Attachment quarantine repository/API/download revalidation and actual photo panel with durable unknown-command recovery; explicit scan-once worker; V52 applied/frozen in designated isolated schema validation",
+        "V52 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50",
+        "Binary content rechecks account/session/member after digest/release validation and before success audit/bytes; 26 targeted security tests passed"
       ],
       "remaining_subitems": [
-        "Designated PostgreSQL V52/MinIO/ClamD integration and real browser verification",
+        "Retained V52 business transactions, MinIO/actual ClamD integration and real browser verification; schema validation already passed",
         "Credential rotation/KMS and audit retention lifecycle wiring",
         "Customer configuration and formal acceptance"
-      ]
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "P03",
@@ -633,7 +720,8 @@
       ],
       "commits": [
         "c2b8f0d7"
-      ]
+      ],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "G01",
@@ -654,7 +742,8 @@
       "status": "CUSTOMER_GATED",
       "completion_criterion": "Q01未确认前仅设计/接口模拟/验证方案，不进入正式排期或真实建连。",
       "evidence": [],
-      "commits": []
+      "commits": [],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
     {
       "id": "G02",
@@ -667,7 +756,8 @@
       "status": "DEFERRED_MOBILE",
       "completion_criterion": "按最新用户要求先做桌面Web；手机触控、窄屏及移动专属验收单列，不冒充已完成。",
       "evidence": [],
-      "commits": []
+      "commits": [],
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     }
   ],
   "requirements": [
@@ -2087,9 +2177,9 @@
       "formal_acceptance": "NOT_RUN"
     }
   ],
-  "execution_status": "STOPPED_BY_USER",
+  "execution_status": "LOCAL_SINGLE_SESSION_ACTIVE",
   "closeout_document": "docs/development-closeout-and-remaining-20261023.md",
-  "status_note": "The current dot resumed under explicit user authorization on 2026-10-23; prior six local sessions remain stopped. Implementation/validation/customer gates/formal acceptance remain distinct; local pending-upload work is not automatically in main.",
+  "status_note": "Current authorized local chat continues from latest main; upstream dot and original six chats remain stopped. Each implementation, code test, designated component validation, customer gate and formal acceptance is recorded separately.",
   "preserved_unverified_work": [
     {
       "owner": "assets",
@@ -2101,7 +2191,9 @@
       "remote_branch": "wip/20261023-assets-a05",
       "remote_commit": "3b219461665781b2a492d8f82a96d495701d768d",
       "original_base": "a8ec4523f26da6b98c0a133f45285b7b7b0373dc",
-      "state": "WIP_NOT_RELEASE_READY"
+      "state": "HISTORICAL_WIP_RECONCILED_WITH_MAIN",
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "release_readiness": "See current gap-specific evidence and remaining gates; old WIP is not a release baseline"
     },
     {
       "owner": "monitoring",
@@ -2113,7 +2205,9 @@
       "remote_branch": "wip/20261023-monitoring-m01",
       "remote_commit": "1b7211190039af081ce87a19ab8adca3c9be5280",
       "original_base": "8701670229d24338f143d009672ac71a1bc370d1",
-      "state": "WIP_NOT_RELEASE_READY"
+      "state": "HISTORICAL_WIP_RECONCILED_WITH_MAIN",
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "release_readiness": "See current gap-specific evidence and remaining gates; old WIP is not a release baseline"
     },
     {
       "owner": "notifications",
@@ -2126,7 +2220,9 @@
       "remote_branch": "wip/20261023-notifications-n01-n02",
       "remote_commit": "e7fa879aa52004d311d29367efa878ec6875c459",
       "original_base": "b122896b84fc18fc09a3410f66e08676b22cbbd9",
-      "state": "WIP_NOT_RELEASE_READY"
+      "state": "HISTORICAL_WIP_RECONCILED_WITH_MAIN",
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "release_readiness": "See current gap-specific evidence and remaining gates; old WIP is not a release baseline"
     },
     {
       "owner": "reports",
@@ -2138,7 +2234,9 @@
       "remote_branch": "wip/20261023-reports-r02",
       "remote_commit": "ad7a2fc3ee0fa899b73fe03217049fc7264b29d6",
       "original_base": "b5b9d7653c8aae6382d59bf85276c7777734eec3",
-      "state": "WIP_NOT_RELEASE_READY"
+      "state": "HISTORICAL_WIP_RECONCILED_WITH_MAIN",
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "release_readiness": "See current gap-specific evidence and remaining gates; old WIP is not a release baseline"
     },
     {
       "owner": "production",
@@ -2150,7 +2248,9 @@
       "remote_branch": "wip/20261023-production-p01",
       "remote_commit": "db3d58ca93bdacea1ed7b93c703c9718fff641e8",
       "original_base": "b122896b84fc18fc09a3410f66e08676b22cbbd9",
-      "state": "WIP_NOT_RELEASE_READY"
+      "state": "HISTORICAL_WIP_RECONCILED_WITH_MAIN",
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "release_readiness": "See current gap-specific evidence and remaining gates; old WIP is not a release baseline"
     },
     {
       "owner": "production",
@@ -2162,7 +2262,9 @@
       "remote_branch": "wip/20261023-production-p02",
       "remote_commit": "678a5a16be0cb784662b5abf62225a597e0c61b3",
       "original_base": "b122896b84fc18fc09a3410f66e08676b22cbbd9",
-      "state": "WIP_NOT_RELEASE_READY"
+      "state": "HISTORICAL_WIP_RECONCILED_WITH_MAIN",
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "release_readiness": "See current gap-specific evidence and remaining gates; old WIP is not a release baseline"
     }
   ],
   "closeout_code_commit": "37337032eeef9a55d0350e9206447a4eb7913874",
@@ -2171,8 +2273,27 @@
     "repository": "https://github.com/yangyour/zhonganzaixian.git",
     "resume_base": "latest origin/main",
     "wip_export_manifest": "docs/evidence/cloud-wip-handoff-20261023.json",
-    "local_development": "STOPPED",
-    "cloud_session": "CURRENT_DOT_IN_PROGRESS"
+    "local_development": "ACTIVE_CURRENT_AUTHORIZED_CHAT",
+    "cloud_session": "STOPPED_UPSTREAM_DOT",
+    "status": "HISTORICAL_HANDOFF_SUPERSEDED_BY_LOCAL_CONTINUATION"
   },
-  "execution_note": "2026-10-24 01:40 UTC user requested finishing the current batch, committing and pushing, then stopping. Task statuses describe implementation gaps, not continuing execution."
+  "execution_note": "Upstream batch 25a17013 is on main through e8362fd6. Current main includes reviewed local fixes and separate designated-component evidence; no deployment or formal acceptance is implied. Do not restore old WIP over current main.",
+  "upstream_batch_review": {
+    "commit": "25a17013",
+    "main_before_review": "0bcd0e34",
+    "merged_by": "e8362fd6",
+    "reviewed_main": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+    "status": "SOURCE_RECONCILED_INCREMENTAL_VALIDATION_ACTIVE",
+    "remote_check_evidence": "docs/evidence/local-astra-ut-20261023/remote-dedup-check-latest.json",
+    "resolved_review_items": {
+      "N01 routing return scope": "b4b739cb",
+      "P02 binary return scope": "a0dc70af",
+      "V52-V55 schema/ACL first application freeze": "ce20a715",
+      "M01 current-cycle source proof and exact t2": "d8ba8dff",
+      "P01 diagnostic matrix": "71bc7a95",
+      "A05 same-ID tenant and wire regression": "df92a03d"
+    },
+    "remaining": "See each task; retained N01/R02 business checks in preparation are not marked passed"
+  },
+  "reviewed_main_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
 }

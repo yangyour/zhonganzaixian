@@ -1,0 +1,91 @@
+{
+  "checked_at": "2026-10-24T03:57:17.105278+00:00",
+  "repository": "https://github.com/yangyour/zhonganzaixian.git",
+  "worktree": "E:\\work\\wxw9\\zhonganzaixian\\.parallel\\local-astra-ut-20261023",
+  "branch": "codex/local-astra-ut-upstream-batch-20261023",
+  "upstream": "origin/codex/local-astra-ut-upstream-batch-20261023",
+  "remote_refs_checked": 63,
+  "main": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+  "head": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+  "main_head_left_right_count": "0\t0",
+  "upstream_batch": "25a170138d3c8b31f5c4a7d0a42209859524033b",
+  "upstream_batch_merge": "e8362fd6a6285d7294007e13daa1ed5a25913c91",
+  "upstream_batch_is_ancestor_of_main": true,
+  "known_function_fixes_on_main": [
+    "b4b739cb",
+    "a0dc70af",
+    "ce20a715",
+    "d8ba8dff",
+    "71bc7a95",
+    "df92a03d"
+  ],
+  "wip_reconciliation": [
+    {
+      "gap_id": "A05",
+      "historical_wip_ref": "origin/wip/20261023-assets-a05",
+      "historical_wip_tip": "3b219461665781b2a492d8f82a96d495701d768d",
+      "wip_tip_ancestor_of_main": false,
+      "representative_path": "server/api/src/main/java/cn/mop/api/AssetLedgerFactsController.java",
+      "representative_path_present_on_main": true,
+      "reuse_baseline": "origin/main",
+      "interpretation": "Old WIP ancestry is not proof of missing implementation; upstream batch and reviewed fixes are already integrated."
+    },
+    {
+      "gap_id": "M01",
+      "historical_wip_ref": "origin/wip/20261023-monitoring-m01",
+      "historical_wip_tip": "1b7211190039af081ce87a19ab8adca3c9be5280",
+      "wip_tip_ancestor_of_main": false,
+      "representative_path": "server/api/src/main/java/cn/mop/api/MonitoringRecoveryController.java",
+      "representative_path_present_on_main": true,
+      "reuse_baseline": "origin/main",
+      "interpretation": "Old WIP ancestry is not proof of missing implementation; upstream batch and reviewed fixes are already integrated."
+    },
+    {
+      "gap_id": "N01/N02",
+      "historical_wip_ref": "origin/wip/20261023-notifications-n01-n02",
+      "historical_wip_tip": "e7fa879aa52004d311d29367efa878ec6875c459",
+      "wip_tip_ancestor_of_main": false,
+      "representative_path": "server/api/src/main/java/cn/mop/api/NotificationRoutingController.java",
+      "representative_path_present_on_main": true,
+      "reuse_baseline": "origin/main",
+      "interpretation": "Old WIP ancestry is not proof of missing implementation; upstream batch and reviewed fixes are already integrated."
+    },
+    {
+      "gap_id": "P01",
+      "historical_wip_ref": "origin/wip/20261023-production-p01",
+      "historical_wip_tip": "db3d58ca93bdacea1ed7b93c703c9718fff641e8",
+      "wip_tip_ancestor_of_main": false,
+      "representative_path": "server/api/src/main/java/cn/mop/api/ProductionReadinessController.java",
+      "representative_path_present_on_main": true,
+      "reuse_baseline": "origin/main",
+      "interpretation": "Old WIP ancestry is not proof of missing implementation; upstream batch and reviewed fixes are already integrated."
+    },
+    {
+      "gap_id": "P02",
+      "historical_wip_ref": "origin/wip/20261023-production-p02",
+      "historical_wip_tip": "678a5a16be0cb784662b5abf62225a597e0c61b3",
+      "wip_tip_ancestor_of_main": false,
+      "representative_path": "server/api/src/main/java/cn/mop/api/AttachmentSecurityController.java",
+      "representative_path_present_on_main": true,
+      "reuse_baseline": "origin/main",
+      "interpretation": "Old WIP ancestry is not proof of missing implementation; upstream batch and reviewed fixes are already integrated."
+    },
+    {
+      "gap_id": "R02",
+      "historical_wip_ref": "origin/wip/20261023-reports-r02",
+      "historical_wip_tip": "ad7a2fc3ee0fa899b73fe03217049fc7264b29d6",
+      "wip_tip_ancestor_of_main": false,
+      "representative_path": "server/domain/src/main/java/cn/mop/domain/reporting/ReportPublication.java",
+      "representative_path_present_on_main": true,
+      "reuse_baseline": "origin/main",
+      "interpretation": "Old WIP ancestry is not proof of missing implementation; upstream batch and reviewed fixes are already integrated."
+    }
+  ],
+  "original_workspace_changes_preserved": [
+    "apps/web/qa/synthetic-routes.ts",
+    "apps/web/src/pages/AuditPage.vue",
+    "apps/web/src/pages/TenantInventoryPage.vue"
+  ],
+  "scope": "Git source deduplication and verified feature integration only; no deployment or formal acceptance",
+  "main_integration": "Normal fast-forward under exclusive integration lock; no force push; exact committed range only"
+}

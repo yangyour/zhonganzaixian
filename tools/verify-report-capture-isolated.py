@@ -142,6 +142,8 @@ def run(output: Path, suite: str):
             env['MOP_RUN_SLA_AVAILABILITY_AGGREGATE_PG_TESTS'] = 'true'
         if suite == 'delivery-attention':
             env['MOP_RUN_DELIVERY_ATTENTION_PG_TESTS'] = 'true'
+        if suite == 'notification-cancellation':
+            env['MOP_RUN_NOTIFICATION_CANCELLATION_PG_TESTS'] = 'true'
         if suite == 'dashboard-sla':
             env['MOP_RUN_DASHBOARD_SLA_PG_TESTS'] = 'true'
         if suite == 'dashboard-actionable':
@@ -157,7 +159,8 @@ def run(output: Path, suite: str):
                          'dashboard-actionable': 'PostgresDashboardActionableTicketsIntegrationTest',
                          'asset-ledger-facts': 'PostgresAssetLedgerFactsIsolatedIntegrationTest',
                          'sla-availability-aggregate': 'PostgresSlaAvailabilityAggregateIntegrationTest',
-                         'delivery-attention': 'PostgresDeliveryAttentionIntegrationTest'}[suite]
+                         'delivery-attention': 'PostgresDeliveryAttentionIntegrationTest',
+                         'notification-cancellation': 'PostgresNotificationCancellationIntegrationTest'}[suite]
         java_started_ns = time.time_ns()
         with (output / 'maven.log').open('w', encoding='utf-8') as log:
             result = subprocess.run(['mvn.cmd', '-pl', 'server/persistence', '-am',
@@ -165,13 +168,13 @@ def run(output: Path, suite: str):
                                      '-Dsurefire.failIfNoSpecifiedTests=false', 'test'], cwd=ROOT, env=env,
                                     stdout=log, stderr=subprocess.STDOUT, timeout=600)
         summary['maven_exit_code'] = result.returncode
-        if suite in ('sla-availability-aggregate', 'delivery-attention'):
+        if suite in ('sla-availability-aggregate', 'delivery-attention', 'notification-cancellation'):
             reports = list((ROOT / 'server/persistence/target/surefire-reports').glob('TEST-*' + selected_test + '.xml'))
             if len(reports) != 1 or reports[0].stat().st_mtime_ns < java_started_ns - 2_000_000_000:
                 raise ValueError('Fresh selected integration report missing')
             junit = ET.parse(reports[0]).getroot()
             summary['junit'] = {key: int(junit.get(key, '0')) for key in ('tests','failures','errors','skipped')}
-            if summary['junit'] != {'tests':3,'failures':0,'errors':0,'skipped':0}:
+            if summary['junit'] != {'tests':8 if suite == 'notification-cancellation' else 3,'failures':0,'errors':0,'skipped':0}:
                 raise ValueError('Selected integration scenarios did not all execute')
         after = protected_fingerprints(admin)
         summary['actual_tenant_fingerprints_unchanged'] = before == after
@@ -218,6 +221,6 @@ def run(output: Path, suite: str):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', required=True, type=Path)
-    parser.add_argument('--suite', choices=('report', 'dashboard', 'dashboard-sla', 'dashboard-actionable', 'asset-ledger-facts', 'sla-availability-aggregate', 'delivery-attention'), default='report')
+    parser.add_argument('--suite', choices=('report', 'dashboard', 'dashboard-sla', 'dashboard-actionable', 'asset-ledger-facts', 'sla-availability-aggregate', 'delivery-attention', 'notification-cancellation'), default='report')
     args = parser.parse_args()
     raise SystemExit(run(args.output.resolve(), args.suite))

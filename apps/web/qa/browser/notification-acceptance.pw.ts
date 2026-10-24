@@ -1,0 +1,8 @@
+import {test,expect} from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
+import {acceptanceSample} from '../../tests/notificationAcceptance.fixture'
+import {acceptanceCounts} from '../../src/utils/notificationAcceptance'
+for(const width of [1024,1440])test(`notification acceptance does not claim delivery and supports complete paging at ${width}`,async({page})=>{
+ const data=acceptanceSample();data.items=Array.from({length:45},(_,i)=>({...data.items[0]!,id:`30000000-0000-4000-8000-${String(i).padStart(12,'0')}`}));data.counts=acceptanceCounts(data.items);data.by_channel.EMAIL=data.counts;
+ await page.route('**/api/v1/dashboard/notification-acceptance',route=>{expect(route.request().method()).toBe('GET');return route.fulfill({json:{data,trace_id:'SYNTHETIC'}})});await page.setViewportSize({width,height:1000});await page.goto('/qa/notification-acceptance.fixture.html');await expect(page.locator('tbody tr')).toHaveCount(20);await expect(page.locator('main')).toContainText('供应商受理 45');await expect(page.locator('main')).toContainText('受理不等于送达');await page.getByRole('button',{name:'下一页'}).click();await page.getByRole('button',{name:'下一页'}).click();await expect(page.locator('tbody tr')).toHaveCount(5);await page.getByLabel('渠道',{exact:true}).selectOption('WECHAT_WORK');await expect(page.getByRole('navigation')).toContainText('第 1 / 1 页');await expect(page.locator('tbody')).toContainText('当前筛选没有业务通知记录');expect((await new AxeBuilder({page}).include('main').withTags(['wcag2a','wcag2aa']).analyze()).violations).toEqual([]);await page.getByRole('button',{name:'模拟撤权'}).click();await expect(page.locator('table')).toHaveCount(0)
+})

@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import {acceptanceSample} from './notificationAcceptance.fixture'
 import {reachabilitySample} from './assetReachability.fixture'
 // Contract layout and authorization regression; synthetic data, not live acceptance.
 import { beforeEach, afterEach, it, expect, vi } from 'vitest'
@@ -31,7 +32,7 @@ it('renders the six contract KPIs and fixed panel order without invented values'
   await settle()
   expect(host.querySelectorAll('[data-kpi]')).toHaveLength(6)
   expect([...host.querySelectorAll('[data-block]')].map(node => node.getAttribute('data-block'))).toEqual(order)
-  expect([...host.querySelectorAll('[data-kpi] strong')].map(node=>node.textContent)).toEqual(['未知','0','无权限','未知','—','未知'])
+  expect([...host.querySelectorAll('[data-kpi] strong')].map(node=>node.textContent)).toEqual(['未知','0','无权限','未知','—','无权限'])
   expect(host.textContent).not.toContain('100%')
   expect(host.querySelector('[data-mode="ranking"]')).not.toBeNull()
 })
@@ -64,7 +65,7 @@ it('links each permitted KPI to its contract list page and omits unauthorized ta
   app = createApp({ template: '<router-view />' }); app.use(router); app.mount(host); await settle()
   const links = Object.fromEntries([...host.querySelectorAll('[data-kpi]')].map(card => [card.getAttribute('data-kpi'), card.querySelector('a')?.getAttribute('href') ?? null]))
   expect(links).toEqual({ ASSET_ONLINE_RATE: null, CURRENT_PROBLEMS: '/event-metrics?window=HOURS_24&view=CURRENT_PROBLEMS', MONTH_SERVICE_AVAILABILITY: null, PENDING_TICKETS: '/dashboard/actionable-tickets', MTTA_24H: '/event-metrics?window=HOURS_24&view=RECENT_PROBLEMS', DELIVERY_RATE_24H: '/ticket-notifications' })
-  expect([...host.querySelectorAll('[data-kpi] strong')].map(node=>node.textContent)).toEqual(['未知','0','无权限','未知','—','未知'])
+  expect([...host.querySelectorAll('[data-kpi] strong')].map(node=>node.textContent)).toEqual(['未知','0','无权限','未知','—','无权限'])
 })
 it('keeps KPI drill-down links behind the same route gates as the menu', async () => {
   await settle()
@@ -135,4 +136,11 @@ it('asset card and detail share full counts and expire locally when refresh is d
  const input=host.querySelector('input')!;input.checked=false;input.dispatchEvent(new Event('change'));await settle();now=60000;vi.advanceTimersByTime(1000);await settle();
  expect(host.querySelector('[data-kpi="ASSET_ONLINE_RATE"] strong')?.textContent).toBe('未知');expect(host.querySelector('[aria-labelledby="asset-reachability-title"]')?.textContent).toContain('未知 1');
  session.value={...auth,capabilities:['dashboard:read']};await settle();expect(host.querySelector('[aria-labelledby="asset-reachability-title"]')).toBeNull();
+})
+
+it('shows provider accepted count without inventing delivered rate and clears it on revocation',async()=>{
+ await settle();const data={...acceptanceSample(),tenant_id:scope.tenantId,actor_id:scope.actorId,permission_version:scope.permissionVersion};
+ vi.mocked(api.request).mockImplementation(async path=>path==='/dashboard/notification-acceptance'?data:response(path));session.value={...auth,capabilities:[...auth.capabilities,'ticket_notes:read_internal']};await settle();
+ const card=host.querySelector('[data-kpi="DELIVERY_RATE_24H"]')!;expect(card.querySelector('strong')!.textContent).toBe('未知');expect(card.textContent).toContain('受理 1');expect(card.textContent).toContain('送达 未知');[...card.querySelectorAll('button')].find(b=>b.textContent==='通知受理明细')!.click();await settle();expect(host.querySelector('[aria-labelledby="notification-acceptance-title"]')?.textContent).toContain('受理不等于送达');
+ session.value={...auth};await settle();expect(host.querySelector('[aria-labelledby="notification-acceptance-title"]')).toBeNull();expect(host.querySelector('[data-kpi="DELIVERY_RATE_24H"]')?.textContent).not.toContain('受理 1');
 })

@@ -1,3 +1,4 @@
+import {addNotificationAcceptanceContract} from './notification-acceptance-contract.mjs';
 import {addAssetReachabilityContract} from './asset-reachability-contract.mjs';
 import {addServiceObservationsContract} from './service-observations-contract.mjs';
 import {addDeliveryDeadLetterContract} from './delivery-dead-letter-contract.mjs';
@@ -1029,6 +1030,7 @@ addBackupRunHistoryContract(contract);
 addEventNoiseTrendContract(contract);
 addServiceObservationsContract(contract);
 addAssetReachabilityContract(contract);
+addNotificationAcceptanceContract(contract);
 const serialized = JSON.stringify(contract) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

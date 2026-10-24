@@ -63,7 +63,9 @@
         "docs/dashboard-month-service-kpi-20261024.md",
         "docs/evidence/dashboard-month-service-kpi-20261024/validation.json",
         "docs/dashboard-asset-reachability-20261024.md",
-        "docs/evidence/dashboard-asset-reachability-20261024/validation.json"
+        "docs/evidence/dashboard-asset-reachability-20261024/validation.json",
+        "docs/dashboard-notification-acceptance-20261024.md",
+        "docs/evidence/dashboard-notification-acceptance-20261024/validation.json"
       ],
       "commits": [
         "25a17013"
@@ -78,7 +80,8 @@
         "b964701b 已统一事件t0、首次确认t1及可信精确t2；真实指定PG与月度冻结回读已验证。剩余健康覆盖、有效分母及对账另验。",
         "首页服务健康与故障时间线接入显式映射的只读PG投影、可信t2/批准维护、取消及撤权清空；未知不伪造健康。代码测试和真实联调分别记录。",
         "本月服务可用率KPI复用同一授权服务快照和精确有效毫秒加权；任一服务覆盖不足返回未知，同页服务明细下钻，客户端复核汇总。",
-        "资产在线卡片读取完整授权台账和显式ICMP绑定，未知独立计数，60秒过期；同快照明细/筛选/分页，供应商读取期间台账及授权变更拒绝返回。"
+        "资产在线卡片读取完整授权台账和显式ICMP绑定，未知独立计数，60秒过期；同快照明细/筛选/分页，供应商读取期间台账及授权变更拒绝返回。",
+        "近24小时创建的邮件/企微业务通知完整受理投影、首页受理数和筛选分页；实际送达仍缺验真来源，V50声明不计为送达，不标全链完成。"
       ]
     },
     {

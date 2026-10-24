@@ -15,6 +15,10 @@ import org.springframework.core.env.Environment;
 @Configuration
 @Profile("remote_test")
 public class ServiceObservationConfiguration {
+    @Bean cn.mop.domain.dashboard.NotificationAcceptance.Reader notificationAcceptanceReader(DataSource source,PlatformRepository repository){
+        if(!(repository instanceof PostgresPlatformRepository platform))throw new IllegalStateException("Notification acceptance requires designated PostgreSQL");
+        return new PostgresNotificationAcceptanceReader(source,platform);
+    }
     @Bean cn.mop.domain.dashboard.AssetReachability.Reader assetReachabilityReader(DataSource source,PlatformRepository repository){
         if(!(repository instanceof PostgresPlatformRepository platform))throw new IllegalStateException("Asset reachability requires designated PostgreSQL");
         return new PostgresAssetReachabilityReader(source,platform);

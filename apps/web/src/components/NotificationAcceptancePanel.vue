@@ -1,0 +1,13 @@
+<script setup lang="ts">
+import {computed,ref,watch} from 'vue'
+import type {AcceptanceState} from '../utils/notificationAcceptance'
+import {displayTime} from '../utils/display'
+import ApiErrorNotice from './ApiErrorNotice.vue'
+const props=defineProps<{state:AcceptanceState;expired:boolean}>();defineEmits<{refresh:[];cancel:[];close:[]}>()
+const page=ref(1),channel=ref('ALL'),status=ref('ALL')
+const rows=computed(()=>props.state.current?.items.filter(row=>(channel.value==='ALL'||row.channel===channel.value)&&(status.value==='ALL'||row.status===status.value))??[])
+const pages=computed(()=>Math.max(1,Math.ceil(rows.value.length/20)))
+watch([channel,status,()=>props.state.current],()=>page.value=1)
+const labels={QUEUED:'排队中',PROCESSING:'处理中',ACCEPTED:'供应商受理',FAILED:'失败',UNKNOWN:'结果未知',CANCELLED:'已取消'}
+</script>
+<template><section class="panel" aria-labelledby="notification-acceptance-title"><div class="actions"><h2 id="notification-acceptance-title">通知受理明细</h2><button :disabled="state.busy" @click="$emit('refresh')">重新读取</button><button v-if="state.busy" @click="$emit('cancel')">停止等待</button><button @click="$emit('close')">关闭明细</button></div><ApiErrorNotice :error="state.error"/><p v-if="state.busy" role="status">正在读取完整通知范围…</p><p v-else-if="state.cancelled" role="status">已停止等待，可重新读取。</p><template v-else-if="state.current"><p v-if="expired" role="status">快照已超过5分钟，请重新读取；以下保留历史快照，不表示当前结果。</p><p>业务通知创建时间：{{displayTime(state.current.window_start)}} 至 {{displayTime(state.current.observed_at)}}。测试消息不纳入。</p><p>共 {{state.current.counts.total}} 条 · 供应商受理 {{state.current.counts.accepted}} · 失败 {{state.current.counts.failed}} · 结果未知 {{state.current.counts.unknown}}</p><p>受理不等于送达。尚未接入已验真的送达来源，送达数与送达率保持未知，不将本地回执声明计为送达，也不触发低于95%的假告警。</p><label>渠道 <select v-model="channel"><option value="ALL">全部</option><option value="EMAIL">邮件</option><option value="WECHAT_WORK">企业微信</option></select></label><label>状态 <select v-model="status"><option value="ALL">全部</option><option v-for="(label,key) in labels" :key="key" :value="key">{{label}}</option></select></label><table class="admin-table"><thead><tr><th>记录ID</th><th>渠道</th><th>状态</th><th>创建时间</th><th>结束时间</th></tr></thead><tbody><tr v-for="row in rows.slice((page-1)*20,page*20)" :key="row.channel+row.id"><td>{{row.id}}</td><td>{{row.channel==='EMAIL'?'邮件':'企业微信'}}</td><td>{{labels[row.status]}}</td><td>{{displayTime(row.created_at)}}</td><td>{{displayTime(row.finished_at)}}</td></tr><tr v-if="!rows.length"><td colspan="5">当前筛选没有业务通知记录</td></tr></tbody></table><nav aria-label="通知受理明细分页"><button :disabled="page<=1" @click="page--">上一页</button><span>第 {{page}} / {{pages}} 页 · {{rows.length}} 条</span><button :disabled="page>=pages" @click="page++">下一页</button></nav></template></section></template>

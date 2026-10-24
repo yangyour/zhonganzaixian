@@ -5,7 +5,7 @@
   "source_sha256": {
     "apps/web/src/router.ts": "d91d2927f0b84ab3e85aef4139bef57efb749c6dd7c205d5613180709460c938",
     "server/domain/src/main/java/cn/mop/domain/Capabilities.java": "6f97ea30fd15e067db3eb6fe72d55c2dedf12a07b5e09678164384c04b366d1f",
-    "contracts/local-api.openapi.json": "5c69232b8bf03695233d6c4c236b6d4255ba53f8bb82bad1758567f81c3f1bfd"
+    "contracts/local-api.openapi.json": "a95d828aab21b77fc169c62b896551ed2bb6276b84afa1924cf8208ed0cc11df"
   },
   "protected_tenant_ids": [
     "55000000-0000-4000-8000-000000000001",
@@ -101,7 +101,8 @@
         "显式服务映射与真实故障/维护时间线，正向健康缺失保持未知",
         "本月可用率卡片与服务列表共享快照、完整覆盖与有效时长加权",
         "服务读取取消、重复刷新、账号或租户切换清空迟到响应",
-        "资产完整台账与ICMP采样核对、未知单列、60秒过期与同快照筛选分页"
+        "资产完整台账与ICMP采样核对、未知单列、60秒过期与同快照筛选分页",
+        "业务通知受理计数及渠道/状态分页，不把受理或未验真声明当送达"
       ],
       "acceptance_status": "NOT_RUN"
     },

@@ -999,7 +999,7 @@ addCmdbImportExecutionContract(contract);
 addDashboardPendingTicketsContract(contract);
 addDemoApiContract(contract);
 addDashboardAlertBellContract(contract);
-const serialized = JSON.stringify(contract, null, 2) + '\n';
+const serialized = JSON.stringify(contract) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');
   console.log('API契约生成一致性检查通过');

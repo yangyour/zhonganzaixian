@@ -13,13 +13,14 @@
     "08-config-json.png": "5f1b048d23b289b64cf61e78337639d8245328f8bf83d0f3c139469dc561e9e5",
     "09-monitoring-not-bound.png": "e8179a187a99194e81d926a420cbeefeb9c413e05e8e23d6c10b6b8aa67f8ed1",
     "10-final-asset-detail.png": "8a551ba033c3b96157f07715b6d9575e11f5adfc1a897da58ccb30edd1584c0d",
-    "after.json": "e967796ce85b761fbff88d600ea75a935d3ed89458859d946fa599910c58ee67",
+    "after.json": "42aabfdb1ef3208e6c2bc9430b828e7ae38908efe75abf746eef9313a355ac72",
     "asset-page.txt": "1b6333ac4f367f59fff9f2c1c96e1daf68f4488ec908ade2d9c11d76076fdafe",
-    "before.json": "3e86493692da98fb813a63c5e3262cb03b873b40e5c25b7018d5133474895e96",
+    "before.json": "75f19fd6bcb0e1ac37bc46e01bc11a37bf6c37e801623fd43fa1d113cabdb82a",
     "generated-config.json": "2fd4e1ba9eef0d7ac780fd2b516b719132d2db2377e0f313ddb0cc3a95599f1d",
     "monitoring-page.txt": "e6ccc0209f6209212f3cdc1fcd601252ea41b5030696cc020e086bbe3647bff4",
     "registration-page.txt": "75ffda81c5b16ed6148c28c8162d792c33d99d6a32d8bc77ef277fff1e4fe654",
-    "result.json": "45e1a5e7ece9e9ee1a2329ac9fafccf6ca1bbcfa6f1af597b2bd5922dc2b4009"
+    "result.json": "e869f73b00d05e9be422b1b251281e1140d89ba0def2ed7fd4b8d2666abd81b2"
   },
-  "application_source_changed": false
+  "application_source_changed": false,
+  "hash_representation": "COMMITTED_FILE_BYTES; TEXT_NORMALIZED_TO_LF_BY_REPOSITORY"
 }

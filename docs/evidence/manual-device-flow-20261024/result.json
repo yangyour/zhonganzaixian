@@ -1,0 +1,51 @@
+{
+  "environment": "lan-test-20261008",
+  "site_origin": "http://mop.all-online.com.cn",
+  "browser_actions": "ACTUAL_VISIBLE_UI",
+  "mocked_responses": false,
+  "asset_id": "7a928c86-3487-4ca5-b587-92d1b5479734",
+  "asset_create": "PASSED",
+  "asset_refresh_and_list_query": "PASSED",
+  "asset_count_before": 7,
+  "asset_count_after": 8,
+  "asset_audit": [
+    {
+      "sequence": 178,
+      "action": "asset.create_draft",
+      "result": "SUCCEEDED"
+    }
+  ],
+  "generated_config_validation": {
+    "valid": true,
+    "target_count": 1,
+    "configuration_sha256": "c4608c8f666c1fb73de3c52590daa0843363b3e9d5f42903e1f0430d9214f208",
+    "network_accessed": false
+  },
+  "browser_download": "INITIATED_ONLY",
+  "config_copy_source": "EXPANDED_VISIBLE_PAGE_JSON",
+  "asset_onboarding": "BLOCKED_Q02_Q03_Q06",
+  "registered_targets": "CONFIG_PENDING",
+  "persistent_enrollment": "CONFIG_PENDING_FEATURE_NOT_ENABLED",
+  "enrollment_rows": 0,
+  "enrollment_revision_rows": 0,
+  "new_asset_network_probe": "NOT_RUN_DOCUMENTATION_ADDRESS",
+  "new_asset_continuous_collection": "NOT_CONFIGURED",
+  "protected_rows_unchanged": true,
+  "schema_unchanged": true,
+  "verdict": "ASSET_AND_CONFIG_VERIFIED_COLLECTION_BLOCKED",
+  "formal_contract_acceptance": "NOT_RUN",
+  "screenshots": [
+    "01-assets-before.png",
+    "02-manual-form.png",
+    "03-asset-created.png",
+    "04-onboarding-gate.png",
+    "05-config-validated.png",
+    "06-registration-blocked.png",
+    "07-list-readback.png",
+    "08-config-json.png",
+    "09-monitoring-not-bound.png",
+    "10-final-asset-detail.png"
+  ],
+  "screenshots_modified": false,
+  "credentials_output": false
+}

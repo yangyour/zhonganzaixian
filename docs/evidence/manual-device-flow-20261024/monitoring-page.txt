@@ -1,0 +1,108 @@
+Browser tab: 3, Title: "基础网络监控 · MOP", URL: "http://mop.all-online.com.cn/network-monitoring".
+0 AXWebArea 基础网络监控 · MOP, URL: mop.all-online.com.cn/network-monitoring
+	1 container app
+		2 link Description: 跳过导航，进入主要内容, Value: mop.all-online.com.cn/network-monitoring#main-content
+		3 container
+			4 link Description: M MOP 运维托管 网络设备管理平台, Value: mop.all-online.com.cn/assets
+			5 container 模块导航
+				6 link Description: 首页门户, Value: mop.all-online.com.cn/dashboard
+				7 link Description: 租户与权限管理, Value: mop.all-online.com.cn/tenant-inventory
+				8 link Description: 设备台账, Value: mop.all-online.com.cn/assets
+				9 link Description: 监控与告警, Value: mop.all-online.com.cn/network-monitoring
+				10 link Description: 工单与SLA, Value: mop.all-online.com.cn/tickets
+				11 link Description: 配置备份, Value: mop.all-online.com.cn/backup-plan-drafts
+				12 link Description: 客户门户与通知, Value: mop.all-online.com.cn/ticket-notifications
+				13 link Description: 月报与体检报告, Value: mop.all-online.com.cn/inspection-quarterly-reports
+				14 link Description: 经营数据看板, Value: mop.all-online.com.cn/operational-comparison
+				15 link Description: 系统设置, Value: mop.all-online.com.cn/runtime-configurations
+			16 container Description: 功能菜单, ID: workspace-sidebar
+				17 text 监控与告警
+				18 container 监控与告警功能导航
+					19 text 监控与接入
+					20 link Description: 设备监控, Value: mop.all-online.com.cn/network-monitoring
+					21 link Description: 服务与设备接入, Value: mop.all-online.com.cn/monitoring-onboarding
+					22 text 告警与诊断
+					23 link Description: 事件中心, Value: mop.all-online.com.cn/monitoring-events
+					24 link Description: 手工故障登记, Value: mop.all-online.com.cn/manual-incidents
+					25 link Description: 告警阈值诊断, Value: mop.all-online.com.cn/threshold-diagnostics
+					26 link Description: 采样观察窗诊断, Value: mop.all-online.com.cn/observation-window-diagnostics
+			27 pop up button (collapsed) Description: 当前租户未确认告警 2 条, Secondary Actions: Expand
+			28 button Description: 打开全局搜索，快捷键斜杠、Control K 或 Command K, Help: 搜索当前租户（/ 或 Ctrl+K / ⌘K）
+			29 text [ [DEMO] 全功能测试用户 平台管理员
+			30 button 我的账号
+			31 button 退出
+		32 container
+			33 button (expanded) Description: 收起功能菜单, Secondary Actions: Collapse
+				34 image
+			35 container 面包屑
+				36 link 监控与告警
+					37 text 监控与告警
+				38 text /
+				39 link 基础网络监控
+					40 text 基础网络监控
+			41 container
+				42 combo box (collapsed, settable) Description: 切换租户, ID: el-id-2347-10, Secondary Actions: Expand
+				43 text [DEMO] 全功能测试·管理
+				44 image
+		45 container main-content
+			46 container
+				47 heading 基础网络监控, Value: 1
+					48 text 基础网络监控
+				49 container
+					50 heading 设备监控, Value: 2
+						51 text 设备监控
+					52 text 绑定 1 台 可达 1
+					53 container 监控自动刷新设置
+						54 text 每30秒 · 合同默认
+					55 button 暂停自动刷新
+					56 button 刷新监控
+				58 container 监控显示方式
+					59 checkbox 设备列表, Value: 1
+					60 checkbox 监控卡片, Value: 0
+				61 search text field (settable) Description: 搜索监控设备, Value: 手动添加交换机-20261024
+				62 text 告警规则待确认
+				63 text 自动刷新：30 秒。
+				64 table
+					65 row
+						66 cell
+							67 text 设备 / 型号
+						68 cell
+							69 text 管理 IP
+						70 cell
+							71 text 连通性
+						72 cell
+							73 text 响应延迟
+						74 cell
+							75 text 丢包率
+						76 cell
+							77 text CPU / 内存
+						78 cell
+							79 text 最近记录
+						80 cell
+							81 text 操作
+					122 row
+						123 cell
+							124 text 当前筛选下没有设备
+				125 text 当前展示 0 台 / 共绑定 1 台设备 数据范围：当前租户已绑定网络设备
+				102 heading 采样历史, Value: 2
+					103 text 采样历史
+				104 text 采样间断处留空，不补零。
+				105 container
+					106 text 指标
+					107 pop up button (collapsed, settable) 指标, Value: 响应延迟, Secondary Actions: Expand
+						108 menu
+							109 (selected) 响应延迟
+							110 丢包率
+							111 ICMP响应
+							112 TCP 22
+							113 TCP 80
+							114 TCP 443
+				115 container
+					116 text 时间
+					117 pop up button (collapsed, settable) 时间, Value: 最近1小时, Secondary Actions: Expand
+						118 menu
+							119 (selected) 最近1小时
+							120 最近24小时
+				121 text 请选择上方一台设备以查看历史采样趋势。
+
+The focused UI element is 61 search text field (settable) Description: 搜索监控设备, Value: 手动添加交换机-20261024

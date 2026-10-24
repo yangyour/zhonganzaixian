@@ -1,17 +1,21 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import type { RegisteredTicket } from '../api/types'
 import { api, ApiError } from '../api/client'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { createTicketLifecycleWorkspace, emptyLifecycleState, lifecycleActions, lifecycleLabels, lifecycleActionLabels, type LifecycleAction, type LifecycleContext } from '../utils/ticketLifecycleWorkspace'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
+import {ticketAuthorityKey,type TicketProcessSummary} from '../utils/ticketProcessSummary'
+import type {TicketSlaProjection} from '../utils/ticketSlaReader'
 import { displayTime } from '../utils/display'
 import { feedback } from '../utils/feedback'
 import ApiErrorNotice from './ApiErrorNotice.vue'
 import TicketSlaPanel from './TicketSlaPanel.vue'
 const slaPanel=ref<InstanceType<typeof TicketSlaPanel>|null>(null)
 const props = defineProps<{ ticket: RegisteredTicket; refreshKey: number }>()
+const emit=defineEmits<{summary:[value:TicketProcessSummary]}>()
+const root=ref<HTMLElement|null>(null),clock=shallowRef<TicketSlaProjection|null>(null)
 const openingPriority = ref(''), openingAcknowledged = ref(false)
 const state = shallowRef(emptyLifecycleState()), selected = ref<LifecycleAction | ''>(''), reason = ref(''), assignee = ref(''), keep = ref(false), acknowledged = ref(false), validation = ref('')
 const workspace = createTicketLifecycleWorkspace(api, value => { state.value = value })
@@ -25,8 +29,8 @@ const missingConfiguration = computed(() => state.value.error instanceof ApiErro
   ? state.value.error.details.flatMap(item => typeof item.configuration_key === 'string' && /^[a-z][a-z0-9_.]{0,99}$/.test(item.configuration_key) ? [item.configuration_key] : []) : [])
 const locked = computed(() => Boolean(state.value.busy) || state.value.attempt?.state === 'uncertain' || slaPanel.value?.hasUnresolved() === true)
 const needsReason = computed(() => selected.value && !['accept','resume','confirm'].includes(selected.value))
-const contextKey = computed(() => JSON.stringify([contextGeneration.value, scope.value]))
-function clear() { openingPriority.value = ''; openingAcknowledged.value = false; selected.value = ''; reason.value = ''; assignee.value = ''; keep.value = false; acknowledged.value = false; validation.value = '' }
+const contextKey = computed(() => ticketAuthorityKey(session.value,contextGeneration.value,props.ticket,switchingTenant.value))
+function clear() { clock.value=null;openingPriority.value = ''; openingAcknowledged.value = false; selected.value = ''; reason.value = ''; assignee.value = ''; keep.value = false; acknowledged.value = false; validation.value = '' }
 watch(contextKey, () => { clear(); workspace.reset(scope.value); if (scope.value) void workspace.refresh() }, { immediate: true, flush: 'sync' })
 watch(() => props.refreshKey, () => { if (!workspace.unresolved() && !slaPanel.value?.hasUnresolved()) void workspace.refresh() })
 watch(openingPriority, () => { openingAcknowledged.value = false })
@@ -44,10 +48,21 @@ const unregister = contextTransitionGuards.register(canLeave)
 onBeforeRouteLeave(canLeave)
 window.addEventListener('beforeunload', beforeUnload)
 onUnmounted(() => { unregister(); workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
-defineExpose({ canLeave })
+function updateClock(value:TicketSlaProjection|null){clock.value=value&&value.tenant_id===props.ticket.tenant_id&&value.ticket_id===props.ticket.id&&value.lifecycle_version===state.value.snapshot?.version?value:null}
+watch([state,clock,locked,contextKey],()=>{
+ const snapshot=scope.value&&state.value.loaded&&!state.value.busy&&!state.value.error?state.value.snapshot:null
+ const currentClock=snapshot&&clock.value?.lifecycle_version===snapshot.version?clock.value:null
+ emit('summary',{authorization_key:contextKey.value,loaded:!!scope.value&&state.value.loaded,loading:!!state.value.busy,failed:!!state.value.error,locked:locked.value,snapshot:snapshot?structuredClone(snapshot):null,clock:currentClock?structuredClone(currentClock):null,actions:snapshot&&!locked.value?[...actions.value]:[]})
+},{immediate:true,flush:'sync'})
+async function prepareAction(action:LifecycleAction){
+ if(!scope.value||locked.value||!actions.value.includes(action)||!state.value.loaded||state.value.error)return false
+ if(selected.value&&selected.value!==action&&(reason.value.trim()||assignee.value.trim())){validation.value='请先核对或清空当前动作输入，再切换快捷操作';return false}
+ selected.value=action;acknowledged.value=false;await nextTick();root.value?.scrollIntoView?.({block:'center'});root.value?.querySelector<HTMLElement>('textarea,input,select')?.focus();return true
+}
+defineExpose({ canLeave, prepareAction })
 </script>
 <template>
-  <section v-if="scope" class="lifecycle-panel" aria-label="工单生命周期">
+  <section v-if="scope" ref="root" class="lifecycle-panel" aria-label="工单生命周期">
     <header><h3>工单流转</h3><el-button :disabled="locked" @click="workspace.refresh()">刷新状态</el-button></header>
     
     <ApiErrorNotice v-if="state.error" :error="state.error"><p v-if="missingConfiguration.length">需补全或重新发布的配置：{{ missingConfiguration.join('、') }}。请由有权限的管理员核对配置内容及生效状态。</p></ApiErrorNotice>
@@ -71,7 +86,7 @@ defineExpose({ canLeave })
         <el-button v-if="selected" type="primary" :disabled="locked || !acknowledged" @click="submit">{{ lifecycleActionLabels[selected] }}</el-button>
       </div>
     </template>
-    <TicketSlaPanel ref="slaPanel" v-if="state.snapshot" :ticket="ticket" :expected-version="state.snapshot.version" />
+    <TicketSlaPanel ref="slaPanel" v-if="state.snapshot" :ticket="ticket" :expected-version="state.snapshot.version" @changed="updateClock" />
     <div v-if="state.attempt?.state === 'uncertain'" role="alert"><p>请求结果尚不确定。请勿另建请求，使用相同请求号重试；刷新状态不等于确认原请求结果。</p><el-button :disabled="Boolean(state.busy)" @click="workspace.retry()">原请求重试</el-button></div>
     <p v-if="state.attempt?.state === 'accepted'" role="status">动作已受理；以刷新后的持久状态为准。</p>
   </section>

@@ -11,8 +11,10 @@ import { formatWorklogDuration, summarizeWorklogPage, worklogKindLabels } from '
 import { displayTime } from '../utils/display'
 import { impactScopeLabel, urgencyLabel } from '../utils/ticket'
 import ApiErrorNotice from './ApiErrorNotice.vue'
+import {ticketAuthorityKey,processLabel,processStages,priorityClockLabel,type TicketProcessSummary} from '../utils/ticketProcessSummary'
 import TicketLifecyclePanel from './TicketLifecyclePanel.vue'
 
+const processSummary=shallowRef<TicketProcessSummary|null>(null)
 const lifecyclePanel = ref<InstanceType<typeof TicketLifecyclePanel> | null>(null)
 function canLeave() { return lifecyclePanel.value?.canLeave() !== false }
 function closeOverview() { if (canLeave()) emit('close') }
@@ -30,8 +32,9 @@ const canComments = computed(() => permitted.value && can('ticket_comments:read'
 const canWorklogs = computed(() => permitted.value && !customer.value && can('worklogs:read_own'))
 const registrationOrigin = computed(() => ticketRegistrationOrigin(props.ticket))
 const showPhone = ref(false), downloadError = ref('')
-const scopeKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, permitted.value, canNotes.value, canComments.value, canWorklogs.value, props.ticket.id, props.ticket.version]))
+const scopeKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version,session.value?.account_version,session.value?.user.role,[...(session.value?.capabilities??[])].sort(), permitted.value, canNotes.value, canComments.value, canWorklogs.value, props.ticket.id, props.ticket.version]))
 function resetReaders() {
+  processSummary.value=null
   showPhone.value = false; downloadError.value = ''
   const current = session.value
   const scope = permitted.value && current ? { tenantId: current.tenant.id, ticketId: props.ticket.id, actorId: current.user.id, permissionVersion: current.permission_version, canWrite: false } : null
@@ -59,25 +62,28 @@ function exportDetail() {
   downloadError.value = ''
   let url: string | undefined
   try {
-    const body = ticketDetailText(props.ticket, session.value.tenant.name, activity.value, canWorklogs.value ? worklogs.value.page?.items ?? null : null, activityScope.value, canWorklogs.value ? worklogScope.value : '当前身份无工时查询权限', new Date().toISOString())
+    const body = ticketDetailText(props.ticket, session.value.tenant.name, activity.value, canWorklogs.value ? worklogs.value.page?.items ?? null : null, activityScope.value, canWorklogs.value ? worklogScope.value : '当前身份无工时查询权限', new Date().toISOString(),processSummary.value)
     url = URL.createObjectURL(new Blob(['\ufeff', body], { type: 'text/plain;charset=utf-8' }))
     const link = document.createElement('a'); link.href = url; link.download = `工单详情-${props.ticket.receipt_no.replace(/[^a-zA-Z0-9_-]/g, '_')}.txt`; document.body.appendChild(link); link.click(); link.remove()
   } catch { downloadError.value = '导出未完成，请重试。' }
   finally { if (url) { const downloadUrl = url; window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000) } }
 }
-const stages = ['工单发起', '工单受理', '原因定位', '解决方案', '服务完结', '客户确认']
+const stages=computed(()=>processStages(processSummary.value))
+function updateProcess(value:TicketProcessSummary){if(permitted.value&&value.authorization_key===ticketAuthorityKey(session.value,contextGeneration.value,props.ticket,switchingTenant.value))processSummary.value=value}
+function prepareProcess(action:'transfer'|'wait-for-vendor'|'resume'){return lifecyclePanel.value?.prepareAction(action)}
 </script>
 
 <template>
   <div v-if="permitted" class="ticket-overview">
     <nav class="ticket-breadcrumb" aria-label="工单详情路径"><button type="button" @click="closeOverview">工单中心</button><span aria-hidden="true">/</span><span>报障与受理</span><span aria-hidden="true">/</span><strong>工单详情</strong></nav>
     <header class="ticket-overview-heading">
-      <div class="ticket-heading-title"><h2>工单详情</h2><span class="ticket-registration-badge"><span aria-hidden="true">●</span> 已登记</span><span class="ticket-heading-receipt">{{ ticket.receipt_no }}</span></div>
-      <div class="ticket-overview-actions"><el-button :disabled="!exportReady" @click="exportDetail">导出详情</el-button><el-button disabled title="需在工单处理流程中执行转派">转派</el-button><el-button v-if="canNotes && can('ticket_notes:write_internal')" type="primary" @click="emit('notes')">新增处理记录</el-button><el-button v-else-if="canComments && can('ticket_comments:write')" type="primary" @click="emit('comments')">追加沟通记录</el-button></div>
+      <div class="ticket-heading-title"><h2>工单详情</h2><span class="ticket-registration-badge"><span aria-hidden="true">●</span> 已登记 · {{processLabel(processSummary)}}</span><span class="ticket-heading-receipt">{{ ticket.receipt_no }}</span></div>
+      <div class="ticket-overview-actions"><el-button :disabled="!exportReady" @click="exportDetail">导出详情</el-button><el-button v-if="processSummary?.actions.includes('transfer')" @click="prepareProcess('transfer')">转派</el-button><el-button v-if="canNotes && can('ticket_notes:write_internal')" type="primary" @click="emit('notes')">新增处理记录</el-button><el-button v-else-if="canComments && can('ticket_comments:write')" type="primary" @click="emit('comments')">追加沟通记录</el-button></div>
     </header>
+    <p class="ticket-muted"><router-link :to="{path:'/ticket-workflows',query:{ticket_id:ticket.id}}">核对工单处理流程</router-link>；本页生命周期未创建时，不据此断定其他处理流程不存在。</p>
     <p v-if="downloadError" role="alert">{{ downloadError }}</p>
     <section class="ticket-stage-card" aria-label="工单阶段">
-      <ol class="ticket-stage-list"><li v-for="(stage, index) in stages" :key="stage" :class="{ recorded: index === 0 }"><span class="ticket-stage-number" aria-hidden="true">{{ index === 0 ? '✓' : index + 1 }}</span><span>{{ stage }}<small>{{ index === 0 ? '已受理入库' : '暂未提供' }}</small></span></li></ol>
+      <ol class="ticket-stage-list"><li v-for="(stage, index) in stages" :key="stage.title" :class="{ recorded: stage.recorded }"><span class="ticket-stage-number" aria-hidden="true">{{ stage.recorded ? '✓' : index + 1 }}</span><span>{{ stage.title }}<small>{{stage.detail}}</small></span></li></ol><p class="ticket-muted">阶段标识仅依据当前生命周期与明确回读证据，不从备注推断已完成步骤；等待厂商不代表自动暂停SLA。</p>
     </section>
 
     <div class="ticket-overview-grid">
@@ -95,7 +101,7 @@ const stages = ['工单发起', '工单受理', '原因定位', '解决方案', 
             <div><dt>关联设备</dt><dd>{{ ticket.asset_name || (ticket.asset_id ? '已关联（名称暂未提供）' : '未关联') }}</dd></div>
             <div><dt>问题类型</dt><dd><span class="ticket-category">{{ ticket.category }}</span></dd></div>
             <div><dt>业务影响</dt><dd><span :class="['ticket-impact', { urgent: ticket.urgency === 'urgent' }]">{{ impactScopeLabel[ticket.impact_scope] }}</span><small>{{ urgencyLabel[ticket.urgency] }} · {{ registrationOrigin }}</small></dd></div>
-            <div><dt>优先级 / SLA</dt><dd class="ticket-muted">暂未提供</dd></div>
+            <div><dt>优先级 / SLA</dt><dd>{{priorityClockLabel(processSummary)}}<small v-if="processSummary?.clock">响应截止 {{displayTime(processSummary.clock.response.deadline)}} · 恢复截止 {{displayTime(processSummary.clock.recovery.deadline)}}；以服务端时钟面板判定为准</small></dd></div>
             <div class="ticket-description-field"><dt>问题描述</dt><dd><p>{{ ticket.description }}</p></dd></div>
           </dl>
         </div>
@@ -134,8 +140,8 @@ const stages = ['工单发起', '工单受理', '原因定位', '解决方案', 
         </section>
       </div>
     </div>
-    <TicketLifecyclePanel ref="lifecyclePanel" :ticket="ticket" :refresh-key="refreshKey" />
-    <footer class="ticket-overview-bottom"><div class="ticket-overview-actions"><el-button disabled title="挂起状态与SLA暂停规则尚未接入">挂起</el-button><el-button disabled title="协助申请与分派规则尚未接入">申请协助</el-button><el-button v-if="canNotes && can('ticket_notes:write_internal')" type="primary" @click="emit('notes')">新增处理记录</el-button><el-button v-else-if="canComments && can('ticket_comments:write')" type="primary" @click="emit('comments')">追加沟通记录</el-button><el-button @click="closeOverview">返回列表</el-button></div></footer>
+    <TicketLifecyclePanel ref="lifecyclePanel" :ticket="ticket" :refresh-key="refreshKey" @summary="updateProcess" />
+    <footer class="ticket-overview-bottom"><div class="ticket-overview-actions"><el-button v-if="processSummary?.actions.includes('wait-for-vendor')" @click="prepareProcess('wait-for-vendor')">等待厂商</el-button><el-button v-if="processSummary?.actions.includes('resume')" @click="prepareProcess('resume')">恢复处理</el-button><el-button disabled title="协助申请与分派规则尚未接入">申请协助</el-button><el-button v-if="canNotes && can('ticket_notes:write_internal')" type="primary" @click="emit('notes')">新增处理记录</el-button><el-button v-else-if="canComments && can('ticket_comments:write')" type="primary" @click="emit('comments')">追加沟通记录</el-button><el-button @click="closeOverview">返回列表</el-button></div></footer>
     <section class="ticket-detail-card ticket-supporting-card"><details><summary>报障照片与登记凭证 <span>查看附件、登记操作与记录标识</span></summary><div class="ticket-supporting-content"><slot /></div></details></section>
     
     <p v-if="canNotes" class="ticket-record-explanation">新增处理记录保存为仅内部可见的备注；需要客户查看的内容请使用“客户沟通”。</p>

@@ -269,7 +269,7 @@ onUnmounted(() => { unregisterContextGuard(); unregisterRouteResolve?.(); unregi
     <h1 class="page-title-sr">报障与受理 </h1>
     
     
-    <el-alert v-if="acceptedOperationId" class="page-note" type="success" :closable="false" show-icon title="故障申报已受理，系统正在创建正式工单，可点击下方按钮刷新处理进度。" />
+    <el-alert v-if="acceptedOperationId" class="page-note" type="success" :closable="false" show-icon title="故障申报已受理，可刷新核对登记与流程状态；受理不表示已创建正式处理流程。" />
     <RetainedPhotoNotice v-if="retainedPhotos" :target-id="photoTargetId" :ticket="appendTicket" :count="detailPhotos.rows.value.length" :can-discard="photoWorkspace.canDiscard.value" @resume="openDetail(photoTargetId)" @discard="discardRetainedPhotos" />
     <div class="panel ticket-register-panel">
       <div class="proto-section-head content-toolbar"><h2>{{ customerView ? '我的故障申报' : '全部故障申报' }}</h2><span class="proto-sub">{{ customerView ? '仅本人可见' : '当前租户范围' }} · 支持按关键词、分类与紧急程度筛选</span><div class="content-actions"><el-button v-if="mayReport" type="primary" @click="createOpen = true">故障申报登记</el-button></div></div>
@@ -280,7 +280,7 @@ onUnmounted(() => { unregisterContextGuard(); unregisterRouteResolve?.(); unregi
         <el-table-column label="登记号 / 标题" min-width="250"><template #default="{ row }"><el-button type="primary" link class="asset-link ticket-detail-link" :data-list-record="row.id" @click="openDetail(row.id, $event)">{{ row.title }}</el-button><span class="cell-sub mono">{{ row.receipt_no }}</span></template></el-table-column>
         <el-table-column label="故障分类 / 设备" min-width="160"><template #default="{ row }">{{ row.category }}<span class="cell-sub">{{ row.asset_name || '暂未指定设备' }}</span></template></el-table-column>
         <el-table-column label="影响 / 紧急程度" min-width="150"><template #default="{ row }">{{ impactScopeLabel[row.impact_scope as keyof typeof impactScopeLabel] }}<span class="cell-sub">{{ urgencyLabel[row.urgency as keyof typeof urgencyLabel] }}</span></template></el-table-column>
-        <el-table-column label="受理 / 流程状态" min-width="175"><template #default="{ row }"><el-tag type="info">{{ row.registration_status === 'REGISTERED' ? '已受理入库' : row.registration_status }}</el-tag><span class="cell-sub">{{ row.state === null ? '待流转分派' : row.state }}</span></template></el-table-column>
+        <el-table-column label="受理 / 流程查询" min-width="175"><template #default="{ row }"><el-tag type="info">{{ row.registration_status === 'REGISTERED' ? '已受理入库' : row.registration_status }}</el-tag><span class="cell-sub">{{ row.state === null ? '实际流程见详情回读' : row.state }}</span></template></el-table-column>
         <el-table-column label="提交时间" min-width="170"><template #default="{ row }">{{ displayTime(row.created_at) }}</template></el-table-column>
         <el-table-column label="操作" width="110" fixed="right"><template #default="{ row }"><el-button type="primary" link class="ticket-detail-link" :data-list-record="row.id" @click="openDetail(row.id, $event)">查看详情</el-button></template></el-table-column>
         <template #empty-action><el-button v-if="loaded && !error && filterItems.length" @click="resetFilters">清空筛选，查看全部工单</el-button></template>
@@ -305,7 +305,7 @@ onUnmounted(() => { unregisterContextGuard(); unregisterRouteResolve?.(); unregi
           <ApiErrorNotice v-if="operationRead.status === 'error'" :error="operationRead.error" />
           <el-skeleton v-if="operationRead.status === 'loading'" :rows="3" animated />
           <el-descriptions v-if="registrationOperation" :column="1" border class="asset-descriptions">
-            <el-descriptions-item label="操作状态"><el-tag type="info">{{ registrationOperation.status }}</el-tag><span class="cell-sub">待 ITSM 流程规则启用</span></el-descriptions-item>
+            <el-descriptions-item label="操作状态"><el-tag type="info">{{ registrationOperation.status }}</el-tag><span class="cell-sub">此处为登记操作状态，实际流转以生命周期和工单处理页回读为准</span></el-descriptions-item>
             <el-descriptions-item label="状态说明"><span class="ticket-description">{{ registrationOperation.error.message }}</span><span class="cell-sub mono">{{ registrationOperation.error.code }}</span></el-descriptions-item>
             <el-descriptions-item label="关联配置项">{{ registrationOperation.error.question_ids.join(' / ') || '暂未提供' }}</el-descriptions-item>
             <el-descriptions-item label="处理进度">暂未提供</el-descriptions-item>
@@ -314,7 +314,7 @@ onUnmounted(() => { unregisterContextGuard(); unregisterRouteResolve?.(); unregi
           <el-button :loading="operationRead.status === 'loading'" @click="readRegistrationOperation">{{ operationRead.status === 'error' ? '重新查询处理进度' : '刷新处理进度' }}</el-button>
         </div>
         <ReportPhotoPanel :queue="detailPhotos" :existing="ticket.attachments" :selectable="matchingPhotoTarget && detailAppender.permitted.value" :show-selections="matchingPhotoTarget" :disabled="detailLoading" :appender="matchingPhotoTarget ? detailAppender : undefined" />
-        <el-descriptions v-if="!customerView" :column="1" border class="asset-descriptions"><el-descriptions-item label="记录 ID"><span class="mono">{{ ticket.id }}</span></el-descriptions-item><el-descriptions-item label="租户 ID"><span class="mono">{{ ticket.tenant_id }}</span></el-descriptions-item><el-descriptions-item label="报障人 ID"><span class="mono">{{ ticket.reporter_id }}</span></el-descriptions-item><el-descriptions-item label="登记操作 ID"><span class="mono">{{ ticket.operation_id }}</span></el-descriptions-item><el-descriptions-item label="版本">v{{ ticket.version }}</el-descriptions-item><el-descriptions-item label="外部同步">待接入 ITSM 外部工单同步</el-descriptions-item></el-descriptions>
+        <el-descriptions v-if="!customerView" :column="1" border class="asset-descriptions"><el-descriptions-item label="记录 ID"><span class="mono">{{ ticket.id }}</span></el-descriptions-item><el-descriptions-item label="租户 ID"><span class="mono">{{ ticket.tenant_id }}</span></el-descriptions-item><el-descriptions-item label="报障人 ID"><span class="mono">{{ ticket.reporter_id }}</span></el-descriptions-item><el-descriptions-item label="登记操作 ID"><span class="mono">{{ ticket.operation_id }}</span></el-descriptions-item><el-descriptions-item label="版本">v{{ ticket.version }}</el-descriptions-item><el-descriptions-item label="外部同步">{{ticket.sync_state==='NOT_APPLICABLE'?'不适用（当前登记权威来源：'+ticket.authority_source+'）':'状态尚未核对'}}</el-descriptions-item></el-descriptions>
       </TicketDetailOverview>
       <template #footer>
         <span v-if="detailPosition >= 0" role="status">本页第 {{ detailPosition + 1 }} / {{ detailTotal }} 条</span>

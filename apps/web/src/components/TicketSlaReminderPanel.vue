@@ -4,12 +4,13 @@ import { api,isCancelled } from '../api/client'
 import { session,switchingTenant,can,contextGeneration } from '../stores/session'
 import type { RegisteredTicket } from '../api/types'
 import { readSlaReminders,type SlaReminderPage } from '../utils/ticketSlaReminderReader'
+import {ticketAuthorityKey} from '../utils/ticketProcessSummary'
 import { displayTime } from '../utils/display'
 import ApiErrorNotice from './ApiErrorNotice.vue'
 const props=defineProps<{ticket:RegisteredTicket;expectedVersion:number}>()
 const value=shallowRef<SlaReminderPage|null>(null),error=shallowRef<unknown>(null),busy=ref(false)
 const permitted=computed(()=>Boolean(session.value&&!switchingTenant.value&&can('tickets:read')&&props.ticket.tenant_id===session.value.tenant.id&&(!['viewer','tadmin'].includes(session.value.user.role)||props.ticket.reporter_id===session.value.user.id)))
-const key=computed(()=>JSON.stringify([contextGeneration.value,session.value?.user.id,session.value?.tenant.id,session.value?.permission_version,permitted.value,props.ticket.id,props.expectedVersion]))
+const key=computed(()=>JSON.stringify([ticketAuthorityKey(session.value,contextGeneration.value,props.ticket,switchingTenant.value),permitted.value,props.expectedVersion]))
 const states={PENDING:'待扫描',LEASED:'已领取租约',IDLE:'当前版本暂停扫描',BLOCKED_ATTEMPTS:'扫描失败待处理'}
 let epoch=0,controller:AbortController|undefined
 async function refresh(){

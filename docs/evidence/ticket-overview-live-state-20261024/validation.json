@@ -1,0 +1,61 @@
+{
+  "status": "CODE_VALIDATED_BRANCH_ONLY",
+  "java": {
+    "command": "mvn -o verify",
+    "passed": 4375,
+    "skipped": 1185,
+    "failures": 0,
+    "errors": 0,
+    "backend_changed": false
+  },
+  "web": {
+    "passed": 5731,
+    "files": 358,
+    "typecheck": "PASSED",
+    "build": "PASSED",
+    "targeted": 36,
+    "new_test_selector_types_corrected": true,
+    "final_full_suite_after_type_fix": true
+  },
+  "regression": {
+    "subpanel_account_version_red_failures": 2,
+    "green": "PASSED"
+  },
+  "contracts": {
+    "passed": 241,
+    "changed": false,
+    "generation_consistency": "PASSED"
+  },
+  "offline_demo": {
+    "passed": 18,
+    "provisioning": false
+  },
+  "synthetic_fixture_build": "PASSED",
+  "browser": {
+    "specifications_discovered": 200,
+    "files": 32,
+    "new_specifications": 3,
+    "functional_tests_executed": 0,
+    "status": "NOT_RUN_LOCAL_PREVIEW_CONNECTION_REFUSED",
+    "available_surface": "EXISTING_CLOUD_CHROMIUM",
+    "preview_attempt": "CONNECTION_REFUSED",
+    "reviewed_launch_attempt": "ENVIRONMENT_INITIALIZATION_BLOCKED",
+    "preview_process_stopped": true,
+    "preview_exit_code": 130,
+    "failed_tab_closed": true,
+    "access_controls_bypassed": false
+  },
+  "scope": {
+    "actual_db": "NOT_RUN",
+    "real_writes": false,
+    "external_dispatch": false,
+    "deployment": false,
+    "migration": false,
+    "main_update": false
+  },
+  "remaining": [
+    "Generic assistance request workflow not implemented",
+    "Frozen V22 inspection evidence binding requires coordinated new persistence",
+    "Legacy workflow remains a separate explicit lookup"
+  ]
+}

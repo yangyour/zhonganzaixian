@@ -5,7 +5,7 @@
   "namespace_id": "79000000-0000-4000-8000-000000000090",
   "username": "demo",
   "anchor_time": "2026-10-22T12:00:00Z",
-  "catalog_sha256": "f2a645adf98dd34c7b9a5d445b5c04f88e584e6deee08d2913941b5de2fe43d4",
+  "catalog_sha256": "753180140969ae9e70272dbe58eea7018d1bc1e9065dc1aac5510bc283e90fc5",
   "source_sha256": {
     "apps/web/src/router.ts": "d91d2927f0b84ab3e85aef4139bef57efb749c6dd7c205d5613180709460c938",
     "server/domain/src/main/java/cn/mop/domain/Capabilities.java": "6f97ea30fd15e067db3eb6fe72d55c2dedf12a07b5e09678164384c04b366d1f",
@@ -369,7 +369,8 @@
       "scenarios": [
         "客户报障",
         "内部人工登记",
-        "不同处理阶段"
+        "不同处理阶段",
+        "详情同版本生命周期/SLA摘要、显式准备转派/等待厂商/恢复、不伪造客户确认、账号变更清空"
       ],
       "acceptance_status": "NOT_RUN",
       "proposed_contexts": [
@@ -2269,5 +2270,5 @@
     "ADVANCED_SCENARIOS_NOT_INITIALIZED",
     "GLOBAL_POLICY_SCOPE_UNRESOLVED"
   ],
-  "plan_sha256": "098c212b9495be3aa3d13f84d7995f6238f1ed01aa7cc20a7e324b0476dfec4b"
+  "plan_sha256": "6480319ce0ec404afc6b96af4de1dedadca693f2c0632f9d9b285d7732e30633"
 }

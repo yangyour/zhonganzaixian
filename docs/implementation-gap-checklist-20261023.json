@@ -109,7 +109,9 @@
         "docs/search-monitoring-return-scope-20261024.md",
         "docs/evidence/search-monitoring-return-scope-20261024/validation.json",
         "docs/runtime-configuration-read-scope-20261024.md",
-        "docs/evidence/runtime-configuration-read-scope-20261024/validation.json"
+        "docs/evidence/runtime-configuration-read-scope-20261024/validation.json",
+        "docs/ticket-overview-live-state-20261024.md",
+        "docs/evidence/ticket-overview-live-state-20261024/validation.json"
       ],
       "commits": [
         "1e4431b5",
@@ -121,7 +123,8 @@
         "M1-8 slash shortcut, local opt-out and account-version invalidation; 65 targeted tests and real browser interaction",
         "Search dialog page-wide landmark duplication fixed and original DOM semantics reproduced with real Element Plus/axe in jsdom; 66 targeted tests",
         "Global search now rechecks full membership/session/account before return; exact read capabilities align with repository. Event-center and network-monitoring account-only changes cancel old requests and clear private state; red-to-green tests retained, API contract unchanged.",
-        "运行配置目录/当前/历史/纯校验返回前完整成员与账号复核；页面account-version变更清空迟到读取；已核查工单10键实际消费链并提供权限化入口。9后端/1前端失败先复现，修复后通过。"
+        "运行配置目录/当前/历史/纯校验返回前完整成员与账号复核；页面account-version变更清空迟到读取；已核查工单10键实际消费链并提供权限化入口。9后端/1前端失败先复现，修复后通过。",
+        "工单详情复用真实生命周期/同版本SLA摘要和合法转派、等待厂商、恢复操作准备；阶段不推断客户确认，账号版本变更清空子面板，申请协助仍未冒充完成。"
       ],
       "remaining_subitems": [
         "Review M1-5 recent events, M1-7 tenant switching, remaining M1-8 search groups and M7 gate",
@@ -484,7 +487,9 @@
         "docs/notification-request-cancellation-20261024.md",
         "docs/evidence/notification-request-cancellation-20261024/validation.json",
         "docs/delivery-dead-letter-disposition-20261024.md",
-        "docs/evidence/delivery-dead-letter-disposition-20261024/validation.json"
+        "docs/evidence/delivery-dead-letter-disposition-20261024/validation.json",
+        "docs/dashboard-notification-acceptance-20261024.md",
+        "docs/evidence/dashboard-notification-acceptance-20261024/validation.json"
       ],
       "commits": [
         "f69fa0dd",
@@ -508,7 +513,8 @@
         "Six real designated retained-V51 PG business checks passed: idempotent durable discovery/routing, explicit publication and synthetic verified binding, preference withdrawal, concurrent CAS/original command, revocation and immutable history; no migrations or external dispatch",
         "Complete bounded current-head attention reader/API/UI for UNKNOWN/FAILED/DEAD_LETTER, same-snapshot count/cursor, strict 1000-root/24002-revision budget, scoped recovery; 3 designated PG, 39 targeted Java, 5564 Web, 219 contracts and 1440/1024 synthetic Edge verified",
         "Atomic pre-dispatch REQUEST/ROUTE cancellation with original audit chain, V50 queue mutual exclusion, concurrent same-command convergence and strict modal recovery; 8 designated PG, 5570 Web, 221 contracts and 4 synthetic Edge scenes verified; external delivery and dead-letter disposition remain separate",
-        "Explicit manual local FAILED-to-DEAD_LETTER command, independently scoped default-off writes, same transaction journal/audit/idempotent receipt, strict confirmation and original-key recovery. Provider verification/send/retry remains unauthorized; designated PG/browser validation still NOT_RUN in this dot."
+        "Explicit manual local FAILED-to-DEAD_LETTER command, independently scoped default-off writes, same transaction journal/audit/idempotent receipt, strict confirmation and original-key recovery. Provider verification/send/retry remains unauthorized; designated PG/browser validation still NOT_RUN in this dot.",
+        "已提交的首页通知受理投影归入N01：真实邮件/企微业务队列计数与筛选分页；不把本地DELIVERED声明计为已验真送达，后续供应商回执门禁保持。"
       ],
       "review_baseline_commit": "dd51b1c4"
     },

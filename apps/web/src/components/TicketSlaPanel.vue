@@ -3,6 +3,7 @@ import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { api, isCancelled } from '../api/client'
 import { session, switchingTenant, can, contextGeneration } from '../stores/session'
 import type { RegisteredTicket } from '../api/types'
+import {ticketAuthorityKey} from '../utils/ticketProcessSummary'
 import { readTicketSla, type TicketSlaProjection } from '../utils/ticketSlaReader'
 import { displayTime } from '../utils/display'
 import ApiErrorNotice from './ApiErrorNotice.vue'
@@ -11,9 +12,10 @@ import TicketSlaReminderPanel from './TicketSlaReminderPanel.vue'
 const policyPanel=ref<InstanceType<typeof TicketSlaPolicyPanel>|null>(null)
 defineExpose({canLeave:()=>policyPanel.value?.canLeave()!==false,hasUnresolved:()=>policyPanel.value?.hasUnresolved()===true})
 const props=defineProps<{ ticket: RegisteredTicket; expectedVersion: number }>()
+const emit=defineEmits<{changed:[value:TicketSlaProjection|null]}>()
 const value=shallowRef<TicketSlaProjection | null>(null), error=shallowRef<unknown>(null), busy=ref(false)
 const permitted=computed(()=>Boolean(session.value && !switchingTenant.value && can('tickets:read') && session.value.tenant.id===props.ticket.tenant_id && (!['viewer','tadmin'].includes(session.value.user.role) || props.ticket.reporter_id===session.value.user.id)))
-const key=computed(()=>JSON.stringify([contextGeneration.value,session.value?.user.id,session.value?.tenant.id,session.value?.permission_version,permitted.value,props.ticket.id,props.expectedVersion]))
+const key=computed(()=>JSON.stringify([ticketAuthorityKey(session.value,contextGeneration.value,props.ticket,switchingTenant.value),permitted.value,props.expectedVersion]))
 const labels={RUNNING:'计时中',PAUSED:'待客户确认，已暂停',COMPLETED:'已停止',CONFIG_PENDING:'待配置'}
 let controller: AbortController | undefined, epoch=0
 async function refresh(){
@@ -25,7 +27,8 @@ async function refresh(){
   finally{if(turn===epoch)busy.value=false}
 }
 watch(key,()=>{void refresh()},{immediate:true,flush:'sync'})
-onUnmounted(()=>{++epoch;controller?.abort()})
+watch([value,busy,error],()=>emit('changed',permitted.value&&!busy.value&&!error.value&&value.value?structuredClone(value.value):null),{immediate:true,flush:'sync'})
+onUnmounted(()=>{++epoch;controller?.abort();emit('changed',null)})
 const duration=(ms:number|null)=>ms===null?'待配置':`${(ms/60000).toFixed(2)} 分钟`
 </script>
 <template>

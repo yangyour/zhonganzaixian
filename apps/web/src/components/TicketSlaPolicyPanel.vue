@@ -6,13 +6,14 @@ import type { RegisteredTicket } from '../api/types'
 import { session, can, contextGeneration, switchingTenant } from '../stores/session'
 import { createTicketSlaPolicyWorkspace, emptyPolicyState, type PolicyScope } from '../utils/ticketSlaPolicyWorkspace'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
+import {ticketAuthorityKey} from '../utils/ticketProcessSummary'
 import { feedback } from '../utils/feedback'
 import ApiErrorNotice from './ApiErrorNotice.vue'
 const props=defineProps<{ticket:RegisteredTicket;expectedVersion:number}>(),emit=defineEmits<{bound:[]}>()
 const state=shallowRef(emptyPolicyState()),acknowledged=ref(false)
 const workspace=createTicketSlaPolicyWorkspace(api,v=>{state.value=v})
 const scope=computed<PolicyScope|null>(()=>{const s=session.value;if(!s||switchingTenant.value||s.tenant.id!==props.ticket.tenant_id||!can('tickets:read')||['viewer','tadmin'].includes(s.user.role)&&props.ticket.reporter_id!==s.user.id)return null;return{tenantId:s.tenant.id,ticketId:props.ticket.id,actorId:s.user.id,permissionVersion:s.permission_version,expectedVersion:props.expectedVersion,canWrite:['msp','padmin'].includes(s.user.role)&&can('tickets:lifecycle_write')}})
-const key=computed(()=>JSON.stringify([contextGeneration.value,scope.value])),locked=computed(()=>Boolean(state.value.busy)||state.value.attempt?.state==='uncertain')
+const key=computed(()=>JSON.stringify([ticketAuthorityKey(session.value,contextGeneration.value,props.ticket,switchingTenant.value),scope.value])),locked=computed(()=>Boolean(state.value.busy)||state.value.attempt?.state==='uncertain')
 watch(()=>JSON.stringify(state.value.view),()=>{acknowledged.value=false})
 watch(key,()=>{acknowledged.value=false;workspace.reset(scope.value);if(scope.value)void workspace.refresh()},{immediate:true,flush:'sync'})
 async function bind(){if(!acknowledged.value||locked.value)return;if(await workspace.bind()){acknowledged.value=false;emit('bound')}}

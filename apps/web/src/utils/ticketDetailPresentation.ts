@@ -2,6 +2,7 @@ import type { RegisteredTicket } from '../api/types'
 import type { InternalNote } from './internalNoteWorkspace'
 import type { TicketComment } from './ticketCommentWorkspace'
 import type { WorklogEntry } from './worklogWorkspace'
+import {processLabel,priorityClockLabel,type TicketProcessSummary} from './ticketProcessSummary'
 import { displayTime } from './display'
 import { impactScopeLabel, urgencyLabel } from './ticket'
 import { formatWorklogDuration, summarizeWorklogPage, worklogKindLabels } from './worklogPageSummary'
@@ -26,13 +27,13 @@ export function maskedContact(value: string): string {
 }
 
 /** Text download avoids spreadsheet formulas and active HTML, and identifies its exact visible scope. */
-export function ticketDetailText(ticket: RegisteredTicket, tenantName: string, activities: readonly TicketActivity[], worklogs: readonly WorklogEntry[] | null, activityScope: string, worklogScope: string, exportedAt: string): string {
+export function ticketDetailText(ticket: RegisteredTicket, tenantName: string, activities: readonly TicketActivity[], worklogs: readonly WorklogEntry[] | null, activityScope: string, worklogScope: string, exportedAt: string,process:TicketProcessSummary|null=null): string {
   const summary = summarizeWorklogPage(worklogs)
   return [
     '工单详情 · 当前可见信息', `导出时间：${exportedAt}`, `登记编号：${ticket.receipt_no}`, `标题：${ticket.title}`,
     `客户：${tenantName}`, `创建时间：${displayTime(ticket.created_at)}`, `设备：${ticket.asset_name || (ticket.asset_id ? '已关联（名称暂未提供）' : '未关联')}`,
     `问题类型：${ticket.category}`, `影响范围：${impactScopeLabel[ticket.impact_scope]}`, `紧急程度：${urgencyLabel[ticket.urgency]}（人工登记）`,
-    `登记来源：${ticketRegistrationOrigin(ticket)}`, `联系人：${ticket.contact_name}`, `联系方式：${maskedContact(ticket.contact_phone)}`, '正式状态 / 优先级 / SLA：暂未提供',
+    `登记来源：${ticketRegistrationOrigin(ticket)}`, `联系人：${ticket.contact_name}`, `联系方式：${maskedContact(ticket.contact_phone)}`, `当前生命周期：${processLabel(process)}`,`优先级 / SLA：${priorityClockLabel(process)}`,`登记权威来源：${ticket.authority_source} · ${ticket.sync_state==='NOT_APPLICABLE'?'外部同步不适用':'外部同步状态未核对'}`,
     '', '问题描述', ticket.description, '', `处理进展（${activityScope}）`,
     ...activities.flatMap(item => [`${displayTime(item.time)} · ${item.title}${item.author ? ' · ' + item.author : ''}`, item.text, '']),
     `处理工时（${worklogScope}）`, '记录工程师实际作业起止时间（跨日记录按原始时段保存，不自动拆分；计费核算以商务结算规则为准）。',
@@ -41,6 +42,6 @@ export function ticketDetailText(ticket: RegisteredTicket, tenantName: string, a
       item.note || '未填写工作描述',
     ])),
     `本页累计：${summary ? formatWorklogDuration(summary.totalMillis) : '未读取'}`,
-    '', '当前已完成故障受理入库；工单分派流转与 SLA 考核计时将在 ITSM 流程启用后自动关联。本文件仅包含上述读取范围，不是完整工单归档或验收证明。',
+    '', '本文件只包含报障登记及上述已读取范围；未取得的流程/SLA信息保持未知，不代表外部ITSM或通知送达已接通，也不是完整工单归档或验收证明。',
   ].join('\n')
 }

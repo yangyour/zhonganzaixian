@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -46,7 +47,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /** Real Spring Security/HTTP protocol with isolated repository doubles, not external integration evidence. */
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
-@ActiveProfiles("local_fixture")
+@ActiveProfiles({"local_fixture","isolated_monitoring_page_intake_http"})
 @ContextConfiguration(classes = MonitoringPageIntakeHttpTest.Configuration.class)
 class MonitoringPageIntakeHttpTest {
 
@@ -60,6 +61,7 @@ class MonitoringPageIntakeHttpTest {
         "\"}";
 
     @TestConfiguration
+    @Profile("isolated_monitoring_page_intake_http")
     @EnableWebMvc
     @EnableWebSecurity
     @Import({ SecurityConfiguration.class, ApiExceptionHandler.class })

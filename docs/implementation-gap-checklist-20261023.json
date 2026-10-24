@@ -414,7 +414,8 @@
         "64d02b08",
         "25a17013",
         "ce20a715",
-        "b4b739cb"
+        "b4b739cb",
+        "b07b3c3b"
       ],
       "remaining_subitems": [
         "Complete actual dispatch, authenticated receipts, controlled retry and dead-letter API/UI",
@@ -456,7 +457,8 @@
       ],
       "commits": [
         "25a17013",
-        "ce20a715"
+        "ce20a715",
+        "b07b3c3b"
       ],
       "completed_subitems": [
         "Restored immutable V51 routing/preference controls and actual API/page/explicit worker wiring, keeping external dispatch disabled",

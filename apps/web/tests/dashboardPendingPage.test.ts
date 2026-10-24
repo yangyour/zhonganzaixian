@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import {reachabilitySample} from './assetReachability.fixture'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { createApp, h, nextTick, type App } from 'vue'
 import { createMemoryHistory, createRouter, RouterView } from 'vue-router'
@@ -37,6 +38,7 @@ beforeEach(() => {
   session.value = structuredClone(auth); switchingTenant.value = false; contextGeneration.value++
   response = fixture(); failed = false
   vi.spyOn(api, 'request').mockImplementation(async path => {
+    if(path==='/dashboard/asset-reachability')return {...reachabilitySample(),tenant_id:scope.tenantId,actor_id:scope.actorId,permission_version:scope.permissionVersion}
     if(path.startsWith('/metrics/monitoring-events?'))return eventMetrics()
     if (path === '/dashboard/actionable-tickets?page=1&page_size=5') { if (failed) throw new Error('synthetic pending outage'); return response }
     return row(new URL('http://unit' + path).searchParams.get('window') as any)

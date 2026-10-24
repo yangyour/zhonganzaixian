@@ -15,9 +15,15 @@ import LiveMonitoringPanel from '../components/LiveMonitoringPanel.vue'
 import DashboardEventsPanel from '../components/DashboardEventsPanel.vue'
 import EventNoiseTrendPanel from '../components/EventNoiseTrendPanel.vue'
 import DashboardWorkflowsPanel from '../components/DashboardWorkflowsPanel.vue'
+import AssetReachabilityPanel from '../components/AssetReachabilityPanel.vue'
+import {createReachabilityReader,emptyReachability,projectReachability} from '../utils/assetReachability'
 import ServiceObservationsPanel from '../components/ServiceObservationsPanel.vue'
 import {createServiceReader,emptyServiceState} from '../utils/serviceObservations'
 
+const reachability=shallowRef(emptyReachability()),reachabilityOpen=ref(false)
+const reachabilityReader=createReachabilityReader(api,value=>reachability.value=value)
+const reachabilityView=computed(()=>reachability.value.current?projectReachability(reachability.value.current,now.value-reachability.value.loadedAt):null)
+const reachabilityAccess=computed(()=>permitted.value&&can('assets:read'))
 const serviceState=shallowRef(emptyServiceState())
 const serviceReader=createServiceReader(api,value=>serviceState.value=value)
 const serviceAccess=computed(()=>permitted.value&&['msp','padmin'].includes(session.value?.user.role??'')&&['assets:read','tickets:read','sla_scenarios:read'].every(can))
@@ -38,7 +44,7 @@ const contextKey = computed(() => JSON.stringify([contextGeneration.value, sessi
 const windows: Record<DashboardWindow, string> = { HOURS_24: '24小时', DAYS_7: '7天', DAYS_30: '30天' }
 // M1-1: six fixed cards; the pending card and its list share the same authorized server snapshot.
 const kpis = [
-  { id: 'ASSET_ONLINE_RATE', title: '资产在线率', route: 'assets', target: '资产列表', parts: [['正常', '—'], ['未知', '—']], note: '未知单独计数，不并入正常' },
+  { id: 'ASSET_ONLINE_RATE', title: '资产在线率', route: 'assets', target: '资产列表', parts: [['正常', '—'], ['未知', '—']], note: 'ICMP可达性 · 未知单列，不代表业务健康' },
   { id: 'CURRENT_PROBLEMS', title: '当前问题', route: 'event-metrics', target: '问题明细', severities: true, note: '已排除已抑制事件' },
   { id: 'MONTH_SERVICE_AVAILABILITY', title: '本月服务可用率', route: 'sla-reports', target: '本页服务明细', note: '本月1日至今 · 无样本不视为可用' },
   { id: 'PENDING_TICKETS', title: '待处理工单', route: 'actionable-tickets', target: '全部待处理与SLA' },
@@ -53,6 +59,7 @@ function updatePending(value: ActionableTicketState) {
   pending.value = permitted.value && can('tickets:read') ? value : emptyActionableTickets()
 }
 function metricValue(id: string) {
+  if(id==='ASSET_ONLINE_RATE'){if(!reachabilityAccess.value)return '无权限';if(reachability.value.busy)return '读取中';if(reachability.value.cancelled)return '已取消';if(reachability.value.error)return '读取失败';const pct=reachabilityView.value?.percentage;return pct==null?'未知':pct.toFixed(4)+'%'}
   if(id==='CURRENT_PROBLEMS'||id==='MTTA_24H'){
     if(!eventAccess.value)return '无权限'
     if(eventMetrics.value.busy)return '读取中'
@@ -70,8 +77,8 @@ function metricValue(id: string) {
   if (pending.value.error) return '读取失败'
   return pending.value.current?.pending_tickets ?? '未知'
 }
-function metricFailed(id: string) { if(id==='MONTH_SERVICE_AVAILABILITY')return Boolean(serviceState.value.error);return Boolean(['CURRENT_PROBLEMS','MTTA_24H'].includes(id)?eventMetrics.value.error:id === 'PENDING_TICKETS' ? pending.value.error : state.value.error) }
-function metricUnknown(id: string) { if(id==='MONTH_SERVICE_AVAILABILITY')return serviceState.value.current?.monthly_summary.percentage==null;if(id==='CURRENT_PROBLEMS')return !eventMetrics.value.current;if(id==='MTTA_24H')return eventMetrics.value.current?.mtta.status!=='CALCULATED';return id === 'PENDING_TICKETS' ? pending.value.current?.pending_tickets == null : !state.value.error }
+function metricFailed(id: string) { if(id==='ASSET_ONLINE_RATE')return Boolean(reachability.value.error); if(id==='MONTH_SERVICE_AVAILABILITY')return Boolean(serviceState.value.error);return Boolean(['CURRENT_PROBLEMS','MTTA_24H'].includes(id)?eventMetrics.value.error:id === 'PENDING_TICKETS' ? pending.value.error : state.value.error) }
+function metricUnknown(id: string) { if(id==='ASSET_ONLINE_RATE')return reachabilityView.value?.percentage==null; if(id==='MONTH_SERVICE_AVAILABILITY')return serviceState.value.current?.monthly_summary.percentage==null;if(id==='CURRENT_PROBLEMS')return !eventMetrics.value.current;if(id==='MTTA_24H')return eventMetrics.value.current?.mtta.status!=='CALCULATED';return id === 'PENDING_TICKETS' ? pending.value.current?.pending_tickets == null : !state.value.error }
 function severityCount(key:string){return eventMetrics.value.current?.current_problems.by_severity[key.toUpperCase() as keyof EventMetricSnapshot['current_problems']['by_severity']]??'未知'}
 function metricLink(id:string,name:string){if(id==='MONTH_SERVICE_AVAILABILITY')return {hash:'#service-health-title'};return name==='event-metrics'?{name,query:{window:'HOURS_24',view:id==='CURRENT_PROBLEMS'?'CURRENT_PROBLEMS':'RECENT_PROBLEMS'}}:{name}}
 function metricNote(id:string,fallback:string){if(id==='MONTH_SERVICE_AVAILABILITY'){const summary=serviceState.value.current?.monthly_summary;return summary?`已满足覆盖 ${summary.qualified_service_count}/${summary.service_count} 个服务 · 按有效时长汇总`:'本月1日至今 · 无样本不视为可用'}const m=eventMetrics.value.current?.mtta;if(id!=='MTTA_24H'||!m)return fallback;return m.status==='SAMPLE_BUDGET_EXCEEDED'?'超过完整样本核算预算':`确认样本 ${m.sample_count??'未知'} · 未确认 ${m.unacknowledged_count??'未知'} · 异常 ${m.invalid_count??'未知'}`}
@@ -87,6 +94,7 @@ let timer: ReturnType<typeof setInterval> | undefined, lastRefresh = 0, alive = 
 async function refresh(window: DashboardWindow = state.value.window) {
   const owner = contextKey.value
   lastRefresh = performance.now()
+  if(reachabilityAccess.value)void reachabilityReader.load()
   if(serviceAccess.value)void serviceReader.load()
   if(permitted.value&&eventAccess.value)void metricReader.load()
   if (await workspace.load(window) && alive && owner === contextKey.value) loadedAt.value = performance.now()
@@ -100,6 +108,8 @@ watch(contextKey, () => {
   loadedAt.value = null
   pending.value = emptyActionableTickets()
   const current = session.value
+  reachabilityOpen.value=false
+  reachabilityReader.reset(reachabilityAccess.value&&current?{tenantId:current.tenant.id,actorId:current.user.id,permissionVersion:current.permission_version,canRead:true}:null)
   serviceReader.reset(serviceAccess.value&&current?{tenantId:current.tenant.id,actorId:current.user.id,permissionVersion:current.permission_version,canRead:true}:null)
   metricReader.reset(permitted.value&&eventAccess.value&&current?{tenantId:current.tenant.id,actorId:current.user.id,permissionVersion:current.permission_version,canRead:true}:null)
   workspace.reset(permitted.value && current ? { tenantId: current.tenant.id, actorId: current.user.id, permissionVersion: current.permission_version, role: current.user.role, canRead: true } : null)
@@ -111,7 +121,7 @@ onMounted(() => {
     if (permitted.value && autoRefresh.value && !document.hidden && now.value - lastRefresh >= 30000) { void refresh(); trendPanel.value?.refresh(); void eventPanel.value?.refresh(); void workflowPanel.value?.refresh() }
   }, 1000)
 })
-onUnmounted(() => { alive = false; clearInterval(timer); workspace.dispose(); metricReader.dispose(); serviceReader.dispose() })
+onUnmounted(() => { alive = false; clearInterval(timer); workspace.dispose(); metricReader.dispose(); serviceReader.dispose(); reachabilityReader.dispose() })
 </script>
 <template>
   <section class="dashboard-page" aria-labelledby="dashboard-title">
@@ -138,14 +148,17 @@ onUnmounted(() => { alive = false; clearInterval(timer); workspace.dispose(); me
             <span v-for="[key, label] in severities" :key="key" class="mop-sev" :class="key">{{ label }} {{severityCount(key)}}</span>
           </div>
           <p v-else-if="kpi.id === 'PENDING_TICKETS'" class="mop-kpi-detail kpi-parts"><span>已超 SLA <b :class="{ 'kpi-failed': (pending.current?.overdue_sla ?? pending.current?.known_overdue ?? 0) > 0 }">{{ pending.current?.overdue_sla ?? '未知' }}</b></span><span v-if="pending.current?.overdue_sla === null">已确认 {{ pending.current.known_overdue }} · 未知 {{ pending.current.unknown_sla }}</span></p>
+          <p v-else-if="kpi.id==='ASSET_ONLINE_RATE'" class="mop-kpi-detail kpi-parts"><span>正常 <b>{{reachabilityView?.normal??'未知'}}</b></span><span>无响应 <b>{{reachabilityView?.no_response??'未知'}}</b></span><span>未知 <b>{{reachabilityView?.unknown??'未知'}}</b></span></p>
           <p v-else-if="'parts' in kpi" class="mop-kpi-detail kpi-parts"><span v-for="[label, value] in kpi.parts" :key="label">{{ label }} <b>{{ value }}</b></span></p>
           <div class="kpi-foot">
             <span v-if="kpi.id === 'PENDING_TICKETS' && pending.current" class="mop-kpi-detail">{{ pendingNote }}</span>
             <span v-if="'note' in kpi" class="mop-kpi-detail">{{ metricNote(kpi.id,kpi.note) }}<span v-if="kpi.id==='MTTA_24H'&&eventMetrics.current?.mtta.target_breached" class="mop-badge warning">超出5分钟目标</span></span>
-            <router-link v-if="allowedRoutes.has(kpi.route)" class="mop-kpi-link" :to="metricLink(kpi.id,kpi.route)" :aria-label="`${kpi.title}：打开${kpi.target}`">{{ kpi.target }}<ArrowRight aria-hidden="true" /></router-link>
+            <button v-if="kpi.id==='ASSET_ONLINE_RATE'&&reachabilityAccess" class="mop-kpi-link" @click="reachabilityOpen=!reachabilityOpen">资产在线明细</button>
+            <router-link v-else-if="allowedRoutes.has(kpi.route)" class="mop-kpi-link" :to="metricLink(kpi.id,kpi.route)" :aria-label="`${kpi.title}：打开${kpi.target}`">{{ kpi.target }}<ArrowRight aria-hidden="true" /></router-link>
           </div>
         </article>
       </div>
+      <AssetReachabilityPanel v-if="reachabilityOpen&&reachabilityAccess" :state="reachability" :now="now" @refresh="reachabilityReader.load()" @cancel="reachabilityReader.cancel()" @close="reachabilityOpen=false" />
       <p class="dashboard-source-status">{{ eventMetrics.current ? '问题计数与MTTA来自授权事件投影；采集时效与时钟准确性未核验，其他未接入指标不补值。' : pending.current ? '待处理工单与下方列表来自同一授权汇总；未配置流程单列为未知，其余未接入指标不补值。' : state.current ? '正式指标尚未接入。以下业务记录与设备采样独立读取，不作为上述指标的替代值。' : '尚未取得有效首页状态，未显示缓存指标。' }}</p>
       <div :key="contextKey" class="dashboard-grid">
         <section class="dashboard-card mop-card span-8" data-block="ALERT_TREND" aria-labelledby="alert-trend-title">

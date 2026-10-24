@@ -1,0 +1,55 @@
+{
+  "status": "CODE_VALIDATED_RUNTIME_NOT_RUN",
+  "java": {
+    "command": "mvn -o verify",
+    "total": 5535,
+    "passed": 4353,
+    "skipped": 1182,
+    "failures": 0,
+    "errors": 0,
+    "packaging": "PASSED"
+  },
+  "web": {
+    "tests": 5698,
+    "files": 353,
+    "typecheck": "PASSED",
+    "build": "PASSED",
+    "policy_and_product_copy": "PASSED"
+  },
+  "contracts": {
+    "tests": 236,
+    "passed": 236,
+    "generation_consistency": "PASSED"
+  },
+  "offline_demo": {
+    "tests": 18,
+    "passed": 18,
+    "provisioning": false
+  },
+  "new_targeted": {
+    "java": 13,
+    "pg_declared": 3,
+    "pg_executed": 0,
+    "browser_declared": 2,
+    "browser_executed": 0
+  },
+  "browser_discovery": {
+    "tests": 195,
+    "files": 30,
+    "scope": "DISCOVERY_ONLY"
+  },
+  "runtime": {
+    "pg": "NOT_RUN_DESIGNATED_CONNECTION_CONFIGURATION_MISSING",
+    "browser": "NOT_RUN_EXISTING_LAUNCH_PERMISSION_LIMIT_NOT_BYPASSED",
+    "deployment": false,
+    "migrations": false,
+    "collection_bindings_created": false,
+    "provider_writes": false
+  },
+  "contract_sha256": "5c69232b8bf03695233d6c4c236b6d4255ba53f8bb82bad1758567f81c3f1bfd",
+  "limitations": [
+    "ICMP reachability is not device or business health",
+    "Unbound/disabled/old/error observations are unknown",
+    "Zero or incomplete population cannot claim a complete percentage"
+  ]
+}

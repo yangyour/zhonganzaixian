@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import {reachabilitySample} from './assetReachability.fixture'
 // Contract layout and authorization regression; synthetic data, not live acceptance.
 import { beforeEach, afterEach, it, expect, vi } from 'vitest'
 import { createApp, nextTick, type App } from 'vue'
@@ -15,7 +16,7 @@ import { scope, row } from './dashboard.fixture'
 import {eventMetrics} from './eventOperationalMetrics.fixture'
 import {sample as serviceSample} from './serviceObservations.fixture'
 import {noiseTrend} from './eventNoiseTrend.fixture'
-const response=(path:string)=>path.startsWith('/metrics/event-noise-trend?')?noiseTrend(new URL('https://unit'+path).searchParams.get('window') as any):path.startsWith('/metrics/monitoring-events?')?eventMetrics():row(new URL('http://unit'+path).searchParams.get('window') as any)
+const response=(path:string)=>path==='/dashboard/asset-reachability'?{...reachabilitySample(),tenant_id:scope.tenantId,actor_id:scope.actorId,permission_version:scope.permissionVersion}:path.startsWith('/metrics/event-noise-trend?')?noiseTrend(new URL('https://unit'+path).searchParams.get('window') as any):path.startsWith('/metrics/monitoring-events?')?eventMetrics():row(new URL('http://unit'+path).searchParams.get('window') as any)
 const auth: Session = { user: { id: scope.actorId, role: 'padmin', display_name: '合成用户' }, tenant: { id: scope.tenantId, name: '合成租户' }, allowed_tenants: [], permission_version: 7, csrf_token: 'SYNTHETIC_NOT_CREDENTIAL', capabilities: ['dashboard:read', 'assets:read', 'tickets:read'], mode: 'remote_test', identity_source: 'synthetic-unit-only' }
 let app: App, host: HTMLElement
 const order = ['ALERT_TREND', 'SERVICE_HEALTH', 'FAULT_TIMELINE', 'RECENT_EVENTS', 'PENDING_TICKETS', 'RESOURCE_TOP5']
@@ -62,7 +63,7 @@ it('links each permitted KPI to its contract list page and omits unauthorized ta
   await router.push('/dashboard'); await router.isReady()
   app = createApp({ template: '<router-view />' }); app.use(router); app.mount(host); await settle()
   const links = Object.fromEntries([...host.querySelectorAll('[data-kpi]')].map(card => [card.getAttribute('data-kpi'), card.querySelector('a')?.getAttribute('href') ?? null]))
-  expect(links).toEqual({ ASSET_ONLINE_RATE: '/assets', CURRENT_PROBLEMS: '/event-metrics?window=HOURS_24&view=CURRENT_PROBLEMS', MONTH_SERVICE_AVAILABILITY: null, PENDING_TICKETS: '/dashboard/actionable-tickets', MTTA_24H: '/event-metrics?window=HOURS_24&view=RECENT_PROBLEMS', DELIVERY_RATE_24H: '/ticket-notifications' })
+  expect(links).toEqual({ ASSET_ONLINE_RATE: null, CURRENT_PROBLEMS: '/event-metrics?window=HOURS_24&view=CURRENT_PROBLEMS', MONTH_SERVICE_AVAILABILITY: null, PENDING_TICKETS: '/dashboard/actionable-tickets', MTTA_24H: '/event-metrics?window=HOURS_24&view=RECENT_PROBLEMS', DELIVERY_RATE_24H: '/ticket-notifications' })
   expect([...host.querySelectorAll('[data-kpi] strong')].map(node=>node.textContent)).toEqual(['未知','0','无权限','未知','—','未知'])
 })
 it('keeps KPI drill-down links behind the same route gates as the menu', async () => {
@@ -96,7 +97,7 @@ it('rejects local fixtures and dashboard revocation', async () => {
 it('keeps failure distinct from unknown successful metadata', async () => {
   await settle(); vi.mocked(api.request).mockImplementation(async path=>{if(path.startsWith('/dashboard?'))throw new Error('unit failure');return response(path)})
   host.querySelector<HTMLButtonElement>('button.dashboard-refresh')!.click(); await settle()
-  expect(host.querySelector('[data-kpi] strong')?.textContent).toBe('读取失败')
+  expect(host.querySelector('[data-kpi] strong')?.textContent).toBe('未知')
   expect(host.querySelector('[data-kpi="CURRENT_PROBLEMS"] strong')?.textContent).toBe('0')
   expect(host.querySelector('.dashboard-source-status')?.textContent).toContain('问题计数与MTTA来自授权事件投影')
 })
@@ -123,4 +124,15 @@ it('monthly service card uses the same verified duration snapshot as the service
  session.value={...auth,capabilities:[...auth.capabilities,'sla_scenarios:read']};await settle();
  expect(host.querySelector('[data-kpi="MONTH_SERVICE_AVAILABILITY"] strong')?.textContent).toBe('0.0000%');expect(host.querySelector('[data-block="SERVICE_HEALTH"]')?.textContent).toContain('0.0000%');expect(host.querySelector('[data-kpi="MONTH_SERVICE_AVAILABILITY"]')?.textContent).toContain('1/1 个服务');
  vi.mocked(api.request).mockImplementation(async path=>{if(path==='/dashboard/service-observations')throw Error('service read failed');return response(path)});host.querySelector<HTMLButtonElement>('button.dashboard-refresh')!.click();await settle();expect(host.querySelector('[data-kpi="MONTH_SERVICE_AVAILABILITY"] strong')?.textContent).toBe('读取失败');expect(host.querySelector('[data-block="SERVICE_HEALTH"] .service-row')).toBeNull();
+})
+
+it('asset card and detail share full counts and expire locally when refresh is disabled',async()=>{
+ app.unmount();vi.useFakeTimers();let now=0;vi.spyOn(performance,'now').mockImplementation(()=>now);
+ const data={...reachabilitySample(),tenant_id:scope.tenantId,actor_id:scope.actorId,permission_version:scope.permissionVersion};Object.assign(data,{normal:1,unknown:0,percentage:100});Object.assign(data.items[0]!,{state:'NORMAL',reason:'FRESH_ICMP_SAMPLE',sampled_at:data.observed_at,valid_until:'2026-10-24T00:01:00Z'});
+ vi.mocked(api.request).mockImplementation(async path=>path==='/dashboard/asset-reachability'?data:response(path));app=createApp(Page);app.mount(host);await settle();
+ expect(host.querySelector('[data-kpi="ASSET_ONLINE_RATE"] strong')?.textContent).toBe('100.0000%');
+ const button=[...host.querySelectorAll('button')].find(b=>b.textContent==='资产在线明细')!;button.click();await settle();expect(host.querySelector('[aria-labelledby="asset-reachability-title"]')?.textContent).toContain('正常 1');
+ const input=host.querySelector('input')!;input.checked=false;input.dispatchEvent(new Event('change'));await settle();now=60000;vi.advanceTimersByTime(1000);await settle();
+ expect(host.querySelector('[data-kpi="ASSET_ONLINE_RATE"] strong')?.textContent).toBe('未知');expect(host.querySelector('[aria-labelledby="asset-reachability-title"]')?.textContent).toContain('未知 1');
+ session.value={...auth,capabilities:['dashboard:read']};await settle();expect(host.querySelector('[aria-labelledby="asset-reachability-title"]')).toBeNull();
 })

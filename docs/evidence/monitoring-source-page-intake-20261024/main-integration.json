@@ -1,0 +1,81 @@
+{
+  "status": "PASSED_MERGE_VALIDATION",
+  "feature_parent": "1f081ac4f7dda39d51832d5633975e946ce60d46",
+  "main_parent": "abbee03428372b31fa7c230897263c0003fe3177",
+  "java": {
+    "tests": 38,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "classes": [
+      {
+        "class_name": "MonitoringPageIntakeHttpTest",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "MonitoringProblemIntakeHttpTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "PostgresMonitoringObjectBindingRepositoryTest",
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "MonitoringBorrowedStorageTransactionTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "NotificationCancellationHttpSecurityTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "class_name": "NotificationControlReadinessGuardTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "web": {
+    "passed": 33,
+    "failed": 0,
+    "skipped": 0,
+    "files": 4
+  },
+  "node_contract": {
+    "passed": 225,
+    "failed": 0,
+    "skipped": 0
+  },
+  "checklist": {
+    "requirements": 128,
+    "tasks": 25,
+    "unassigned": 0,
+    "completion_verified": false
+  },
+  "conflicts_resolved": [
+    "Regenerated contracts/local-api.openapi.json from both feature generators",
+    "Combined both added contract-test paths in package.json"
+  ],
+  "existing_main_features_preserved": true,
+  "original_sql_unchanged": true,
+  "deployments": 0,
+  "external_messages": 0,
+  "real_pg_evidence": "Feature run: 12 full-suite successes and one targeted replay success; no repeated real PG on merge because upstream only added a separate audit overload, with unchanged M02 call path"
+}

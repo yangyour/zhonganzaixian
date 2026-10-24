@@ -461,7 +461,9 @@
         "docs/notification-routing-retained-business-20261024.md",
         "docs/evidence/local-astra-ut-20261023/n01-retained-business/summary.json",
         "docs/delivery-attention-20261024.md",
-        "docs/evidence/delivery-attention-20261024/validation.json"
+        "docs/evidence/delivery-attention-20261024/validation.json",
+        "docs/notification-request-cancellation-20261024.md",
+        "docs/evidence/notification-request-cancellation-20261024/validation.json"
       ],
       "commits": [
         "f69fa0dd",
@@ -483,9 +485,10 @@
         "V51 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; historical active mop_test was V50 at that verification; superseded by the 2026-10-24 deployment to active V55",
         "Six routing GET paths recheck current account/session/membership before releasing results; 54 targeted authorization tests passed",
         "Six real designated retained-V51 PG business checks passed: idempotent durable discovery/routing, explicit publication and synthetic verified binding, preference withdrawal, concurrent CAS/original command, revocation and immutable history; no migrations or external dispatch",
-        "Complete bounded current-head attention reader/API/UI for UNKNOWN/FAILED/DEAD_LETTER, same-snapshot count/cursor, strict 1000-root/24002-revision budget, scoped recovery; 3 designated PG, 39 targeted Java, 5564 Web, 219 contracts and 1440/1024 synthetic Edge verified"
+        "Complete bounded current-head attention reader/API/UI for UNKNOWN/FAILED/DEAD_LETTER, same-snapshot count/cursor, strict 1000-root/24002-revision budget, scoped recovery; 3 designated PG, 39 targeted Java, 5564 Web, 219 contracts and 1440/1024 synthetic Edge verified",
+        "Atomic pre-dispatch REQUEST/ROUTE cancellation with original audit chain, V50 queue mutual exclusion, concurrent same-command convergence and strict modal recovery; 8 designated PG, 5570 Web, 221 contracts and 4 synthetic Edge scenes verified; external delivery and dead-letter disposition remain separate"
       ],
-      "review_baseline_commit": "1654838c"
+      "review_baseline_commit": "dd51b1c4"
     },
     {
       "id": "N02",

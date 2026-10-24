@@ -666,6 +666,36 @@ public final class PostgresPlatformRepository implements PlatformRepository {
         return true;
     }
     @Override public void audit(String actor,String tenant,String action,String resourceType,String resourceId,String result,String reason,String trace){auditActor(actor,null,tenant,action,resourceType,resourceId,result,reason,trace);}
+    /** Append the existing audit chain inside a caller-owned command transaction without committing it separately. */
+    void auditInTransaction(
+        Connection borrowed,
+        String actor,
+        String tenant,
+        String action,
+        String resourceType,
+        String resourceId,
+        String reason,
+        String trace
+    ) throws SQLException {
+        if (borrowed == null || borrowed.isClosed() || borrowed.getAutoCommit() || borrowed.isReadOnly()) {
+            throw new SQLException("A writable caller-owned transaction is required for command audit");
+        }
+        Connection current = transaction.get();
+        if (current != null && current != borrowed) {
+            throw new SQLException("Cannot cross existing project transaction ownership");
+        }
+        if (current == null) {
+            transaction.set(borrowed);
+        }
+        try {
+            audit(actor, tenant, action, resourceType, resourceId, "SUCCEEDED", reason, trace);
+        } finally {
+            if (current == null) {
+                transaction.remove();
+            }
+        }
+    }
+
     private void auditActor(String actor,String actorLabel,String tenant,String action,String resourceType,String resourceId,String result,String reason,String trace){inTransaction(()->{
         String namespace=tenant==null?"platform":tenant;lock("audit|"+namespace);
         Map<String,Object> row=new LinkedHashMap<>();row.put("id",UUID.randomUUID().toString());row.put("occurred_at",Instant.now().truncatedTo(ChronoUnit.MILLIS).toString());row.put("actor_id",actor);row.put("actor_name",actorLabel!=null?actorLabel:actor==null?"未认证主体":user(actor).map(FixtureUser::displayName).orElse("未认证主体"));row.put("tenant_id",tenant);row.put("action",action);row.put("resource_type",resourceType);row.put("resource_id",resourceId);row.put("result",result);row.put("reason",reason);row.put("trace_id",trace);row.put("source","postgresql");

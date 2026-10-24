@@ -1,0 +1,121 @@
+{
+  "project": "众安在线MOP",
+  "base_commit": "af261cbe",
+  "integrated_upstream_commit": "dd51b1c4",
+  "status": "VERIFIED_PRE_DISPATCH_CANCELLATION_WITH_EXPLICIT_EXTERNAL_GATES",
+  "created_at": "2026-10-24T11:01:09.034487+00:00",
+  "source_hashes": {
+    "apps/web/src/pages/NotificationRoutingPage.vue": "0ee81003601de7ca2a4122a8db2ab0a0f00441f010a3bef70d411cef4cbcb17e",
+    "apps/web/src/utils/notificationControl.ts": "8660e9986ff17a86f42ebe802751b017f96bdd36ccd29948265d63d24a007138",
+    "apps/web/tests/notificationCancellation.test.ts": "d3abbc0491179053062d3ed825290758d0b07fd593705686f6aa892516dc3968",
+    "apps/web/tests/notificationCancellationPage.test.ts": "c489e9097fb1d1d6ed59490582876094e53e154d1fa07f88da6b8db32f10fee1",
+    "apps/web/qa/notification-cancellation.fixture.ts": "811d043dc7c70c96510e381c7de5021697ed70c448c451d0e6685d152b2d25c9",
+    "apps/web/qa/notification-cancellation.fixture.html": "d25f13a892db89f83654ebc32c8fb9422f94f32864540bf3b1f3236d6772e3b1",
+    "apps/web/qa/browser/notification-cancellation.pw.ts": "e5c499bf49e5c61d55a8010407bec874ca4d4419d4477d00b401764f5f551830",
+    "server/persistence/src/main/java/cn/mop/persistence/NotificationCancellationGuard.java": "ac194f3684874155c2590f96296fc5c0a05c2ceb4290bc007ff39b8b4c0ae779",
+    "server/persistence/src/main/java/cn/mop/persistence/NotificationRequestCancellationService.java": "f9e193a6cd6dda717a7131a156614a45cce57c27d81da37a548655660a07b125",
+    "server/persistence/src/main/java/cn/mop/persistence/NotificationControlStore.java": "d3ea17699b7f63fed8f5de6dc3148e912742885fdbfb7aab3c015350b83882c1",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresDeliveryReceiptRepository.java": "17b659894d0537d8853040f7ad3b1a3df6c8d97c6a04cd51c0c76df06b80bb07",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresPlatformRepository.java": "97c07adb93930f0ee3c0adcc3db4d6cf8210d4601d637037a6e625959dc796a9",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresNotificationCancellationIntegrationTest.java": "9f70e332ab9d8a6a8b9752affd5d713a7476b08b76396c8643301502aee550be",
+    "server/api/src/main/java/cn/mop/api/NotificationCancellationController.java": "3b1148f8738affc040e431b2580787b5a9c00e71b0d3c4154f746e169db124e6",
+    "server/api/src/main/java/cn/mop/api/NotificationRoutingConfiguration.java": "1ec152c3c5041e8ae23f918cea3d0c6654ba8f5f93f41e2253f04d259fbd9976",
+    "server/api/src/test/java/cn/mop/api/NotificationCancellationHttpSecurityTest.java": "546a81e43b2085793cb56cb97da3844d238ffdaa129357b6d6cc0ec659188909",
+    "server/api/src/test/java/cn/mop/persistence/NotificationControlReadinessGuardTest.java": "dc4f0fef730183a4234a119853c3cef0be32fffbbc91dfeb6551566892d2cdd2",
+    "tools/verify-report-capture-isolated.py": "ae7a6bd50d0b2ea31314dd0b9c658a957aed099c8598190ca9be2bb9fe2fd09d",
+    "tools/notification-routing-contract.mjs": "d2404c7cead27d4e90548e0d92b59ffac9093c6168deea7b1fb12f5a5472bfec",
+    "tests/notification-cancellation-contract.test.mjs": "03abfbe78d242315abb0387ac54ae5415fdeed72d7a92158ff692d7de6a54b2e",
+    "contracts/local-api.openapi.json": "aa7abc7d6e2a0fa916c93666636c848dc090dea1b3643164f72691006b092771",
+    "package.json": "bc3ccdf2fda2828cb23405466efbd17b6849962b800db34689fbd69dcc824379"
+  },
+  "java_full_reactor": {
+    "tests": 5384,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1158,
+    "executed": 4226
+  },
+  "web_full": {
+    "files": 345,
+    "tests": 5570,
+    "failures": 0
+  },
+  "web_targeted": {
+    "files": 3,
+    "tests": 18,
+    "failures": 0
+  },
+  "contracts": {
+    "tests": 221,
+    "failures": 0,
+    "reproducible": true
+  },
+  "postgresql": {
+    "environment": "lan-test-20261008",
+    "version": "17.9 (Debian 17.9-1.pgdg12+1)",
+    "active_schema": 55,
+    "junit": {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "scope": "FRESH_SYNTHETIC_CONTROL_SOURCES_NO_CUSTOMER_OR_PROVIDER_AUTHORITY",
+    "checks": [
+      "REQUEST and unsent ROUTE revisions plus exactly one audit, original replay, plan-after-cancel guard",
+      "Existing V50 registration rejects without partial route writes",
+      "Cancelled source refuses a fresh V50 root",
+      "Concurrent cancellation and registration yield exactly one committed outcome",
+      "Different cancellation commands have one CAS winner/audit",
+      "Identical concurrent commands converge to one original receipt",
+      "Injected audit INSERT failure rolls back all cancellation revisions",
+      "Foreign object and stale current authorization rejected"
+    ],
+    "readiness": "ACTUAL_V50_V51_AUDIT_ACL_AND_READ_COMMITTED_PASSED",
+    "other_tenant_delivery_digest_unchanged": true,
+    "actual_tenant_fingerprints_unchanged": true,
+    "migration_history_unchanged": true,
+    "test_principal_deactivated": true,
+    "immutable_records_retained": true
+  },
+  "browser": {
+    "engine": "Microsoft Edge",
+    "tests": 4,
+    "widths": [
+      1440,
+      1024
+    ],
+    "scope": "SYNTHETIC_IDENTITY_INTERCEPTED_API",
+    "axe_violations": 0,
+    "explicit_reason_and_confirmation": "PASSED",
+    "keyboard": "PASSED",
+    "unknown_command_reload_readback": "PASSED",
+    "registered_delivery_rejection_preserves_reason": "PASSED",
+    "visual_review": "TWO_FINAL_SCREENSHOTS_REVIEWED"
+  },
+  "build": {
+    "typecheck": "PASSED",
+    "production_build": "PASSED",
+    "static_policy": "PASSED"
+  },
+  "schema_migrations": 0,
+  "external_messages": 0,
+  "deployment": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "failures_preserved": [
+    "MVC CSRF fixture initially added a query parameter rejected by strict no-query rule; changed to actual header transport",
+    "Mockito restubbing a throwing cancellation stub used when; replaced with doAnswer without changing assertions",
+    "New mandatory V50/isolation readiness dependencies required explicit legacy protocol doubles; added missing-dependency and snapshot rejection cases",
+    "New dialog label/button contrast and checks sampled during opening transition; scoped colors corrected and actual animation completion awaited"
+  ],
+  "remaining": [
+    "Recorded manual dead-letter disposition and controlled retry",
+    "Trusted provider lookup/authentication and continuous dispatch",
+    "Actual HTTP/browser positive writes and real V34-to-routing-to-provider business chain",
+    "Customer approval and formal contract acceptance"
+  ],
+  "screenshots": {
+    "desktop-1024.png": "1a06d69a395a89debf90e56b528924a30b5dd95a6796813f24e68826e9371504",
+    "desktop-1440.png": "428d6a11fdcb7d27402e1bd46330dbdd912f9509493c18fa3388d3e9ae251241"
+  }
+}

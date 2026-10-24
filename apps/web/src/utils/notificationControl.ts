@@ -36,9 +36,12 @@ export function createControlCommands(client:{request(path:string,options?:Reque
  const snapshot=()=>({...state,pending:state.pending?structuredClone(state.pending):null,receipt:state.receipt?structuredClone(state.receipt):null})
  const emit=()=>changed(snapshot())
  const valid=(value:unknown):value is ControlCommand=>object(value)&&uuid(value.id)&&typeof value.path==='string'
-  &&/^\/(notification-routing\/(policy|bindings|requests\/[0-9a-f-]{36}\/plan|routes\/[0-9a-f-]{36}\/[a-z-]+)|my\/notification-preferences\/publication)$/.test(value.path)
+  &&/^\/(notification-routing\/(policy|bindings|requests\/[0-9a-f-]{36}\/(plan|cancel)|routes\/[0-9a-f-]{36}\/[a-z-]+)|my\/notification-preferences\/publication)$/.test(value.path)
   &&object(value.body)&&Number.isSafeInteger(value.body.expected_version)&&(value.body.expected_version as number)>=-1
   &&(value.body.expected_version as number)<100000&&kinds.includes(value.kind as ControlKind)&&(value.objectId===null||uuid(value.objectId))
+  &&(!value.path.endsWith('/cancel')||value.kind==='REQUEST'&&value.objectId===value.path.split('/')[3]
+   &&(value.body.expected_version as number)>=0&&Object.keys(value.body).sort().join(',')==='expected_version,reason'
+   &&typeof value.body.reason==='string'&&value.body.reason.trim().length>0&&value.body.reason.length<=1000)
  function reset(next:string|null){
   const priorKey=key();epoch++;abort?.abort();abort=null
   let cleanupFailure:unknown=null
@@ -53,6 +56,8 @@ export function createControlCommands(client:{request(path:string,options?:Reque
   const entry=readControlEntry(raw)
   if(entry.command_id!==command.id||entry.kind!==command.kind||command.objectId!==null&&entry.id!==command.objectId
    ||entry.version!==(command.body.expected_version as number)+1)throw invalid()
+  if(command.path.endsWith('/cancel')&&(entry.state.status!=='CANCELLED'||entry.state.cancellation_reason!==command.body.reason
+   ||entry.state.external_dispatch_enabled!==false))throw invalid()
   storage.removeItem(key()!);state.pending=null;state.receipt=entry
  }
  async function perform(recover:boolean,retry:boolean){

@@ -16,13 +16,15 @@ interface Policy {published:boolean;resource_pool_id:string|null;matrix:Record<s
 const fresh=():Policy=>({published:false,resource_pool_id:null,matrix:null,aggregate_seconds:null,precedence:null,retry_budget:null,retry_delay_seconds:null})
 const policy=shallowRef<ControlEntry|null>(null),page=shallowRef<ControlPage|null>(null),form=reactive<Policy>(fresh())
 const policyLoaded=ref(false)
+const cancelTarget=shallowRef<ControlEntry|null>(null),cancelReason=ref('')
 const kind=ref<ControlKind>('REQUEST'),loading=ref(false),error=shallowRef<unknown>(null),dirty=ref(false),ack=ref(false),notice=ref('')
 const commandState=shallowRef<ControlCommandState>({pending:null,busy:false,error:null,receipt:null,restorationBlocked:false})
 const pendingStorage={getItem:(key:string)=>window.sessionStorage.getItem(key),setItem:(key:string,value:string)=>window.sessionStorage.setItem(key,value),removeItem:(key:string)=>window.sessionStorage.removeItem(key)}
 const commands=createControlCommands(api,pendingStorage,value=>commandState.value=value)
 const permitted=computed(()=>session.value?.mode==='remote_test'&&can('ticket_notes:read_internal')&&!switchingTenant.value)
 const writable=computed(()=>permitted.value&&can('configurations:write'))
-const scope=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,permitted.value,writable.value]))
+const journalScope=computed(()=>JSON.stringify([session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,permitted.value,writable.value,can('audit:read')]))
+const scope=computed(()=>JSON.stringify([contextGeneration.value,journalScope.value]))
 const locked=computed(()=>loading.value||commandState.value.busy||!!commandState.value.pending||commandState.value.restorationBlocked)
 let epoch=0,abort:AbortController|null=null
 type BindingChoice={id:string;receiver:string;channel:'EMAIL'|'WECHAT_WORK';label:string;active:boolean}
@@ -62,7 +64,7 @@ function cancelRead(){epoch++;abort?.abort();abort=null;loading.value=false;noti
 function discard(){if(locked.value)return;fromPolicy(policy.value);dirty.value=false;ack.value=false;notice.value='已放弃未保存编辑。'}
 async function save(){if(!writable.value||locked.value||bindingDirty.value||!dirty.value||!ack.value)return;const owner=scope.value;const ok=await commands.submit('/notification-routing/policy',{expected_version:policy.value?.version??-1,policy:JSON.parse(JSON.stringify(form))},'POLICY',policy.value?.id??null);if(ok&&owner===scope.value){dirty.value=false;notice.value='内部路由配置已记录，外部发送仍关闭。';await read()}}
 async function plan(entry:ControlEntry){if(!writable.value||locked.value||dirty.value||bindingDirty.value||entry.kind!=='REQUEST')return;const owner=scope.value;if(await commands.submit(`/notification-routing/requests/${entry.id}/plan`,{expected_version:entry.version},'REQUEST',entry.id)&&owner===scope.value)await read()}
-async function recovery(retry=false){const owner=scope.value;const ok=retry?await commands.retry():await commands.recover();if(ok&&owner===scope.value){dirty.value=false;bindingDirty.value=false;notice.value='原命令结果已核对，请以刷新后的当前版本为准。';bindingChecked.value=false;await read()}}
+async function recovery(retry=false){const cancelled=commandState.value.pending?.path.endsWith('/cancel'),owner=scope.value;const ok=retry?await commands.retry():await commands.recover();if(ok&&owner===scope.value){if(cancelled){cancelTarget.value=null;cancelReason.value=''}dirty.value=false;bindingDirty.value=false;notice.value='原命令结果已核对，请以刷新后的当前版本为准。';bindingChecked.value=false;await read()}}
 async function loadBindings(){
  if(!writable.value||locked.value||dirty.value||bindingDirty.value)return
  const turn=++epoch,controller=new AbortController();abort=controller;loading.value=true;error.value=null;choices.value=[];selected.value='';bindingChecked.value=false
@@ -92,15 +94,30 @@ async function saveBinding(){
  if(await commands.submit('/notification-routing/bindings',{expected_version:binding.value?.version??-1,binding:{receiver_id:selectedChoice.receiver,channel:selectedChoice.channel,binding_id:selectedChoice.id,valid_until:expires.toISOString(),active:bindingActive.value}},'BINDING',binding.value?.id??null)&&owner===scope.value){bindingChecked.value=false;bindingDirty.value=false;notice.value='路由绑定引用已记录，未调用供应商。';await read()}
 }
 function discardBinding(){if(locked.value)return;bindingDirty.value=false;bindingChecked.value=false;binding.value=null;until.value='';bindingActive.value=false}
-function mayLeave(){if(dirty.value||bindingDirty.value||commandState.value.pending||commandState.value.busy){notice.value='请先保存或放弃编辑，并核对未确认的原命令。';return false}return true}
+function mayLeave(){if(dirty.value||bindingDirty.value||cancelReason.value.trim()||commandState.value.pending||commandState.value.busy){notice.value='请先保存或放弃编辑，并核对未确认的原命令。';return false}return true}
 onBeforeRouteLeave(mayLeave);const unregister=contextTransitionGuards.register(mayLeave)
-function beforeUnload(event:BeforeUnloadEvent){if(dirty.value||bindingDirty.value||commandState.value.pending){event.preventDefault();event.returnValue=''}}
+function beforeUnload(event:BeforeUnloadEvent){if(dirty.value||bindingDirty.value||cancelReason.value.trim()||commandState.value.pending){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
 watch(selected,()=>{bindingChecked.value=false;binding.value=null;until.value='';bindingActive.value=false})
-watch(scope,()=>{epoch++;abort?.abort();abort=null;loading.value=false;policyLoaded.value=false;policy.value=null;page.value=null;choices.value=[];selected.value='';binding.value=null;bindingChecked.value=false;bindingDirty.value=false;until.value='';bindingActive.value=false;dirty.value=false;error.value=null;notice.value='';Object.assign(form,fresh());commands.reset(permitted.value?scope.value:null);if(permitted.value&&!commandState.value.pending&&!commandState.value.restorationBlocked)void read()},{immediate:true,flush:'sync'})
+watch(scope,()=>{cancelTarget.value=null;cancelReason.value='';epoch++;abort?.abort();abort=null;loading.value=false;policyLoaded.value=false;policy.value=null;page.value=null;choices.value=[];selected.value='';binding.value=null;bindingChecked.value=false;bindingDirty.value=false;until.value='';bindingActive.value=false;dirty.value=false;error.value=null;notice.value='';Object.assign(form,fresh());commands.reset(permitted.value?journalScope.value:null);if(permitted.value&&!commandState.value.pending&&!commandState.value.restorationBlocked)void read()},{immediate:true,flush:'sync'})
 onUnmounted(()=>{epoch++;abort?.abort();commands.dispose();unregister();window.removeEventListener('beforeunload',beforeUnload)})
 const statusLabels:Record<string,string>={WAITING_CONFIGURATION:'等待配置',QUEUED:'待派发',ROUTED:'已记录路由',CANCELLED:'已取消',UNKNOWN:'结果不明',ACCEPTED:'已受理',DELIVERED:'已记录送达',FAILED:'失败',DEAD_LETTER:'死信',MANUAL_CLOSED:'人工结束'}
-const reasonLabels:Record<string,string>={PUBLISHED_ROUTING_CONFIGURATION_REQUIRED:'等待已发布规则和本人偏好',PLANNED:'路由条件已核对；尚未派发',CONFIG_PENDING:'路由、偏好或渠道绑定未就绪',FILTERED_LEVEL:'未达到本人订阅级别',FILTERED_CHANNEL:'不在当前渠道范围',QUIET:'当前在静音时段',DUPLICATE:'处于去重窗口，未重复派发',RESULT_UNKNOWN:'原请求结果不明，须核对回执'}
+function chooseCancellation(entry:ControlEntry){
+ if(!writable.value||locked.value||dirty.value||bindingDirty.value||entry.kind!=='REQUEST'
+  ||!['WAITING_CONFIGURATION','ROUTED'].includes(String(entry.state.status)))return
+ cancelTarget.value=structuredClone(entry);cancelReason.value=''
+}
+function abandonCancellation(){if(locked.value)return;cancelTarget.value=null;cancelReason.value=''}
+async function cancelRequest(){
+ const target=cancelTarget.value
+ if(!target||!writable.value||locked.value||!cancelReason.value.trim())return
+ const owner=scope.value
+ if(await commands.submit(`/notification-routing/requests/${target.id}/cancel`,
+  {expected_version:target.version,reason:cancelReason.value},'REQUEST',target.id)&&owner===scope.value){
+  cancelTarget.value=null;cancelReason.value='';notice.value='内部通知请求已取消，原路由与审计历史保留。';await read()
+ }
+}
+const reasonLabels:Record<string,string>={PUBLISHED_ROUTING_CONFIGURATION_REQUIRED:'等待已发布规则和本人偏好',PLANNED:'路由条件已核对；尚未派发',CONFIG_PENDING:'路由、偏好或渠道绑定未就绪',FILTERED_LEVEL:'未达到本人订阅级别',FILTERED_CHANNEL:'不在当前渠道范围',QUIET:'当前在静音时段',DUPLICATE:'处于去重窗口，未重复派发',RESULT_UNKNOWN:'原请求结果不明，须核对回执',MANUALLY_CANCELLED_BEFORE_DISPATCH:'人工取消了尚未登记投递的请求'}
 </script>
 <template>
  <section class="notification-routing">
@@ -138,14 +155,32 @@ const reasonLabels:Record<string,string>={PUBLISHED_ROUTING_CONFIGURATION_REQUIR
    </div>
    <div class="proto-panel"><div class="proto-toolbar content-toolbar"><label>查看记录<select v-model="kind" :disabled="locked||dirty||bindingDirty" @change="read()"><option value="REQUEST">业务来源请求</option><option value="ROUTE">渠道派发任务</option><option value="BINDING">路由绑定</option></select></label></div>
     <p v-if="!page&&!loading">{{error?'当前记录未能读取，数量未知。':'尚未读取记录。'}}</p><p v-if="page&&!page.items.length">当前没有此类通知记录。</p>
-    <div v-if="page?.items.length" class="admin-table-scroll" tabindex="0" role="region" aria-label="通知处理记录"><table class="admin-table"><caption>当前租户的通知记录</caption><thead><tr><th scope="col">记录</th><th scope="col">渠道／级别</th><th scope="col">状态与原因</th><th scope="col">版本／更新时间</th><th scope="col">操作</th></tr></thead><tbody><tr v-for="entry in page.items" :key="entry.id"><td>{{entry.id}}</td><td>{{labels[String(entry.state.channel)]??entry.state.priority??'—'}}</td><td>{{entry.kind==='BINDING'?(entry.state.active?'有效绑定':'停用绑定'):(statusLabels[String(entry.state.status)]??'未知状态')}}<small>{{reasonLabels[String(entry.state.reason??entry.state.decision)]??entry.state.reason??entry.state.decision??''}}</small></td><td>{{entry.version}} · {{displayTime(entry.recorded_at)}}</td><td><button v-if="writable&&entry.kind==='REQUEST'" :disabled="locked||dirty||bindingDirty" @click="plan(entry)">重新核对路由</button></td></tr></tbody></table></div>
+    <div v-if="page?.items.length" class="admin-table-scroll" tabindex="0" role="region" aria-label="通知处理记录"><table class="admin-table"><caption>当前租户的通知记录</caption><thead><tr><th scope="col">记录</th><th scope="col">渠道／级别</th><th scope="col">状态与原因</th><th scope="col">版本／更新时间</th><th scope="col">操作</th></tr></thead><tbody><tr v-for="entry in page.items" :key="entry.id"><td>{{entry.id}}</td><td>{{labels[String(entry.state.channel)]??entry.state.priority??'—'}}</td><td>{{entry.kind==='BINDING'?(entry.state.active?'有效绑定':'停用绑定'):(statusLabels[String(entry.state.status)]??'未知状态')}}<small>{{reasonLabels[String(entry.state.reason??entry.state.decision)]??entry.state.reason??entry.state.decision??''}}</small></td><td>{{entry.version}} · {{displayTime(entry.recorded_at)}}</td><td><button v-if="writable&&entry.kind==='REQUEST'&&entry.state.status!=='CANCELLED'" :disabled="locked||dirty||bindingDirty" @click="plan(entry)">重新核对路由</button><button v-if="writable&&can('audit:read')&&entry.kind==='REQUEST'&&['WAITING_CONFIGURATION','ROUTED'].includes(String(entry.state.status))" :disabled="locked||dirty||bindingDirty" @click="chooseCancellation(entry)">取消未派发请求</button></td></tr></tbody></table></div>
     <button v-if="page?.next_id" :disabled="locked||dirty||bindingDirty" @click="read(true)">下一页</button>
    </div>
+   <el-dialog :model-value="cancelTarget!==null" title="取消未派发通知请求" width="560px" :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
+    <div v-if="cancelTarget" class="notification-cancellation-body">
+     <p>请求 {{cancelTarget.id}} · 当前版本 {{cancelTarget.version}}</p>
+     <p>取消后停止内部路由规划并保留历史。已有投递登记的请求会被拒绝，请继续核对原请求。</p>
+     <label>取消原因<textarea v-model="cancelReason" maxlength="1000" rows="4" :disabled="locked" /></label>
+     <ApiErrorNotice :error="commandState.error" />
+     <div v-if="commandState.pending" role="alert"><p>取消结果尚未确认，请核对同一条原命令。</p>
+      <button :disabled="commandState.busy" @click="recovery()">核对原命令</button><button :disabled="commandState.busy" @click="recovery(true)">重试原请求</button>
+      <button v-if="commandState.busy" @click="commands.cancelWait">停止等待</button></div>
+    </div>
+    <template #footer><div class="notification-cancellation-actions"><button :disabled="locked" @click="abandonCancellation">放弃取消</button><button :disabled="locked||!cancelReason.trim()" @click="cancelRequest">确认取消请求</button></div></template>
+   </el-dialog>
    <DeliveryJournalPanel />
   </template>
  </section>
 </template>
 <style scoped>
+.notification-cancellation-body, .notification-cancellation-body label { color: var(--mop-text, #2f4157); }
+.notification-cancellation-body label { display: flex; flex-direction: column; gap: 6px; }
+.notification-cancellation-body textarea { width: 100%; min-height: 100px; box-sizing: border-box; }
+.notification-cancellation-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.notification-cancellation-actions button:not(:disabled) { color: var(--mop-text, #2f4157); background: var(--mop-sunken, #f7f9fc); }
+
 .notification-routing{display:grid;gap:16px;min-width:0}.notification-routing .proto-panel>p,.notification-routing .proto-panel>div[role=alert]{margin:12px 16px}.routing-form{display:grid;gap:12px;padding:16px}.routing-form h2{margin:0}.routing-form fieldset{display:flex;gap:12px;flex-wrap:wrap;min-width:0;border:1px solid var(--border-color,#d7dee8);padding:12px}.routing-form label{display:grid;gap:6px}.routing-form label:has(input[type=checkbox]){display:flex;align-items:center;gap:8px}.routing-form input:not([type=checkbox]),.routing-form select{min-height:36px;min-width:180px}.routing-actions{display:flex;align-items:center;gap:12px}.notification-routing .admin-table td{max-width:320px;overflow-wrap:anywhere}.notification-routing small{display:block}.notification-routing .admin-table-scroll:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
 .routing-form .routing-pool-reference{width:320px;max-width:100%}.routing-form fieldset.routing-matrix{display:block}.routing-matrix>label{margin-bottom:12px}.routing-matrix .admin-table-scroll{width:100%}
 </style>

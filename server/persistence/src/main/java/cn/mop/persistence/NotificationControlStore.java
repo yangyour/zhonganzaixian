@@ -83,16 +83,29 @@ public final class NotificationControlStore {
     }
 
     public boolean ready() {
-        try (var connection = source.getConnection(); var query = query(connection,
-                "SELECT current_user='mop_test_runtime' AND has_table_privilege(current_user,'public.mop_notification_control','SELECT') "
-                        + "AND has_table_privilege(current_user,'public.mop_notification_control','INSERT') "
-                        + "AND NOT has_table_privilege(current_user,'public.mop_notification_control','DELETE,TRUNCATE') "
-                        + "AND EXISTS(SELECT 1 FROM pg_trigger WHERE tgname='mop_notification_control_guard' "
-                        + "AND tgrelid='public.mop_notification_control'::regclass AND tgenabled='O')")) {
+        try (
+            var connection = source.getConnection();
+            var query = query(
+                connection,
+                "SELECT current_user='mop_test_runtime' AND has_table_privilege(current_user,'public.mop_notification_control','SELECT') " +
+                    "AND has_table_privilege(current_user,'public.mop_notification_control','INSERT') " +
+                    "AND NOT has_table_privilege(current_user,'public.mop_notification_control','DELETE,TRUNCATE') " +
+                    "AND has_table_privilege(current_user,'public.mop_audit','SELECT') " +
+                    "AND has_table_privilege(current_user,'public.mop_audit','INSERT') " +
+                    "AND EXISTS(SELECT 1 FROM pg_trigger WHERE tgname='mop_notification_control_guard' " +
+                    "AND tgrelid='public.mop_notification_control'::regclass AND tgenabled='O')"
+            )
+        ) {
             try (var rows = query.executeQuery()) {
-                if (!rows.next() || !rows.getBoolean(1)) return false;
+                if (!rows.next() || !rows.getBoolean(1)) {
+                    return false;
+                }
                 NotificationControlSchemaVerifier.resource();
                 NotificationControlSchemaVerifier.verify(connection);
+                DeliveryReceiptSchemaVerifier.verify(connection);
+                if (connection.getTransactionIsolation() != Connection.TRANSACTION_READ_COMMITTED) {
+                    return false;
+                }
                 return true;
             }
         } catch (Exception failure) {

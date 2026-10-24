@@ -56,6 +56,14 @@ export function addNotificationRoutingContract(contract) {
   contract.paths['/notification-routing/entries'] = { get: base('listNotificationControlEntries', 'Read a bounded page of current durable control states in root creation order.', ref('NotificationControlPageResult'), 'ticket_notes:read_internal', { parameters: [{name:'kind',in:'query',required:true,schema:kind},{name:'page_size',in:'query',schema:{type:'integer',minimum:1,maximum:100,default:25}},{name:'before_time',in:'query',schema:time},{name:'before_id',in:'query',schema:uuid}] }) };
   contract.paths['/notification-routing/entries/{kind}/{id}'] = { get: base('readNotificationControlEntry', 'Read a current tenant control record; foreign objects return 404.', ref('NotificationControlResult'), 'ticket_notes:read_internal', { parameters: [{name:'kind',in:'path',required:true,schema:kind},path('id')] }) };
   contract.paths['/notification-routing/requests/{id}/plan'] = { post: write('planNotificationRoutingRequest', 'Recheck the saved source against current publications, bindings and exact receipt history. No change is an explicit 409.', object({expected_version:{type:'integer',minimum:0,maximum:99999}}), 'configurations:write', [path('id')]) };
+  contract.components.schemas.NotificationRequestCancellationWrite = object({expected_version:{type:'integer',minimum:0,maximum:99999},reason:{type:'string',minLength:1,maxLength:1000}});
+  contract.paths['/notification-routing/requests/{id}/cancel'] = { post: {
+    ...write('cancelNotificationRoutingRequest', 'Atomically cancel a pre-dispatch request and unsent routes with an audit; an existing V50 registration blocks cancellation. Original-command replay never resends.', ref('NotificationRequestCancellationWrite'), 'configurations:write', [path('id')]),
+    'x-mop-capabilities':['configurations:write','ticket_notes:read_internal','audit:read'],
+    'x-mop-cancellation-scope':'PRE_DISPATCH_CONTROL_ONLY_NOT_PROVIDER_RETRACTION',
+    'x-mop-queue-serialization':'SAME_TENANT_INTENT_RECEIVER_PHASE_ADVISORY_TRANSACTION_LOCK',
+    'x-mop-atomic-audit':true
+  } };
   contract.paths['/notification-routing/commands/{id}'] = { get: base('recoverNotificationControlCommand', 'Recover this actor original command receipt under current authority; missing does not prove cancellation.', ref('NotificationControlResult'), 'notification_preferences:read_own', { parameters:[path('id')] }) };
   contract.info.version = '0.85.0';
 }

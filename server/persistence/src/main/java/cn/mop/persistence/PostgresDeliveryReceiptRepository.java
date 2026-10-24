@@ -46,19 +46,79 @@ public final class PostgresDeliveryReceiptRepository {
     }
     private record Row(Scope scope,long version,UUID commandId,UUID actorId,long permissionVersion,String trace,long expectedVersion,String previous,byte[] encoded,String sha,String commandSha,Instant recordedAt){}
     private record Loaded(DeliveryReceiptJournal journal,Row root,List<Row> rows){}
-    private final DataSource source;private final Authorizer authorizer;private final CommandVerifier verifier;
-    public PostgresDeliveryReceiptRepository(DataSource source,Authorizer authorizer,CommandVerifier verifier){this.source=Objects.requireNonNull(source);this.authorizer=Objects.requireNonNull(authorizer);this.verifier=Objects.requireNonNull(verifier);}
+    /** Restricted project datasource; queue and cancellation share transaction-scoped source locks. */
+    private final DataSource source;
+    /** Live operation authorization, including current revocation boundaries. */
+    private final Authorizer authorizer;
+    /** Trusted prerequisites for append-only start, receipt and dead-letter transitions. */
+    private final CommandVerifier verifier;
+    /** Present V51 source cancellation is checked in the same transaction as a new delivery root. */
+    private final NotificationControlStore notificationControl;
+    public PostgresDeliveryReceiptRepository(
+        DataSource source,
+        Authorizer authorizer,
+        CommandVerifier verifier
+    ) {
+        this.source = Objects.requireNonNull(source);
+        this.authorizer = Objects.requireNonNull(authorizer);
+        this.verifier = Objects.requireNonNull(verifier);
+        this.notificationControl = new NotificationControlStore(
+            source,
+            new com.fasterxml.jackson.databind.ObjectMapper()
+        );
+    }
 
-    public Receipt queue(Access access,Scope scope,UUID commandId,Instant queuedAt,String trace){
-        matching(access,scope);if(commandId==null||!trace(trace))throw invalid();var initial=DeliveryReceiptJournal.queued(scope,queuedAt);
-        String fingerprint=fingerprint(initial.root().sha256(),commandId,access.actorId(),access.permissionVersion(),trace,-1,null);
-        return transaction(access,scope,Operation.QUEUE,c->{
-            var old=load(c,scope,true);if(old!=null){if(!old.root().commandId().equals(commandId)||!old.root().commandSha().equals(fingerprint)||!old.journal().root().sha256().equals(initial.root().sha256()))throw conflict();return new Receipt(old.journal(),0,true);}
-            rejectOtherCommand(c,access.tenantId(),commandId);
-            insert(c,scope,0,commandId,access.actorId(),access.permissionVersion(),trace,-1,null,initial.root().bytes(),initial.root().sha256(),fingerprint);
-            var stored=required(load(c,scope,true));if(!stored.journal().headSha256().equals(initial.headSha256()))throw unavailable();return new Receipt(stored.journal(),0,false);
+    public Receipt queue(Access access, Scope scope, UUID commandId, Instant queuedAt, String trace) {
+        matching(access, scope);
+        if (commandId == null || !trace(trace)) {
+            throw invalid();
+        }
+        var initial = DeliveryReceiptJournal.queued(scope, queuedAt);
+        String fingerprint = fingerprint(
+            initial.root().sha256(),
+            commandId,
+            access.actorId(),
+            access.permissionVersion(),
+            trace,
+            -1,
+            null
+        );
+        return transaction(access, scope, Operation.QUEUE, c -> {
+            NotificationCancellationGuard.beforeQueue(c, scope, notificationControl);
+            var old = load(c, scope, true);
+            if (old != null) {
+                if (
+                    !old.root().commandId().equals(commandId) ||
+                    !old.root().commandSha().equals(fingerprint) ||
+                    !old.journal().root().sha256().equals(initial.root().sha256())
+                ) {
+                    throw conflict();
+                }
+                return new Receipt(old.journal(), 0, true);
+            }
+            rejectOtherCommand(c, access.tenantId(), commandId);
+            insert(
+                c,
+                scope,
+                0,
+                commandId,
+                access.actorId(),
+                access.permissionVersion(),
+                trace,
+                -1,
+                null,
+                initial.root().bytes(),
+                initial.root().sha256(),
+                fingerprint
+            );
+            var stored = required(load(c, scope, true));
+            if (!stored.journal().headSha256().equals(initial.headSha256())) {
+                throw unavailable();
+            }
+            return new Receipt(stored.journal(), 0, false);
         });
     }
+
     public Optional<Receipt> current(Access access,Scope scope){matching(access,scope);return transaction(access,scope,Operation.READ,c->{var loaded=load(c,scope,false);return loaded==null?Optional.empty():Optional.of(new Receipt(loaded.journal(),loaded.journal().state().version(),false));});}
     public Receipt append(Access access,Scope scope,Command command){
         matching(access,scope);if(command==null||!command.actorId().equals(access.actorId())||command.permissionVersion()!=access.permissionVersion())throw invalid();

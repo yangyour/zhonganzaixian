@@ -106,3 +106,5 @@ git -C 'E:\work\wxw9\zhonganzaixian\.parallel\launch-20261023\monitoring' stash 
 - 为防止将WIP字节码混入未来发布，domain/persistence/adapters/api的`target`链接已从标准构建位置移到本检出 `.local/stopped-wip-target-links/`；实际文件仍在 `D:\CodexData\workspace-builds\monitoring-launch-20261023`。这些是草稿构建产物，不得部署；以后须按恢复后的源码重新构建。
 - Web依赖仍为本线独立D盘目录的junction，仅为文件，不是运行服务。测试数据按不可变证据保留，仅本次新身份已停用；未清除其他项目/租户数据。
 - 本次收尾只提交本进度及已审查的脱敏失败摘要，未提交任何观察草稿源码。总会话已接管main归档；本线只推送自己的功能分支，随后结束。
+
+2026-10-24 M02有界HOST来源页消费已以1f081ac4推送功能分支，raw/待处理事实/事件/工单/审计/幂等回执同事务；153Java、27Web、223契约、3Edge和13指定PG场景逐项验证。合并后保留abbee034通知取消，补验38Java/33Web/225契约；见[范围与证据](../monitoring-source-page-intake-20261024.md)。M02保持IN_PROGRESS，后台持续拉取、全局水位、迟到补读、自动raw/恢复调度和实际设备完整链仍待；未迁移、部署或外发。

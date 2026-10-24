@@ -1,0 +1,23 @@
+{
+  "status": "PASSED",
+  "environment": "lan-test-20261008",
+  "browser": "156.0.4314.42",
+  "source": "LOCAL_CANDIDATE_API_WITH_DESIGNATED_POSTGRESQL",
+  "business_writes": 0,
+  "external_messages": 0,
+  "formal_contract_acceptance": "NOT_RUN",
+  "checks": [
+    {
+      "role": "padmin",
+      "viewport": "1440x1000",
+      "projection": "production-readiness",
+      "checks": 9,
+      "actual_database_observed": true,
+      "production_ready": false,
+      "page_errors": 0,
+      "overflow": false,
+      "status": "PASSED"
+    }
+  ],
+  "finished_at": "2026-10-24T03:14:22.742Z"
+}

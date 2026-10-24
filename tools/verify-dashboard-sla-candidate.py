@@ -35,10 +35,10 @@ def require(condition, message):
 
 
 def verify(output: Path, hold: bool = False, actionable: bool = False, port: int = PORT,
-           artifact: Path | None = None, ledger_facts: bool = False):
+           artifact: Path | None = None, ledger_facts: bool = False, production_readiness: bool = False):
     output.mkdir(parents=True, exist_ok=False)
-    marker = {'session': 'local-astra-ut' if actionable or ledger_facts else 'reports',
-              'operation': 'A05-ledger-facts-http' if ledger_facts else 'UI01-actionable-candidate-http' if actionable else 'R03-SLA-candidate-http',
+    marker = {'session': 'local-astra-ut' if actionable or ledger_facts or production_readiness else 'reports',
+              'operation': 'P01-readiness-http' if production_readiness else 'A05-ledger-facts-http' if ledger_facts else 'UI01-actionable-candidate-http' if actionable else 'R03-SLA-candidate-http',
               'token': str(uuid.uuid4())}
     with LOCK.open('x', encoding='utf-8') as stream:
         json.dump(marker, stream)
@@ -211,6 +211,27 @@ def verify(output: Path, hold: bool = False, actionable: bool = False, port: int
                 result['checks'].append({'role': role, 'projection': 'asset-ledger-facts', 'assets': len(assets),
                                          'single_detail_matches_batch': True, 'version_binding_verified': True,
                                          'invalid_queries_rejected': 3, 'status': 'PASSED'})
+            if production_readiness:
+                permitted = 'configurations:read' in session['capabilities']
+                if permitted:
+                    diagnostic = call('/operations/production-readiness')
+                    require(diagnostic['tenant_id'] == tenant and diagnostic['actor_id'] == session['user']['id']
+                            and diagnostic['permission_version'] == session['permission_version'], 'Readiness scope mismatch')
+                    require(diagnostic['runtime_mode'] == 'remote_test' and diagnostic['production_ready'] is False
+                            and diagnostic['activation_performed'] is False, 'Readiness claimed production activation')
+                    require(diagnostic['runtime_database_restricted'] is True and diagnostic['database_observed_at']
+                            and diagnostic['database_version'] and len(diagnostic['checks']) == 9, 'Actual restricted database observation missing')
+                    checks = {row['id']: row for row in diagnostic['checks']}
+                    require(checks['PUBLIC_TLS_CERTIFICATE']['status'] == 'NOT_RUN'
+                            and checks['PRODUCTION_DATABASE_ISOLATION']['status'] == 'CUSTOMER_GATED'
+                            and checks['PRODUCTION_RUNTIME']['status'] == 'BLOCKED', 'Production gates were guessed')
+                    result['checks'].append({'role': role, 'projection': 'production-readiness',
+                        'database_observed': True, 'runtime_database_restricted': True, 'checks': len(checks),
+                        'production_ready': False, 'status': 'PASSED'})
+                else:
+                    denied = http.get(origin + '/api/v1/operations/production-readiness', timeout=15)
+                    require(denied.status_code == 403 and 'data' not in denied.json(), 'Unauthorized readiness observation leaked')
+                    result['checks'].append({'role': role, 'projection': 'production-readiness', 'access': 'DENIED_403', 'status': 'PASSED'})
             http.close()
         result['status'] = 'PASSED'
         if hold:
@@ -250,5 +271,6 @@ if __name__ == '__main__':
     parser.add_argument('--port', type=int, default=PORT)
     parser.add_argument('--jar', type=Path, help='Explicit locally built candidate artifact; does not deploy it')
     parser.add_argument('--ledger-facts', action='store_true', help='Also verify read-only public asset facts in existing isolated DEMO tenants')
+    parser.add_argument('--production-readiness', action='store_true', help='Verify real read-only runtime diagnostics and production gates')
     args = parser.parse_args()
-    raise SystemExit(verify(args.output.resolve(), args.hold, args.actionable, args.port, args.jar, args.ledger_facts))
+    raise SystemExit(verify(args.output.resolve(), args.hold, args.actionable, args.port, args.jar, args.ledger_facts, args.production_readiness))

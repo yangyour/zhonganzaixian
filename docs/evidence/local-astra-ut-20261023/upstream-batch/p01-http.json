@@ -1,0 +1,69 @@
+{
+  "environment": "lan-test-20261008",
+  "api_origin": "http://127.0.0.1:18217",
+  "status": "PASSED",
+  "business_writes": 0,
+  "migrations": 0,
+  "external_messages": 0,
+  "new_local_components": 0,
+  "local_application_candidate": true,
+  "full_readiness_claimed": false,
+  "checks": [
+    {
+      "role": "padmin",
+      "scope": "CURRENT_TENANT_INTERNAL",
+      "visible_items": 3,
+      "known_pending": 3,
+      "known_overdue": 1,
+      "unknown_sla": 3,
+      "overdue_sla": null,
+      "status": "PASSED"
+    },
+    {
+      "role": "padmin",
+      "projection": "production-readiness",
+      "database_observed": true,
+      "runtime_database_restricted": true,
+      "checks": 9,
+      "production_ready": false,
+      "status": "PASSED"
+    },
+    {
+      "role": "msp",
+      "scope": "CURRENT_TENANT_INTERNAL",
+      "visible_items": 3,
+      "known_pending": 3,
+      "known_overdue": 1,
+      "unknown_sla": 3,
+      "overdue_sla": null,
+      "status": "PASSED"
+    },
+    {
+      "role": "msp",
+      "projection": "production-readiness",
+      "access": "DENIED_403",
+      "status": "PASSED"
+    },
+    {
+      "role": "tadmin",
+      "scope": "REPORTER_ONLY",
+      "visible_items": 3,
+      "known_pending": 3,
+      "known_overdue": 1,
+      "unknown_sla": 1,
+      "overdue_sla": null,
+      "status": "PASSED"
+    },
+    {
+      "role": "tadmin",
+      "projection": "production-readiness",
+      "access": "DENIED_403",
+      "status": "PASSED"
+    }
+  ],
+  "formal_tc": "NOT_RUN",
+  "jar_sha256": "3d410569ba5228db43fd48ea7dbe06822d355b8fde469cb6a27a1ee440a1a208",
+  "anonymous_read_denied": true,
+  "candidate_stopped": true,
+  "finished_at": "2026-10-24T03:15:26.962776+00:00"
+}

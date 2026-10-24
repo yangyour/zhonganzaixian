@@ -7,7 +7,9 @@ import { chromium } from 'playwright';
 const origin = process.env.MOP_UI01_WEB_ORIGIN ?? 'http://127.0.0.1:15217';
 assert.match(origin, /^http:\/\/127\.0\.0\.1:\d+$/);
 const ledger = process.argv.includes('--assets');
-const output = new URL(ledger ? '../.local/a05-live-browser/' : '../.local/ui01-live-browser/', import.meta.url);
+const readiness = process.argv.includes('--readiness');
+assert.ok(!(ledger && readiness));
+const output = new URL(readiness ? '../.local/p01-live-browser/' : ledger ? '../.local/a05-live-browser/' : '../.local/ui01-live-browser/', import.meta.url);
 mkdirSync(output, { recursive: false });
 const privatePath = 'E:/work/wxw9/zhonganzaixian/mop-platform/deploy/private/demo-full-20261023.json';
 const demo = JSON.parse(readFileSync(privatePath, 'utf8').replace(/^\uFEFF/, ''));
@@ -46,6 +48,29 @@ try {
     const page = await context.newPage();
     const pageErrors = [];
     page.on('pageerror', failure => pageErrors.push(failure.name));
+    if (readiness) {
+      if (role !== 'padmin') {
+        await context.close();
+        continue;
+      }
+      const diagnostic = await call('/operations/production-readiness');
+      await page.goto(origin + '/runtime-configurations');
+      const panel = page.locator('details').filter({ has: page.locator('summary').filter({ hasText: '生产启用检查' }) });
+      await panel.locator('summary').click();
+      await panel.getByRole('button', { name: '检查运行隔离' }).click();
+      await panel.getByText('生产未就绪；当前测试数据库账号符合运行限制。', { exact: true }).waitFor();
+      assert.equal(await panel.locator('li').count(), diagnostic.checks.length);
+      assert.ok((await panel.textContent()).includes(diagnostic.database_version));
+      assert.ok((await panel.textContent()).includes('待客户确认'));
+      assert.ok((await panel.textContent()).includes('未检查'));
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
+      assert.deepEqual(pageErrors, []);
+      await page.screenshot({ path: new URL('padmin-readiness.png', output).pathname.replace(/^\/([A-Z]:)/i, '$1'), fullPage: true });
+      result.checks.push({ role, viewport: '1440x1000', projection: 'production-readiness', checks: diagnostic.checks.length,
+        actual_database_observed: true, production_ready: false, page_errors: 0, overflow: false, status: 'PASSED' });
+      await context.close();
+      continue;
+    }
     if (ledger) {
       const assets = (await call('/assets?page_size=100')).items;
       assert.ok(assets.length > 0 && assets.length <= 100);

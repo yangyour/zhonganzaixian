@@ -1,0 +1,75 @@
+{
+  "status": "CODE_VALIDATED_MAPPING_PUBLICATION_REAL_COMPONENTS_PENDING",
+  "recorded_at": "2026-10-23T23:58:40Z",
+  "java": {
+    "tests": 5082,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1120,
+    "executed": 3962
+  },
+  "web": {
+    "files": 335,
+    "tests": 5368,
+    "failures": 0
+  },
+  "node_contracts": {
+    "tests": 256,
+    "failures": 0
+  },
+  "demo_plan_tests": 18,
+  "typecheck": "PASSED",
+  "build": "PASSED_WITH_EXISTING_CHUNK_WARNING",
+  "contract_generator": "PASSED",
+  "migration_candidate": "V55",
+  "candidate_sha256": "03bf7bcc280c0054ad8e52b1d2ff2aa8cafff921a282f2edef04a890faa1b01b",
+  "candidate_applied": false,
+  "candidate_frozen": false,
+  "reservation_remote_commit": "f9d8c59c26217410a350ed0104de4f0413c14a5e",
+  "last_origin_main": "f9d8c59c26217410a350ed0104de4f0413c14a5e",
+  "sql_parser": {
+    "library": "pglast 8.7",
+    "statements": 13,
+    "plpgsql_blocks": 2,
+    "database_execution": false
+  },
+  "v1_through_v54_changed": false,
+  "v51_sha256": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b",
+  "designated_postgresql": "BLOCKED_MISSING_PRIVATE_CONFIGURATION",
+  "real_zabbix": "NOT_RUN",
+  "real_identity": "NOT_RUN",
+  "browser": "NOT_RUN",
+  "source_adapter": "Zabbix 7.0 host/item own-host tag metadata only",
+  "physical_device_identity_verified": false,
+  "external_configuration_applied": false,
+  "continuous_collection_verified": false,
+  "outbound_dispatch_enabled": false,
+  "real_tenant_writes": 0,
+  "migrations_applied": 0,
+  "deployed": false,
+  "github": "PENDING_LARGE_CONTRACT_UPLOAD",
+  "initial_failures_and_resolution": [
+    {
+      "scope": "controller role-change unit",
+      "failure": "Expected 401 but actual 403 after padmin->msp removes configurations:read",
+      "resolution": "Assert exact capability denial 403; retained independent revoked-membership 401 and foreign-tenant rejection tests."
+    },
+    {
+      "scope": "migration history tests",
+      "failure": "22 stale script-list errors after adding explicit V55 to registry",
+      "resolution": "Append V55 to full historical test inventory; preserve contiguous/checksum rejection assertions and add explicit V55 predecessor/no-auto-apply test."
+    },
+    {
+      "scope": "offline demo golden",
+      "failure": "Contract digest changed after new API",
+      "resolution": "Regenerate preparation-only golden from same fixed unit input; no account creation, initialization, network or business writes."
+    }
+  ],
+  "remaining": [
+    "Wire puller/raw/quarantine persistent mapping consumption before business event/ticket/notification fanout",
+    "Other providers require explicit ownership metadata adapters",
+    "Collector/rule publication, parameter/OID consumption and verified first values",
+    "Designated PG concurrent/ACL/trigger and actual Zabbix identity/timeout verification",
+    "Browser and formal acceptance"
+  ]
+}

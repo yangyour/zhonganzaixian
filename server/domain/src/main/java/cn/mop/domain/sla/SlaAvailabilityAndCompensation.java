@@ -259,25 +259,15 @@ public final class SlaAvailabilityAndCompensation {
         if (samplesSec == null || samplesSec.isEmpty()) {
             return new LatencyStats(0, Math.max(0, unrecoveredCount), null, null, null);
         }
-        List<Long> sorted = new ArrayList<>(samplesSec);
-        sorted.sort(Long::compareTo);
-        long sum = 0;
-        for (long v : sorted) sum += v;
-        long mean = Math.round((double) sum / sorted.size());
-        long p50 = percentileNearestRank(sorted, 50);
-        long p95 = percentileNearestRank(sorted, 95);
-        return new LatencyStats(sorted.size(), Math.max(0, unrecoveredCount), mean, p50, p95);
+        var values=samplesSec.stream().map(v->java.math.BigInteger.valueOf(v).multiply(java.math.BigInteger.valueOf(1000))).toList();
+        var result=cn.mop.domain.operations.OperationalLatencyStatistics.calculate(values);
+        return new LatencyStats(result.sampleCount(),Math.max(0,unrecoveredCount),
+                cn.mop.domain.operations.OperationalLatencyStatistics.seconds(result.meanMillis()),
+                cn.mop.domain.operations.OperationalLatencyStatistics.seconds(result.medianMillis()),
+                result.p95Millis().divide(java.math.BigInteger.valueOf(1000)).longValueExact());
     }
 
-    private static long percentileNearestRank(List<Long> sorted, int percentile) {
-        if (percentile == 50 && sorted.size() % 2 == 0) {
-            int mid = sorted.size() / 2;
-            return Math.round((sorted.get(mid - 1) + sorted.get(mid)) / 2.0);
-        }
-        int rank = (int) Math.ceil((percentile / 100.0) * sorted.size());
-        int idx = Math.max(0, Math.min(sorted.size() - 1, rank - 1));
-        return sorted.get(idx);
-    }
+
 
     public static MonthlyEvaluation evaluateMonthly(Tier tierSnapshot, Long monthlyFeeFen, List<TicketSample> samples) {
         if (samples == null || samples.size() > SlaComplianceScenario.MAX_TICKETS) throw invalid();

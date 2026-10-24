@@ -1,0 +1,42 @@
+{
+  "status": "QUARTERLY_PUBLICATION_CHAIN_CODE_VALIDATED_REMAINING_REPORT_TYPES_AND_REAL_COMPONENTS_PENDING",
+  "restored_wip": "ad7a2fc3ee0fa899b73fe03217049fc7264b29d6",
+  "java": {
+    "discovered": 4829,
+    "executed": 3713,
+    "skipped": 1116,
+    "failures": 0,
+    "errors": 0
+  },
+  "web": {
+    "files": 323,
+    "tests": 5256,
+    "failed": 0
+  },
+  "node_contracts": {
+    "tests": 246,
+    "failed": 0
+  },
+  "demo_plan_tests": 18,
+  "typecheck": "PASSED",
+  "build": "PASSED_WITH_EXISTING_CHUNK_WARNING",
+  "sql_parser": {
+    "library": "pglast 8.7",
+    "sql_statements": 16,
+    "plpgsql_blocks": 2,
+    "database_execution": false
+  },
+  "migration_candidate": "V53",
+  "candidate_sha256": "42ecf93f54017057db3caf27ac6b4670084866466c3ed1d9d329c362c0ab95a7",
+  "reservation_remote_commit": "73b2b83b6464ccf337f081373b7e84e879553644",
+  "candidate_applied": false,
+  "candidate_frozen": false,
+  "real_postgresql": "BLOCKED_MISSING_PRIVATE_CONFIGURATION",
+  "real_publication_pdf_fonts": "NOT_RUN",
+  "browser": "NOT_RUN",
+  "external_dispatch_enabled": false,
+  "customer_acceptance_confirmed": false,
+  "migrations_applied": 0,
+  "deployed": false,
+  "github": "PENDING_LARGE_CONTRACT_UPLOAD"
+}

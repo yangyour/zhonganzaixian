@@ -22,6 +22,15 @@ public final class PostgresMonitoringQuarantineRepository {
             c.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);c.setAutoCommit(false);
             try{
                 try(var s=c.createStatement()){s.execute("SET LOCAL synchronous_commit='on'");s.execute("SET LOCAL lock_timeout='10s'");s.execute("SET LOCAL statement_timeout='10s'");}
+                Receipt receipt=holdInTransaction(c,incoming);
+                c.commit();return receipt;
+            }catch(SQLException|RuntimeException failure){try{c.rollback();}catch(SQLException ignored){}throw unavailable();}
+        }catch(SQLException|RuntimeException failure){throw unavailable();}
+    }
+    /** Borrowed owned transaction: never commits, rolls back or closes the caller connection. */
+    static Receipt holdInTransaction(Connection c,QuarantinedMonitoringEvent incoming)throws SQLException{
+        Objects.requireNonNull(incoming);
+        if(c.getAutoCommit()||c.getTransactionIsolation()!=Connection.TRANSACTION_READ_COMMITTED)throw unavailable();
                 boolean inserted;
                 try(var s=c.prepareStatement("INSERT INTO public.mop_monitoring_quarantine(id,pool_id,source_event_id,source_phase,claimed_tenant_id,claimed_asset_id,quarantine_reason,occurred_epoch_second,occurred_nano,received_epoch_second,received_nano,payload) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(candidate_fingerprint) DO NOTHING RETURNING id")){
                     s.setObject(1,UUID.randomUUID());s.setObject(2,incoming.key().poolId());s.setString(3,incoming.key().sourceEventId());s.setString(4,incoming.key().phase().name());s.setObject(5,incoming.claims().tenantId());s.setObject(6,incoming.claims().assetId());s.setString(7,incoming.reason().name());s.setLong(8,incoming.occurredAt().getEpochSecond());s.setInt(9,incoming.occurredAt().getNano());s.setLong(10,incoming.receivedAt().getEpochSecond());s.setInt(11,incoming.receivedAt().getNano());s.setBytes(12,incoming.payload());try(var r=s.executeQuery()){inserted=r.next();}
@@ -34,9 +43,7 @@ public final class PostgresMonitoringQuarantineRepository {
                         receipt=new Receipt(inserted?Outcome.HELD:Outcome.SAME_CANDIDATE,r.getObject("id",UUID.class),stored.receivedAt());
                     }
                 }
-                c.commit();return receipt;
-            }catch(SQLException|RuntimeException failure){try{c.rollback();}catch(SQLException ignored){}throw unavailable();}
-        }catch(SQLException|RuntimeException failure){throw unavailable();}
+        return receipt;
     }
     private static QuarantinedMonitoringEvent read(ResultSet r)throws SQLException{
         if(!"HELD_UNVERIFIED".equals(r.getString("quarantine_status"))||r.getBoolean("dispatch_allowed")||r.getBoolean("source_authorized"))throw unavailable();

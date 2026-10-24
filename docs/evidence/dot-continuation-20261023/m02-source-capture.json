@@ -1,0 +1,54 @@
+{
+  "status": "CODE_VALIDATED_SINGLE_BOUND_SOURCE_CAPTURE_RAW_ONLY",
+  "recorded_at": "2026-10-24T00:30:37Z",
+  "java": {
+    "tests": 5125,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1120,
+    "executed": 4005
+  },
+  "web": {
+    "files": 335,
+    "tests": 5371,
+    "failures": 0
+  },
+  "node_contracts": {
+    "tests": 257,
+    "failures": 0
+  },
+  "demo_plan_tests": 18,
+  "typecheck": "PASSED",
+  "build": "PASSED_WITH_EXISTING_CHUNK_WARNING",
+  "contract_generator": "PASSED",
+  "storage_transaction": "Same existing authorized idempotent READ_COMMITTED connection for raw/held/audit/replay; real PG atomicity NOT_RUN",
+  "migration_added": false,
+  "v1_through_v55_changed": false,
+  "migrations_applied": 0,
+  "real_postgresql": "BLOCKED_MISSING_PRIVATE_CONFIGURATION",
+  "real_zabbix": "NOT_RUN",
+  "real_identity": "NOT_RUN",
+  "browser": "NOT_RUN",
+  "real_tenant_writes": 0,
+  "source_capture_default_enabled": false,
+  "persisted_source_authorization_status": "UNVERIFIED",
+  "business_processed": false,
+  "monitoring_applied": false,
+  "dispatch_allowed": false,
+  "sla_recovery_confirmed": false,
+  "deployed": false,
+  "formal_acceptance": "NOT_RUN",
+  "github": "LOCAL_ONLY_KNOWN_PUSH_AUTHENTICATION_AND_LARGE_CONTRACT_UPLOAD_BLOCKER",
+  "initial_failure": {
+    "scope": "borrowed-transaction Mockito unit",
+    "error": "UnfinishedStubbingException from nested mock construction in thenReturn argument",
+    "resolution": "Build the ResultSet double before setting the response; retained no-commit/no-rollback/no-close assertions"
+  },
+  "remaining": [
+    "Continuous pull and durable watermarks",
+    "Authenticated source-proof journal and durable business event consumer",
+    "ITEM trigger relationship verification",
+    "Unknown-mapping quarantine management and more providers",
+    "Real designated component/browser validation"
+  ]
+}

@@ -3,8 +3,8 @@ import {digestSha256} from './browserCrypto'
 import {inspectionUuid} from './inspectionTemplates'
 export const reportPdfMaxBytes=8*1024*1024
 const invalid=()=>new ApiError(200,'INVALID_REPORT_PDF','PDF 的身份、摘要、长度或文件结构不符，未发起下载','—')
-function abortable<T>(promise:Promise<T>,signal:AbortSignal):Promise<T>{return new Promise((resolve,reject)=>{const abort=()=>{signal.removeEventListener('abort',abort);reject(new StaleRequestError())};signal.addEventListener('abort',abort,{once:true});promise.then(v=>{signal.removeEventListener('abort',abort);resolve(v)},e=>{signal.removeEventListener('abort',abort);reject(e)});if(signal.aborted)abort()})}
-async function bounded(response:Response,limit:number,signal:AbortSignal):Promise<Uint8Array<ArrayBuffer>>{
+export function abortable<T>(promise:Promise<T>,signal:AbortSignal):Promise<T>{return new Promise((resolve,reject)=>{const abort=()=>{signal.removeEventListener('abort',abort);reject(new StaleRequestError())};signal.addEventListener('abort',abort,{once:true});promise.then(v=>{signal.removeEventListener('abort',abort);resolve(v)},e=>{signal.removeEventListener('abort',abort);reject(e)});if(signal.aborted)abort()})}
+export async function bounded(response:Response,limit:number,signal:AbortSignal):Promise<Uint8Array<ArrayBuffer>>{
  if(signal.aborted){void response.body?.cancel().catch(()=>{});throw new StaleRequestError()}
  if(!response.body)throw invalid();const reader=response.body.getReader(),chunks:Uint8Array[]=[];let length=0
  const cancel=()=>{void reader.cancel().catch(()=>{})};signal.addEventListener('abort',cancel,{once:true})

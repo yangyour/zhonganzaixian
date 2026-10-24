@@ -74,7 +74,13 @@ public final class PostgresDeliveryReceiptRepository {
             var stored=required(load(c,scope,true));if(!stored.journal().headSha256().equals(result.journal().headSha256()))throw unavailable();return new Receipt(stored.journal(),result.appliedVersion(),false);
         });
     }
-    private Loaded load(Connection c,Scope scope,boolean write)throws SQLException{
+    /** Borrowed read only; caller must hold current authorization and scope locks in the same transaction. */
+    record ReadJournal(DeliveryReceiptJournal journal,UUID queueCommandId,Instant firstRecordedAt,Map<UUID,Instant> commandRecordedAt){ReadJournal{commandRecordedAt=Map.copyOf(commandRecordedAt);}}
+    static ReadJournal readVerifiedInTransaction(Connection c,Scope scope)throws SQLException{
+        if(c.getAutoCommit())throw unavailable();var loaded=required(load(c,scope,false));var times=new HashMap<UUID,Instant>();for(var row:loaded.rows())if(times.put(row.commandId(),row.recordedAt())!=null)throw unavailable();
+        return new ReadJournal(loaded.journal(),loaded.root().commandId(),loaded.root().recordedAt(),times);
+    }
+    private static Loaded load(Connection c,Scope scope,boolean write)throws SQLException{
         try(var q=query(c,"SELECT 1 FROM "+TABLE+" WHERE tenant_id=? AND delivery_id=? AND version=0 "+(write?"FOR UPDATE":"FOR SHARE"))){q.setObject(1,scope.tenantId());q.setObject(2,scope.deliveryId());try(var r=q.executeQuery()){if(!r.next())return null;}}
         var rows=new ArrayList<Row>();
         try(var q=query(c,"SELECT * FROM "+TABLE+" WHERE tenant_id=? AND delivery_id=? ORDER BY version LIMIT 12002")){q.setObject(1,scope.tenantId());q.setObject(2,scope.deliveryId());try(var r=q.executeQuery()){while(r.next())rows.add(row(r));}}

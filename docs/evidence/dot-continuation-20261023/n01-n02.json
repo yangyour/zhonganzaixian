@@ -1,0 +1,32 @@
+{
+  "status": "ROUTING_CONTROL_CODE_VALIDATED_EXTERNAL_CHAIN_PENDING",
+  "restored_wip": "e7fa879aa52004d311d29367efa878ec6875c459",
+  "frozen_v51_sha256": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b",
+  "migrations_applied": 0,
+  "java": {
+    "discovered": 4748,
+    "executed": 3646,
+    "skipped": 1102,
+    "failures": 0,
+    "errors": 0
+  },
+  "web": {
+    "files": 316,
+    "tests": 5219,
+    "failed": 0
+  },
+  "node_contracts": {
+    "tests": 241,
+    "failed": 0
+  },
+  "demo_plan_tests": 18,
+  "build": "PASSED_WITH_EXISTING_CHUNK_WARNING",
+  "typecheck": "PASSED",
+  "profile_failure": "Three original failures reproduced; conflicting test store bean isolated with dedicated test profile; original startup assertions preserved",
+  "source_collection_failures": "Not reproduced in targeted or full current runs; unchanged assertions and timeout; original environment cause remains unverified",
+  "designated_postgresql": "BLOCKED_MISSING_PRIVATE_CONFIGURATION",
+  "browser": "NOT_RUN",
+  "external_dispatch": false,
+  "deployed": false,
+  "github": "PENDING_LARGE_CONTRACT_UPLOAD"
+}

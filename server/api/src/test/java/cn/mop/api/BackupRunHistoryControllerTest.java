@@ -1,0 +1,27 @@
+package cn.mop.api;
+import cn.mop.domain.*;
+import cn.mop.domain.backup.*;
+import cn.mop.domain.backup.BackupRunHistoryReader.*;
+import java.time.*;
+import java.util.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.mock.web.MockHttpServletRequest;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+/** Synthetic immutable run snapshots and scope races only. */
+class BackupRunHistoryControllerTest {
+ static UUID id(int n){return UUID.fromString("79000000-0000-4000-8000-"+String.format("%012d",n));}
+ final UUID tenant=id(1),actor=id(2),asset=id(3);final Instant now=Instant.parse("2026-10-23T20:00:00Z");
+ final PlatformRepository platform=mock(PlatformRepository.class);final BackupRunHistoryReader reader=mock(BackupRunHistoryReader.class);final BackupRunHistoryController controller=new BackupRunHistoryController(platform,reader);final MockHttpServletRequest request=new MockHttpServletRequest();
+ BackupRunHistoryControllerTest(){request.setUserPrincipal(()->actor.toString());request.getSession().setAttribute("mop.tenant_id",tenant.toString());when(platform.membership(actor.toString(),tenant.toString())).thenReturn(Optional.of(new Membership(actor.toString(),tenant.toString(),"padmin",1,true)));}
+ Page page(BackupRunState state){return new Page(new Access(tenant,actor,1),asset,now.plusSeconds(5000),20,1,List.of(new Entry(id(4),state,"a".repeat(64))),null);}
+ @Test void twoFailedAttemptsAreNotTwoFinalRunsOrAutomaticTicketPermission(){var state=BackupRunState.queued(tenant,asset,now);for(int n=0;n<2;n++){state=state.start(state.version(),now.plusSeconds(n*700));state=state.fail(state.version(),now.plusSeconds(n*700+1),BackupRunState.Failure.READ_TIMEOUT);}var dto=BackupRunHistoryController.dto(page(state));var item=(Map<?,?>)((List<?>)dto.get("items")).get(0);assertEquals(2L,item.get("known_failed_attempt_count"));assertNull(item.get("final_run_failure_count"));assertEquals("RETRY_WAIT",item.get("state"));assertNull(dto.get("failure_count_semantics"));assertNull(dto.get("consecutive_failure_count"));assertEquals(false,dto.get("automatic_ticket_allowed"));assertEquals(2,dto.get("failure_ticket_threshold"));assertEquals(600,dto.get("ticket_deadline_seconds"));}
+ @Test void unknownAttemptNeverBecomesKnownFailure(){var state=BackupRunState.queued(tenant,asset,now).start(0,now).markUnknown(1,now.plusSeconds(1));var item=(Map<?,?>)((List<?>)BackupRunHistoryController.dto(page(state)).get("items")).get(0);assertEquals(0L,item.get("known_failed_attempt_count"));assertNull(item.get("final_run_failure_count"));assertEquals(true,item.get("reconciliation_required"));}
+ @Test void currentScopeAndStableMemberAreRequired(){when(reader.read(any(),any(),isNull(),eq(20))).thenReturn(page(BackupRunState.queued(tenant,asset,now)));assertNotNull(controller.read(asset.toString(),request));verify(reader).read(new Access(tenant,actor,1),asset,null,20);verify(platform,times(2)).membership(actor.toString(),tenant.toString());}
+ @ParameterizedTest @ValueSource(strings={"inactive","removed","version","capability","role","tenant","session"}) void returnTimeChangesNeverExposeOldRows(String change){when(reader.read(any(),any(),isNull(),eq(20))).thenAnswer(call->{switch(change){case "inactive"->when(platform.membership(actor.toString(),tenant.toString())).thenReturn(Optional.of(new Membership(actor.toString(),tenant.toString(),"padmin",1,false)));case "removed"->when(platform.membership(actor.toString(),tenant.toString())).thenReturn(Optional.empty());case "version"->when(platform.membership(actor.toString(),tenant.toString())).thenReturn(Optional.of(new Membership(actor.toString(),tenant.toString(),"padmin",2,true)));case "capability"->when(platform.membership(actor.toString(),tenant.toString())).thenReturn(Optional.of(new Membership(actor.toString(),tenant.toString(),"padmin",1,true,List.of("assets:read"))));case "role"->when(platform.membership(actor.toString(),tenant.toString())).thenReturn(Optional.of(new Membership(actor.toString(),tenant.toString(),"msp",1,true)));case "tenant"->request.getSession().setAttribute("mop.tenant_id",asset.toString());case "session"->request.getSession().invalidate();}return page(BackupRunState.queued(tenant,asset,now));});assertEquals(401,assertThrows(DomainException.class,()->controller.read(asset.toString(),request)).status);}
+ @ParameterizedTest @ValueSource(strings={"tenant_id","actor_id","before_run_id","before_queued_at","failure_count_semantics"}) void rejectsScopeAndBusinessOverrides(String key){request.addParameter(key,"untrusted");assertEquals(400,assertThrows(DomainException.class,()->controller.read(asset.toString(),request)).status);verifyNoInteractions(reader);}
+ @Test void customerWithAssetReadCannotReadInternalRunFacts(){when(platform.membership(actor.toString(),tenant.toString())).thenReturn(Optional.of(new Membership(actor.toString(),tenant.toString(),"tadmin",1,true)));assertEquals(403,assertThrows(DomainException.class,()->controller.read(asset.toString(),request)).status);verifyNoInteractions(reader);}
+ @Test void missingPrivateBindingFailsBeforeDatabase(){var source=mock(javax.sql.DataSource.class);var query=BackupRunHistoryConfiguration.configured(source,k->null);assertEquals(503,assertThrows(DomainException.class,()->query.read(new Access(tenant,actor,1),asset,null,20)).status);verifyNoInteractions(source);}
+}

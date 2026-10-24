@@ -29,6 +29,8 @@ import ManualWarrantyWorkspace from '../components/ManualWarrantyWorkspace.vue'
 import AssetMetadataQuery from '../components/AssetMetadataQuery.vue'
 import AssetDateAssessmentPanel from '../components/AssetDateAssessmentPanel.vue'
 import BackupVersionInventoryPanel from '../components/BackupVersionInventoryPanel.vue'
+import BackupRunHistoryPanel from '../components/BackupRunHistoryPanel.vue'
+import AssetMonitoringMappingPanel from '../components/AssetMonitoringMappingPanel.vue'
 import AssetDateQuery from '../components/AssetDateQuery.vue'
 import { assetLedgerColumns, assetLedgerCell } from '../utils/assetLedgerColumns'
 import { useAssetLedgerFacts } from '../utils/assetLedgerFacts'
@@ -350,6 +352,8 @@ onUnmounted(() => { disposed=true;listGeneration++;detailGeneration++;listContro
         <div v-if="metadataAllowed" class="detail-section"><h3>手工维护档案</h3><PermissionGate capability="assets:write"><div class="detail-section-actions"><el-button @click="openMetadata">扩展资料与修订历史</el-button><el-button @click="openWarranty">维保档案与供应商</el-button></div></PermissionGate></div>
         <AssetDateAssessmentPanel v-if="metadataAllowed" :asset="asset" />
         <BackupVersionInventoryPanel :key="asset.id" :asset="asset" />
+        <BackupRunHistoryPanel :asset="asset" />
+        <AssetMonitoringMappingPanel :asset="asset" />
       </div>
         <div v-else-if="detailTab === 'relations'" class="asset-inventory-panel"><div class="panel-heading"><h3>设备关联与依赖</h3><span>拓扑草稿</span></div><div class="prototype-inline-empty"><Connection /><strong>管理当前资产的上下游依赖关系</strong><el-button type="primary" @click="openDependencies">查看或编辑依赖关系</el-button></div></div>
         <div v-else-if="detailTab === 'configuration'" class="asset-inventory-panel"><div class="panel-heading"><h3>监控接入</h3><span>待确认</span></div><PermissionGate capability="assets:write"><el-button type="primary" :loading="onboarding" @click="requestOnboarding">检查接入条件</el-button></PermissionGate></div>

@@ -35,7 +35,8 @@
         "Real enabled nonempty V42 monitoring-t2 and complete lifecycle browser flow",
         "Formal SLA policy and production performance qualification",
         "Formal contract acceptance"
-      ]
+      ],
+      "integration_note": "Latest origin/main d53697df UI01 full-population pagination supersedes the earlier dot offset projection. Real component evidence belongs to the independent local session; this dot reruns code checks only."
     },
     {
       "id": "UI02",
@@ -48,10 +49,20 @@
         "M1-4",
         "M1-10"
       ],
-      "status": "OPEN",
+      "status": "IN_PROGRESS",
       "completion_criterion": "与报告/监控实际来源衔接；已定义口径可计算，来源或规则缺失保持null，不能用演示数据补正常。",
-      "evidence": [],
-      "commits": []
+      "evidence": [
+        "docs/event-operational-metrics-20261023.md",
+        "docs/evidence/dot-continuation-20261023/ui02-event-metrics.json",
+        "docs/event-noise-trend-20261023.md",
+        "docs/evidence/dot-continuation-20261023/ui02-noise-trend.json"
+      ],
+      "commits": [],
+      "remaining": [
+        "Designated PostgreSQL and browser integration; formal acceptance",
+        "Remaining source aggregates, effective denominators, frozen reports and customer-confirmed inputs",
+        "Existing SLA workflow timestamps are not yet replaced by event problem/first-ack timestamps; shared math alone is not full source unification"
+      ]
     },
     {
       "id": "UI03",
@@ -72,7 +83,9 @@
         "docs/evidence/gap-ui03-search-20261023/validation.json",
         "docs/global-search-landmark-fix-20261023.md",
         "docs/event-read-authorization-20261023.md",
-        "docs/evidence/dot-continuation-20261023/ui03-event-read-authorization.json"
+        "docs/evidence/dot-continuation-20261023/ui03-event-read-authorization.json",
+        "docs/event-noise-trend-20261023.md",
+        "docs/evidence/dot-continuation-20261023/ui02-noise-trend.json"
       ],
       "commits": [
         "1e4431b5",
@@ -187,7 +200,8 @@
       "completion_criterion": "补可信字段投影、来源和关联核验、已实现导出链的合同缺口；未知Proxy/责任人等不造值。",
       "evidence": [
         "docs/asset-ledger-public-facts-20261023.md",
-        "docs/evidence/local-astra-ut-20261023/a05/validation.json"
+        "docs/evidence/local-astra-ut-20261023/a05/validation.json",
+        "docs/asset-ledger-facts-20261023.md"
       ],
       "commits": [
         "8dc5d412"
@@ -202,7 +216,8 @@
         "Frozen export files and public reference/name consistency acceptance",
         "Authoritative business-system/Proxy relationships and actual monitoring inputs",
         "Formal contract acceptance"
-      ]
+      ],
+      "integration_note": "Preserve main 0bcd0e34 A05 improvements and its independently recorded PG/browser evidence; retain dot explicit ISO/snake-case serialization and its regression test. Dot stopped after closeout."
     },
     {
       "id": "M01",
@@ -227,11 +242,22 @@
       "status": "IN_PROGRESS",
       "completion_criterion": "实际样本/有效策略→观察确认→t2与事件/工单；复发重新安排必要任务及耐久通知意图，证明缺失不得提前停钟。",
       "evidence": [
-        "docs/parallel/monitoring-progress.md"
+        "docs/parallel/monitoring-progress.md",
+        "docs/monitoring-recovery-observation-20261023.md"
       ],
       "commits": [
         "4a62c0a3",
         "87016702"
+      ],
+      "completed_subitems": [
+        "Restored server-bound recovery observation POST/receipt and event panel",
+        "Reproduced receipt numeric-node mismatch; exact wire comparison retains all business checks",
+        "Corrected source t2 versus observation confirmation using customer timeline, preserving raw sample precision"
+      ],
+      "remaining_subitems": [
+        "Designated PG rerun including source/receipt atomicity, nonzero hold and concurrent rollback",
+        "Actual continuous source integration and browser validation",
+        "Formal contract acceptance"
       ]
     },
     {
@@ -251,12 +277,28 @@
       "status": "IN_PROGRESS",
       "completion_criterion": "完成注册任务、参数/OID/模板消费、显式应用与首值回读、失败恢复，234项目录仅按已获参数配置，不假设全部已采集。",
       "evidence": [
+        "docs/monitoring-enrollment-continuation-20261023.md",
+        "docs/evidence/dot-continuation-20261023/m02.json",
+        "docs/monitoring-object-mapping-20261023.md",
+        "docs/evidence/dot-continuation-20261023/m02-object-mapping.json",
         "docs/monitoring-simulation-boundary-20261024.md",
-        "docs/evidence/dot-continuation-20261023/m02-simulation-boundary.json"
+        "docs/evidence/dot-continuation-20261023/m02-simulation-boundary.json",
+        "docs/mapped-source-capture-20261024.md",
+        "docs/evidence/dot-continuation-20261023/m02-source-capture.json"
       ],
       "commits": [],
       "completed_subitems": [
-        "Public event intake rejects deliberate auto-ticket failure; internal simulation is limited to explicit isolated PostgreSQL and non-protected tenants, with historical customer-tenant fixture fallback removed. No real component run."
+        "Durable server-plan application, explicit policy approval, disabled registration, cancellation and server one-shot probe journal, real API/page wiring and original-command recovery; V54 candidate NOT_APPLIED",
+        "Persistent pool/HOST-or-ITEM object mapping draft/activation/revocation journal, bound own-host Zabbix metadata verification, current-authority/expiry checks, idempotent acknowledgment-only API and asset-detail actions; V55 candidate NOT_APPLIED, real component validation pending",
+        "Public event intake rejects deliberate auto-ticket failure; internal simulation is limited to explicit isolated PostgreSQL and non-protected tenants, with historical customer-tenant fixture fallback removed. No real component run.",
+        "Explicit one-event HOST source capture from current published mapping, bound metadata/event reads, shared raw/quarantine/audit/idempotency transaction and asset-detail original-command recovery; V29/V30 remain UNVERIFIED and never process recovery or dispatch."
+      ],
+      "remaining_subitems": [
+        "Complete continuous pull/watermarks, source-proof journal and durable raw-to-business consumption; one-event HOST capture now wired but unverified storage is not business authority",
+        "External collector/rule publication and independently verified first-value consumption",
+        "OID/parameter and full 234-catalog consumption",
+        "Persistent collector lifecycle and broader providers",
+        "Designated PostgreSQL/probe/browser integration and formal acceptance"
       ]
     },
     {
@@ -324,16 +366,24 @@
       "status": "IN_PROGRESS",
       "completion_criterion": "补路由发布/绑定事务、持续调度、可信签名、原请求查询、受控重试及人工处置API/页面，保留既有站内relay与DEMO通道隔离。",
       "evidence": [
-        "docs/parallel/notifications-progress.md"
+        "docs/parallel/notifications-progress.md",
+        "docs/notification-routing-continuation-20261023.md",
+        "docs/delivery-journal-read-recovery-20261024.md",
+        "docs/evidence/dot-continuation-20261023/n01-journal-read.json"
       ],
       "commits": [
         "f69fa0dd",
         "64d02b08"
       ],
       "remaining_subitems": [
-        "Restore preserved routing/preference/V51 work bbe6e5d11225e6f6615e2152abe805f48a0a10fb; full Java has 3 startup-test failures and full Web has 2 failures",
         "Complete actual dispatch, authenticated receipts, controlled retry and dead-letter API/UI",
-        "Formal contract acceptance"
+        "Formal contract acceptance",
+        "Designated V51 component/browser verification blocked by private configuration",
+        "Supplier dispatch/verified receipts/dead-letter manual workflow and remaining portal wiring"
+      ],
+      "completed_subitems": [
+        "Restored immutable V51 routing/preference controls and actual API/page/explicit worker wiring, keeping external dispatch disabled",
+        "Explicit-scope V50 local delivery journal listing, full-chain verification, immutable history and original-command read-only recovery, actual API/notification workspace and context revocation tests; delivered declarations remain unverified and no resend is authorized."
       ]
     },
     {
@@ -350,10 +400,20 @@
         "M8-9",
         "M8-12"
       ],
-      "status": "OPEN",
+      "status": "IN_PROGRESS",
       "completion_criterion": "先核对已有门户/扫码/偏好/工单入口，补桌面可实现的链路；报告入口接报告线，移动专项按后续安排，不外发真实消息。",
-      "evidence": [],
-      "commits": []
+      "evidence": [
+        "docs/notification-routing-continuation-20261023.md"
+      ],
+      "commits": [],
+      "completed_subitems": [
+        "Restored immutable V51 routing/preference controls and actual API/page/explicit worker wiring, keeping external dispatch disabled"
+      ],
+      "remaining_subitems": [
+        "Designated V51 component/browser verification blocked by private configuration",
+        "Supplier dispatch/verified receipts/dead-letter manual workflow and remaining portal wiring",
+        "Formal contract acceptance"
+      ]
     },
     {
       "id": "B01",
@@ -402,10 +462,19 @@
         "M6-5",
         "M6-7"
       ],
-      "status": "OPEN",
+      "status": "IN_PROGRESS",
       "completion_criterion": "补失败计数与幂等工单意图、恢复申请/批准/结果和演练记录、保留清理及变更检测报备，真实执行/删除默认关闭。",
-      "evidence": [],
-      "commits": []
+      "evidence": [
+        "docs/backup-run-history-20261023.md",
+        "docs/evidence/dot-continuation-20261023/b02-run-history.json"
+      ],
+      "commits": [],
+      "remaining": [
+        "Q22 published failure/reset semantics, durable deduplicated ticket intent and real consumer",
+        "Restore request/approval/manual outcome, drill records and attachment authorization",
+        "Retention cleanup and version diff/change-notice linkage",
+        "Designated component/browser integration and formal acceptance"
+      ]
     },
     {
       "id": "R01",
@@ -439,10 +508,22 @@
         "M9-6",
         "M9-8"
       ],
-      "status": "OPEN",
+      "status": "IN_PROGRESS",
       "completion_criterion": "补模板、审核发布、报告中心/阅读记录和交付意图；评分/重生成/品牌未决值配置化，年度二期条件单列。",
-      "evidence": [],
-      "commits": []
+      "evidence": [
+        "docs/report-publication-continuation-20261023.md",
+        "docs/evidence/dot-continuation-20261023/r02.json"
+      ],
+      "commits": [],
+      "completed_subitems": [
+        "Quarterly frozen-source publication repository, V53 NOT_APPLIED candidate, exact XHTML/PDF renderer, authenticated API/report center, durable command recovery and read receipts; no outbound dispatch"
+      ],
+      "remaining_subitems": [
+        "Monthly boss/full, health-check and annual source/template adapters",
+        "Revision generation, reader dashboard and unread followup integration",
+        "Source verification, customer approval policy/template gates",
+        "Designated PostgreSQL/fonts/browser integration and formal acceptance"
+      ]
     },
     {
       "id": "R03",
@@ -465,11 +546,18 @@
       "status": "IN_PROGRESS",
       "completion_criterion": "补真实来源/已定义数学、时间维度与导出、版本/未知原因，支持首页所需真实聚合；不编造成本/FTE/远程执行事实。",
       "evidence": [
-        "docs/parallel/reports-progress.md"
+        "docs/parallel/reports-progress.md",
+        "docs/event-operational-metrics-20261023.md",
+        "docs/evidence/dot-continuation-20261023/ui02-event-metrics.json"
       ],
       "commits": [
         "d58ea011",
         "b5b9d765"
+      ],
+      "remaining": [
+        "Designated PostgreSQL and browser integration; formal acceptance",
+        "Remaining source aggregates, effective denominators, frozen reports and customer-confirmed inputs",
+        "Existing SLA workflow timestamps are not yet replaced by event problem/first-ack timestamps; shared math alone is not full source unification"
       ]
     },
     {
@@ -483,6 +571,7 @@
       "completion_criterion": "实现可验证的生产配置、迁移/隔离接口和启用前守卫；最终数据库/生产DDL待Q02，不能仅改ready布尔或解除测试库限制。",
       "evidence": [
         "docs/evidence/gap-p01-runtime-20261023/closing-validation.json",
+        "docs/production-readiness-api-20261023.md",
         "docs/read-return-account-revision-20261023.md",
         "docs/evidence/dot-continuation-20261023/p01-account-read-return.json",
         "docs/json-read-account-guard-20261024.md",
@@ -492,7 +581,13 @@
         "7e05923d"
       ],
       "completed_subitems": [
+        "Restored live-database read-only diagnostic API and compact operator panel, with post-read authorization and explicit non-production gates",
         "Shared successful standard-JSON GET/HEAD account revision/session/forced-password return guard, sanitized denial and success-header removal; tenant/object and stream authorization remain separate."
+      ],
+      "remaining_subitems": [
+        "Actual designated configuration/TLS/browser verification",
+        "Production approval and Q02 isolation decision",
+        "Formal contract acceptance"
       ]
     },
     {
@@ -507,11 +602,21 @@
       "status": "IN_PROGRESS",
       "completion_criterion": "把现有传输/协调器接入实际业务授权、审计、隔离发布和受控生命周期；缺KMS/扫描服务时保持未配置，不安装或启用替代。",
       "evidence": [
-        "docs/parallel/production-progress.md"
+        "docs/parallel/production-progress.md",
+        "docs/attachment-security-continuation-20261023.md",
+        "docs/evidence/dot-continuation-20261023/p02.json"
       ],
       "commits": [
         "3fcf9323",
         "bd9c86bb"
+      ],
+      "completed_subitems": [
+        "Attachment quarantine repository/API/download revalidation and actual photo panel with durable unknown-command recovery; explicit scan-once worker; V52 candidate NOT_APPLIED"
+      ],
+      "remaining_subitems": [
+        "Designated PostgreSQL V52/MinIO/ClamD integration and real browser verification",
+        "Credential rotation/KMS and audit retention lifecycle wiring",
+        "Customer configuration and formal acceptance"
       ]
     },
     {
@@ -1982,7 +2087,7 @@
       "formal_acceptance": "NOT_RUN"
     }
   ],
-  "execution_status": "LOCAL_SINGLE_SESSION_ACTIVE",
+  "execution_status": "STOPPED_BY_USER",
   "closeout_document": "docs/development-closeout-and-remaining-20261023.md",
   "status_note": "The current dot resumed under explicit user authorization on 2026-10-23; prior six local sessions remain stopped. Implementation/validation/customer gates/formal acceptance remain distinct; local pending-upload work is not automatically in main.",
   "preserved_unverified_work": [
@@ -2069,5 +2174,5 @@
     "local_development": "STOPPED",
     "cloud_session": "CURRENT_DOT_IN_PROGRESS"
   },
-  "execution_note": "2026-10-23 latest direct user instruction resumes one local checkout; old six chats stay stopped."
+  "execution_note": "2026-10-24 01:40 UTC user requested finishing the current batch, committing and pushing, then stopping. Task statuses describe implementation gaps, not continuing execution."
 }

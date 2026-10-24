@@ -15,8 +15,8 @@ class DashboardReadAuthorizationTest {
     static final String ACTOR="79000000-0000-4000-8000-000000000001";
     static final String TENANT="79000000-0000-4000-8000-000000000002";
     @ParameterizedTest
-    @ValueSource(strings={"v1:inactive","v1:removed","v1:version","v1:capability","v1:role","v1:tenant","v1:session",
-        "v2:inactive","v2:removed","v2:version","v2:capability","v2:role","v2:tenant","v2:session"})
+    @ValueSource(strings={"base:inactive","base:removed","base:version","base:capability","base:role","base:tenant","base:session","v1:inactive","v1:removed","v1:version","v1:capability","v1:role","v1:tenant","v1:session",
+        "v2:inactive","v2:removed","v2:version","v2:capability","v2:role","v2:tenant","v2:session", "actionable:inactive", "actionable:removed", "actionable:version", "actionable:capability", "actionable:role", "actionable:tenant", "actionable:session"})
     void rejectsChangesDuringRead(String scenario) {
         var platform=mock(PlatformRepository.class);
         var member=new Membership(ACTOR,TENANT,"padmin",1,true);
@@ -39,9 +39,17 @@ class DashboardReadAuthorizationTest {
             }
         };
         DomainException error;
-        if(scenario.startsWith("v1")) {
+        if(scenario.startsWith("base")) {
+            DashboardAvailabilityReader reader=(access,window)->{change.run();return new DashboardAvailabilitySnapshot(UUID.fromString(TENANT),UUID.fromString(ACTOR),1,Instant.parse("2026-10-23T16:00:00Z"),window);};
+            error=assertThrows(DomainException.class,()->new DashboardController(platform,reader).read(request));
+        } else if(scenario.startsWith("v1")) {
             DashboardPendingTicketsReader reader=access->{change.run();return base;};
             error=assertThrows(DomainException.class,()->new DashboardPendingTicketsController(platform,reader).read(request));
+        } else if (scenario.startsWith("actionable")) {
+            var reader=mock(DashboardActionableTicketsReader.class);
+            when(reader.read(any(),any())).thenAnswer(call->{change.run(); return new DashboardActionableTicketsReader.Snapshot(
+                UUID.fromString(TENANT),UUID.fromString(ACTOR),1,Instant.parse("2026-10-23T16:00:00Z"),"CURRENT_TENANT_INTERNAL",0,0,0,0,0,0,call.getArgument(1),List.of());});
+            error=assertThrows(DomainException.class,()->new DashboardActionableTicketsController(platform,reader).read(request));
         } else {
             DashboardPendingTicketSlaReader reader=access->{change.run();return new DashboardPendingTicketSlaReader.Snapshot(base,0,0,0,List.of());};
             error=assertThrows(DomainException.class,()->new DashboardPendingTicketSlaController(platform,reader).read(request));

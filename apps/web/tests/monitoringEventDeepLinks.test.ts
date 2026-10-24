@@ -32,7 +32,19 @@ async function mount(path = '/monitoring-events') {
   app = createApp({ render: () => h(RouterView) }); app.use(router); app.mount(host); await settle()
 }
 function setup(callback?: (path: string, options?: RequestOptions) => unknown) {
-  return vi.spyOn(api, 'request').mockImplementation(async (path, options) => callback ? callback(path, options) : path.startsWith('/events?') ? sampleWorkspace() : detail(path.slice('/events/'.length)))
+  // Keep list/detail navigation assertions independent of the recovery panel's separate GET.
+  const primary = vi.fn(async (path: string, options?: RequestOptions) => callback ? callback(path, options) : path.startsWith('/events?') ? sampleWorkspace() : detail(path.slice('/events/'.length)))
+  vi.spyOn(api, 'request').mockImplementation(async (path, options) => {
+    if (path.endsWith('/recovery-observations')) return {
+      tenant_id: auth.tenant.id, actor_id: auth.user.id, permission_version: session.value!.permission_version,
+      event_id: path.split('/')[2], asset_id: A, event_version: 1, monitor_state: 'PROBLEM', handling_state: 'NEW',
+      recovery_evidence_status: 'NOT_CONFIRMED', configuration_status: 'CONFIG_PENDING', missing_reason: 'CONFIG_PENDING',
+      policy_release_id: null, policy_release_version: null, rule: null, observed_at: '2026-10-23T10:00:00Z',
+      source: 'postgresql', source_binding_available: false,
+    }
+    return primary(path, options)
+  })
+  return primary
 }
 const details = () => host.querySelector('[aria-label="监控事件详情"]')
 const button = (label: string) => { const b = [...host.querySelectorAll('button')].find(b => b.textContent?.trim() === label); expect(b, label).toBeDefined(); return b! }

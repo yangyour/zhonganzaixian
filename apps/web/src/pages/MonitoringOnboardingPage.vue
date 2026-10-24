@@ -7,6 +7,7 @@ import {api,isCancelled} from '../api/client'
 import {session,can,contextGeneration,switchingTenant} from '../stores/session'
 import {contextTransitionGuards} from '../utils/contextTransitionGuard'
 import {buildMonitoringConfig,emptyMonitoringDraft,monitoringPresets,monitoringTestCommand,monitoringConfigDigest,readProbeReport,monitoringIpv4,type ProbeReport} from '../utils/monitoringOnboarding'
+import MonitoringEnrollmentPanel from '../components/MonitoringEnrollmentPanel.vue'
 import RegisteredMonitoringTargets from '../components/RegisteredMonitoringTargets.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 const draft=reactive(emptyMonitoringDraft()),targetId=ref(createRequestId()),baseline=ref(''),notice=ref(''),validation=ref(''),assetError=ref<unknown>(null),assetName=ref(''),assetIp=ref(''),busy=ref(false),importing=ref(false),report=ref<ProbeReport|null>(null),confirming=ref(false),heading=ref<HTMLElement|null>(null)
@@ -49,6 +50,7 @@ const reportLabel=computed(()=>report.value?({NOT_RUN:'尚未执行',FAILED:'单
 <p class="inline-boundary">当前只生成接入配置，不会修改现有监控或自动部署。{{preset.engine==='zabbix'?'Zabbix 模板ID、组及安全配置仍需在实际实例核对。':'设备和数据库凭据只在采集端管理，不填写到此页面。'}}</p>
 <div class="actions content-toolbar"><button type="submit">校验配置</button><button type="button" :disabled="!config" @click="download">下载接入配置</button><div class="content-actions"><button type="button" :disabled="!permitted||confirming" @click="clear">清空配置</button></div></div>
 </form>
+<MonitoringEnrollmentPanel :draft="draft" />
 <p v-if="validation" role="alert">{{validation}}</p><p v-if="notice" role="status">{{notice}}</p>
 <section v-if="config" class="ws-card probe-workflow"><h2>连接测试</h2><p>在能访问目标的采集机运行下方命令，将 JSON 输出保存后导入；导入报告只核对其与当前配置一致，报告来源未独立核验。</p><label>测试命令<textarea readonly aria-label="测试命令" :value="command" rows="3" /></label><label>导入测试报告 JSON<input type="file" accept="application/json,.json" aria-label="导入测试报告" :disabled="importing" @change="importReport" /></label><p v-if="importing" role="status">正在核对报告…</p><div v-if="report" class="probe-result" role="status"><strong>{{reportLabel}}</strong><p v-if="report.reason">原因：{{report.reason}}</p><p v-if="report.sample_count!==null">样本 {{report.sample_count}} 条 · 匹配指标 {{report.matched_metrics.join('、')}}</p><p>未证明设备身份、持续采集或业务健康。</p></div><details><summary>查看配置 JSON</summary><pre>{{JSON.stringify(config,null,2)}}</pre></details></section>
 </template></section>

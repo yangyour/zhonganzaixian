@@ -38,6 +38,8 @@ class DashboardHttpSecurityTest {
     static class Configuration implements WebMvcConfigurer {
         @Bean PlatformRepository repository(){return mock(PlatformRepository.class);}
         @Bean DashboardAvailabilityReader reader(){return mock(DashboardAvailabilityReader.class);}
+        @Bean cn.mop.domain.operations.EventOperationalMetricsReader eventMetricReader(){return mock(cn.mop.domain.operations.EventOperationalMetricsReader.class);}
+        @Bean EventOperationalMetricsController eventMetricController(PlatformRepository repository,cn.mop.domain.operations.EventOperationalMetricsReader eventMetricReader){return new EventOperationalMetricsController(repository,eventMetricReader);}
         @Bean ObjectMapper mapper(){return new ObjectMapper();}
         @Bean DashboardController controller(PlatformRepository repository,DashboardAvailabilityReader reader){return new DashboardController(repository,reader);}
         @Bean
@@ -76,10 +78,11 @@ class DashboardHttpSecurityTest {
     cn.mop.domain.dashboard.DashboardPendingTicketsReader pendingReader;
     @Autowired
     cn.mop.domain.dashboard.DashboardPendingTicketSlaReader slaReader;
+    @Autowired cn.mop.domain.operations.EventOperationalMetricsReader eventMetricReader;
     @Autowired
     DashboardActionableTicketsReader actionableReader;
     private MockMvc mvc;
-    @BeforeEach void setup(){reset(repository,reader);mvc=webAppContextSetup(context).apply(springSecurity()).build();when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"viewer",7,true)));when(reader.read(any(),any())).thenAnswer(c->DashboardControllerTest.snapshot(c.getArgument(0),c.getArgument(1)));}
+    @BeforeEach void setup(){reset(repository,reader,eventMetricReader,actionableReader);mvc=webAppContextSetup(context).apply(springSecurity()).build();when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"viewer",7,true)));when(reader.read(any(),any())).thenAnswer(c->DashboardControllerTest.snapshot(c.getArgument(0),c.getArgument(1)));}
     private MockHttpServletRequestBuilder scoped(MockHttpServletRequestBuilder builder){var session=new MockHttpSession(context.getServletContext());session.setAttribute("mop.tenant_id",TENANT);return builder.session(session).with(user(ACTOR));}
     @Test
     void actionablePaginationRequiresSessionAndCannotOverrideScopeOrMutate() throws Exception {
@@ -136,9 +139,29 @@ class DashboardHttpSecurityTest {
         mvc.perform(scoped(get(path).param("tenant_id", TENANT))).andExpect(status().isBadRequest());
         mvc.perform(scoped(post(path)).with(csrf().asHeader())).andExpect(status().isMethodNotAllowed());
     }
+    @Test
+    void actionablePageUsesCompatibleNewProjectionAndRejectsOverrides() throws Exception {
+        when(actionableReader.read(any(), any())).thenAnswer(call -> new DashboardActionableTicketsReader.Snapshot(
+            UUID.fromString(TENANT), UUID.fromString(ACTOR), 7, DashboardControllerTest.TIME,
+            "REPORTER_ONLY", 0, 0, 0, 0, 0, 0, call.getArgument(1), List.of()));
+        String path = "/api/v1/dashboard/actionable-tickets";
+        mvc.perform(scoped(get(path))).andExpect(status().isOk()).andExpect(header().string("Cache-Control", "no-store"))
+            .andExpect(jsonPath("$.data.projection_version").value("MOP_ACTIONABLE_TICKETS_SLA_V1"))
+            .andExpect(jsonPath("$.data.excluded_states[2]").value("RESOLVED"))
+            .andExpect(jsonPath("$.data.excluded").value(0)).andExpect(jsonPath("$.data.terminal").doesNotExist())
+            .andExpect(jsonPath("$.data.page").value(1)).andExpect(jsonPath("$.data.total_pages").value(0));
+        for (String value : List.of("-5", "1", "00", "1e2", "2147483648")) {
+            mvc.perform(scoped(get(path).param("offset", value))).andExpect(status().isBadRequest());
+        }
+        mvc.perform(scoped(get(path).param("offset", "0", "5"))).andExpect(status().isBadRequest());
+        mvc.perform(scoped(get(path).param("tenant_id", TENANT))).andExpect(status().isBadRequest());
+        mvc.perform(get(path)).andExpect(status().isUnauthorized());
+        mvc.perform(scoped(post(path)).with(csrf().asHeader())).andExpect(status().isMethodNotAllowed());
+    }
+
     @Test void getNeedsNoCsrfAndPreservesNullsWithNoStore()throws Exception{
         mvc.perform(scoped(get("/api/v1/dashboard"))).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store")).andExpect(jsonPath("$.trace_id").isString()).andExpect(jsonPath("$.data.tenant_id").value(TENANT)).andExpect(jsonPath("$.data.kpis[0].value").value(nullValue())).andExpect(jsonPath("$.data.panels[0].items").value(nullValue())).andExpect(jsonPath("$.data.metric_samples_loaded").value(false));
-        verify(repository).membership(ACTOR,TENANT);verifyNoMoreInteractions(repository);
+        verify(repository,times(2)).membership(ACTOR,TENANT);verifyNoMoreInteractions(repository);
     }
     @Test void anonymousAndInactiveMembersDeniedBeforeRead()throws Exception{
         mvc.perform(get("/api/v1/dashboard")).andExpect(status().isUnauthorized()).andExpect(jsonPath("$.error.code").value("SESSION_EXPIRED"));
@@ -160,5 +183,20 @@ class DashboardHttpSecurityTest {
         mvc.perform(scoped(post("/api/v1/dashboard"))).andExpect(status().isForbidden()).andExpect(jsonPath("$.error.code").value("CSRF_INVALID"));
         mvc.perform(scoped(post("/api/v1/dashboard")).with(csrf().asHeader())).andExpect(status().isMethodNotAllowed());
         mvc.perform(scoped(patch("/api/v1/dashboard")).with(csrf().asHeader())).andExpect(status().isMethodNotAllowed());verifyNoInteractions(reader);
+    }
+
+    @Test void eventMetricsUseAuthenticatedReadOnlyNoStoreTransport() throws Exception {
+        when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"padmin",1,true)));
+        var original=new EventOperationalMetricsControllerTest().snapshot(TENANT);
+        var result=new cn.mop.domain.operations.EventOperationalMetricsReader.Snapshot(UUID.fromString(TENANT),UUID.fromString(ACTOR),1,original.observedAt(),original.window(),original.view(),original.from(),original.currentProblems(),0,original.mtta(),List.of(),null);
+        when(eventMetricReader.read(any(),any(),any(),isNull())).thenReturn(result);
+        String path="/api/v1/metrics/monitoring-events";
+        mvc.perform(scoped(get(path))).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store"))
+            .andExpect(jsonPath("$.data.mtta.mean_millis").value(nullValue())).andExpect(jsonPath("$.data.writes_performed").value(false));
+        mvc.perform(get(path)).andExpect(status().isUnauthorized());
+        mvc.perform(scoped(get(path).param("tenant_id",TENANT))).andExpect(status().isBadRequest());
+        mvc.perform(scoped(post(path)).with(csrf().asHeader())).andExpect(status().isMethodNotAllowed());
+        when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"tadmin",1,true)));
+        mvc.perform(scoped(get(path))).andExpect(status().isForbidden());
     }
 }

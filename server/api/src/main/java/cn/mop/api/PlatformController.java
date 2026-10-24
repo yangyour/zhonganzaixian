@@ -51,6 +51,8 @@ public class PlatformController {
     @org.springframework.beans.factory.annotation.Autowired(required=false)
     private cn.mop.domain.notification.TicketNotificationRepository ticketNotifications;
     @org.springframework.beans.factory.annotation.Autowired(required=false)
+    private NotificationRoutingConfiguration.NotificationRoutingProbe notificationRouting;
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
     private WeComService weCom;
     @org.springframework.beans.factory.annotation.Autowired(required=false)
     private EmailService email;
@@ -72,6 +74,10 @@ public class PlatformController {
     public PlatformController(PlatformRepository repository,ObjectMapper mapper,ObjectProvider<TestOidcConfiguration.OidcDependencyProbe> identityProbe,ObjectProvider<PhotoConfiguration.PhotoDependencyProbe> photoProbe,ObjectProvider<AssetImportConfiguration.ImportDependencyProbe> importProbe,ObjectProvider<ProjectIdentityService> projectIdentity){this.repository=repository;this.mapper=mapper;this.identityProbe=identityProbe;this.photoProbe=photoProbe;this.importProbe=importProbe;this.projectIdentity=projectIdentity;new SecureRandom().nextBytes(cursorSecret);}
     @GetMapping("/health/live") Object live(HttpServletRequest request){return success(map("status","UP","mode",repository.metadata().mode(),"source",repository.metadata().source()),request);}
     @GetMapping("/health/ready") Object ready(HttpServletRequest request){
+        if (notificationRouting != null && !notificationRouting.ready()) {
+            throw new DomainException(503, "UPSTREAM_UNAVAILABLE", "已启用的通知路由存储或权限未就绪",
+                    List.of(map("component", "notification_routing", "reasons", List.of("NOTIFICATION_CONTROL_UNAVAILABLE"))));
+        }
         if(email!=null){var status=email.check();if(!Boolean.TRUE.equals(status.get("ready")))throw new DomainException(503,"UPSTREAM_UNAVAILABLE","已启用的邮件依赖未就绪",List.of(map("component","email","status",status)));}
         if(weCom!=null){var status=weCom.check();if(!Boolean.TRUE.equals(status.get("ready")))throw new DomainException(503,"UPSTREAM_UNAVAILABLE","已启用的企业微信依赖未就绪",List.of(map("component","wecom","status",status)));}
         if(inspectionQuarterlyReports!=null){

@@ -5,11 +5,11 @@
   "namespace_id": "79000000-0000-4000-8000-000000000090",
   "username": "demo",
   "anchor_time": "2026-10-22T12:00:00Z",
-  "catalog_sha256": "22c61c64afcad9206d5362dfe4fd77a2407458fcdf6d48f1befa84bf0ea87d6e",
+  "catalog_sha256": "e7dc481094a14bf015a0e2301b76e9bfe076ea6a16152ee63ff547d792ff0942",
   "source_sha256": {
-    "apps/web/src/router.ts": "170299ac467972db389013a78a5138c8b995a7a7b8ef662053888952cb0050dd",
+    "apps/web/src/router.ts": "d91d2927f0b84ab3e85aef4139bef57efb749c6dd7c205d5613180709460c938",
     "server/domain/src/main/java/cn/mop/domain/Capabilities.java": "6f97ea30fd15e067db3eb6fe72d55c2dedf12a07b5e09678164384c04b366d1f",
-    "contracts/local-api.openapi.json": "dbdda818e20ef0145bc29b96a1d2bd193271615e96a1c6110712c86f348d81cb"
+    "contracts/local-api.openapi.json": "154dd147255311f3d59e78d82006c66d54cf8ff2f870fbdc8b02567135a81edc"
   },
   "contexts": [
     {
@@ -239,27 +239,6 @@
       "scenarios": [
         "由演示台账和工单派生总览",
         "缺少来源时保留未知"
-      ],
-      "acceptance_status": "NOT_RUN",
-      "proposed_contexts": [
-        "padmin",
-        "msp",
-        "tadmin"
-      ],
-      "data_initialized": false,
-      "interaction_verified": false
-    },
-    {
-      "path": "/dashboard/actionable-tickets",
-      "title": "待处理工单与SLA",
-      "required_capabilities": [
-        "dashboard:read",
-        "tickets:read"
-      ],
-      "allowed_roles": [],
-      "scenarios": [
-        "与首页一致的未解决工单与全量SLA",
-        "完整分页、未知状态与撤权恢复"
       ],
       "acceptance_status": "NOT_RUN",
       "proposed_contexts": [
@@ -1019,6 +998,89 @@
         "padmin",
         "msp",
         "tadmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/dashboard/actionable-tickets",
+      "title": "待处理工单与SLA",
+      "required_capabilities": [
+        "dashboard:read",
+        "tickets:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "与首页一致的未解决工单与全量SLA",
+        "完整分页、未知状态与撤权恢复"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp",
+        "tadmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/notification-routing",
+      "title": "通知路由与处理",
+      "required_capabilities": [
+        "ticket_notes:read_internal"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "显式路由配置与持久原命令恢复，不进行外发"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/report-publications",
+      "title": "报告中心",
+      "required_capabilities": [
+        "dashboard:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "当前授权冻结报告、审核发布、同源输出和阅读意图，外发关闭"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp",
+        "tadmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/event-metrics",
+      "title": "事件指标明细",
+      "required_capabilities": [
+        "dashboard:read",
+        "tickets:read"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "同源当前问题计数、首次确认时长与完整游标明细；无样本和异常不补值"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp"
       ],
       "data_initialized": false,
       "interaction_verified": false
@@ -2178,7 +2240,7 @@
     }
   ],
   "coverage": {
-    "pages_declared": 44,
+    "pages_declared": 47,
     "capability_union_count": 48,
     "pages_accepted": 0,
     "all_functions_ready": false
@@ -2202,5 +2264,5 @@
     "ADVANCED_SCENARIOS_NOT_INITIALIZED",
     "GLOBAL_POLICY_SCOPE_UNRESOLVED"
   ],
-  "plan_sha256": "aefdb996e1b28b3036d581b96deaa8c061d9417f1c2623447791251c38b6e65d"
+  "plan_sha256": "fbfd2ba21a5616f98ea0a2c8e99107df01a3aa0cb1d531fa9c2b1a0a05d20574"
 }

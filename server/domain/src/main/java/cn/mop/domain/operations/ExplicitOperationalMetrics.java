@@ -42,9 +42,8 @@ public final class ExplicitOperationalMetrics {
         for(var duration:durations){count(duration);if(duration==null)unknown++;else sorted.add(duration);}
         if(unknown>0)return new MedianResult(Status.UNRESOLVED,Reason.UNKNOWN_SAMPLE,durations.size(),unknown,null);
         if(sorted.isEmpty())return new MedianResult(Status.UNDEFINED,Reason.EMPTY_SAMPLE,0,0,null);
-        sorted.sort(BigInteger::compareTo);int size=sorted.size();
-        BigDecimal median=size%2==1?new BigDecimal(sorted.get(size/2)):new BigDecimal(sorted.get(size/2-1).add(sorted.get(size/2))).divide(BigDecimal.valueOf(2));
-        return new MedianResult(Status.CALCULATED,Reason.ALL_EXPLICIT,size,0,median);
+        BigDecimal median=OperationalLatencyStatistics.calculate(sorted).medianMillis();
+        return new MedianResult(Status.CALCULATED,Reason.ALL_EXPLICIT,sorted.size(),0,median);
     }
     public record StaffingInput(BigInteger activeTenants,BigDecimal onCallFte,BigDecimal secondLineFte) {}
     public record StaffingResult(Status status,Reason reason,BigDecimal explicitTotalFte,BigDecimal sampleTenantsPerFte,List<String> missingInputs) {

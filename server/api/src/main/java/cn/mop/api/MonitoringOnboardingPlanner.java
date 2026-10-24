@@ -58,6 +58,8 @@ final class MonitoringOnboardingPlanner {
         } catch (Exception error) { throw MonitoringPresetRegistry.invalid(); }
     }
 
+    String catalogSha256() { return catalogHash; }
+
     Map<String, Object> catalog(String tenant) {
         var configured = collectors.getOrDefault(tenant, Map.of());
         List<Object> definitions = new ArrayList<>();

@@ -1,0 +1,19 @@
+<script setup lang="ts">
+import {computed,onBeforeUnmount,shallowRef,watch,useId} from 'vue'
+import {api} from '../api/client'
+import type {Asset} from '../api/types'
+import {session,can,contextGeneration,switchingTenant} from '../stores/session'
+import {createBackupRunHistoryReader,emptyBackupRunHistory} from '../utils/backupRunHistory'
+import {displayTime} from '../utils/display'
+import ApiErrorNotice from './ApiErrorNotice.vue'
+const props=defineProps<{asset:Asset}>(),heading=useId(),state=shallowRef(emptyBackupRunHistory()),reader=createBackupRunHistoryReader(api,s=>state.value=s)
+const permitted=computed(()=>session.value?.mode==='remote_test'&&['padmin','msp'].includes(session.value.user.role)&&can('assets:read')&&props.asset.tenant_id===session.value.tenant.id&&!switchingTenant.value)
+watch(()=>JSON.stringify([contextGeneration.value,props.asset.id,props.asset.version,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,session.value?.capabilities,permitted.value]),()=>{const s=session.value;reader.reset(permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,assetId:props.asset.id}:null)},{immediate:true,flush:'sync'})
+onBeforeUnmount(reader.dispose)
+const outcomes={RUNNING:'进行中',RESULT_UNKNOWN:'结果不明',SUCCEEDED:'成功记录',FAILED:'已确认失败'}
+const failures:Record<string,string>={CONNECTION_UNAVAILABLE:'连接不可用',READ_TIMEOUT:'读取超时',HOST_KEY_REJECTED:'主机指纹拒绝',AUTHORIZATION_REJECTED:'授权拒绝',COMMAND_REJECTED:'命令拒绝',STORAGE_FAILED:'存储失败',VERIFICATION_FAILED:'核验失败'}
+const labels={QUEUED:'已排队',RUNNING:'运行中/待核对',RETRY_WAIT:'等待重试',SUCCEEDED:'成功记录',FAILED:'最终失败'}
+</script>
+<template><section v-if="permitted" class="detail-section backup-runs" :aria-labelledby="heading" :aria-busy="state.busy"><h3 :id="heading">备份运行与失败记录</h3><div class="actions"><button :disabled="state.busy" @click="reader.first">读取运行历史</button><button v-if="state.busy" @click="reader.cancel">取消读取</button><button v-if="state.target&&(state.error||state.cancelled)&&!state.busy" @click="reader.retry">重试原页</button><button v-if="state.current?.next" :disabled="state.busy" @click="reader.next">下一页</button></div><p v-if="state.busy||state.cancelled" role="status">{{state.busy?'正在读取当前资产的授权运行记录…':'已取消，未保留旧数据。'}}</p><ApiErrorNotice :error="state.error" guidance="需要独立的运行历史授权，资产可见或能下载版本均不能代替。未配置或失败不是没有备份。"/>
+<template v-if="state.current"><p role="status">当前页 {{state.current.items.length}} 条 / 当前资产共 {{state.current.total_count}} 次运行。连续失败的计数与重置口径未确认，自动P3建单未启用。</p><p v-if="!state.current.items.length">本页没有运行记录，不代表设备备份健康。</p><div v-else class="run-table" role="region" tabindex="0" aria-label="备份运行记录，可横向滚动"><table><thead><tr><th>运行 / 排队时间</th><th>状态</th><th>尝试失败 / 最终运行失败</th><th>尝试详情</th></tr></thead><tbody><tr v-for="run in state.current.items" :key="run.run_id"><td>{{run.run_id}}<br>{{displayTime(run.queued_at)}}</td><td>{{labels[run.state]}}<br><span v-if="run.reconciliation_required">结果不明，需核对</span></td><td>{{run.known_failed_attempt_count}} / {{run.final_run_failure_count??'尚无终局'}}<small>本次运行，不是跨运行连续计数</small></td><td><details><summary>{{run.attempts.length}} 次尝试 · v{{run.version}}</summary><ol><li v-for="attempt in run.attempts" :key="attempt.number">{{outcomes[attempt.outcome]}} · {{attempt.failure?failures[attempt.failure]:'尚无失败结论'}}<br>{{displayTime(attempt.started_at)}} → {{displayTime(attempt.observed_at)}}</li></ol></details></td></tr></tbody></table></div><small>每页独立读取当前运行日志快照，未读取对象存储、执行设备命令或核验完整历史链。</small></template></section></template>
+<style scoped>.backup-runs{min-width:0;overflow-wrap:anywhere}.actions{display:flex;flex-wrap:wrap;gap:8px}.run-table{overflow:auto;max-width:100%}table{width:100%;min-width:660px;border-collapse:collapse;text-align:left}th,td{padding:8px;vertical-align:top;border-bottom:1px solid #e2e8f0}small{display:block}summary,button{min-height:32px}summary{cursor:pointer}</style>

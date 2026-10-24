@@ -1,0 +1,58 @@
+<script setup lang="ts">
+import {computed,onBeforeUnmount,ref,watch,useId} from 'vue'
+import {onBeforeRouteLeave} from 'vue-router'
+import {api,ApiError} from '../api/client'
+import type {Asset} from '../api/types'
+import {session,can,contextGeneration,switchingTenant} from '../stores/session'
+import {contextTransitionGuards} from '../utils/contextTransitionGuard'
+import {createMappingCommands,readMappingPage,readObjectMapping,mappingLabels,mappingUuid,mappingSourceId,type ObjectMapping,type MappingCursor,type MappingAction,type MappingCaptureReceipt} from '../utils/monitoringObjectMappings'
+import {displayTime} from '../utils/display'
+import ApiErrorNotice from './ApiErrorNotice.vue'
+const props=defineProps<{asset:Asset}>(),heading=useId()
+const permitted=computed(()=>session.value?.mode==='remote_test'&&props.asset.tenant_id===session.value.tenant.id&&can('assets:read')&&can('configurations:read')&&!switchingTenant.value)
+const writable=computed(()=>permitted.value&&session.value?.user.role==='padmin'&&can('configurations:write'))
+const stableScope=computed(()=>permitted.value?JSON.stringify([props.asset.id,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,session.value?.capabilities,writable.value]):null)
+const scope=computed(()=>JSON.stringify([stableScope.value,contextGeneration.value,props.asset.version]))
+const captureReceipt=ref<MappingCaptureReceipt|null>(null),sourceEventId=ref('')
+const commands=createMappingCommands(()=>writable.value?stableScope.value:null,{getItem:k=>sessionStorage.getItem(k),setItem:(k,v)=>sessionStorage.setItem(k,v),removeItem:k=>sessionStorage.removeItem(k)},api,receipt=>captureReceipt.value=receipt)
+const rows=ref<ObjectMapping[]|null>(null),selected=ref<ObjectMapping|null>(null),next=ref<MappingCursor|null>(null),loading=ref(false),error=ref<unknown>(null),notice=ref('')
+const pool=ref(''),objectType=ref<'HOST'|'ITEM'>('HOST'),external=ref(''),reason=ref('')
+const locked=computed(()=>loading.value||commands.busy.value||!!commands.pending.value||commands.blocked.value)
+let epoch=0,abort:AbortController|null=null
+function clear(){epoch++;abort?.abort();abort=null;loading.value=false;rows.value=null;selected.value=null;next.value=null;error.value=null;notice.value='';captureReceipt.value=null;sourceEventId.value=''}
+async function read(id:string|null=null,cursor:MappingCursor|null=null){if(!permitted.value||locked.value)return;if(captureReceipt.value?.mapping_id!==id)captureReceipt.value=null;const turn=++epoch,current=scope.value,controller=new AbortController();abort=controller;loading.value=true;error.value=null;notice.value='';rows.value=null;selected.value=null;next.value=null
+ try{const path=id?`/monitoring-object-mappings/${id}`:'/monitoring-object-mappings?'+new URLSearchParams({asset_id:props.asset.id,...cursor});const raw=await api.request<unknown>(path,{signal:controller.signal});if(turn!==epoch||current!==scope.value||controller.signal.aborted)return
+  if(id)selected.value=readObjectMapping(raw,session.value!.tenant.id,id);else{const page=readMappingPage(raw,session.value!.tenant.id);rows.value=page.items;next.value=page.next}
+ }catch(e){if(turn===epoch){error.value=e;if(e instanceof ApiError&&([401,403].includes(e.status)||e.code==='IDENTITY_UNAVAILABLE'))captureReceipt.value=null}}finally{if(turn===epoch){loading.value=false;abort=null}}}
+function cancelRead(){clear();notice.value='已取消读取，旧映射内容已清空。'}
+async function create(){if(!writable.value||locked.value)return;if(await commands.send('/monitoring-object-mappings',{asset_id:props.asset.id,asset_version:props.asset.version,pool_id:pool.value,object_type:objectType.value,external_id:external.value,reason:reason.value.trim()||null})){external.value='';reason.value='';await read()}}
+async function change(action:MappingAction){if(!writable.value||locked.value||!selected.value)return;const row=selected.value,id=row.state.document.id;const body:Record<string,unknown>={action,expected_version:row.state.version,reason:reason.value.trim()||null}
+ if(action==='SUBMIT_DRAFT'){body.asset_id=props.asset.id;body.asset_version=props.asset.version}
+ if(action==='ACTIVATE'){if(!row.current_actor_can_activate||row.state.draft?.asset_id!==props.asset.id)return;body.expected_policy_reference=row.policy_reference;body.expected_source_definition_sha256=row.source_definition_sha256}
+ if(await commands.send(`/monitoring-object-mappings/${id}/actions`,body)){reason.value='';await read(id)}}
+async function capture(){if(!selected.value||!writable.value||locked.value||!selected.value.source_capture_enabled||selected.value.availability!=='CURRENT_RECORDED_MAPPING'||selected.value.state.document.key.object_type!=='HOST'||!mappingSourceId(sourceEventId.value))return;const row=selected.value,id=row.state.document.id;captureReceipt.value=null;
+ if(await commands.send(`/monitoring-object-mappings/${id}/captures`,{expected_version:row.state.version,source_event_id:sourceEventId.value,expected_source_definition_sha256:row.source_definition_sha256}))await read(id)}
+async function retry(){const path=commands.pending.value?.path;if(await commands.retry())await read(path?.endsWith('/captures')?path.split('/')[2]!:null)}
+function mayLeave(){return !commands.pending.value&&!commands.busy.value&&!commands.blocked.value}
+onBeforeRouteLeave(mayLeave);const unregister=contextTransitionGuards.register(mayLeave)
+function beforeUnload(e:BeforeUnloadEvent){if(!mayLeave()){e.preventDefault();e.returnValue=''}}window.addEventListener('beforeunload',beforeUnload)
+watch(scope,()=>{clear();pool.value='';external.value='';reason.value='';commands.reset()},{immediate:true,flush:'sync'})
+onBeforeUnmount(()=>{clear();commands.dispose();unregister();window.removeEventListener('beforeunload',beforeUnload)})
+</script>
+<template><section v-if="permitted" class="detail-section mapping-panel" :aria-labelledby="heading" :aria-busy="loading||commands.busy.value">
+ <h3 :id="heading">监控对象映射</h3><div class="actions"><button :disabled="locked" @click="read()">读取资产映射</button><button v-if="loading" @click="cancelRead">取消读取</button><button v-if="next" :disabled="locked" @click="read(null,next)">下一页</button></div>
+ <ApiErrorNotice :error="error"/><ApiErrorNotice :error="commands.error.value"/><p v-if="loading||notice" role="status">{{loading?'正在核对当前映射…':notice}}</p>
+ <p v-if="commands.pending.value" role="alert">请求结果待确认，不要重复新建。<button :disabled="commands.busy.value" @click="retry">核对原请求</button><button v-if="commands.busy.value" @click="commands.cancel">停止等待</button></p><p v-if="commands.blocked.value" role="alert">原请求无法安全恢复，新增操作已阻止。</p>
+ <p v-if="rows?.length===0" role="status">此资产没有映射历史，不代表监控正常。</p>
+ <div v-if="rows?.length" class="mapping-table" role="region" aria-label="资产监控对象映射，可横向滚动" tabindex="0"><table><thead><tr><th>对象</th><th>当前记录</th><th>草稿</th><th>操作</th></tr></thead><tbody><tr v-for="row in rows" :key="row.state.document.id"><td>{{row.state.document.key.object_type==='HOST'?'主机':'监控项'}} {{row.state.document.key.external_id}}</td><td>{{mappingLabels[row.availability]}}</td><td>{{row.state.draft?'待复核':'无'}}<span v-if="row.state.draft&&!row.draft_asset_current"> · 资产已变化</span></td><td><button :disabled="locked" @click="read(row.state.document.id)">查看与处理</button></td></tr></tbody></table></div>
+ <details v-if="writable"><summary>登记新对象草稿</summary><form @submit.prevent="create"><label>资源池 ID<input v-model="pool" required maxlength="36" :disabled="locked" autocomplete="off" /></label><label>对象类型<select v-model="objectType" :disabled="locked"><option value="HOST">主机（hostid）</option><option value="ITEM">监控项（itemid）</option></select></label><label>来源对象 ID<input v-model="external" required maxlength="256" :disabled="locked" autocomplete="off" /></label><button :disabled="locked||!mappingUuid(pool)||!external.trim()">保存映射草稿</button></form></details>
+  <p v-if="captureReceipt" role="status">{{captureReceipt.outcome.startsWith('CONFLICT')?'来源键冲突，候选已隔离':'原始来源事实已保存或已存在'}} · {{captureReceipt.source_phase==='RECOVERED'?'原始恢复信号，未确认t2':'原始问题信号'}} · {{captureReceipt.record_id}}。来源授权仍标记为未认证，尚未推进业务处理。</p>
+ <section v-if="selected" aria-label="映射详情"><p>{{selected.state.document.provider}} · {{selected.state.document.key.object_type}} {{selected.state.document.key.external_id}} · v{{selected.state.version}}</p><p>资源池：{{selected.state.document.key.pool_id}}</p><p role="status">{{mappingLabels[selected.availability]}}。仅记录归属，不开启采集或通知。</p>
+  <p v-if="selected.state.active">已发布资产：{{selected.state.active.approved_draft.asset_id}} · 归属证明截止 {{displayTime(selected.state.active.expires_at)}}</p>
+  <p v-if="selected.state.draft">草稿资产：{{selected.state.draft.asset_id}} · 资产版本 {{selected.state.draft.asset_version}}<span v-if="!selected.draft_asset_current">，须按当前资产版本重新提交</span></p><p v-if="selected.state.reason">{{selected.state.reason}}</p>
+  <template v-if="writable"><label>操作原因（撤销必填）<input v-model="reason" maxlength="500" :disabled="locked" /></label><div class="actions"><button :disabled="locked" @click="change('SUBMIT_DRAFT')">提交当前资产版本草稿</button><button v-if="selected.state.draft?.asset_id===asset.id" :disabled="locked||!selected.current_actor_can_activate" @click="change('ACTIVATE')">核验来源归属并发布</button><button v-if="selected.state.draft" :disabled="locked" @click="change('CANCEL_DRAFT')">取消草稿</button><button v-if="selected.state.active" :disabled="locked||!reason.trim()" @click="change('REVOKE')">撤销已发布映射</button></div><p v-if="selected.state.draft&&!selected.current_actor_can_activate">发布须满足明确复核策略、当前资产版本和可用来源配置。</p></template>
+  <details v-if="writable&&selected.source_capture_enabled&&selected.state.document.key.object_type==='HOST'"><summary>保存一条真实来源事件</summary><form @submit.prevent="capture"><label>来源事件 ID<input v-model="sourceEventId" required maxlength="20" inputmode="numeric" :disabled="locked" /></label><button :disabled="locked||selected.availability!=='CURRENT_RECORDED_MAPPING'||!mappingSourceId(sourceEventId)">读取来源并保存原始记录</button></form><small>不接收事件正文或恢复结论，不创建告警、工单、通知或停止SLA时钟。</small></details>
+  <button :disabled="locked" @click="read(selected.state.document.id)">重新读取此映射</button>
+ </section>
+</section></template>
+<style scoped>.mapping-panel{min-width:0;overflow-wrap:anywhere}.actions,form{display:flex;flex-wrap:wrap;gap:8px;align-items:end}.mapping-table{max-width:100%;overflow:auto}table{width:100%;min-width:520px;border-collapse:collapse;text-align:left}th,td{padding:8px;vertical-align:top;border-bottom:1px solid #e2e8f0}label{display:flex;flex-direction:column;gap:4px}summary,button{min-height:32px}summary{cursor:pointer}</style>

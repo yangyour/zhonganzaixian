@@ -1,0 +1,6 @@
+/** Unit-only snapshots. No initialized tenant, device or backup. */
+import type {BackupRunPage,BackupRunRow} from '../src/utils/backupRunHistory'
+export const id=(n:number)=>`79000000-0000-4000-8000-${String(n).padStart(12,'0')}`
+export const historyScope={tenantId:id(1),actorId:id(2),assetId:id(3),permissionVersion:1}
+export function runRow(n=4):BackupRunRow{return{run_id:id(n),asset_id:id(3),version:0,state:'QUEUED',queued_at:'2026-10-23T20:00:00.000Z',finished_at:null,known_failed_attempt_count:0,final_run_failure_count:null,reconciliation_required:false,snapshot_sha256:'a'.repeat(64),attempts:[]}}
+export function runPage():BackupRunPage{return{tenant_id:id(1),actor_id:id(2),permission_version:1,asset_id:id(3),observed_at:'2026-10-23T21:00:00.000Z',page_size:20,total_count:1,items:[runRow()],next:null,failure_count_semantics:null,consecutive_failure_count:null,automatic_ticket_status:'CONFIG_PENDING_Q22',automatic_ticket_allowed:false,failure_ticket_threshold:2,ticket_deadline_seconds:600,snapshot_scope:'SINGLE_READ_PAGE_NOT_GLOBAL_SNAPSHOT',source:'CURRENT_AUTHORIZED_BACKUP_RUN_JOURNAL',snapshot_payload_verified:true,full_journal_chain_verified:false,object_storage_accessed:false,device_execution_authorized:false,writes_performed:false}}

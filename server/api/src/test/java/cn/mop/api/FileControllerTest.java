@@ -19,7 +19,23 @@ import static org.mockito.Mockito.*;
 class FileControllerTest {
     private static final String ACTOR="55000000-0000-4000-8000-000000000003",TENANT="55000000-0000-4000-8000-000000000001",FILE="55000000-0000-4000-8000-000000000009",OPERATION="55000000-0000-4000-8000-000000000010",GRANT="55000000-0000-4000-8000-000000000011";
     private PlatformRepository repository;private PhotoObjectStore store;private FileController controller;private final ObjectMapper mapper=new ObjectMapper();
-    @BeforeEach void setup(){repository=mock(PlatformRepository.class);store=mock(PhotoObjectStore.class);controller=new FileController(repository,new PhotoPolicy("image/jpeg,image/png"),store,mapper);when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"viewer",8,true)));when(store.ready()).thenReturn(true);when(repository.idempotent(anyString(),anyString(),anyString(),anyString(),anyString(),anyLong(),any())).thenAnswer(call->call.getArgument(6,Supplier.class).get());when(repository.acceptPhoto(eq(TENANT),eq(ACTOR),any())).thenReturn(Map.of("operation_id",OPERATION,"status","PENDING"));}
+    @BeforeEach
+    void setup() {
+        repository = mock(PlatformRepository.class);
+        store = mock(PhotoObjectStore.class);
+        controller = new FileController(repository, new PhotoPolicy("image/jpeg,image/png"), store, mapper);
+        org.springframework.test.util.ReflectionTestUtils.setField(controller, "attachmentSecurity", mock(AttachmentSecurityRepository.class));
+        when(repository.idempotentAuthorized(anyString(), anyString(), anyString(), anyString(), anyString(), anyLong(), any(), any()))
+            .thenAnswer(call -> {
+                call.getArgument(6, Runnable.class).run();
+                return call.getArgument(7, Supplier.class).get();
+            });
+        when(repository.membership(ACTOR, TENANT)).thenReturn(Optional.of(new Membership(ACTOR, TENANT, "viewer", 8, true)));
+        when(store.ready()).thenReturn(true);
+        when(repository.idempotent(anyString(), anyString(), anyString(), anyString(), anyString(), anyLong(), any()))
+            .thenAnswer(call -> call.getArgument(6, Supplier.class).get());
+        when(repository.acceptPhoto(eq(TENANT), eq(ACTOR), any())).thenReturn(Map.of("operation_id", OPERATION, "status", "PENDING"));
+    }
     private MockHttpServletRequest request(String method,String path){var request=new MockHttpServletRequest(method,"/api/v1"+path);var session=new MockHttpSession();session.setAttribute("mop.tenant_id",TENANT);request.setSession(session);request.setUserPrincipal(()->ACTOR);request.setAttribute("mop.trace_id","isolated-trace");request.addHeader("Idempotency-Key","isolated-photo-request");return request;}
     private MockHttpServletRequest upload(String name,byte[] original){var request=request("POST","/files");request.setContentType(MediaType.MULTIPART_FORM_DATA_VALUE);var file=new MockPart("file",name,original);file.getHeaders().setContentType(MediaType.IMAGE_PNG);request.addPart(file);request.addPart(new MockPart("purpose","customer_report_photo".getBytes(StandardCharsets.UTF_8)));return request;}
     @SuppressWarnings("unchecked") private static Map<String,Object> data(Object response){return (Map<String,Object>)((Map<String,Object>)response).get("data");}

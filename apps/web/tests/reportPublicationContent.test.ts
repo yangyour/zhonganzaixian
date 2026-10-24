@@ -1,0 +1,10 @@
+import {it,expect,vi} from 'vitest'
+import {createHash} from 'node:crypto'
+import {fetchPublicationContent} from '../src/utils/reportPublicationContent'
+const id='79000000-0000-4000-8000-000000000001',tenant='79000000-0000-4000-8000-000000000002',bytes=new TextEncoder().encode('<html><body>unit only</body></html>'),hash=createHash('sha256').update(bytes).digest('hex')
+function response(overrides:Record<string,string>={},body:Uint8Array=bytes){return new Response(new Uint8Array(body),{headers:{'Content-Type':'text/html','Content-Length':String(body.length),'Content-Disposition':`attachment; filename="report-${id}.html"`,'Cache-Control':'no-store','X-MOP-Report-ID':id,'X-MOP-Tenant-ID':tenant,'X-MOP-Document-SHA256':'a'.repeat(64),'X-MOP-Content-SHA256':hash,'X-MOP-Report-Phase':'FAILED',...overrides}})}
+const options=(transport:typeof fetch)=>({id,tenant,documentHash:'a'.repeat(64),contentHash:hash,phase:'FAILED',format:'html' as const,signal:new AbortController().signal,active:()=>true,transport})
+it('checks exact content and identity before allowing a download',async()=>{const transport=vi.fn(async()=>response());const value=await fetchPublicationContent(options(transport));expect(value.blob.size).toBe(bytes.length);expect(transport).toHaveBeenCalledWith(`/api/v1/report-publications/${id}/content/html`,expect.objectContaining({redirect:'error',credentials:'same-origin',headers:{Accept:'text/html','If-Match':'"'+'a'.repeat(64)+'"'}}))})
+it('rejects another tenant or changed phase',async()=>{for(const headers of [{'X-MOP-Tenant-ID':id},{'X-MOP-Report-Phase':'PUBLISHED'}] as Record<string,string>[])await expect(fetchPublicationContent(options(vi.fn(async()=>response(headers))))).rejects.toThrow()})
+it('rejects content with an incorrect digest',async()=>{await expect(fetchPublicationContent(options(vi.fn(async()=>response({},new TextEncoder().encode('different')))))).rejects.toThrow()})
+it('does not return data after account scope changes',async()=>{let active=true;const input=options(vi.fn(async()=>{active=false;return response()}));input.active=()=>active;await expect(fetchPublicationContent(input)).rejects.toThrow()})

@@ -34,7 +34,7 @@ vi.mock('../src/components/TicketCommentWorkspace.vue', () => ({ default: { rend
 
 import AssetsPage from '../src/pages/AssetsPage.vue'
 import TicketsPage from '../src/pages/TicketsPage.vue'
-import { api, ApiError } from '../src/api/client'
+import { api, ApiError, type RequestOptions } from '../src/api/client'
 import { contextGeneration, session, switchingTenant } from '../src/stores/session'
 
 const auth: Session = {
@@ -68,7 +68,20 @@ function button(text: string) {
 }
 function searchInput(label: string) { return host.querySelector<HTMLInputElement>(`input[aria-label="${label}"]`)! }
 async function type(input: HTMLInputElement, value: string) { input.value = value; input.dispatchEvent(new Event('input', { bubbles: true })); await settle() }
-function queryParams(request: ReturnType<typeof vi.spyOn>) { return new URL(request.mock.calls.at(-1)![0] as string, 'https://unit.invalid').searchParams }
+// Assert list-search IO separately from the independently tested public-field enrichment GET.
+function listTransport() {
+  const list = vi.fn<(path: string, options?: RequestOptions) => Promise<unknown>>()
+  vi.spyOn(api, 'request').mockImplementation(async (path, options) => {
+    if (path.startsWith('/assets/ledger-facts?')) return {
+      tenant_id: auth.tenant.id, observed_at: '2026-10-23T00:00:00Z', source: 'postgresql', scope: 'CURRENT_TENANT_PUBLIC_ASSET_FIELDS',
+      business_relationship_verified: false, proxy_verified: false,
+      items: [{asset_id:asset.id,asset_version:asset.version,site_id:asset.site_id,site_name:'Unit site',metadata_version:null,metadata_recorded_at:null,metadata_source:'NOT_RECORDED',business_description:null,owner:null}],
+    }
+    return list(path, options)
+  })
+  return list
+}
+function queryParams(request: ReturnType<typeof listTransport>) { return new URL(request.mock.calls.at(-1)![0] as string, 'https://unit.invalid').searchParams }
 beforeEach(() => {
   session.value = structuredClone(auth); switchingTenant.value = false; contextGeneration.value = 0
   host = document.createElement('div'); document.body.append(host)
@@ -78,7 +91,7 @@ afterEach(() => { app?.unmount(); app = undefined; host.remove(); session.value 
 
 describe.each(cases)('$path explicit list search', config => {
   it('discards only unsubmitted filters, keeps the original cursor and returns input focus without a request', async () => {
-    const request = vi.spyOn(api, 'request').mockResolvedValue(config.page())
+    const request = listTransport().mockResolvedValue(config.page())
     await mount(config, '?q=before&page_size=25&cursor=synthetic-cursor')
     await type(searchInput(config.label), '尚未查询的文字')
     button('撤销修改').click(); await settle()
@@ -90,7 +103,7 @@ describe.each(cases)('$path explicit list search', config => {
   })
 
   it('applies the pending filter action to the first page and keeps keyboard focus reachable', async () => {
-    const request = vi.spyOn(api, 'request').mockResolvedValue(config.page())
+    const request = listTransport().mockResolvedValue(config.page())
     await mount(config, '?q=before&cursor=synthetic-cursor')
     await type(searchInput(config.label), '  新查询  ')
     button('应用筛选').click()
@@ -101,7 +114,7 @@ describe.each(cases)('$path explicit list search', config => {
   })
 
   it('keeps typing separate, trims submitted input and returns to the first page', async () => {
-    const request = vi.spyOn(api, 'request').mockResolvedValue(config.page())
+    const request = listTransport().mockResolvedValue(config.page())
     await mount(config, '?q=before&page_size=25&cursor=synthetic-cursor')
     await type(searchInput(config.label), '  新关键词  ')
     expect(request).toHaveBeenCalledTimes(1)
@@ -114,7 +127,7 @@ describe.each(cases)('$path explicit list search', config => {
   })
 
   it('blocks IME candidate Enter and submitting during composition, then accepts a normal submit', async () => {
-    const request = vi.spyOn(api, 'request').mockResolvedValue(config.page())
+    const request = listTransport().mockResolvedValue(config.page())
     await mount(config)
     const input = searchInput(config.label)
     input.dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }))
@@ -133,7 +146,7 @@ describe.each(cases)('$path explicit list search', config => {
   })
 
   it('keeps pending input while paging or refreshing the applied query', async () => {
-    const request = vi.spyOn(api, 'request').mockResolvedValue(config.page(false, true))
+    const request = listTransport().mockResolvedValue(config.page(false, true))
     await mount(config, '?q=applied')
     await type(searchInput(config.label), '未提交输入')
     button('下一页').click()
@@ -148,7 +161,7 @@ describe.each(cases)('$path explicit list search', config => {
   })
 
   it('recovers an empty result and never announces a failed query as zero successful results', async () => {
-    const request = vi.spyOn(api, 'request').mockResolvedValue(config.page(true))
+    const request = listTransport().mockResolvedValue(config.page(true))
     await mount(config, '?q=missing')
     expect(host.querySelector('.filter-result')?.textContent).toContain('本页 0 条匹配记录')
     request.mockResolvedValueOnce(config.page()); button(config.emptyButton).click()
@@ -167,7 +180,7 @@ describe.each(cases)('$path explicit list search', config => {
 })
 
 it('asset status shortcut and removing one applied filter leave other drafts and applied filters intact', async () => {
-  const request = vi.spyOn(api, 'request').mockResolvedValue(assetPage())
+  const request = listTransport().mockResolvedValue(assetPage())
   await mount(cases[0]!, '?q=applied&type=switch&site_id=unit-site&cursor=unit-old')
   await type(searchInput('搜索资产'), '尚未提交')
   button('未知').click()
@@ -181,7 +194,7 @@ it('asset status shortcut and removing one applied filter leave other drafts and
 })
 
 it('ticket single-filter removal preserves pending keywords and the other applied condition', async () => {
-  const request = vi.spyOn(api, 'request').mockResolvedValue(ticketPage())
+  const request = listTransport().mockResolvedValue(ticketPage())
   await mount(cases[1]!, '?q=applied&category=网络不通&urgency=normal&cursor=unit-old')
   await type(searchInput('搜索报障登记'), '尚未提交')
   host.querySelector<HTMLButtonElement>('button[aria-label="分类：网络不通，移除此筛选"]')!.click()

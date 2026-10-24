@@ -18,7 +18,12 @@ it('maps every live business route exactly once, retaining detail context and al
   expect(new Set(mapped).size).toBe(mapped.length)
   expect([...mapped].sort()).toEqual(routes.map(route => String(route.name)).sort())
   expect(navigationModuleTitle('contact-import-preview')).toBe('租户与权限管理')
+  expect(navigationModuleTitle('event-metrics')).toBe('监控与告警')
   expect(navigationModuleTitle('actionable-tickets')).toBe('首页门户')
+  expect(navigationModuleTitle('report-publications')).toBe('首页门户')
+  expect(router.getRoutes().find(route => route.name === 'report-publications')?.meta.capability).toBe('dashboard:read')
+  expect(router.getRoutes().find(route => route.name === 'report-publications')?.meta.hidden).toBe(true)
+  expect(router.getRoutes().find(route => route.name === 'actionable-tickets')?.meta.capabilities).toEqual(['tickets:read'])
   const current = { user: {role:'viewer'}, capabilities:['assets:read'] } as Session
   expect(visibleNavigationModules(current, router.getRoutes()).map(module => module.id)).toEqual(['M3','M4'])
   expect(visibleNavigationModules({ ...current, capabilities: [] }, router.getRoutes())).toEqual([])

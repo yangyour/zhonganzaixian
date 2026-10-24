@@ -12,12 +12,15 @@ import { api } from '../src/api/client'
 import { session, switchingTenant, contextGeneration } from '../src/stores/session'
 import type { Session } from '../src/api/types'
 import { scope, row } from './dashboard.fixture'
+import {eventMetrics} from './eventOperationalMetrics.fixture'
+import {noiseTrend} from './eventNoiseTrend.fixture'
+const response=(path:string)=>path.startsWith('/metrics/event-noise-trend?')?noiseTrend(new URL('https://unit'+path).searchParams.get('window') as any):path.startsWith('/metrics/monitoring-events?')?eventMetrics():row(new URL('http://unit'+path).searchParams.get('window') as any)
 const auth: Session = { user: { id: scope.actorId, role: 'padmin', display_name: '合成用户' }, tenant: { id: scope.tenantId, name: '合成租户' }, allowed_tenants: [], permission_version: 7, csrf_token: 'SYNTHETIC_NOT_CREDENTIAL', capabilities: ['dashboard:read', 'assets:read', 'tickets:read'], mode: 'remote_test', identity_source: 'synthetic-unit-only' }
 let app: App, host: HTMLElement
 const order = ['ALERT_TREND', 'SERVICE_HEALTH', 'FAULT_TIMELINE', 'RECENT_EVENTS', 'PENDING_TICKETS', 'RESOURCE_TOP5']
 async function settle() { await Promise.resolve(); await nextTick(); await Promise.resolve(); await nextTick() }
 beforeEach(() => {
-  vi.spyOn(api, 'request').mockImplementation(async path => row(new URL('http://unit' + path).searchParams.get('window') as any))
+  vi.spyOn(api, 'request').mockImplementation(async path => response(path))
   session.value = structuredClone(auth); switchingTenant.value = false; contextGeneration.value++
   host = document.createElement('div'); document.body.append(host); app = createApp(Page); app.mount(host)
 })
@@ -26,7 +29,7 @@ it('renders the six contract KPIs and fixed panel order without invented values'
   await settle()
   expect(host.querySelectorAll('[data-kpi]')).toHaveLength(6)
   expect([...host.querySelectorAll('[data-block]')].map(node => node.getAttribute('data-block'))).toEqual(order)
-  expect([...host.querySelectorAll('[data-kpi] strong')].every(node => node.textContent === '未知')).toBe(true)
+  expect([...host.querySelectorAll('[data-kpi] strong')].map(node=>node.textContent)).toEqual(['未知','0','未知','未知','—','未知'])
   expect(host.textContent).not.toContain('100%')
   expect(host.querySelector('[data-mode="ranking"]')).not.toBeNull()
 })
@@ -36,7 +39,8 @@ it('switches the actual dashboard request window and displays its unknown state'
   const week = [...range.querySelectorAll('button')].find(button => button.textContent === '7天')!
   expect(week.getAttribute('aria-pressed')).toBe('false')
   week.click(); await settle()
-  expect(api.request).toHaveBeenLastCalledWith('/dashboard?window=DAYS_7', expect.objectContaining({ method: 'GET' }))
+  expect(vi.mocked(api.request).mock.calls.filter(([path])=>path.startsWith('/dashboard?')).at(-1)).toEqual(['/dashboard?window=DAYS_7', expect.objectContaining({ method: 'GET' })])
+  expect(vi.mocked(api.request).mock.calls.filter(([path])=>path.startsWith('/metrics/event-noise-trend?')).at(-1)).toEqual(['/metrics/event-noise-trend?window=DAYS_7',expect.objectContaining({method:'GET'})])
   expect(host.querySelector('[data-block="ALERT_TREND"]')?.textContent).toContain('7天')
   expect(week.getAttribute('aria-pressed')).toBe('true')
 })
@@ -45,6 +49,7 @@ it('links each permitted KPI to its contract list page and omits unauthorized ta
   const blank = { template: '<p />' }
   const router = createRouter({ history: createMemoryHistory(), routes: [
     { path: '/dashboard', name: 'dashboard', component: Page, meta: { capability: 'dashboard:read' } },
+    { path: '/event-metrics', name:'event-metrics', component:blank, meta:{roles:['padmin','msp'],capability:'dashboard:read',capabilities:['dashboard:read','tickets:read']} },
     { path: '/assets', name: 'assets', component: blank, meta: { capability: 'assets:read' } },
     { path: '/monitoring-events', name: 'monitoring-events', component: blank, meta: { roles: ['padmin', 'msp'], capability: 'tickets:read' } },
     { path: '/sla-reports', name: 'sla-reports', component: blank, meta: { roles: ['padmin', 'msp'], capability: 'sla_scenarios:read' } },
@@ -56,14 +61,14 @@ it('links each permitted KPI to its contract list page and omits unauthorized ta
   await router.push('/dashboard'); await router.isReady()
   app = createApp({ template: '<router-view />' }); app.use(router); app.mount(host); await settle()
   const links = Object.fromEntries([...host.querySelectorAll('[data-kpi]')].map(card => [card.getAttribute('data-kpi'), card.querySelector('a')?.getAttribute('href') ?? null]))
-  expect(links).toEqual({ ASSET_ONLINE_RATE: '/assets', CURRENT_PROBLEMS: '/monitoring-events', MONTH_SERVICE_AVAILABILITY: null, PENDING_TICKETS: '/dashboard/actionable-tickets', MTTA_24H: '/monitoring-events', DELIVERY_RATE_24H: '/ticket-notifications' })
-  expect([...host.querySelectorAll('[data-kpi] strong')].every(node => node.textContent === '未知')).toBe(true)
+  expect(links).toEqual({ ASSET_ONLINE_RATE: '/assets', CURRENT_PROBLEMS: '/event-metrics?window=HOURS_24&view=CURRENT_PROBLEMS', MONTH_SERVICE_AVAILABILITY: null, PENDING_TICKETS: '/dashboard/actionable-tickets', MTTA_24H: '/event-metrics?window=HOURS_24&view=RECENT_PROBLEMS', DELIVERY_RATE_24H: '/ticket-notifications' })
+  expect([...host.querySelectorAll('[data-kpi] strong')].map(node=>node.textContent)).toEqual(['未知','0','未知','未知','—','未知'])
 })
 it('keeps KPI drill-down links behind the same route gates as the menu', async () => {
   await settle()
   // No router is installed in this unit host, so no unauthorized or unresolved link may render.
   expect(host.querySelectorAll('[data-kpi] a')).toHaveLength(0)
-  expect([...host.querySelectorAll('[data-kpi="CURRENT_PROBLEMS"] .mop-sev')].map(node => node.textContent)).toEqual(['灾难 —', '严重 —', '一般 —', '警告 —', '信息 —'])
+  expect([...host.querySelectorAll('[data-kpi="CURRENT_PROBLEMS"] .mop-sev')].map(node => node.textContent)).toEqual(['灾难 0', '严重 0', '一般 0', '警告 0', '信息 0'])
 })
 it('auto-refresh control reaches the actual resource component without writes', async () => {
   await settle(); const input = host.querySelector('input')!; input.checked = false; input.dispatchEvent(new Event('change')); await nextTick()
@@ -88,8 +93,13 @@ it('rejects local fixtures and dashboard revocation', async () => {
   session.value = { ...auth, capabilities: [] }; await settle(); expect(host.querySelector('[data-kpi]')).toBeNull()
 })
 it('keeps failure distinct from unknown successful metadata', async () => {
-  await settle(); vi.mocked(api.request).mockRejectedValueOnce(new Error('unit failure'))
+  await settle(); vi.mocked(api.request).mockImplementation(async path=>{if(path.startsWith('/dashboard?'))throw new Error('unit failure');return response(path)})
   host.querySelector<HTMLButtonElement>('button.dashboard-refresh')!.click(); await settle()
   expect(host.querySelector('[data-kpi] strong')?.textContent).toBe('读取失败')
-  expect(host.querySelector('.dashboard-source-status')?.textContent).toContain('尚未取得有效首页状态')
+  expect(host.querySelector('[data-kpi="CURRENT_PROBLEMS"] strong')?.textContent).toBe('0')
+  expect(host.querySelector('.dashboard-source-status')?.textContent).toContain('问题计数与MTTA来自授权事件投影')
 })
+
+it('keeps event source failure independent from available dashboard metadata',async()=>{await settle();vi.mocked(api.request).mockImplementation(async path=>{if(path.startsWith('/metrics/monitoring-events?'))throw new Error('event read failed');return response(path)});host.querySelector<HTMLButtonElement>('button.dashboard-refresh')!.click();await settle();expect(host.querySelector('[data-kpi="CURRENT_PROBLEMS"] strong')?.textContent).toBe('读取失败');expect(host.querySelector('[data-kpi="MTTA_24H"] strong')?.textContent).toBe('读取失败');expect(host.querySelector('[data-kpi="ASSET_ONLINE_RATE"] strong')?.textContent).toBe('未知')})
+
+it('refreshes actual trend once per due interval and skips hidden-page polling',async()=>{app.unmount();vi.useFakeTimers();let now=0;vi.spyOn(performance,'now').mockImplementation(()=>now);const hidden=vi.spyOn(document,'hidden','get').mockReturnValue(false);app=createApp(Page);app.mount(host);await settle();vi.mocked(api.request).mockClear();now=31000;vi.advanceTimersByTime(1000);await settle();expect(vi.mocked(api.request).mock.calls.filter(([path])=>path==='/metrics/event-noise-trend?window=HOURS_24')).toHaveLength(1);hidden.mockReturnValue(true);now=62000;vi.advanceTimersByTime(1000);await settle();expect(vi.mocked(api.request).mock.calls.filter(([path])=>path==='/metrics/event-noise-trend?window=HOURS_24')).toHaveLength(1)})

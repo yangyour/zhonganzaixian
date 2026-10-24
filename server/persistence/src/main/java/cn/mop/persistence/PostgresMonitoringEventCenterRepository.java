@@ -523,6 +523,10 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
             String resultEventId = null;
             if ("BIND_ASSET".equals(cmd.decision())) {
                 MonitorState phase = "RECOVERED".equals(q.sourcePhase()) ? MonitorState.RECOVERED : MonitorState.PROBLEM;
+                if (phase == MonitorState.RECOVERED) {
+                    throw new DomainException(422, "RECOVERY_OBSERVATION_REQUIRED",
+                        "隔离恢复信号不能替代已发布策略和来源观察核验，请在原故障事件中确认恢复");
+                }
                 EventSummary promoted = ingestInternal(c, a, new IngestEventCommand(
                     cmd.boundAssetId(),
                     "QUARANTINE_PROMOTED",
@@ -759,9 +763,10 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
         long depCount = 0;
         long maintCount = 0;
         long effectiveCount = 0;
-        try (var s = statement(c, "SELECT layer, count(*) FROM public.mop_event_noise_record WHERE tenant_id=?::uuid AND recorded_at>=? GROUP BY layer")) {
+        try (var s = statement(c, "SELECT layer, count(*) FROM public.mop_event_noise_record WHERE tenant_id=?::uuid AND recorded_at>=? AND recorded_at<? GROUP BY layer")) {
             s.setString(1, tenant);
             instant(s, 2, since);
+            instant(s, 3, observed);
             try (var r = s.executeQuery()) {
                 while (r.next()) {
                     String layer = r.getString(1);

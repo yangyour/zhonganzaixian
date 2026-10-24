@@ -7,19 +7,24 @@ import { can, contextGeneration, session, switchingTenant } from '../stores/sess
 import { createDashboardWorkspace, emptyDashboardState } from '../utils/dashboardWorkspace'
 import { dashboardWindows, type DashboardWindow } from '../utils/dashboardAvailability'
 import { emptyActionableTickets, type ActionableTicketState } from '../utils/dashboardActionableTickets'
+import {createEventMetricReader,emptyEventMetrics,elapsedMetricLabel,type EventMetricSnapshot} from '../utils/eventOperationalMetrics'
 import { clockTime, displayTime } from '../utils/display'
 import { routeAllowed } from '../utils/routeAccess'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import LiveMonitoringPanel from '../components/LiveMonitoringPanel.vue'
 import DashboardEventsPanel from '../components/DashboardEventsPanel.vue'
+import EventNoiseTrendPanel from '../components/EventNoiseTrendPanel.vue'
 import DashboardWorkflowsPanel from '../components/DashboardWorkflowsPanel.vue'
 
 const router = useRouter()
+const trendPanel = ref<{refresh:()=>void}|null>(null)
 const eventPanel = ref<{ refresh: () => unknown } | null>(null)
 const workflowPanel = ref<{ refresh: () => unknown } | null>(null)
 const resourcePanel = ref<{ refresh: () => unknown } | null>(null)
 const state = shallowRef(emptyDashboardState())
 const pending = shallowRef(emptyActionableTickets())
+const eventMetrics=shallowRef(emptyEventMetrics())
+const metricReader=createEventMetricReader(api,value=>eventMetrics.value=value)
 const workspace = createDashboardWorkspace(api, value => { state.value = value })
 const autoRefresh = ref(true), now = ref(performance.now()), loadedAt = ref<number | null>(null)
 const permitted = computed(() => Boolean(session.value?.mode === 'remote_test' && ['viewer', 'tadmin', 'msp', 'padmin'].includes(session.value.user.role) && can('dashboard:read') && !switchingTenant.value))
@@ -29,10 +34,10 @@ const windows: Record<DashboardWindow, string> = { HOURS_24: '24小时', DAYS_7:
 // M1-1: six fixed cards; the pending card and its list share the same authorized server snapshot.
 const kpis = [
   { id: 'ASSET_ONLINE_RATE', title: '资产在线率', route: 'assets', target: '资产列表', parts: [['正常', '—'], ['未知', '—']], note: '未知单独计数，不并入正常' },
-  { id: 'CURRENT_PROBLEMS', title: '当前问题', route: 'monitoring-events', target: '事件中心', severities: true, note: '已排除已抑制事件' },
+  { id: 'CURRENT_PROBLEMS', title: '当前问题', route: 'event-metrics', target: '问题明细', severities: true, note: '已排除已抑制事件' },
   { id: 'MONTH_SERVICE_AVAILABILITY', title: '本月服务可用率', route: 'sla-reports', target: 'SLA 报表', note: '本月1日至今 · 无样本不视为可用' },
   { id: 'PENDING_TICKETS', title: '待处理工单', route: 'actionable-tickets', target: '全部待处理与SLA' },
-  { id: 'MTTA_24H', title: 'MTTA', period: '近24小时', route: 'monitoring-events', target: '事件中心', note: '首次有效人工确认 · 样本量未知' },
+  { id: 'MTTA_24H', title: 'MTTA', period: '近24小时', route: 'event-metrics', target: '时长明细', note: '首次有效人工确认 · 样本量未知' },
   { id: 'DELIVERY_RATE_24H', title: '通知送达率', period: '近24小时', route: 'ticket-notifications', target: '工单通知', parts: [['受理', '—'], ['送达', '—']] },
 ] as const
 const severities = [['disaster', '灾难'], ['high', '严重'], ['average', '一般'], ['warning', '警告'], ['info', '信息']] as const
@@ -43,6 +48,15 @@ function updatePending(value: ActionableTicketState) {
   pending.value = permitted.value && can('tickets:read') ? value : emptyActionableTickets()
 }
 function metricValue(id: string) {
+  if(id==='CURRENT_PROBLEMS'||id==='MTTA_24H'){
+    if(!eventAccess.value)return '无权限'
+    if(eventMetrics.value.busy)return '读取中'
+    if(eventMetrics.value.cancelled)return '已取消'
+    if(eventMetrics.value.error)return '读取失败'
+    const value=eventMetrics.value.current
+    if(!value)return '未知'
+    return id==='CURRENT_PROBLEMS'?value.current_problems.total:value.mtta.status==='CALCULATED'?elapsedMetricLabel(value.mtta.mean_millis):value.mtta.status==='NO_ACKNOWLEDGED_SAMPLES'?'—':'未知'
+  }
   if (id !== 'PENDING_TICKETS') return kpiValue.value
   if (!can('tickets:read')) return '无权限'
   if (pending.value.busy) return '读取中'
@@ -50,8 +64,12 @@ function metricValue(id: string) {
   if (pending.value.error) return '读取失败'
   return pending.value.current?.pending_tickets ?? '未知'
 }
-function metricFailed(id: string) { return Boolean(id === 'PENDING_TICKETS' ? pending.value.error : state.value.error) }
-function metricUnknown(id: string) { return id === 'PENDING_TICKETS' ? pending.value.current?.pending_tickets == null : !state.value.error }
+function metricFailed(id: string) { return Boolean(['CURRENT_PROBLEMS','MTTA_24H'].includes(id)?eventMetrics.value.error:id === 'PENDING_TICKETS' ? pending.value.error : state.value.error) }
+function metricUnknown(id: string) { if(id==='CURRENT_PROBLEMS')return !eventMetrics.value.current;if(id==='MTTA_24H')return eventMetrics.value.current?.mtta.status!=='CALCULATED';return id === 'PENDING_TICKETS' ? pending.value.current?.pending_tickets == null : !state.value.error }
+function severityCount(key:string){return eventMetrics.value.current?.current_problems.by_severity[key.toUpperCase() as keyof EventMetricSnapshot['current_problems']['by_severity']]??'未知'}
+function metricLink(id:string,name:string){return name==='event-metrics'?{name,query:{window:'HOURS_24',view:id==='CURRENT_PROBLEMS'?'CURRENT_PROBLEMS':'RECENT_PROBLEMS'}}:{name}}
+function metricNote(id:string,fallback:string){const m=eventMetrics.value.current?.mtta;if(id!=='MTTA_24H'||!m)return fallback;return m.status==='SAMPLE_BUDGET_EXCEEDED'?'超过完整样本核算预算':`确认样本 ${m.sample_count??'未知'} · 未确认 ${m.unacknowledged_count??'未知'} · 异常 ${m.invalid_count??'未知'}`}
+
 const pendingNote = computed(() => {
   const current = pending.value.current
   if (!current) return ''
@@ -71,34 +89,36 @@ let timer: ReturnType<typeof setInterval> | undefined, lastRefresh = 0, alive = 
 async function refresh(window: DashboardWindow = state.value.window) {
   const owner = contextKey.value
   lastRefresh = performance.now()
+  if(permitted.value&&eventAccess.value)void metricReader.load()
   if (await workspace.load(window) && alive && owner === contextKey.value) loadedAt.value = performance.now()
 }
 function refreshAll() {
   if (!permitted.value) return
-  void refresh(); void eventPanel.value?.refresh(); void workflowPanel.value?.refresh(); void resourcePanel.value?.refresh()
+  void refresh(); trendPanel.value?.refresh(); void eventPanel.value?.refresh(); void workflowPanel.value?.refresh(); void resourcePanel.value?.refresh()
 }
 function selectWindow(window: DashboardWindow) { if (!state.value.busy) void refresh(window) }
 watch(contextKey, () => {
   loadedAt.value = null
   pending.value = emptyActionableTickets()
   const current = session.value
+  metricReader.reset(permitted.value&&eventAccess.value&&current?{tenantId:current.tenant.id,actorId:current.user.id,permissionVersion:current.permission_version,canRead:true}:null)
   workspace.reset(permitted.value && current ? { tenantId: current.tenant.id, actorId: current.user.id, permissionVersion: current.permission_version, role: current.user.role, canRead: true } : null)
   if (permitted.value) void refresh()
 }, { immediate: true, flush: 'sync' })
 onMounted(() => {
   timer = setInterval(() => {
     now.value = performance.now()
-    if (permitted.value && autoRefresh.value && !document.hidden && now.value - lastRefresh >= 30000) { void refresh(); void eventPanel.value?.refresh(); void workflowPanel.value?.refresh() }
+    if (permitted.value && autoRefresh.value && !document.hidden && now.value - lastRefresh >= 30000) { void refresh(); trendPanel.value?.refresh(); void eventPanel.value?.refresh(); void workflowPanel.value?.refresh() }
   }, 1000)
 })
-onUnmounted(() => { alive = false; clearInterval(timer); workspace.dispose() })
+onUnmounted(() => { alive = false; clearInterval(timer); workspace.dispose(); metricReader.dispose() })
 </script>
 <template>
   <section class="dashboard-page" aria-labelledby="dashboard-title">
     <h1 id="dashboard-title" class="page-title-sr">运营总览</h1>
     <p v-if="!permitted" class="mop-empty" role="alert">当前会话不可读取运营总览，或正在切换租户；已清除原范围数据。</p>
     <template v-else>
-      <div class="dashboard-toolbar">
+      <div class="dashboard-toolbar"><router-link to="/report-publications">报告中心</router-link>
         <div class="dashboard-range" role="group" aria-label="首页时间范围">
           <span class="mop-toolbar-label">时间范围</span>
           <div class="mop-segmented">
@@ -115,24 +135,24 @@ onUnmounted(() => { alive = false; clearInterval(timer); workspace.dispose() })
           <div class="mop-kpi-label"><h2>{{ kpi.title }}<span v-if="'period' in kpi" class="kpi-period">{{ kpi.period }}</span></h2></div>
           <strong class="mop-kpi-value" :class="{ 'kpi-failed': metricFailed(kpi.id) }">{{ metricValue(kpi.id) }}</strong>
           <div v-if="'severities' in kpi" class="kpi-severities" aria-label="按严重级别计数">
-            <span v-for="[key, label] in severities" :key="key" class="mop-sev" :class="key">{{ label }} —</span>
+            <span v-for="[key, label] in severities" :key="key" class="mop-sev" :class="key">{{ label }} {{severityCount(key)}}</span>
           </div>
           <p v-else-if="kpi.id === 'PENDING_TICKETS'" class="mop-kpi-detail kpi-parts"><span>已超 SLA <b :class="{ 'kpi-failed': (pending.current?.overdue_sla ?? pending.current?.known_overdue ?? 0) > 0 }">{{ pending.current?.overdue_sla ?? '未知' }}</b></span><span v-if="pending.current?.overdue_sla === null">已确认 {{ pending.current.known_overdue }} · 未知 {{ pending.current.unknown_sla }}</span></p>
           <p v-else-if="'parts' in kpi" class="mop-kpi-detail kpi-parts"><span v-for="[label, value] in kpi.parts" :key="label">{{ label }} <b>{{ value }}</b></span></p>
           <div class="kpi-foot">
             <span v-if="kpi.id === 'PENDING_TICKETS' && pending.current" class="mop-kpi-detail">{{ pendingNote }}</span>
-            <span v-if="'note' in kpi" class="mop-kpi-detail">{{ kpi.note }}</span>
-            <router-link v-if="allowedRoutes.has(kpi.route)" class="mop-kpi-link" :to="{ name: kpi.route }" :aria-label="`${kpi.title}：打开${kpi.target}`">{{ kpi.target }}<ArrowRight aria-hidden="true" /></router-link>
+            <span v-if="'note' in kpi" class="mop-kpi-detail">{{ metricNote(kpi.id,kpi.note) }}<span v-if="kpi.id==='MTTA_24H'&&eventMetrics.current?.mtta.target_breached" class="mop-badge warning">超出5分钟目标</span></span>
+            <router-link v-if="allowedRoutes.has(kpi.route)" class="mop-kpi-link" :to="metricLink(kpi.id,kpi.route)" :aria-label="`${kpi.title}：打开${kpi.target}`">{{ kpi.target }}<ArrowRight aria-hidden="true" /></router-link>
           </div>
         </article>
       </div>
-      <p class="dashboard-source-status">{{ pending.current ? '待处理工单与下方列表来自同一授权汇总；未配置流程单列为未知，其余未接入指标不补值。' : state.current ? '正式指标尚未接入。以下业务记录与设备采样独立读取，不作为上述指标的替代值。' : '尚未取得有效首页状态，未显示缓存指标。' }}</p>
+      <p class="dashboard-source-status">{{ eventMetrics.current ? '问题计数与MTTA来自授权事件投影；采集时效与时钟准确性未核验，其他未接入指标不补值。' : pending.current ? '待处理工单与下方列表来自同一授权汇总；未配置流程单列为未知，其余未接入指标不补值。' : state.current ? '正式指标尚未接入。以下业务记录与设备采样独立读取，不作为上述指标的替代值。' : '尚未取得有效首页状态，未显示缓存指标。' }}</p>
       <div :key="contextKey" class="dashboard-grid">
         <section class="dashboard-card mop-card span-8" data-block="ALERT_TREND" aria-labelledby="alert-trend-title">
-          <header class="mop-card-head"><div class="mop-card-title"><h2 id="alert-trend-title">告警趋势</h2><span>原始事件 vs 归并后 · {{ windows[state.window] }}</span></div><span class="mop-badge unknown">降噪率未知</span></header>
+          <header class="mop-card-head"><div class="mop-card-title"><h2 id="alert-trend-title">告警趋势</h2><span>原始记录 vs 指纹归并后 · {{ windows[state.window] }}</span></div><span class="mop-badge unknown" title="最终通知来源尚未接入，不能以有效告警数代替">降噪率未知</span></header>
           <div class="mop-card-body">
-            <div class="dashboard-legend"><span class="legend-line raw">原始事件</span><span class="legend-line merged">归并后事件</span><span class="legend-note">降噪链：指纹归并 → 依赖抑制 → 维护静默</span></div>
-            <div class="mop-unavailable trend-unavailable"><strong>未接入</strong><span>{{ state.error ? '首页状态读取失败，请重试。' : '时序统计尚未接入，暂无可核验的趋势。' }}</span></div>
+            <div class="dashboard-legend"><span class="legend-line raw">原始记录</span><span class="legend-line merged">指纹归并后</span><span class="legend-note">降噪链：指纹归并 → 依赖抑制 → 维护静默</span></div>
+            <EventNoiseTrendPanel ref="trendPanel" :window="state.window" />
           </div>
         </section>
         <section class="dashboard-card mop-card span-4" data-block="SERVICE_HEALTH" aria-labelledby="service-health-title">

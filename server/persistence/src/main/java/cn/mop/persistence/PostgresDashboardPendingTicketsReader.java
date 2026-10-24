@@ -60,6 +60,15 @@ public final class PostgresDashboardPendingTicketsReader implements DashboardPen
     }
 
     <T> T readSnapshot(Access access, SnapshotProjection<T> projection) {
+        return readSnapshot(access, false, projection);
+    }
+
+    static String predicate(boolean actionable) {
+        return "model<>'UNCONFIGURED' AND state NOT IN (" +
+                (actionable ? "'CLOSED','CANCELLED','RESOLVED'" : "'CLOSED','CANCELLED'") + ")";
+    }
+
+    <T> T readSnapshot(Access access, boolean actionable, SnapshotProjection<T> projection) {
         platform.requireStandaloneRead();
         if (access == null) {
             throw expired();
@@ -107,7 +116,8 @@ public final class PostgresDashboardPendingTicketsReader implements DashboardPen
                             }
                             if ("UNCONFIGURED".equals(model) && state == null) {
                                 unconfigured = Math.addExact(unconfigured, count);
-                            } else if (DashboardPendingTicketsReader.pending(model, state)) {
+                            } else if (actionable ? DashboardPendingTicketsReader.actionable(model, state)
+                                    : DashboardPendingTicketsReader.pending(model, state)) {
                                 knownPending = Math.addExact(knownPending, count);
                             } else {
                                 terminal = Math.addExact(terminal, count);
@@ -118,7 +128,7 @@ public final class PostgresDashboardPendingTicketsReader implements DashboardPen
                 var items = new ArrayList<Item>();
                 try (var statement = query(connection, access, internal,
                         "SELECT id,receipt_no,title,created_at,model,state,version FROM visible "
-                                + "WHERE model<>'UNCONFIGURED' AND state NOT IN ('CLOSED','CANCELLED') "
+                                + "WHERE " + predicate(actionable) + " "
                                 + "ORDER BY created_at DESC,id DESC LIMIT 5")) {
                     try (var rows = statement.executeQuery()) {
                         while (rows.next()) {

@@ -1,0 +1,39 @@
+package cn.mop.api;
+import cn.mop.domain.*;
+import cn.mop.domain.notification.DeliveryJournalReader;
+import cn.mop.domain.notification.DeliveryJournalReader.*;
+import com.fasterxml.jackson.databind.*;
+import jakarta.servlet.http.*;
+import java.time.Instant;
+import java.util.*;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
+import org.springframework.web.bind.annotation.*;
+/** Read-only local journal reconciliation, never provider receipt authentication or a resend endpoint. */
+@RestController @Profile("remote_test") @RequestMapping("/api/v1/notification-deliveries")
+public final class DeliveryJournalController {
+ private final PlatformRepository platform;private final DeliveryJournalReader reader;private final ObjectMapper json;private final boolean enabled;
+ public DeliveryJournalController(PlatformRepository platform,DeliveryJournalReader reader,ObjectMapper json,Environment env){this.platform=platform;this.reader=reader;this.json=json.copy().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);enabled=MonitoringEnrollmentConfiguration.flag(env,"MOP_DELIVERY_JOURNAL_READ_ENABLED");}
+ @ModelAttribute void headers(HttpServletResponse r){r.setHeader("Cache-Control","no-store");r.setHeader("Referrer-Policy","no-referrer");}
+ private Membership member(HttpServletRequest r){if(r.getUserPrincipal()==null||r.getSession(false)==null||!(r.getSession(false).getAttribute("mop.tenant_id") instanceof String tenant)||!MonitoringPresetRegistry.uuid(tenant)||!MonitoringPresetRegistry.uuid(r.getUserPrincipal().getName()))throw expired();String actor=r.getUserPrincipal().getName();var m=platform.membership(actor,tenant).orElseThrow(DeliveryJournalController::expired);
+  if(!m.active()||m.permissionVersion()<1||!actor.equals(m.userId())||!tenant.equals(m.tenantId()))throw expired();if(!"padmin".equals(m.role())||!m.capabilities().containsAll(List.of("ticket_notes:read_internal","audit:read")))throw new DomainException(403,"DELIVERY_JOURNAL_FORBIDDEN","当前身份不能读取内部投递日志");if(!enabled)throw new DomainException(503,"DELIVERY_JOURNAL_READ_DISABLED","投递日志只读核对尚未显式启用");return m;
+ }
+ private static Access access(Membership m){return new Access(UUID.fromString(m.tenantId()),UUID.fromString(m.userId()),m.permissionVersion());}
+ @GetMapping Object list(HttpServletRequest r){var m=member(r);var q=query(r,Set.of("resource_pool_id","before","before_id","page_size"));if(q.containsKey("before")!=q.containsKey("before_id"))throw invalid();UUID pool=q.containsKey("resource_pool_id")?uuid(q.get("resource_pool_id")):null;Cursor cursor=null;
+  if(q.containsKey("before"))try{var at=Instant.parse(q.get("before"));if(at.getNano()%1000000!=0||!at.toString().equals(q.get("before")))throw invalid();cursor=new Cursor(at,uuid(q.get("before_id")));}catch(Exception e){throw invalid();}
+  int size=size(q.get("page_size"),10,20);var page=reader.list(access(m),pool,cursor,size);if(page==null||!access(m).equals(page.access())||page.pageSize()!=size||pool!=null&&page.items().stream().anyMatch(e->!pool.equals(e.resourcePoolId())))throw unavailable();var result=flags();result.put("tenant_id",m.tenantId());result.put("observed_at",page.observedAt().toString());result.put("total_count",page.totalCount());result.put("page_size",size);result.put("items",page.items().stream().map(e->entry(m,e)).toList());result.put("next",page.next()==null?null:Map.of("before",page.next().firstRecordedAt().toString(),"before_id",page.next().deliveryId().toString()));result.put("snapshot_scope","CURRENT_READ_PAGE_NOT_GLOBAL_SNAPSHOT");DashboardReadAuthorization.recheck(r,platform,m);return ApiResponse.success(result,r);
+ }
+ @GetMapping("/{id}") Object detail(@PathVariable String id,HttpServletRequest r){var m=member(r);var q=query(r,Set.of("before_version","page_size"));UUID delivery=uuid(id);Long before=q.containsKey("before_version")?(long)size(q.get("before_version"),1,12001):null;int size=size(q.get("page_size"),100,100);var detail=reader.detail(access(m),delivery,before,size);if(detail==null||!access(m).equals(detail.access())||!delivery.equals(detail.entry().deliveryId())||detail.history().size()>size)throw unavailable();var versions=new HashSet<Long>();long prior=before==null?detail.entry().version()+1:before;for(var step:detail.history()){if(step.version()>=prior||step.version()>detail.entry().version()||!versions.add(step.version()))throw unavailable();prior=step.version();}if(detail.nextBeforeVersion()!=null&&(detail.history().size()!=size||detail.nextBeforeVersion()!=prior||prior<1))throw unavailable();
+  var result=flags();result.put("tenant_id",m.tenantId());result.put("observed_at",detail.observedAt().toString());result.put("entry",entry(m,detail.entry()));result.put("history",detail.history().stream().map(this::step).toList());result.put("next_before_version",detail.nextBeforeVersion());result.put("history_scope","CURRENT_HEAD_WITH_IMMUTABLE_VERSION_PAGE");DashboardReadAuthorization.recheck(r,platform,m);return ApiResponse.success(result,r);
+ }
+ @GetMapping("/{id}/commands/{commandId}") Object recover(@PathVariable String id,@PathVariable String commandId,HttpServletRequest r){var m=member(r);MonitoringOnboardingAccess.noQuery(r);UUID delivery=uuid(id),command=uuid(commandId);var recovered=reader.recover(access(m),delivery,command);if(recovered==null||!access(m).equals(recovered.access())||!delivery.equals(recovered.current().deliveryId())||!command.equals(recovered.original().commandId())||recovered.original().version()>recovered.current().version())throw unavailable();var result=flags();result.put("tenant_id",m.tenantId());result.put("observed_at",recovered.observedAt().toString());result.put("current",entry(m,recovered.current()));result.put("original",step(recovered.original()));result.put("recovery_scope","LOCAL_RECORDED_COMMAND_ONLY_NOT_PROVIDER_LOOKUP");result.put("fresh_send_authorized",false);DashboardReadAuthorization.recheck(r,platform,m);return ApiResponse.success(result,r);}
+ private Map<String,Object> entry(Membership m,Entry e){if(e==null||!m.tenantId().equals(e.tenantId().toString()))throw unavailable();var value=json.convertValue(e,Map.class);@SuppressWarnings("unchecked")Map<String,Object> result=(Map<String,Object>)value;result.put("provider_receipt_verified",false);result.put("automatic_send_enabled",false);result.put("verified_delivered_count",null);result.put("journal_integrity_checked",true);return result;}
+ private Map<String,Object> step(Step step){return json.convertValue(step,Map.class);}
+ private static Map<String,Object> flags(){return ApiResponse.map("source","postgresql_delivery_receipt_journal","provider_receipt_verified",false,"automatic_send_enabled",false,"provider_lookup_invoked",false,"verified_delivered_count",null,"status_meaning","JOURNAL_DECLARATION_NOT_PROVIDER_VERIFICATION");}
+ private static Map<String,String> query(HttpServletRequest r,Set<String> allowed){var out=new HashMap<String,String>();r.getParameterMap().forEach((k,v)->{if(!allowed.contains(k)||v.length!=1||v[0].isBlank()||v[0].length()>100)throw invalid();out.put(k,v[0]);});return out;}
+ private static int size(String value,int fallback,int max){if(value==null)return fallback;if(!value.matches("[1-9][0-9]{0,4}"))throw invalid();int n=Integer.parseInt(value);if(n>max)throw invalid();return n;}
+ private static UUID uuid(String value){if(!MonitoringPresetRegistry.uuid(value))throw invalid();return UUID.fromString(value);}
+ private static DomainException expired(){return new DomainException(401,"SESSION_EXPIRED","投递日志读取会话已变化");}
+ private static DomainException invalid(){return new DomainException(400,"VALIDATION_ERROR","只接受明确投递日志、原命令和完整分页参数");}
+ private static DomainException unavailable(){return new DomainException(503,"DELIVERY_JOURNAL_UNAVAILABLE","投递日志范围或读取回执未通过核对");}
+}

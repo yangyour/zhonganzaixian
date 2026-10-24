@@ -42,7 +42,7 @@ public final class AssetLedgerFactsController {
         }
         var member = platform.membership(actor, tenant).orElseThrow(AssetLedgerFactsController::expired);
         if (!member.active() || !actor.equals(member.userId()) || !tenant.equals(member.tenantId())
-                || member.permissionVersion() < 1 || member.permissionVersion() > 9007199254740991L) {
+                || member.permissionVersion() < 1 || member.permissionVersion() > 9007199254740990L) {
             throw expired();
         }
         if (!member.capabilities().contains("assets:read")) {
@@ -68,7 +68,13 @@ public final class AssetLedgerFactsController {
             throw new DomainException(503, "ASSET_LEDGER_FACTS_UNAVAILABLE", "资产资料快照范围、完整性或记录时间不一致");
         }
         DashboardReadAuthorization.recheck(request, platform, member);
-        return success(map("tenant_id", result.tenantId(), "observed_at", result.observedAt(), "items", result.items(),
+        return success(map("tenant_id", result.tenantId(), "observed_at", result.observedAt().toString(),
+                "items", result.items().stream().map(item -> map("asset_id", item.assetId(), "asset_version", item.assetVersion(),
+                    "site_id", item.siteId(), "site_name", item.siteName(), "metadata_version", item.metadataVersion(),
+                    "metadata_recorded_at", item.metadataRecordedAt() == null ? null : item.metadataRecordedAt().toString(),
+                    "metadata_source", item.metadataSource(), "business_description", item.businessDescription(),
+                    "owner", item.owner() == null ? null : map("id", item.owner().id(), "display_name", item.owner().displayName(),
+                        "status", item.owner().status()))).toList(),
                 "source", "postgresql", "scope", "CURRENT_TENANT_PUBLIC_ASSET_FIELDS", "business_relationship_verified", false,
                 "proxy_verified", false), request);
     }

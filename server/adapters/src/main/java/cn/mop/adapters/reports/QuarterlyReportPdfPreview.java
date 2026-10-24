@@ -39,6 +39,45 @@ public final class QuarterlyReportPdfPreview {
    int count=fop.getResults().getPageCount();if(count<1||count>MAX_PAGES||out.size()<100)throw failed();byte[] bytes=out.toByteArray();return new Result(bytes,digest(bytes),count);
   }catch(DomainException safe){throw safe;}catch(Exception failure){LOG.warn("PDF preview rejected exception_type={}",failure.getClass().getName());for(Throwable cause=failure;cause!=null;cause=cause.getCause())if(cause instanceof DomainException safe)throw safe;throw failed();}finally{renderSlot.release();}
  }
+ /** Render only the exact inert XHTML emitted by the publication renderer; no URL or caller layout is accepted. */
+ public Result renderPublicationHtml(String html) {
+  if(!settings.enabled())throw unconfigured();
+  if(html==null||html.length()>MAX_TEXT_CHARS*8)throw limit();
+  if(!renderSlot.tryAcquire())throw new DomainException(503,"REPORT_PDF_BUSY","PDF生成器正在处理其他请求");
+  try {
+   var parser=javax.xml.parsers.DocumentBuilderFactory.newInstance();
+   parser.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING,true);
+   parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
+   parser.setFeature("http://xml.org/sax/features/external-general-entities",false);
+   parser.setFeature("http://xml.org/sax/features/external-parameter-entities",false);
+   parser.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD,"");parser.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA,"");
+   parser.setXIncludeAware(false);parser.setExpandEntityReferences(false);
+   var doc=parser.newDocumentBuilder().parse(new ByteArrayInputStream(html.getBytes(StandardCharsets.UTF_8)));
+   var all=doc.getElementsByTagName("*");for(int i=0;i<all.getLength();i++){
+    var element=(org.w3c.dom.Element)all.item(i);
+    if(!Set.of("html","head","title","body","h1","p").contains(element.getTagName()))throw invalid();
+    if(element.getAttributes().getLength()>(element.getTagName().equals("html")?1:0))throw invalid();
+    if(element.getAttributes().getLength()==1&&!"http://www.w3.org/1999/xhtml".equals(element.getAttribute("xmlns")))throw invalid();
+   }
+   if(doc.getElementsByTagName("body").getLength()!=1||doc.getElementsByTagName("h1").getLength()!=1)throw invalid();
+   var lines=new ArrayList<String>();var body=doc.getElementsByTagName("body").item(0).getChildNodes();
+   for(int i=0;i<body.getLength();i++){var node=body.item(i);if(node.getNodeType()==org.w3c.dom.Node.ELEMENT_NODE){
+    if(!Set.of("h1","p").contains(node.getNodeName()))throw invalid();
+    for(int j=0;j<node.getChildNodes().getLength();j++)if(node.getChildNodes().item(j).getNodeType()!=org.w3c.dom.Node.TEXT_NODE)throw invalid();
+    lines.add(node.getTextContent());
+   }}
+   var user=factory().newFOUserAgent();user.setAccessibility(true);user.setTitle("MOP report");user.setCreator("MOP frozen XHTML publication renderer");
+   var pageCounter=new AtomicInteger();user.getEventBroadcaster().addEventListener(event->{if(event.getEventID().endsWith(".endPage")&&pageCounter.incrementAndGet()>MAX_PAGES)throw limit();if(event.getSeverity()!=EventSeverity.INFO)throw failed();});
+   var out=new LimitedOutput();var fop=factory().newFop("application/pdf",user,out);
+   new Layout(fop.getDefaultHandler(),primaryGlyphs,fallbackGlyphs).renderParagraphs(lines);
+   int pages=fop.getResults().getPageCount();if(pages<1||pages>MAX_PAGES||out.size()<100)throw limit();
+   var bytes=out.toByteArray();return new Result(bytes,digest(bytes),pages);
+  }catch(DomainException safe){throw safe;}catch(Exception failure){throw failed();}finally{renderSlot.release();}
+ }
+ public String publicationFontIdentity() {
+  if(!settings.enabled()||settings.fontSha256()==null)return null;
+  return digest((settings.fontSha256()+"\n"+Objects.toString(settings.fallbackSha256(),"")).getBytes(StandardCharsets.UTF_8));
+ }
  private FopFactory factory()throws Exception{
   if(factory!=null)return factory;
   byte[] font=font(settings.fontPath(),settings.fontSha256());boolean hasFallback=settings.fallbackPath()!=null&&!settings.fallbackPath().isBlank();
@@ -98,6 +137,13 @@ public final class QuarterlyReportPdfPreview {
   void heading(String value)throws Exception{p(value,"font-size","15pt","color","#17324d","space-before","16pt","space-after","8pt","keep-with-next.within-page","always","role","H2");}
   void fact(String label,JsonNode value)throws Exception{p(label+"："+(value==null||value.isNull()?"未配置（null）":value.isValueNode()?value.asText():value.toString()),"space-after","5pt");}
   String reasonLabel(String value){return switch(value){case "TIME_ZONE_MISSING"->"报告业务时区未配置";case "DUPLICATE_RULE_MISSING"->"重复来源规则未配置";case "ARCHIVE_RULE_MISSING"->"归档来源规则未配置";case "METRIC_VERSION_MISSING"->"指标版本未配置";case "REPORT_TEMPLATE_VERSION_MISSING"->"报告模板版本未配置";case "CONFIG_REVISION_MISSING"->"配置修订未指定";case "SOURCE_SET_UNKNOWN"->"来源集合未知";case "SOURCE_SET_INCOMPLETE"->"来源集合不完整";case "EMPTY_SELECTION"->"未明确选定来源";case "UNRESOLVED_ASSET_SELECTION"->"仍有资产来源选择待解决";case "UNANSWERED_ITEMS"->"仍有检查项未填写";case "SELF_REPORTED_SOURCES_UNVERIFIED"->"人工自述来源尚未核验";case "TEMPLATE_APPROVAL_UNVERIFIED"->"模板批准状态尚未核验";case "EVIDENCE_REFERENCES_UNVERIFIED"->"证据引用尚未核验";case "PUBLICATION_PIPELINE_NOT_CONNECTED"->"正式发布链路未接通";default->"待解决事项";};}
+  void renderParagraphs(List<String> lines)throws Exception {
+   h.startDocument();h.startPrefixMapping("fo",FO);start("root","xml:lang","zh-CN");
+   start("layout-master-set");start("simple-page-master","master-name","report","page-width","210mm","page-height","297mm","margin","18mm");start("region-body");end("region-body");end("simple-page-master");end("layout-master-set");
+   start("page-sequence","master-reference","report","font-family","ReportFont","font-size","10pt","line-height","15pt");start("flow","flow-name","xsl-region-body");
+   for(int i=0;i<lines.size();i++)p(lines.get(i),"font-size",i==0?"15pt":"10pt","space-after","6pt","white-space-collapse","false","linefeed-treatment","preserve","wrap-option","wrap");
+   end("flow");end("page-sequence");end("root");h.endPrefixMapping("fo");h.endDocument();
+  }
   void render(JsonNode report)throws Exception{
    JsonNode doc=report.path("frozen_document"),output=doc.path("output");h.startDocument();h.startPrefixMapping("fo",FO);
    start("root","xml:lang","zh-CN");start("layout-master-set");start("simple-page-master","master-name","report","page-width","210mm","page-height","297mm","margin-top","15mm","margin-bottom","15mm","margin-left","18mm","margin-right","18mm");start("region-body","margin-top","12mm","margin-bottom","12mm");end("region-body");start("region-before","extent","9mm");end("region-before");start("region-after","extent","9mm");end("region-after");end("simple-page-master");end("layout-master-set");

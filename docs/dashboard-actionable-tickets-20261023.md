@@ -37,3 +37,7 @@ npm --prefix apps/web run test:browser -- qa/browser/dashboard-actionable.pw.ts
 候选API已通过匿名拒绝、三个隔离DEMO角色、非法查询拒绝及首页/完整列表核对，实际Edge156.0.4314.42在1440桌面通过三角色页面读取，0页面错误/横向溢出。候选只包含UI01源代码，排除尚未验证的A05草稿；首个候选因独立快照漏复制既有Maven配置目录而启动失败，补齐原始资源后重建通过，没有放宽启动守卫。候选API、Web及SSH转发已关闭，无部署、迁移、业务外发或DEMO初始化。见[HTTP](evidence/local-astra-ut-20261023/ui01-http.json)、[真实浏览器](evidence/local-astra-ut-20261023/ui01-live-browser.json)及[完整分层验证](evidence/local-astra-ut-20261023/ui01-validation.json)。
 
 正式合同TC、完整V42监控t2消费/非空浏览器流转、正式SLA政策及生产性能仍独立留待核验；UI01总组不据此标为全部验收完成。
+
+## dot收尾集成说明
+
+2026-10-24收尾采用main d53697df的完整人群SLA和page/page_size契约，替代此前dot的offset投影。事件指标和其余新增接口保持。真实PG/浏览器证据归属于原独立本地会话，dot仅再次执行代码测试，不冒充真实联调。

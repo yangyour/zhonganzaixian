@@ -1,0 +1,42 @@
+{
+  "status": "CODE_VALIDATED_STANDARD_JSON_ACCOUNT_RETURN_BOUNDARY",
+  "recorded_at": "2026-10-24T00:15:46Z",
+  "local_full_java": {
+    "tests": 5105,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1120,
+    "executed": 3985
+  },
+  "independent_origin_main": {
+    "base": "d536c0a1e6a2c7a1c26c8a069489d308b1b2b77c",
+    "tests": 35,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "new_tests": 17,
+  "contract_shape_changed": false,
+  "ui_changed": false,
+  "real_identity_store": "NOT_RUN",
+  "browser": "NOT_RUN",
+  "performance": "NOT_RUN",
+  "real_account_changes": 0,
+  "migrations_applied": 0,
+  "deployed": false,
+  "formal_acceptance": "NOT_RUN",
+  "scope": "Successful standard Jackson JSON/+json GET and HEAD under /api/v1/ in remote_test project_local mode, before converter writes the body",
+  "not_covered": [
+    "Per-object/tenant capability rechecks still belong to controllers/repositories",
+    "Binary downloads and streaming responses",
+    "Pre-serialized String converters",
+    "Changes after final check or already transmitted bytes",
+    "Legacy non-project identity sources"
+  ],
+  "initial_failure": {
+    "tests": 5,
+    "reason": "Removing Spring HttpHeaders alone retained ETag already set on HttpServletResponse",
+    "fix": "Clear both response layers and preserve header-removal assertions"
+  },
+  "remote_integration": "PENDING_AFTER_INDEPENDENT_VALIDATION"
+}

@@ -464,10 +464,15 @@
       "evidence": [
         "docs/evidence/gap-p01-runtime-20261023/closing-validation.json",
         "docs/read-return-account-revision-20261023.md",
-        "docs/evidence/dot-continuation-20261023/p01-account-read-return.json"
+        "docs/evidence/dot-continuation-20261023/p01-account-read-return.json",
+        "docs/json-read-account-guard-20261024.md",
+        "docs/evidence/dot-continuation-20261023/p01-json-read-guard.json"
       ],
       "commits": [
         "7e05923d"
+      ],
+      "completed_subitems": [
+        "Shared successful standard-JSON GET/HEAD account revision/session/forced-password return guard, sanitized denial and success-header removal; tenant/object and stream authorization remain separate."
       ]
     },
     {

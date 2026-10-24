@@ -13,14 +13,30 @@ import org.springframework.core.env.Environment;
 import java.util.*;
 import java.util.function.Function;
 
-@Configuration @Profile("remote_test")
+@Configuration
+@Profile("remote_test")
 public class MonitoringObjectBindingConfiguration {
  private static final ObjectMapper JSON=new ObjectMapper(JsonFactory.builder().enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION).build()).setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
  record Definition(String provider,String reference,String endpoint,String tokenEnv,ZabbixObjectIdentityReader.Tags tags){@Override public String toString(){return "MappingSourceDefinition[private configuration redacted]";}}
- @Bean MonitoringObjectBindingRepository monitoringObjectBindingRepository(PlatformRepository platform,ObjectMapper json,Environment env){
-  if(!(platform instanceof PostgresPlatformRepository pg))throw new IllegalStateException("Mapping journal requires designated PostgreSQL");
-  return new PostgresMonitoringObjectBindingRepository(pg,json,policies(env.getProperty("MOP_MONITORING_MAPPING_POLICIES")),sources(env));
- }
+
+    @Bean
+    MonitoringObjectBindingRepository monitoringObjectBindingRepository(
+        PlatformRepository platform,
+        ObjectMapper json,
+        Environment env,
+        javax.sql.DataSource dataSource
+    ) {
+        if (!(platform instanceof PostgresPlatformRepository pg)) {
+            throw new IllegalStateException("Mapping journal requires designated PostgreSQL");
+        }
+        return new PostgresMonitoringObjectBindingRepository(
+            pg,
+            json,
+            policies(env.getProperty("MOP_MONITORING_MAPPING_POLICIES")),
+            sources(env),
+            new cn.mop.persistence.PostgresMonitoringEventCenterRepository(dataSource, pg)
+        );
+    }
  static Function<String,Policy> policies(String raw){
   if(raw==null||raw.isBlank())return tenant->new Policy(null,null,null,null,null);
   try{var root=object(raw);var out=new HashMap<String,Policy>();var entries=root.fields();while(entries.hasNext()){

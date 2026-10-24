@@ -13,10 +13,34 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.Supplier;
 
-@RestController @Profile("remote_test") @RequestMapping("/api/v1/monitoring-object-mappings")
+/** Tenant-scoped mapping publication, raw capture receipts and explicitly configured problem-intake availability. */
+@RestController
+@Profile("remote_test")
+@RequestMapping("/api/v1/monitoring-object-mappings")
 public final class MonitoringObjectBindingController {
- private final PlatformRepository platform;private final MonitoringObjectBindingRepository mappings;private final ObjectMapper json;private final boolean enabled;private final boolean captureEnabled;
- public MonitoringObjectBindingController(PlatformRepository platform,MonitoringObjectBindingRepository mappings,ObjectMapper json,Environment env){this.platform=platform;this.mappings=mappings;this.json=json.copy().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);enabled=MonitoringEnrollmentConfiguration.flag(env,"MOP_MONITORING_MAPPING_ENABLED");captureEnabled=MonitoringEnrollmentConfiguration.flag(env,"MOP_MONITORING_MAPPING_CAPTURE_ENABLED");}
+ private final PlatformRepository platform;
+ private final MonitoringObjectBindingRepository mappings;
+ private final ObjectMapper json;
+ private final boolean enabled;
+ private final boolean captureEnabled;
+ private final boolean problemIntakeEnabled;
+
+    public MonitoringObjectBindingController(
+        PlatformRepository platform,
+        MonitoringObjectBindingRepository mappings,
+        ObjectMapper json,
+        Environment env
+    ) {
+        this.platform = platform;
+        this.mappings = mappings;
+        this.json = json
+            .copy()
+            .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        enabled = MonitoringEnrollmentConfiguration.flag(env, "MOP_MONITORING_MAPPING_ENABLED");
+        captureEnabled = MonitoringEnrollmentConfiguration.flag(env, "MOP_MONITORING_MAPPING_CAPTURE_ENABLED");
+        problemIntakeEnabled = MonitoringProblemIntakeController.enabled(env);
+    }
  private Membership member(HttpServletRequest r,boolean write){var m=MonitoringOnboardingAccess.member(platform,r,write);if(!enabled)throw new DomainException(503,"MONITORING_MAPPING_DISABLED","持久对象映射尚未显式启用");return m;}
  private static Access access(Membership m,HttpServletRequest r){return new Access(m.tenantId(),m.userId(),m.permissionVersion(),ApiResponse.trace(r));}
  private void recheck(Membership m,HttpServletRequest r,boolean write){MonitoringOnboardingAccess.recheck(platform,m,r,write);ProjectSessionValidationFilter.recheckBeforeReturn(r);}
@@ -54,7 +78,33 @@ public final class MonitoringObjectBindingController {
   Object response=platform.idempotentAuthorized(m.userId(),m.tenantId(),r.getMethod()+" "+ApiResponse.route(r),key,digest(body.toString()),m.permissionVersion(),()->{mappings.authorize(access(m,r),id,true);if(id==null)MonitoringOnboardingAccess.asset(platform,m,text(body,"asset_id"));},()->{var receipt=action.get();if(receipt==null||id!=null&&!id.equals(receipt.id())||receipt.acceptedVersion()<1||receipt.acceptedVersion()>MonitoringObjectBinding.MAX_VERSION)throw unavailable();recheck(m,r,true);return ApiResponse.map("id",receipt.id().toString(),"accepted_version",receipt.acceptedVersion(),"action",receipt.action().name(),"acknowledgement_only",true,"current_mapping_claimed",false,"monitoring_applied",false,"dispatch_allowed",false);});
   recheck(m,r,true);return ApiResponse.success(response,r);
  }
- private Map<String,Object> dto(View v){return ApiResponse.map("state",json.convertValue(v.state(),Map.class),"availability",v.availability(),"draft_asset_current",v.draftAssetCurrent(),"current_actor_can_activate",v.currentActorCanActivate(),"policy_reference",v.policyReference(),"source_definition_sha256",v.sourceDefinitionSha256(),"source_capture_enabled",captureEnabled,"monitoring_applied",false,"dispatch_allowed",false,"device_identity_verified",false);}
+
+    private Map<String, Object> dto(View v) {
+        return ApiResponse.map(
+            "state",
+            json.convertValue(v.state(), Map.class),
+            "availability",
+            v.availability(),
+            "draft_asset_current",
+            v.draftAssetCurrent(),
+            "current_actor_can_activate",
+            v.currentActorCanActivate(),
+            "policy_reference",
+            v.policyReference(),
+            "source_definition_sha256",
+            v.sourceDefinitionSha256(),
+            "source_capture_enabled",
+            captureEnabled,
+            "problem_intake_enabled",
+            problemIntakeEnabled,
+            "monitoring_applied",
+            false,
+            "dispatch_allowed",
+            false,
+            "device_identity_verified",
+            false
+        );
+    }
  private static void bound(Membership m,UUID id,View v){if(v==null||v.state()==null||!m.tenantId().equals(v.state().document().tenantId().toString())||id!=null&&!id.equals(v.state().document().id()))throw unavailable();}
  private static void fields(JsonNode b,Set<String> keys){if(b==null||!b.isObject()||b.size()!=keys.size())throw invalid();b.fieldNames().forEachRemaining(k->{if(!keys.contains(k))throw invalid();});}
  private static String text(JsonNode b,String k){if(b==null||!b.path(k).isTextual())throw invalid();return b.path(k).asText();}

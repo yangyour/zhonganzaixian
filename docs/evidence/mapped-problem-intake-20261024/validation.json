@@ -1,0 +1,91 @@
+{
+  "project": "众安在线MOP",
+  "base_commit": "b025cd87",
+  "status": "VERIFIED_EXPLICIT_PROBLEM_INTAKE_ONLY",
+  "source_hashes": {
+    "apps/web/qa/browser/monitoring-problem-intake.pw.ts": "f371bf43cba63e92e1640848a1114e8936f4278609946d4a7e8dcf1ea7bd12ec",
+    "apps/web/qa/monitoring-problem-intake.fixture.ts": "984e5d100e3ebcda00ccf60e9cbb95d7f48134fde3d0eb52f7ae3ef9df42e764",
+    "apps/web/src/components/AssetMonitoringMappingPanel.vue": "c04944521ada8a28577338000315b997626064ff30c09497c3553c0493e3380a",
+    "apps/web/src/utils/monitoringObjectMappings.ts": "5737a261f085c307af3bd05e2dbea5a762edb6cb51b57bcb78006e91faa8f986",
+    "apps/web/tests/assetMonitoringMappingPanel.test.ts": "c54cc481b4009d5e8cbb300862c0b732db51b71e934f52ae1d4f871d90d8929b",
+    "apps/web/tests/monitoringObjectMappings.fixture.ts": "d5abf626404eaa64a053d9d29b1dd9b34841eef38882cb8742d9fd4a2195ffe1",
+    "apps/web/tests/monitoringObjectMappings.test.ts": "baf08d441ffc4bb2089ddfeaa9ebe3f7b38154ecff9d6b330e1f9b973c4ba2d9",
+    "server/api/src/main/java/cn/mop/api/MonitoringObjectBindingConfiguration.java": "fbd58ce01fd1f82ad91629a2f26849be9e2acf62155038afe5ee02d46d261d2c",
+    "server/api/src/main/java/cn/mop/api/MonitoringObjectBindingController.java": "5577ff11266b6c9294e775f4a48f02f2c22cd84b3ae0846533c9e3baf0ede465",
+    "server/api/src/main/java/cn/mop/api/MonitoringProblemIntakeController.java": "07de399e47e9b126edb70a961d37eb6a7a0f9eee7baed85829cd5bf0b2a4a9cf",
+    "server/api/src/test/java/cn/mop/api/MonitoringProblemIntakeHttpTest.java": "2a505a63db6d799bdf814b2cec4e3a2ed957da945e5ccc37b93b59851db45fe0",
+    "server/api/src/test/java/cn/mop/persistence/MappedProblemIntakePostgresTest.java": "a0192b6b09f2764ce36e5d07d299732b58df7f7e660a3f10046d43973b5ac62a",
+    "server/domain/src/main/java/cn/mop/domain/monitoring/MonitoringObjectBindingRepository.java": "42742c32ba2c46b52e9589a3c74a3e7b583f96ef7e7608718b0202a9f83f55a0",
+    "server/persistence/src/main/java/cn/mop/persistence/MappedMonitoringProblem.java": "3425975b479f5e00aaada90fffa0df245473f217203089c74c284ba80e186b85",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresMonitoringEventCenterRepository.java": "d4036c6923584ac523acfabf3013c99e81dd381227b1eadf49e67b47b5571ce0",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresMonitoringObjectBindingRepository.java": "5687b7ee33b28ead7416a6344125d0d07ba47e703170b072797225a4ca1194af",
+    "server/persistence/src/test/java/cn/mop/persistence/MappedMonitoringProblemTest.java": "23a05a367ccbd130e44eadb7fbe41b3d6813ac4888e04fa804ae365bc82de1ab",
+    "tools/monitoring-object-mapping-contract.mjs": "8471b6471df4b4bb2c5d222e39625b7fe0fba9164acb8035932a3a778df1c89f",
+    "tools/verify-mapped-problem-intake.py": "aceb6c231d56db514599c9ca6e56527cb4988722d79f6eb9c81aad900d9e88f3"
+  },
+  "java_broad": {
+    "tests": 191,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "java_final": {
+    "tests": 23,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "designated_postgresql": {
+    "evidence": "postgres-validation.json",
+    "tests": 6,
+    "source": "ISOLATED_SYNTHETIC",
+    "controlled_lock_retries": 4,
+    "schema": "V55",
+    "version": "17.9"
+  },
+  "web": {
+    "tests": 114,
+    "files": 4,
+    "failures": 0
+  },
+  "contracts": {
+    "tests": 215,
+    "generation_check": "PASSED"
+  },
+  "build": {
+    "typecheck": "PASSED",
+    "production_build": "PASSED",
+    "artifact_policy": "PASSED"
+  },
+  "browser": {
+    "engine": "Microsoft Edge",
+    "tests": 3,
+    "failures": 0,
+    "api": "SYNTHETIC_INTERCEPTION",
+    "viewport_widths": [
+      1024,
+      1440
+    ],
+    "axe_1024_violations": 0,
+    "visual_review": "TWO_SCREENSHOTS_REVIEWED"
+  },
+  "failed_attempts": {
+    "pg_1": "Test seed omitted required site; transaction rolled back",
+    "pg_2": "Test runtime account was incorrectly asked to read Flyway history; no permission grant",
+    "pg_3_to_5": "Retained clone raw CHECK catalogue mismatch; guard unchanged",
+    "pg_6": "Five of six JUnit scenarios passed; concurrency needed bounded original-command lock-wait recovery",
+    "pg_7": "Environment lock held by other device flow; no connection or write"
+  },
+  "schema_migrations": 0,
+  "external_messages": 0,
+  "deployment": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "complete_25_groups": false,
+  "retained_raw_guard": {
+    "active_check_sha256": "162c421f9552d45f7210ffccc62bb888d0acf1518ac7bca952709bdc7797f39b",
+    "retained_check_sha256": "c1f1dc4468f83b85953a8e6fd71972585bd6307a627b5830c0c2d72081433a77",
+    "probe": "READ_ONLY_POSTGRESQL_PG_GET_CONSTRAINTDEF",
+    "guard_relaxed": false,
+    "existing_database_repaired": false
+  }
+}

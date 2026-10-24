@@ -1,0 +1,14 @@
+{
+  "scope": "EXAMPLE_ONLY_NOT_ACTIVE",
+  "environment": {
+    "MOP_MONITORING_MAPPING_ENABLED": "false",
+    "MOP_MONITORING_MAPPING_CAPTURE_ENABLED": "false",
+    "MOP_MONITORING_MAPPING_PROBLEM_INTAKE_ENABLED": "false"
+  },
+  "required_configuration": [
+    "Explicit mapping policy and source definition with private secret references",
+    "Current published HOST mapping, asset version and ownership proof",
+    "Designated PostgreSQL V55 and restricted project runtime account"
+  ],
+  "reference": "docs/mapped-problem-intake-20261024.md"
+}

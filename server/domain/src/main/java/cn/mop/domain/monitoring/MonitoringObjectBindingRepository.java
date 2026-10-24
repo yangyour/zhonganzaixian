@@ -24,6 +24,22 @@ public interface MonitoringObjectBindingRepository {
   public CaptureReceipt{if(mappingId==null||mappingVersion<1||mappingVersion>MonitoringObjectBinding.MAX_VERSION||sourceEventId==null||phase==null||!Set.of("RAW_STORED","RAW_ALREADY_PRESENT","CONFLICT_HELD","CONFLICT_ALREADY_HELD").contains(outcome)||recordId==null||firstReceivedAt==null)throw new IllegalArgumentException("Invalid source capture receipt");}
  }
  CaptureReceipt capture(Access access,UUID id,long expectedVersion,String sourceEventId,String expectedDefinition);
+    /** One explicitly requested problem intake; raw conflict evidence is retained without business consumption. */
+    record ProblemIntakeReceipt(CaptureReceipt capture, MonitoringEventCenterRepository.EventSummary event) {
+        public boolean businessProcessed() {
+            return event != null;
+        }
+    }
+
+    /** Server-read source identity only. Implementations must retain raw facts and business effects in one transaction. */
+    default ProblemIntakeReceipt intakeProblem(
+            Access access,
+            UUID id,
+            long expectedVersion,
+            String sourceEventId,
+            String expectedDefinition) {
+        throw new cn.mop.domain.DomainException(503, "MAPPING_PROBLEM_INTAKE_DISABLED", "来源问题事件消费尚未配置");
+    }
  void authorize(Access access,UUID id,boolean write);
  Page list(Access access,UUID assetId,Cursor before);
  View get(Access access,UUID id);

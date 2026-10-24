@@ -1,0 +1,37 @@
+{
+  "environment": "lan-test-20261008",
+  "database": "mop_test",
+  "owner_marker": null,
+  "source_summary_sha256": "0295ff4b9ec23441ebb28b9a839458efa24d90fa5ed5baad1c16a949f894b1a7",
+  "status": "PASSED_REAL_PG_WITH_SYNTHETIC_SOURCE",
+  "database_scope": "active-isolated-tenants",
+  "schema_migrations": 0,
+  "database_created": false,
+  "database_removed": false,
+  "actual_tenant_written": false,
+  "source_protocol": "ISOLATED_SYNTHETIC",
+  "devices_contacted": 0,
+  "external_messages": 0,
+  "formal_contract_acceptance": "NOT_RUN",
+  "started_at": "2026-10-24T08:37:30.950813+00:00",
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "maven_exit_code": 0,
+  "junit": {
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "prior_retained_rows_unchanged": true,
+  "schema_history_unchanged": true,
+  "active_schema_history_unchanged": true,
+  "test_tenants": [
+    "c0f8e3e5-66dd-44ae-a9e1-3c42e66f4668",
+    "fec225c8-c01f-4892-a563-649c46e46524"
+  ],
+  "test_actor": "8bd2e195-a882-4e5c-89cb-62883daaed2b",
+  "test_asset": "dc39c612-7e11-4029-8684-b849a63e9775",
+  "own_actor_deactivated": true,
+  "environment_lock_released": true,
+  "finished_at": "2026-10-24T08:40:53.276522+00:00"
+}

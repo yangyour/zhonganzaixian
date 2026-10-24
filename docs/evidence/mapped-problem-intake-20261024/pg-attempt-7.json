@@ -1,0 +1,19 @@
+{
+  "environment": "lan-test-20261008",
+  "database": "mop_test",
+  "owner_marker": null,
+  "source_summary_sha256": "0295ff4b9ec23441ebb28b9a839458efa24d90fa5ed5baad1c16a949f894b1a7",
+  "status": "FAILED",
+  "database_scope": "active-isolated-tenants",
+  "schema_migrations": 0,
+  "database_created": false,
+  "database_removed": false,
+  "actual_tenant_written": false,
+  "source_protocol": "ISOLATED_SYNTHETIC",
+  "devices_contacted": 0,
+  "external_messages": 0,
+  "formal_contract_acceptance": "NOT_RUN",
+  "started_at": "2026-10-24T08:31:21.763986+00:00",
+  "failure_type": "FileExistsError",
+  "finished_at": "2026-10-24T08:31:21.764118+00:00"
+}

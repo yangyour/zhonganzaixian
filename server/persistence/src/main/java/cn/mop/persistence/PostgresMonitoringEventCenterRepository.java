@@ -131,6 +131,31 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
         }
     }
 
+    /** Only the mapping resolver supplies this path, after server-side source and raw-content verification. */
+    EventSummary ingestMappedProblem(Access a, IngestEventCommand cmd, UUID rawEventId) {
+        if (rawEventId == null || cmd == null || cmd.sourcePhase() != MonitorState.PROBLEM) {
+            throw invalid();
+        }
+        Connection c = platform.idempotentCommandConnection();
+        try {
+            member(c, a, "ticket_notes:write_internal", true, true);
+            lock(c, "mop.raw.problem.consume|" + rawEventId);
+            try (var statement = statement(c, "SELECT event_id::text FROM public.mop_monitoring_event_member "
+                    + "WHERE raw_event_id=?::uuid AND tenant_id<>?::uuid")) {
+                statement.setString(1, rawEventId.toString());
+                statement.setString(2, a.tenantId());
+                try (var rows = statement.executeQuery()) {
+                    if (rows.next()) {
+                        throw new DomainException(404, "RESOURCE_NOT_FOUND", "当前租户没有该来源事件");
+                    }
+                }
+            }
+            return ingestInternal(c, a, cmd, rawEventId.toString());
+        } catch (SQLException failure) {
+            throw unavailable();
+        }
+    }
+
     private EventSummary ingestInternal(Connection c, Access a, IngestEventCommand cmd, String rawEventId) throws SQLException {
         if (cmd.simulateAutoTicketFailure()) MonitoringSimulationGuard.requireIsolated(c, a.tenantId());
         String assetName = requireAssetName(c, a.tenantId(), cmd.assetId());
@@ -140,10 +165,15 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
         Instant occurred = cmd.occurredAt() != null ? cmd.occurredAt() : now;
 
         // Collector redelivery is independent of the HTTP idempotency key.
-        try (var s = statement(c, "SELECT e.id::text FROM public.mop_monitoring_event e JOIN public.mop_monitoring_event_member m ON m.tenant_id=e.tenant_id AND m.event_id=e.id WHERE e.tenant_id=?::uuid AND e.fingerprint=? AND m.source_event_id=? AND m.source_phase=? ORDER BY m.recorded_at DESC LIMIT 1")) {
+        try (var s = statement(c, "SELECT e.id::text,m.raw_event_id::text FROM public.mop_monitoring_event e JOIN public.mop_monitoring_event_member m ON m.tenant_id=e.tenant_id AND m.event_id=e.id WHERE e.tenant_id=?::uuid AND e.fingerprint=? AND m.source_event_id=? AND m.source_phase=? ORDER BY m.recorded_at DESC LIMIT 1")) {
             s.setString(1, a.tenantId()); s.setString(2, fp); s.setString(3, cmd.sourceEventId().trim()); s.setString(4, cmd.sourcePhase().name());
             try (var r = s.executeQuery()) {
-                if (r.next()) return findEvent(c, a.tenantId(), r.getString(1)).orElseThrow(PostgresMonitoringEventCenterRepository::unavailable);
+                if (r.next()) {
+                    if (rawEventId != null && !rawEventId.equals(r.getString(2))) {
+                        throw new DomainException(409, "RAW_EVENT_CONSUMPTION_CONFLICT", "已有事件成员没有同一原始来源引用，未覆盖历史事实");
+                    }
+                    return findEvent(c, a.tenantId(), r.getString(1)).orElseThrow(PostgresMonitoringEventCenterRepository::unavailable);
+                }
             }
         }
         Optional<EventSummary> latestOpen = findLatestOpenEventByFingerprint(c, a.tenantId(), fp);

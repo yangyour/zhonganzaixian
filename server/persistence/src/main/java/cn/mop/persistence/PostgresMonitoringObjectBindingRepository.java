@@ -10,33 +10,88 @@ import java.time.*;
 import java.util.*;
 import java.util.function.Function;
 
-/** Append-only mapping publication. No source provisioning, event ingestion or dispatch. */
+/** Append-only mapping publication, raw capture and explicitly requested problem intake; no source provisioning or dispatch. */
 public final class PostgresMonitoringObjectBindingRepository implements MonitoringObjectBindingRepository {
  private final PostgresPlatformRepository platform;
  private final ObjectMapper json;
  private final Function<String,Policy> policies;
  private final Source source;
- public PostgresMonitoringObjectBindingRepository(PostgresPlatformRepository platform,ObjectMapper json,Function<String,Policy> policies,Source source){
-  this.platform=Objects.requireNonNull(platform);this.json=json.copy().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);this.policies=Objects.requireNonNull(policies);this.source=Objects.requireNonNull(source);
- }
+ /** Shares the caller's idempotent transaction; absent only for raw-only historical assemblies. */
+ private final PostgresMonitoringEventCenterRepository events;
+
+    public PostgresMonitoringObjectBindingRepository(
+        PostgresPlatformRepository platform,
+        ObjectMapper json,
+        Function<String, Policy> policies,
+        Source source
+    ) {
+        this(platform, json, policies, source, null);
+    }
+
+    public PostgresMonitoringObjectBindingRepository(
+        PostgresPlatformRepository platform,
+        ObjectMapper json,
+        Function<String, Policy> policies,
+        Source source,
+        PostgresMonitoringEventCenterRepository events
+    ) {
+        this.platform = Objects.requireNonNull(platform);
+        this.json = json
+            .copy()
+            .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        this.policies = Objects.requireNonNull(policies);
+        this.source = Objects.requireNonNull(source);
+        this.events = events;
+    }
  @FunctionalInterface private interface Work<T>{T run(Connection connection)throws Exception;}
- private <T>T transaction(Access a,boolean write,Work<T> work){
-  validate(a);if(write)platform.idempotentCommandConnection();
-  return platform.identityTransaction(c->{try{
-   MonitoringObjectBindingSchemaVerifier.verify(c);authority(c,a,write);
-   T result=work.run(c);authority(c,a,write);return result;
-  }catch(DomainException e){throw e;}catch(Exception e){throw unavailable();}});
- }
+
+    private <T> T transaction(Access a, boolean write, Work<T> work) {
+        validate(a);
+        if (write) {
+            platform.idempotentCommandConnection();
+        }
+        return platform.identityTransaction(c -> {
+            try {
+                MonitoringObjectBindingSchemaVerifier.verify(c);
+                authority(c, a, write);
+                T result = work.run(c);
+                authority(c, a, write);
+                return result;
+            } catch (DomainException e) {
+                throw e;
+            } catch (Exception e) {
+                throw unavailable(e);
+            }
+        });
+    }
  private static void authority(Connection c,Access a,boolean write)throws SQLException{
   for(String capability:write?List.of("assets:read","configurations:read","configurations:write"):List.of("assets:read","configurations:read"))PostgresAuthorization.require(c,a.actorId(),a.tenantId(),a.permissionVersion(),capability);
   try(var s=query(c,"SELECT m.role_code FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id=?::uuid AND m.user_id=?::uuid AND m.active AND u.active AND m.permission_version=? FOR SHARE OF m,u")){
    s.setString(1,a.tenantId());s.setString(2,a.actorId());s.setLong(3,a.permissionVersion());try(var r=s.executeQuery()){if(!r.next())throw new DomainException(401,"SESSION_EXPIRED","映射读取授权已变化");if(write&&!"padmin".equals(r.getString(1)))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色不能修改映射");}
   }
  }
- @Override public void authorize(Access a,UUID id,boolean write){
-  // Authorization is also used before the idempotency scope exists; no mutation occurs here.
-  validate(a);platform.identityTransaction(c->{try{MonitoringObjectBindingSchemaVerifier.verify(c);authority(c,a,write);if(id!=null)load(c,a,id,false);return null;}catch(DomainException e){throw e;}catch(Exception e){throw unavailable();}});
- }
+
+    @Override
+    public void authorize(Access a, UUID id, boolean write) {
+        // Write authorization locks the root directly; a shared-to-exclusive upgrade can deadlock concurrent intakes.
+        // This preflight also runs before the idempotency scope exists; it never mutates the root.
+        validate(a);
+        platform.identityTransaction(c -> {
+            try {
+                MonitoringObjectBindingSchemaVerifier.verify(c);
+                authority(c, a, write);
+                if (id != null) {
+                    load(c, a, id, write);
+                }
+                return null;
+            } catch (DomainException e) {
+                throw e;
+            } catch (Exception e) {
+                throw unavailable(e);
+            }
+        });
+    }
  @Override public View get(Access a,UUID id){return transaction(a,false,c->view(c,a,load(c,a,Objects.requireNonNull(id),false)));}
  @Override public Page list(Access a,UUID assetId,Cursor before){return transaction(a,false,c->{
   asset(c,a,Objects.requireNonNull(assetId));if(before!=null&&(before.id()==null||before.createdAt()==null))throw invalid();
@@ -90,26 +145,172 @@ public final class PostgresMonitoringObjectBindingRepository implements Monitori
   }
   append(c,a,action,after);return receipt(after,action);
  });}
- @Override public CaptureReceipt capture(Access a,UUID id,long expected,String eventId,String expectedDefinition){return transaction(a,true,c->{
-  var state=load(c,a,id,true);if(state.version()!=expected)throw changed();var view=view(c,a,state);
-  if(!"CURRENT_RECORDED_MAPPING".equals(view.availability()))throw new DomainException(409,"MAPPING_NOT_CURRENT","当前映射、资产或归属证明已失效，请重新复核");
-  var key=state.document().key();if(key.objectType()!=MonitoringObjectMapping.ObjectType.HOST)throw new DomainException(422,"MAPPING_CAPTURE_HOST_REQUIRED","当前只支持明确主机映射的来源事件保存");
-  if(eventId==null||!eventId.matches("[1-9][0-9]{0,19}")||expectedDefinition==null)throw invalid();
-  if(!Objects.equals(expectedDefinition,view.sourceDefinitionSha256()))throw changed();var policy=policy(a);
-  RawMonitoringEventSchemaVerifier.verify(c);MonitoringQuarantineSchemaVerifier.verify(c);
-  var metadata=source.verify(key);if(!state.active().source().equals(metadata))throw missing();
-  var fetched=source.readEvent(key,eventId);if(fetched==null||!eventId.equals(fetched.sourceEventId())||!metadata.sourceHostId().equals(fetched.sourceHostId()))throw missing();
-  // Source reads are not an upstream transaction; recheck the local authority after both bounded reads.
-  if(!Objects.equals(policy,policy(a))||!Objects.equals(expectedDefinition,source.definitionSha256(key.poolId()))||!"CURRENT_RECORDED_MAPPING".equals(view(c,a,state).availability()))throw changed();
-  authority(c,a,true);var received=now(c);
-  var incoming=new RawMonitoringEvent(new RawMonitoringEvent.Key(key.poolId(),eventId,fetched.phase()),new RawMonitoringEvent.Binding(state.document().tenantId(),state.active().approvedDraft().assetId()),fetched.occurredAt(),received,fetched.payload());
-  try(var settings=c.createStatement()){settings.setQueryTimeout(10);settings.execute("SET LOCAL synchronous_commit='on'");settings.execute("SET LOCAL lock_timeout='10s'");settings.execute("SET LOCAL statement_timeout='10s'");}
-  var stored=PostgresMonitoringEventStorageCoordinator.storeInTransaction(c,incoming);CaptureReceipt receipt;
-  if(stored instanceof PostgresMonitoringEventStorageCoordinator.RawResult raw){var r=raw.receipt();receipt=new CaptureReceipt(id,expected,eventId,fetched.phase(),r.outcome()==PostgresRawMonitoringEventRepository.Outcome.STORED?"RAW_STORED":"RAW_ALREADY_PRESENT",r.storedId(),r.firstReceivedAt());}
-  else if(stored instanceof PostgresMonitoringEventStorageCoordinator.HeldResult held){var r=held.receipt();receipt=new CaptureReceipt(id,expected,eventId,fetched.phase(),r.outcome()==PostgresMonitoringQuarantineRepository.Outcome.HELD?"CONFLICT_HELD":"CONFLICT_ALREADY_HELD",r.quarantineId(),r.firstReceivedAt());}
-  else throw unavailable();
-  platform.audit(a.actorId(),a.tenantId(),"monitoring_mapping.capture","monitoring_mapping",id.toString(),"SUCCEEDED","UNVERIFIED_RAW_ONLY_"+receipt.outcome(),a.traceId());return receipt;
- });}
+
+    @Override
+    public CaptureReceipt capture(Access a, UUID id, long expected, String eventId, String expectedDefinition) {
+        return transaction(a, true, c -> capture(c, a, id, expected, eventId, expectedDefinition, false).receipt());
+    }
+
+ /** Current ownership, exact raw acceptance and event/ticket effects commit or roll back together. */
+
+    @Override
+    public ProblemIntakeReceipt intakeProblem(
+        Access a,
+        UUID id,
+        long expected,
+        String eventId,
+        String expectedDefinition
+    ) {
+        if (events == null) {
+            throw new DomainException(503, "MAPPING_PROBLEM_INTAKE_DISABLED", "来源问题事件消费尚未装配");
+        }
+        return transaction(a, true, c -> {
+            var captured = capture(c, a, id, expected, eventId, expectedDefinition, true);
+            if (captured.receipt().outcome().startsWith("CONFLICT")) {
+                return new ProblemIntakeReceipt(captured.receipt(), null);
+            }
+            var command = MappedMonitoringProblem.decode(captured.raw(), captured.sourceHost());
+            var event = events.ingestMappedProblem(
+                new MonitoringEventCenterRepository.Access(
+                    a.tenantId(),
+                    a.actorId(),
+                    a.permissionVersion(),
+                    a.traceId()
+                ),
+                command,
+                captured.receipt().recordId()
+            );
+            platform.audit(
+                a.actorId(),
+                a.tenantId(),
+                "monitoring_mapping.problem_intake",
+                "monitoring_event",
+                event.id(),
+                "SUCCEEDED",
+                "RAW:" + captured.receipt().recordId() + ";MAPPING:" + id + ";VERSION:" + expected,
+                a.traceId()
+            );
+            return new ProblemIntakeReceipt(captured.receipt(), event);
+        });
+    }
+
+ private record Captured(CaptureReceipt receipt,RawMonitoringEvent raw,String sourceHost){}
+
+    private Captured capture(
+        Connection c,
+        Access a,
+        UUID id,
+        long expected,
+        String eventId,
+        String expectedDefinition,
+        boolean problemOnly
+    ) throws Exception {
+        var state = load(c, a, id, true);
+        if (state.version() != expected) {
+            throw changed();
+        }
+        var view = view(c, a, state);
+        if (!"CURRENT_RECORDED_MAPPING".equals(view.availability())) {
+            throw new DomainException(409, "MAPPING_NOT_CURRENT", "当前映射、资产或归属证明已失效，请重新复核");
+        }
+        var key = state.document().key();
+        if (key.objectType() != MonitoringObjectMapping.ObjectType.HOST) {
+            throw new DomainException(422, "MAPPING_CAPTURE_HOST_REQUIRED", "当前只支持明确主机映射的来源事件保存");
+        }
+        if (eventId == null || !eventId.matches("[1-9][0-9]{0,19}") || expectedDefinition == null) {
+            throw invalid();
+        }
+        if (!Objects.equals(expectedDefinition, view.sourceDefinitionSha256())) {
+            throw changed();
+        }
+        var policy = policy(a);
+        RawMonitoringEventSchemaVerifier.verify(c);
+        MonitoringQuarantineSchemaVerifier.verify(c);
+        var metadata = source.verify(key);
+        if (!state.active().source().equals(metadata)) {
+            throw missing();
+        }
+        var fetched = source.readEvent(key, eventId);
+        if (
+            fetched == null ||
+            !eventId.equals(fetched.sourceEventId()) ||
+            !metadata.sourceHostId().equals(fetched.sourceHostId())
+        ) {
+            throw missing();
+        }
+        if (problemOnly && fetched.phase() != RawMonitoringEvent.Phase.PROBLEM) {
+            throw new DomainException(
+                422,
+                "RECOVERY_REQUIRES_OBSERVATION",
+                "原始恢复信号须通过当前周期观察证据核验，不能在问题事件入口确认恢复"
+            );
+        }
+        // Source reads are not an upstream transaction; recheck the local authority after both bounded reads.
+        if (
+            !Objects.equals(policy, policy(a)) ||
+            !Objects.equals(expectedDefinition, source.definitionSha256(key.poolId())) ||
+            !"CURRENT_RECORDED_MAPPING".equals(view(c, a, state).availability())
+        ) {
+            throw changed();
+        }
+        authority(c, a, true);
+        var received = now(c);
+        var incoming = new RawMonitoringEvent(
+            new RawMonitoringEvent.Key(key.poolId(), eventId, fetched.phase()),
+            new RawMonitoringEvent.Binding(state.document().tenantId(), state.active().approvedDraft().assetId()),
+            fetched.occurredAt(),
+            received,
+            fetched.payload()
+        );
+        try (var settings = c.createStatement()) {
+            settings.setQueryTimeout(10);
+            settings.execute("SET LOCAL synchronous_commit='on'");
+            settings.execute("SET LOCAL lock_timeout='10s'");
+            settings.execute("SET LOCAL statement_timeout='10s'");
+        }
+        var stored = PostgresMonitoringEventStorageCoordinator.storeInTransaction(c, incoming);
+        CaptureReceipt receipt;
+        if (stored instanceof PostgresMonitoringEventStorageCoordinator.RawResult raw) {
+            var r = raw.receipt();
+            receipt = new CaptureReceipt(
+                id,
+                expected,
+                eventId,
+                fetched.phase(),
+                r.outcome() == PostgresRawMonitoringEventRepository.Outcome.STORED
+                    ? "RAW_STORED"
+                    : "RAW_ALREADY_PRESENT",
+                r.storedId(),
+                r.firstReceivedAt()
+            );
+        } else if (stored instanceof PostgresMonitoringEventStorageCoordinator.HeldResult held) {
+            var r = held.receipt();
+            receipt = new CaptureReceipt(
+                id,
+                expected,
+                eventId,
+                fetched.phase(),
+                r.outcome() == PostgresMonitoringQuarantineRepository.Outcome.HELD
+                    ? "CONFLICT_HELD"
+                    : "CONFLICT_ALREADY_HELD",
+                r.quarantineId(),
+                r.firstReceivedAt()
+            );
+        } else {
+            throw unavailable();
+        }
+        platform.audit(
+            a.actorId(),
+            a.tenantId(),
+            "monitoring_mapping.capture",
+            "monitoring_mapping",
+            id.toString(),
+            "SUCCEEDED",
+            "UNVERIFIED_RAW_ONLY_" + receipt.outcome(),
+            a.traceId()
+        );
+        return new Captured(receipt, incoming, metadata.sourceHostId());
+    }
  private void keyAvailable(Connection c,State state)throws SQLException{
   var key=state.document().key();try(var s=query(c,"SELECT pg_advisory_xact_lock(hashtextextended(?,0))")){s.setString(1,"mop.mapping.key|"+key.poolId()+"|"+key.objectType()+"|"+key.externalId());s.execute();}
   try(var s=query(c,"SELECT 1 FROM public.mop_monitoring_object_binding b JOIN LATERAL (SELECT r.state FROM public.mop_monitoring_object_binding_revision r WHERE r.tenant_id=b.tenant_id AND r.id=b.id ORDER BY r.version DESC LIMIT 1) latest ON true WHERE b.pool_id=? AND b.object_type=? AND b.external_id=? AND (b.tenant_id,b.id)<>(?,?) AND latest.state->'active'<>'null'::jsonb LIMIT 1")){
@@ -141,5 +342,22 @@ public final class PostgresMonitoringObjectBindingRepository implements Monitori
  private static DomainException changed(){return new DomainException(409,"MAPPING_VERSION_CONFLICT","映射、资产或审批来源已变化，请重新读取");}
  private static DomainException pending(){return new DomainException(503,"MONITORING_MAPPING_SOURCE_PENDING","映射来源尚未明确配置");}
  private static DomainException missing(){return new DomainException(404,"MONITORING_MAPPING_NOT_FOUND","当前范围内没有该映射或资产");}
- private static DomainException unavailable(){return new DomainException(503,"MONITORING_MAPPING_UNAVAILABLE","映射结构、来源或受限权限尚未就绪");}
+ /** Keeps diagnostic type, SQL state and stack location without retaining driver messages or source payloads. */
+
+    private static DomainException unavailable(Exception cause) {
+        var failure = unavailable();
+        var safe = new IllegalStateException(
+            "mapping_failure_type=" +
+                cause.getClass().getSimpleName() +
+                ";sql_state=" +
+                (cause instanceof SQLException sql ? sql.getSQLState() : "NONE")
+        );
+        safe.setStackTrace(cause.getStackTrace());
+        failure.initCause(safe);
+        return failure;
+    }
+
+    private static DomainException unavailable() {
+        return new DomainException(503, "MONITORING_MAPPING_UNAVAILABLE", "映射结构、来源或受限权限尚未就绪");
+    }
 }

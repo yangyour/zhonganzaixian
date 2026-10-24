@@ -1,3 +1,9 @@
+# 当前单会话接续：显式来源问题事务（2026-10-24）
+
+唯一新接续会话复用 `.worktrees/remaining-gaps-20261024` / `codex/remaining-gaps-20261024`，规范origin/组织不变。M02补齐当前主机问题的raw→事件成员→事件/现有工单同事务，原始恢复仍须独立观察证明。指定PG17.9/活动V55的6项隔离事务、191项定向Java及最后23项复验、114Web、215契约和3项Edge合成场景通过。真实来源持续拉取、水位、自动消费及完整V42仍缺，不升级大项/正式TC。具体接口、失败回溯、环境与边界见[实施记录](../mapped-problem-intake-20261024.md)。
+
+下文为各历史切片的当时范围。“隔离写范围未核验”只描述其对应历史验证，不再覆盖本轮已完成的明确隔离事务测试；未验证的其他业务仍保留。
+
 # 监控与工单会话进度
 
 2026-10-23：众安在线 MOP，监控/工单/SLA；本地独立检出 `E:\work\wxw9\zhonganzaixian\.parallel\launch-20261023\monitoring`；规范 origin `https://github.com/yangyour/zhonganzaixian.git`，组织 `yangyour/zhonganzaixian`；功能分支 `codex/launch-monitoring-20261023`，初始上游 `origin/main`、基线 `05ec77ba`。已读取本检出 AGENTS、并行协调文档和两份 launch-work 清单，且 Git 实际配置与交接一致。原主目录仅用于受控读取连接资料，未编辑主工作区和前端文件。

@@ -1,0 +1,606 @@
+{
+  "checked_at": "2026-10-24T08:05:51.973497+00:00",
+  "status": "COMPLETED_READ_ONLY_AUDIT",
+  "business_writes": 0,
+  "messages_sent": 0,
+  "schema_migrations": 0,
+  "https": "DEFERRED_BY_USER",
+  "formal_contract_acceptance": "NOT_RUN",
+  "http": [
+    {
+      "path": "/login",
+      "http_status": 200
+    },
+    {
+      "path": "/api/v1/health/ready",
+      "http_status": 200,
+      "data": {
+        "keys": [
+          "asset_dependencies",
+          "asset_exports",
+          "asset_imports",
+          "asset_manual_metadata",
+          "asset_reads",
+          "backup_plan_drafts",
+          "capacity_scenarios",
+          "change_notice_approvals",
+          "change_notice_drafts",
+          "contact_imports",
+          "customer_contacts",
+          "durable",
+          "export_inbox",
+          "export_publication",
+          "inspection_quarterly_reports",
+          "inspection_source_collections",
+          "inspection_templates",
+          "inspection_worksheets",
+          "internal_notes",
+          "manual_incidents",
+          "manual_recovery",
+          "mode",
+          "own_notification_preferences",
+          "photos",
+          "production_ready",
+          "ready",
+          "runtime_configurations",
+          "source",
+          "status",
+          "ticket_comments",
+          "working_calendars",
+          "worklogs"
+        ],
+        "ready": true,
+        "durable": true,
+        "mode": "remote_test",
+        "production_ready": false,
+        "status": "READY_REMOTE_TEST"
+      }
+    },
+    {
+      "path": "/release-manifest.json",
+      "http_status": 200,
+      "build_id": "f9351338e1695550fe0b7df67ec5e90f638a99be1ae214576eae195674f51cc6"
+    },
+    {
+      "path": "/api/v1/report-publications",
+      "http_status": 200,
+      "data": {
+        "keys": [
+          "external_dispatch_enabled",
+          "items",
+          "next"
+        ],
+        "external_dispatch_enabled": false,
+        "items_count": 0
+      }
+    },
+    {
+      "path": "/api/v1/sla/reports",
+      "http_status": 200,
+      "data": {
+        "keys": [
+          "current_tier",
+          "formula_version",
+          "kpis",
+          "live_monthly_evaluation",
+          "monthly_result",
+          "observed_at",
+          "period",
+          "services",
+          "source",
+          "target_availability_pct",
+          "tenant_id",
+          "timezone"
+        ],
+        "services_count": 4
+      },
+      "kpis": {
+        "mean_verified_availability_pct": null,
+        "unavailable_union_total_sec": 0,
+        "mtta": {
+          "sample_count": 0,
+          "unrecovered_count": 0,
+          "mean_sec": null,
+          "p50_sec": null,
+          "p95_sec": null,
+          "source_version": "mop-event-acknowledgement-v1",
+          "unknown_count": 0
+        },
+        "mttr": {
+          "sample_count": 0,
+          "unrecovered_count": 0,
+          "mean_sec": null,
+          "p50_sec": null,
+          "p95_sec": null,
+          "source_version": "mop-monitoring-recovery-t2-v1",
+          "unknown_count": 0
+        },
+        "unrecovered_total_count": 0,
+        "unknown_interval_total_sec": 8180624
+      }
+    },
+    {
+      "path": "/api/v1/operations/production-readiness",
+      "http_status": 200,
+      "data": {
+        "keys": [
+          "activation_performed",
+          "actor_id",
+          "checks",
+          "database_observed_at",
+          "database_version",
+          "permission_version",
+          "production_database_kind",
+          "production_isolation_strategy",
+          "production_ready",
+          "runtime_database_restricted",
+          "runtime_mode",
+          "tenant_id"
+        ],
+        "production_ready": false
+      },
+      "checks": [
+        {
+          "id": "DATABASE_NAMESPACE",
+          "status": "PASS",
+          "code": "DEDICATED_TEST_SCOPE"
+        },
+        {
+          "id": "DATABASE_ROLE",
+          "status": "PASS",
+          "code": "ROLE_RESTRICTED"
+        },
+        {
+          "id": "DATABASE_DDL",
+          "status": "PASS",
+          "code": "RUNTIME_DDL_DENIED"
+        },
+        {
+          "id": "MIGRATION_IDENTITY",
+          "status": "PASS",
+          "code": "MIGRATION_IDENTITY_SEPARATE"
+        },
+        {
+          "id": "GLOBAL_DATABASE_CAPABILITIES",
+          "status": "PASS",
+          "code": "GLOBAL_CAPABILITIES_DENIED"
+        },
+        {
+          "id": "SECURE_SESSION_SETTINGS",
+          "status": "BLOCKED",
+          "code": "SECURE_SESSION_NOT_CONFIGURED"
+        },
+        {
+          "id": "PUBLIC_TLS_CERTIFICATE",
+          "status": "NOT_RUN",
+          "code": "PUBLIC_ENTRY_PROBE_REQUIRED"
+        },
+        {
+          "id": "PRODUCTION_DATABASE_ISOLATION",
+          "status": "CUSTOMER_GATED",
+          "code": "Q02_PENDING"
+        },
+        {
+          "id": "PRODUCTION_RUNTIME",
+          "status": "BLOCKED",
+          "code": "REMOTE_TEST_IS_NOT_PRODUCTION"
+        }
+      ]
+    },
+    {
+      "path": "/api/v1/monitoring-onboarding/registered-targets",
+      "http_status": 503,
+      "error_code": "CONFIG_PENDING"
+    },
+    {
+      "path": "/api/v1/monitoring-onboarding/enrollments",
+      "http_status": 503,
+      "error_code": "CONFIG_PENDING"
+    },
+    {
+      "path": "/api/v1/monitoring-object-mappings",
+      "http_status": 503,
+      "error_code": "MONITORING_MAPPING_DISABLED"
+    },
+    {
+      "path": "/api/v1/notification-routing/policy",
+      "http_status": 503,
+      "error_code": "NOTIFICATION_ROUTING_NOT_CONFIGURED"
+    },
+    {
+      "path": "/api/v1/notification-routing/entries",
+      "http_status": 503,
+      "error_code": "NOTIFICATION_ROUTING_NOT_CONFIGURED"
+    },
+    {
+      "path": "/api/v1/my/notification-preferences/publication",
+      "http_status": 503,
+      "error_code": "NOTIFICATION_ROUTING_NOT_CONFIGURED"
+    },
+    {
+      "path": "/api/v1/notification-deliveries",
+      "http_status": 503,
+      "error_code": "DELIVERY_JOURNAL_READ_DISABLED"
+    },
+    {
+      "path": "/api/v1/notification-intents",
+      "http_status": 200,
+      "data": {
+        "keys": [
+          "has_more",
+          "items",
+          "next_before_created_at",
+          "next_before_id",
+          "observed_at",
+          "source"
+        ],
+        "items_count": 0
+      }
+    },
+    {
+      "path": "/api/v1/backup-plan-drafts",
+      "http_status": 200,
+      "data": {
+        "keys": [
+          "has_more",
+          "items",
+          "next_before_created_at",
+          "next_before_id",
+          "page_size_limit",
+          "scope",
+          "source",
+          "tenant_id"
+        ],
+        "items_count": 0
+      }
+    },
+    {
+      "path": "/api/v1/inspection-quarterly-reports",
+      "http_status": 200,
+      "data": {
+        "keys": [
+          "has_more",
+          "items",
+          "next_before_id",
+          "next_before_recorded_at",
+          "page_size_limit",
+          "scope",
+          "source",
+          "tenant_id"
+        ],
+        "items_count": 0
+      }
+    },
+    {
+      "path": "/api/v1/metrics/monitoring-events",
+      "http_status": 200,
+      "data": {
+        "keys": [
+          "actor_id",
+          "clock_accuracy_verified",
+          "collection_freshness_verified",
+          "current_problems",
+          "frozen_report",
+          "items",
+          "metric_version",
+          "mtta",
+          "next",
+          "observed_at",
+          "period",
+          "permission_version",
+          "source",
+          "statistics_version",
+          "tenant_id",
+          "timezone",
+          "view",
+          "window",
+          "writes_performed"
+        ],
+        "items_count": 0
+      }
+    },
+    {
+      "path": "/api/v1/network-monitoring",
+      "http_status": 200,
+      "data": {
+        "keys": [
+          "devices",
+          "generated_at",
+          "refresh_seconds",
+          "scope",
+          "source",
+          "tenant_id"
+        ],
+        "devices_count": 4
+      },
+      "observed_state_fields": [
+        {},
+        {},
+        {},
+        {}
+      ]
+    },
+    {
+      "path": "/api/v1/assets/90cdb296-c3c6-47fb-bf1e-1e82761226e3/backup-versions",
+      "http_status": 503,
+      "error_code": "BACKUP_VERSION_INVENTORY_NOT_CONFIGURED"
+    },
+    {
+      "path": "/api/v1/assets/90cdb296-c3c6-47fb-bf1e-1e82761226e3/backup-runs",
+      "http_status": 503,
+      "error_code": "BACKUP_RUN_HISTORY_NOT_CONFIGURED"
+    }
+  ],
+  "applications": {
+    "api": {
+      "source_commit": "b964701b5a148978cf761bf550dd7f24745fdb43",
+      "running": true,
+      "restart_count": 0,
+      "flags": {
+        "MOP_NOTIFICATION_ROUTING_ENABLED": "UNSET",
+        "MOP_NOTIFICATION_RELAY_ENABLED": "true",
+        "MOP_EMAIL_ENABLED": "true",
+        "MOP_EMAIL_DISPATCH_ENABLED": "true",
+        "MOP_WECOM_ENABLED": "true",
+        "MOP_WECOM_DISPATCH_ENABLED": "true",
+        "MOP_TICKET_LIFECYCLE_ENABLED": "UNSET",
+        "MOP_TICKET_CLOCK_ENABLED": "UNSET",
+        "MOP_MONITORING_ENROLLMENT_ENABLED": "UNSET",
+        "MOP_MONITORING_ENROLLMENT_TEST_ENABLED": "UNSET",
+        "MOP_MONITORING_MAPPING_ENABLED": "UNSET",
+        "MOP_MONITORING_MAPPING_CAPTURE_ENABLED": "UNSET",
+        "MOP_DELIVERY_JOURNAL_READ_ENABLED": "UNSET",
+        "MOP_MONITORING_PRESET_REGISTRY_ENABLED": "UNSET",
+        "MOP_MONITORING_PROMETHEUS_READ_ENABLED": "UNSET",
+        "MOP_NETWORK_MONITORING_ENABLED": "true",
+        "MOP_AF_RESOURCE_ENABLED": "true",
+        "MOP_REPORT_PDF_PREVIEW_ENABLED": "UNSET",
+        "MOP_ATTACHMENT_SCAN_ENABLED": "UNSET",
+        "MOP_BACKUP_WORKER_ENABLED": "UNSET",
+        "MOP_BACKUP_CONTENT_ENABLED": "UNSET"
+      },
+      "configured_presence": {
+        "MOP_REPORT_PDF_FONT_PATH": false,
+        "MOP_REPORT_PDF_FONT_SHA256": false,
+        "MOP_REPORT_PUBLICATION_TEMPLATE_VERSION": false,
+        "MOP_REPORT_PUBLICATION_POLICY_JSON": false,
+        "MOP_BACKUP_KMS_PROVIDER": false,
+        "MOP_BACKUP_COLLECTION_PROOFS_DIRECTORY": false,
+        "MOP_ATTACHMENT_SCANNER_PORT": false,
+        "MOP_MONITORING_ENROLLMENT_APPROVAL_POLICY": false
+      }
+    },
+    "web": {
+      "source_commit": "b964701b5a148978cf761bf550dd7f24745fdb43",
+      "running": true,
+      "restart_count": 0,
+      "flags": {
+        "MOP_NOTIFICATION_ROUTING_ENABLED": "UNSET",
+        "MOP_NOTIFICATION_RELAY_ENABLED": "UNSET",
+        "MOP_EMAIL_ENABLED": "false",
+        "MOP_EMAIL_DISPATCH_ENABLED": "false",
+        "MOP_WECOM_ENABLED": "false",
+        "MOP_WECOM_DISPATCH_ENABLED": "false",
+        "MOP_TICKET_LIFECYCLE_ENABLED": "UNSET",
+        "MOP_TICKET_CLOCK_ENABLED": "UNSET",
+        "MOP_MONITORING_ENROLLMENT_ENABLED": "UNSET",
+        "MOP_MONITORING_ENROLLMENT_TEST_ENABLED": "UNSET",
+        "MOP_MONITORING_MAPPING_ENABLED": "UNSET",
+        "MOP_MONITORING_MAPPING_CAPTURE_ENABLED": "UNSET",
+        "MOP_DELIVERY_JOURNAL_READ_ENABLED": "UNSET",
+        "MOP_MONITORING_PRESET_REGISTRY_ENABLED": "UNSET",
+        "MOP_MONITORING_PROMETHEUS_READ_ENABLED": "UNSET",
+        "MOP_NETWORK_MONITORING_ENABLED": "UNSET",
+        "MOP_AF_RESOURCE_ENABLED": "UNSET",
+        "MOP_REPORT_PDF_PREVIEW_ENABLED": "UNSET",
+        "MOP_ATTACHMENT_SCAN_ENABLED": "UNSET",
+        "MOP_BACKUP_WORKER_ENABLED": "UNSET",
+        "MOP_BACKUP_CONTENT_ENABLED": "UNSET"
+      },
+      "configured_presence": {
+        "MOP_REPORT_PDF_FONT_PATH": false,
+        "MOP_REPORT_PDF_FONT_SHA256": false,
+        "MOP_REPORT_PUBLICATION_TEMPLATE_VERSION": false,
+        "MOP_REPORT_PUBLICATION_POLICY_JSON": false,
+        "MOP_BACKUP_KMS_PROVIDER": false,
+        "MOP_BACKUP_COLLECTION_PROOFS_DIRECTORY": false,
+        "MOP_ATTACHMENT_SCANNER_PORT": false,
+        "MOP_MONITORING_ENROLLMENT_APPROVAL_POLICY": false
+      }
+    },
+    "photo-worker": {
+      "source_commit": "b964701b5a148978cf761bf550dd7f24745fdb43",
+      "running": true,
+      "restart_count": 0,
+      "flags": {
+        "MOP_NOTIFICATION_ROUTING_ENABLED": "UNSET",
+        "MOP_NOTIFICATION_RELAY_ENABLED": "UNSET",
+        "MOP_EMAIL_ENABLED": "false",
+        "MOP_EMAIL_DISPATCH_ENABLED": "false",
+        "MOP_WECOM_ENABLED": "false",
+        "MOP_WECOM_DISPATCH_ENABLED": "false",
+        "MOP_TICKET_LIFECYCLE_ENABLED": "UNSET",
+        "MOP_TICKET_CLOCK_ENABLED": "UNSET",
+        "MOP_MONITORING_ENROLLMENT_ENABLED": "UNSET",
+        "MOP_MONITORING_ENROLLMENT_TEST_ENABLED": "UNSET",
+        "MOP_MONITORING_MAPPING_ENABLED": "UNSET",
+        "MOP_MONITORING_MAPPING_CAPTURE_ENABLED": "UNSET",
+        "MOP_DELIVERY_JOURNAL_READ_ENABLED": "UNSET",
+        "MOP_MONITORING_PRESET_REGISTRY_ENABLED": "UNSET",
+        "MOP_MONITORING_PROMETHEUS_READ_ENABLED": "UNSET",
+        "MOP_NETWORK_MONITORING_ENABLED": "UNSET",
+        "MOP_AF_RESOURCE_ENABLED": "UNSET",
+        "MOP_REPORT_PDF_PREVIEW_ENABLED": "UNSET",
+        "MOP_ATTACHMENT_SCAN_ENABLED": "UNSET",
+        "MOP_BACKUP_WORKER_ENABLED": "UNSET",
+        "MOP_BACKUP_CONTENT_ENABLED": "UNSET"
+      },
+      "configured_presence": {
+        "MOP_REPORT_PDF_FONT_PATH": false,
+        "MOP_REPORT_PDF_FONT_SHA256": false,
+        "MOP_REPORT_PUBLICATION_TEMPLATE_VERSION": false,
+        "MOP_REPORT_PUBLICATION_POLICY_JSON": false,
+        "MOP_BACKUP_KMS_PROVIDER": false,
+        "MOP_BACKUP_COLLECTION_PROOFS_DIRECTORY": false,
+        "MOP_ATTACHMENT_SCANNER_PORT": false,
+        "MOP_MONITORING_ENROLLMENT_APPROVAL_POLICY": false
+      }
+    },
+    "import-worker": {
+      "source_commit": "b964701b5a148978cf761bf550dd7f24745fdb43",
+      "running": true,
+      "restart_count": 0,
+      "flags": {
+        "MOP_NOTIFICATION_ROUTING_ENABLED": "UNSET",
+        "MOP_NOTIFICATION_RELAY_ENABLED": "UNSET",
+        "MOP_EMAIL_ENABLED": "false",
+        "MOP_EMAIL_DISPATCH_ENABLED": "false",
+        "MOP_WECOM_ENABLED": "false",
+        "MOP_WECOM_DISPATCH_ENABLED": "false",
+        "MOP_TICKET_LIFECYCLE_ENABLED": "UNSET",
+        "MOP_TICKET_CLOCK_ENABLED": "UNSET",
+        "MOP_MONITORING_ENROLLMENT_ENABLED": "UNSET",
+        "MOP_MONITORING_ENROLLMENT_TEST_ENABLED": "UNSET",
+        "MOP_MONITORING_MAPPING_ENABLED": "UNSET",
+        "MOP_MONITORING_MAPPING_CAPTURE_ENABLED": "UNSET",
+        "MOP_DELIVERY_JOURNAL_READ_ENABLED": "UNSET",
+        "MOP_MONITORING_PRESET_REGISTRY_ENABLED": "UNSET",
+        "MOP_MONITORING_PROMETHEUS_READ_ENABLED": "UNSET",
+        "MOP_NETWORK_MONITORING_ENABLED": "UNSET",
+        "MOP_AF_RESOURCE_ENABLED": "UNSET",
+        "MOP_REPORT_PDF_PREVIEW_ENABLED": "UNSET",
+        "MOP_ATTACHMENT_SCAN_ENABLED": "UNSET",
+        "MOP_BACKUP_WORKER_ENABLED": "UNSET",
+        "MOP_BACKUP_CONTENT_ENABLED": "UNSET"
+      },
+      "configured_presence": {
+        "MOP_REPORT_PDF_FONT_PATH": false,
+        "MOP_REPORT_PDF_FONT_SHA256": false,
+        "MOP_REPORT_PUBLICATION_TEMPLATE_VERSION": false,
+        "MOP_REPORT_PUBLICATION_POLICY_JSON": false,
+        "MOP_BACKUP_KMS_PROVIDER": false,
+        "MOP_BACKUP_COLLECTION_PROOFS_DIRECTORY": false,
+        "MOP_ATTACHMENT_SCANNER_PORT": false,
+        "MOP_MONITORING_ENROLLMENT_APPROVAL_POLICY": false
+      }
+    },
+    "contact-worker": {
+      "source_commit": "b964701b5a148978cf761bf550dd7f24745fdb43",
+      "running": true,
+      "restart_count": 0,
+      "flags": {
+        "MOP_NOTIFICATION_ROUTING_ENABLED": "UNSET",
+        "MOP_NOTIFICATION_RELAY_ENABLED": "UNSET",
+        "MOP_EMAIL_ENABLED": "false",
+        "MOP_EMAIL_DISPATCH_ENABLED": "false",
+        "MOP_WECOM_ENABLED": "false",
+        "MOP_WECOM_DISPATCH_ENABLED": "false",
+        "MOP_TICKET_LIFECYCLE_ENABLED": "UNSET",
+        "MOP_TICKET_CLOCK_ENABLED": "UNSET",
+        "MOP_MONITORING_ENROLLMENT_ENABLED": "UNSET",
+        "MOP_MONITORING_ENROLLMENT_TEST_ENABLED": "UNSET",
+        "MOP_MONITORING_MAPPING_ENABLED": "UNSET",
+        "MOP_MONITORING_MAPPING_CAPTURE_ENABLED": "UNSET",
+        "MOP_DELIVERY_JOURNAL_READ_ENABLED": "UNSET",
+        "MOP_MONITORING_PRESET_REGISTRY_ENABLED": "UNSET",
+        "MOP_MONITORING_PROMETHEUS_READ_ENABLED": "UNSET",
+        "MOP_NETWORK_MONITORING_ENABLED": "UNSET",
+        "MOP_AF_RESOURCE_ENABLED": "UNSET",
+        "MOP_REPORT_PDF_PREVIEW_ENABLED": "UNSET",
+        "MOP_ATTACHMENT_SCAN_ENABLED": "UNSET",
+        "MOP_BACKUP_WORKER_ENABLED": "UNSET",
+        "MOP_BACKUP_CONTENT_ENABLED": "UNSET"
+      },
+      "configured_presence": {
+        "MOP_REPORT_PDF_FONT_PATH": false,
+        "MOP_REPORT_PDF_FONT_SHA256": false,
+        "MOP_REPORT_PUBLICATION_TEMPLATE_VERSION": false,
+        "MOP_REPORT_PUBLICATION_POLICY_JSON": false,
+        "MOP_BACKUP_KMS_PROVIDER": false,
+        "MOP_BACKUP_COLLECTION_PROOFS_DIRECTORY": false,
+        "MOP_ATTACHMENT_SCANNER_PORT": false,
+        "MOP_MONITORING_ENROLLMENT_APPROVAL_POLICY": false
+      }
+    },
+    "export-preparation-worker": {
+      "source_commit": "b964701b5a148978cf761bf550dd7f24745fdb43",
+      "running": true,
+      "restart_count": 0,
+      "flags": {
+        "MOP_NOTIFICATION_ROUTING_ENABLED": "UNSET",
+        "MOP_NOTIFICATION_RELAY_ENABLED": "UNSET",
+        "MOP_EMAIL_ENABLED": "false",
+        "MOP_EMAIL_DISPATCH_ENABLED": "false",
+        "MOP_WECOM_ENABLED": "false",
+        "MOP_WECOM_DISPATCH_ENABLED": "false",
+        "MOP_TICKET_LIFECYCLE_ENABLED": "UNSET",
+        "MOP_TICKET_CLOCK_ENABLED": "UNSET",
+        "MOP_MONITORING_ENROLLMENT_ENABLED": "UNSET",
+        "MOP_MONITORING_ENROLLMENT_TEST_ENABLED": "UNSET",
+        "MOP_MONITORING_MAPPING_ENABLED": "UNSET",
+        "MOP_MONITORING_MAPPING_CAPTURE_ENABLED": "UNSET",
+        "MOP_DELIVERY_JOURNAL_READ_ENABLED": "UNSET",
+        "MOP_MONITORING_PRESET_REGISTRY_ENABLED": "UNSET",
+        "MOP_MONITORING_PROMETHEUS_READ_ENABLED": "UNSET",
+        "MOP_NETWORK_MONITORING_ENABLED": "UNSET",
+        "MOP_AF_RESOURCE_ENABLED": "UNSET",
+        "MOP_REPORT_PDF_PREVIEW_ENABLED": "UNSET",
+        "MOP_ATTACHMENT_SCAN_ENABLED": "UNSET",
+        "MOP_BACKUP_WORKER_ENABLED": "UNSET",
+        "MOP_BACKUP_CONTENT_ENABLED": "UNSET"
+      },
+      "configured_presence": {
+        "MOP_REPORT_PDF_FONT_PATH": false,
+        "MOP_REPORT_PDF_FONT_SHA256": false,
+        "MOP_REPORT_PUBLICATION_TEMPLATE_VERSION": false,
+        "MOP_REPORT_PUBLICATION_POLICY_JSON": false,
+        "MOP_BACKUP_KMS_PROVIDER": false,
+        "MOP_BACKUP_COLLECTION_PROOFS_DIRECTORY": false,
+        "MOP_ATTACHMENT_SCANNER_PORT": false,
+        "MOP_MONITORING_ENROLLMENT_APPROVAL_POLICY": false
+      }
+    },
+    "af-collector": {
+      "source_commit": "b964701b5a148978cf761bf550dd7f24745fdb43",
+      "running": true,
+      "restart_count": 0,
+      "flags": {
+        "MOP_NOTIFICATION_ROUTING_ENABLED": "UNSET",
+        "MOP_NOTIFICATION_RELAY_ENABLED": "UNSET",
+        "MOP_EMAIL_ENABLED": "false",
+        "MOP_EMAIL_DISPATCH_ENABLED": "false",
+        "MOP_WECOM_ENABLED": "false",
+        "MOP_WECOM_DISPATCH_ENABLED": "false",
+        "MOP_TICKET_LIFECYCLE_ENABLED": "UNSET",
+        "MOP_TICKET_CLOCK_ENABLED": "UNSET",
+        "MOP_MONITORING_ENROLLMENT_ENABLED": "UNSET",
+        "MOP_MONITORING_ENROLLMENT_TEST_ENABLED": "UNSET",
+        "MOP_MONITORING_MAPPING_ENABLED": "UNSET",
+        "MOP_MONITORING_MAPPING_CAPTURE_ENABLED": "UNSET",
+        "MOP_DELIVERY_JOURNAL_READ_ENABLED": "UNSET",
+        "MOP_MONITORING_PRESET_REGISTRY_ENABLED": "UNSET",
+        "MOP_MONITORING_PROMETHEUS_READ_ENABLED": "UNSET",
+        "MOP_NETWORK_MONITORING_ENABLED": "UNSET",
+        "MOP_AF_RESOURCE_ENABLED": "UNSET",
+        "MOP_REPORT_PDF_PREVIEW_ENABLED": "UNSET",
+        "MOP_ATTACHMENT_SCAN_ENABLED": "UNSET",
+        "MOP_BACKUP_WORKER_ENABLED": "UNSET",
+        "MOP_BACKUP_CONTENT_ENABLED": "UNSET"
+      },
+      "configured_presence": {
+        "MOP_REPORT_PDF_FONT_PATH": false,
+        "MOP_REPORT_PDF_FONT_SHA256": false,
+        "MOP_REPORT_PUBLICATION_TEMPLATE_VERSION": false,
+        "MOP_REPORT_PUBLICATION_POLICY_JSON": false,
+        "MOP_BACKUP_KMS_PROVIDER": false,
+        "MOP_BACKUP_COLLECTION_PROOFS_DIRECTORY": false,
+        "MOP_ATTACHMENT_SCANNER_PORT": false,
+        "MOP_MONITORING_ENROLLMENT_APPROVAL_POLICY": false
+      }
+    }
+  },
+  "schema": "55|55",
+  "auth_session_created": true,
+  "actual_assets": 4,
+  "finished_at": "2026-10-24T08:05:58.033446+00:00"
+}

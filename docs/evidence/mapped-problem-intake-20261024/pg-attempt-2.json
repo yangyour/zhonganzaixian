@@ -1,0 +1,28 @@
+{
+  "environment": "lan-test-20261008",
+  "database": "mop_monitoring_test_554a57478666",
+  "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:M02:bbd0675fb4dd4632a04f8449d7af73a3",
+  "source_summary_sha256": "0295ff4b9ec23441ebb28b9a839458efa24d90fa5ed5baad1c16a949f894b1a7",
+  "status": "FAILED",
+  "schema_migrations": 0,
+  "database_created": false,
+  "database_removed": false,
+  "actual_tenant_written": false,
+  "source_protocol": "ISOLATED_SYNTHETIC",
+  "devices_contacted": 0,
+  "external_messages": 0,
+  "formal_contract_acceptance": "NOT_RUN",
+  "started_at": "2026-10-24T08:14:20.287592+00:00",
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "maven_exit_code": 1,
+  "junit": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 1,
+    "skipped": 0
+  },
+  "failure_type": "AssertionError",
+  "own_actor_deactivated": true,
+  "environment_lock_released": true,
+  "finished_at": "2026-10-24T08:14:31.555604+00:00"
+}

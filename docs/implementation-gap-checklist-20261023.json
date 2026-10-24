@@ -321,7 +321,9 @@
         "docs/mapped-source-capture-20261024.md",
         "docs/evidence/dot-continuation-20261023/m02-source-capture.json",
         "docs/designated-candidate-schema-chain-20261023.md",
-        "docs/evidence/local-astra-ut-20261023/schema-chain/summary.json"
+        "docs/evidence/local-astra-ut-20261023/schema-chain/summary.json",
+        "docs/mapped-problem-intake-20261024.md",
+        "docs/evidence/mapped-problem-intake-20261024/validation.json"
       ],
       "commits": [
         "25a17013",
@@ -332,7 +334,8 @@
         "Persistent pool/HOST-or-ITEM object mapping draft/activation/revocation journal, bound own-host Zabbix metadata verification, current-authority/expiry checks, idempotent acknowledgment-only API and asset-detail actions; V55 applied/frozen in designated isolated schema validation; business integration pending",
         "Public event intake rejects deliberate auto-ticket failure; internal simulation is limited to explicit isolated PostgreSQL and non-protected tenants, with historical customer-tenant fixture fallback removed. No real component run.",
         "Explicit one-event HOST source capture from current published mapping, bound metadata/event reads, shared raw/quarantine/audit/idempotency transaction and asset-detail original-command recovery; V29/V30 remain UNVERIFIED and never process recovery or dispatch.",
-        "V54/V55 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; historical active mop_test was V50 at that verification; superseded by the 2026-10-24 deployment to active V55"
+        "V54/V55 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; historical active mop_test was V50 at that verification; superseded by the 2026-10-24 deployment to active V55",
+        "显式当前主机问题消费入口：raw/成员/事件/现有建单同事务，来源严格校验与冲突隔离，原请求恢复及桌面入口；6项指定PG、191+23定向Java、114Web、215契约和3实际Edge合成场景通过。实时设备来源、持续水位及自动消费仍待。"
       ],
       "remaining_subitems": [
         "Complete continuous pull/watermarks, source-proof journal and durable raw-to-business consumption; one-event HOST capture now wired but unverified storage is not business authority",
@@ -341,7 +344,15 @@
         "Persistent collector lifecycle and broader providers",
         "Designated PostgreSQL/probe/browser integration and formal acceptance"
       ],
-      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "remaining": [
+        "持续来源拉取、耐久水位、完整来源运行日志和自动待消费raw调度；当前周期恢复证明的持续处理。",
+        "实际设备非空问题到恢复证据/工单的完整链、V42生命周期、客户规则与正式TC。显式单条问题事务入口已验证，不再重复列作缺失。",
+        "保留V55克隆库的raw约束守卫阻塞须另行处理；不放宽守卫或修写原库。",
+        "外部采集器/规则发布与独立核验的首值消费。",
+        "OID/参数及完整234项目录消费。",
+        "持久采集器生命周期和更广的监控提供者；指定来源探测和完整浏览器联调。"
+      ]
     },
     {
       "id": "M03",

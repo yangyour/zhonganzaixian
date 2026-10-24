@@ -7,22 +7,22 @@ import Panel from '../src/components/DashboardWorkflowsPanel.vue'
 import { api, ApiError } from '../src/api/client'
 import { session, contextGeneration, switchingTenant } from '../src/stores/session'
 import type { Session } from '../src/api/types'
-import type { PendingTicketState } from '../src/utils/dashboardPendingTickets'
-import { pendingContext as c, pendingId as id, pendingSnapshot } from './dashboardPending.fixture'
+import type { ActionableTicketState } from '../src/utils/dashboardActionableTickets'
+import { actionableContext as c, actionableId as id, actionableSnapshot as pendingSnapshot } from './dashboardActionable.fixture'
 
 const auth: Session = {
   user: { id: c.actorId, display_name: 'Synthetic', role: 'padmin' },
   tenant: { id: c.tenantId, name: 'Synthetic' }, allowed_tenants: [], permission_version: c.permissionVersion,
   capabilities: ['dashboard:read', 'tickets:read'], csrf_token: 'SYNTHETIC', mode: 'remote_test', identity_source: 'synthetic-unit-only',
 }
-let host: HTMLElement, app: App | undefined, router: Router, emitted: PendingTicketState[]
+let host: HTMLElement, app: App | undefined, router: Router, emitted: ActionableTicketState[]
 async function settle() { for (let i = 0; i < 10; i++) { await Promise.resolve(); await nextTick() } }
 async function mount() {
   host = document.createElement('div'); document.body.append(host)
   const detail = { setup() { const route = useRoute(); return () => h('p', { role: 'status' }, 'Synthetic target ' + route.query.ticket_id) } }
   router = createRouter({ history: createMemoryHistory(), routes: [
-    { path: '/', component: { render: () => h(Panel, { onState: (value: PendingTicketState) => emitted.push(value) }) } },
-    { path: '/ticket-workflows', component: detail }, { path: '/tickets', component: detail },
+    { path: '/', component: { render: () => h(Panel, { onState: (value: ActionableTicketState) => emitted.push(value) }) } },
+    { path: '/dashboard/actionable-tickets', component: detail }, { path: '/ticket-workflows', component: detail }, { path: '/tickets', component: detail },
   ] })
   await router.push('/'); await router.isReady()
   app = createApp({ render: () => h(RouterView) }); app.use(router); app.component('ElAlert', ElAlert); app.component('ElButton', ElButton)
@@ -35,11 +35,11 @@ afterEach(() => { app?.unmount(); app = undefined; host?.remove(); session.value
 it('uses the cross-state summary once and shares the exact snapshot with the parent', async () => {
   const request = vi.spyOn(api, 'request').mockResolvedValue(pendingSnapshot())
   await mount()
-  expect(request).toHaveBeenCalledWith('/dashboard/pending-tickets', expect.objectContaining({ method: 'GET' }))
+  expect(request).toHaveBeenCalledWith('/dashboard/actionable-tickets?page=1&page_size=5', expect.objectContaining({ method: 'GET' }))
   expect(host.querySelectorAll('tbody tr')).toHaveLength(2)
   expect(host.querySelectorAll('th[scope="col"]')).toHaveLength(5)
   expect(host.querySelector('select')).toBeNull()
-  expect(host.querySelector('caption')?.textContent).toContain('未结束工单')
+  expect(host.querySelector('caption')?.textContent).toContain('未关闭且未解决工单')
   expect(host.textContent).toContain('待处理 2 条')
   expect(host.textContent).toContain('等待厂商')
   expect(emitted.at(-1)?.current?.pending_tickets).toBe(2)
@@ -54,17 +54,17 @@ it('links each model to an actually supported view', async () => {
   await vi.waitFor(() => expect(router.currentRoute.value.query.ticket_id).toBe(id(19)))
 })
 it('keeps complete zero separate from partial registrations and unknown SLA', async () => {
-  vi.spyOn(api, 'request').mockResolvedValue(pendingSnapshot({ registrations: 0, known_pending: 0, terminal: 0, pending_tickets: 0, items: [] }))
+  vi.spyOn(api, 'request').mockResolvedValue(pendingSnapshot({ registrations: 0, known_pending: 0, excluded: 0, pending_tickets: 0, evaluated_pending: 0, total_pages: 0, items: [] }))
   await mount()
-  expect(host.textContent).toContain('当前授权范围没有未结束工单')
-  expect(host.textContent).toContain('SLA状态尚未接入')
+  expect(host.textContent).toContain('当前授权范围没有未关闭且未解决的工单')
+  expect(host.textContent).toContain('已超 SLA 0')
   expect(emitted.at(-1)?.current?.pending_tickets).toBe(0)
 })
 it('reports missing workflow coverage without substituting the known count as total', async () => {
-  vi.spyOn(api, 'request').mockResolvedValue(pendingSnapshot({ registrations: 4, unconfigured: 1, pending_tickets: null, state: 'PARTIAL', unavailable_reason: 'REGISTRATIONS_WITHOUT_WORKFLOW' }))
+  vi.spyOn(api, 'request').mockResolvedValue(pendingSnapshot({ registrations: 4, unconfigured: 1, pending_tickets: null, overdue_sla: null, unknown_sla: 1, unavailable_reasons: ['REGISTRATIONS_WITHOUT_WORKFLOW'] }))
   await mount()
   expect(host.textContent).toContain('完整待办数未知')
-  expect(host.textContent).toContain('已确认未结束 2 条')
+  expect(host.textContent).toContain('已确认待处理 2 条')
   expect(host.textContent).toContain('1 条登记未配置流程')
   expect(emitted.at(-1)?.current?.pending_tickets).toBeNull()
 })
@@ -77,7 +77,7 @@ it('clears rows and parent count on failed refresh and restores them only after 
   button('重试待办汇总').click(); await settle()
   expect(host.querySelectorAll('tbody tr')).toHaveLength(2)
   expect(document.activeElement).toBe(host.querySelector('p[role="status"]'))
-  expect(request.mock.calls.every(([path, options]) => path === '/dashboard/pending-tickets' && options?.method === 'GET')).toBe(true)
+  expect(request.mock.calls.every(([path, options]) => path === '/dashboard/actionable-tickets?page=1&page_size=5' && options?.method === 'GET')).toBe(true)
 })
 it('cancels, restores focus and rejects late transport success', async () => {
   let finish!: (value: unknown) => void

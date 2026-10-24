@@ -49,32 +49,8 @@ public final class PostgresDashboardPendingTicketSlaReader implements DashboardP
                     while (rows.next()) {
                         String ticket = rows.getString("id");
                         long version = rows.getLong("version");
-                        var recovery = PostgresTicketWorkflowRepository.monitoringRecovery(connection, access.tenantId(), ticket);
-                        DashboardTicketSla.Assessment assessment;
-                        if ("WORKFLOW_V33".equals(rows.getString("model"))) {
-                            WorkflowLifecycle.Snapshot workflow;
-                            try {
-                                workflow = mapper.readValue(rows.getString("workflow_snapshot"), WorkflowLifecycle.Snapshot.class);
-                            } catch (Exception invalid) {
-                                throw unavailable();
-                            }
-                            if (workflow.version() != version || !workflow.state().name().equals(rows.getString("state"))
-                                    || workflow.updatedAt().isAfter(base.observedAt())) {
-                                throw unavailable();
-                            }
-                            var evaluated = TicketSlaClockEvaluation.evaluate(workflow, tier, base.observedAt(),
-                                    recovery.linked(), recovery.recoveredAt());
-                            var recoveryClock = "PENDING_Q27".equals(evaluated.reopenPolicyStatus())
-                                    ? DashboardTicketSla.unavailable("REOPEN_POLICY_MISSING")
-                                    : DashboardTicketSla.workflow(evaluated.recoveryClock(), base.observedAt());
-                            assessment = new DashboardTicketSla.Assessment(evaluated.priority(), evaluated.frozenServiceTier().name(),
-                                    evaluated.metricVersion(), version, DashboardTicketSla.workflow(evaluated.responseClock(), base.observedAt()),
-                                    recoveryClock);
-                        } else if ("LIFECYCLE_V42".equals(rows.getString("model"))) {
-                            assessment = lifecycle(connection, access, ticket, version, base.observedAt(), recovery.linked());
-                        } else {
-                            throw unavailable();
-                        }
+                        var assessment = assess(connection, access, ticket, rows.getString("model"), rows.getString("state"),
+                                version, rows.getString("workflow_snapshot"), base.observedAt(), tier);
                         if (assessments.put(ticket, assessment) != null) {
                             throw unavailable();
                         }
@@ -92,6 +68,37 @@ public final class PostgresDashboardPendingTicketSlaReader implements DashboardP
             var items = base.items().stream().map(item -> new Item(item, assessments.get(item.ticketId().toString()))).toList();
             return new Snapshot(base, assessments.size(), knownOverdue, unknown, items);
         });
+    }
+
+    /** Shared exact-version evaluation keeps additive projections on the existing frozen SLA engines. */
+    DashboardTicketSla.Assessment assess(Connection connection, Access access, String ticket, String model,
+                                         String state, long version, String workflowJson, Instant observed,
+                                         Tier tier) throws SQLException {
+        var recovery = PostgresTicketWorkflowRepository.monitoringRecovery(connection, access.tenantId(), ticket);
+        if ("WORKFLOW_V33".equals(model)) {
+            WorkflowLifecycle.Snapshot workflow;
+            try {
+                workflow = mapper.readValue(workflowJson, WorkflowLifecycle.Snapshot.class);
+            } catch (Exception invalid) {
+                throw unavailable();
+            }
+            if (workflow.version() != version || !workflow.state().name().equals(state)
+                    || workflow.updatedAt().isAfter(observed)) {
+                throw unavailable();
+            }
+            var evaluated = TicketSlaClockEvaluation.evaluate(workflow, tier, observed,
+                    recovery.linked(), recovery.recoveredAt());
+            var recoveryClock = "PENDING_Q27".equals(evaluated.reopenPolicyStatus())
+                    ? DashboardTicketSla.unavailable("REOPEN_POLICY_MISSING")
+                    : DashboardTicketSla.workflow(evaluated.recoveryClock(), observed);
+            return new DashboardTicketSla.Assessment(evaluated.priority(), evaluated.frozenServiceTier().name(),
+                    evaluated.metricVersion(), version, DashboardTicketSla.workflow(evaluated.responseClock(), observed),
+                    recoveryClock);
+        }
+        if ("LIFECYCLE_V42".equals(model)) {
+            return lifecycle(connection, access, ticket, version, observed, recovery.linked());
+        }
+        throw unavailable();
     }
 
     private DashboardTicketSla.Assessment lifecycle(Connection connection, Access access, String ticket,
@@ -122,7 +129,7 @@ public final class PostgresDashboardPendingTicketSlaReader implements DashboardP
         }
     }
 
-    private static Tier currentTier(Connection connection, String tenant) throws SQLException {
+    static Tier currentTier(Connection connection, String tenant) throws SQLException {
         try (var statement = connection.prepareStatement("SELECT tier FROM public.mop_service_tier WHERE tenant_id=?::uuid")) {
             statement.setQueryTimeout(10);
             statement.setString(1, tenant);

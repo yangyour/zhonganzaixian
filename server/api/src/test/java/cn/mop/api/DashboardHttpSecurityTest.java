@@ -58,6 +58,15 @@ class DashboardHttpSecurityTest {
                 cn.mop.domain.dashboard.DashboardPendingTicketSlaReader slaReader) {
             return new DashboardPendingTicketSlaController(repository, slaReader);
         }
+        @Bean
+        DashboardActionableTicketsReader actionableReader() {
+            return mock(DashboardActionableTicketsReader.class);
+        }
+        @Bean
+        DashboardActionableTicketsController actionableController(PlatformRepository repository,
+                DashboardActionableTicketsReader actionableReader) {
+            return new DashboardActionableTicketsController(repository, actionableReader);
+        }
         @Override public void configureMessageConverters(List<HttpMessageConverter<?>> converters){converters.add(new MappingJackson2HttpMessageConverter(mapper()));}
     }
     @Autowired WebApplicationContext context;
@@ -67,9 +76,37 @@ class DashboardHttpSecurityTest {
     cn.mop.domain.dashboard.DashboardPendingTicketsReader pendingReader;
     @Autowired
     cn.mop.domain.dashboard.DashboardPendingTicketSlaReader slaReader;
+    @Autowired
+    DashboardActionableTicketsReader actionableReader;
     private MockMvc mvc;
     @BeforeEach void setup(){reset(repository,reader);mvc=webAppContextSetup(context).apply(springSecurity()).build();when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"viewer",7,true)));when(reader.read(any(),any())).thenAnswer(c->DashboardControllerTest.snapshot(c.getArgument(0),c.getArgument(1)));}
     private MockHttpServletRequestBuilder scoped(MockHttpServletRequestBuilder builder){var session=new MockHttpSession(context.getServletContext());session.setAttribute("mop.tenant_id",TENANT);return builder.session(session).with(user(ACTOR));}
+    @Test
+    void actionablePaginationRequiresSessionAndCannotOverrideScopeOrMutate() throws Exception {
+        when(actionableReader.read(any(), any())).thenAnswer(invocation ->
+                new DashboardActionableTicketsReader.Snapshot(UUID.fromString(TENANT), UUID.fromString(ACTOR), 7,
+                        DashboardControllerTest.TIME, "REPORTER_ONLY", 0, 0, 0, 0, 0, 0,
+                        invocation.getArgument(1), List.of()));
+        String path = "/api/v1/dashboard/actionable-tickets";
+        mvc.perform(scoped(get(path)))
+                .andExpect(status().isOk()).andExpect(header().string("Cache-Control", "no-store"))
+                .andExpect(jsonPath("$.data.metric_version").value("MOP_ACTIONABLE_TICKETS_V1"))
+                .andExpect(jsonPath("$.data.projection_version").value("MOP_ACTIONABLE_TICKETS_SLA_V1"))
+                .andExpect(jsonPath("$.data.pending_tickets").value(0))
+                .andExpect(jsonPath("$.data.overdue_sla").value(0))
+                .andExpect(jsonPath("$.data.evaluation_limit").value(nullValue()))
+                .andExpect(jsonPath("$.data.page_size").value(5));
+        mvc.perform(scoped(head(path))).andExpect(status().isOk()).andExpect(header().string("Cache-Control", "no-store"));
+        mvc.perform(scoped(get(path).param("page", "2").param("page_size", "100")))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.page").value(2))
+                .andExpect(jsonPath("$.data.page_size").value(100));
+        mvc.perform(get(path)).andExpect(status().isUnauthorized());
+        mvc.perform(scoped(get(path).param("tenant_id", TENANT))).andExpect(status().isBadRequest());
+        mvc.perform(scoped(get(path).param("page", "1", "2"))).andExpect(status().isBadRequest());
+        mvc.perform(scoped(get(path).param("page_size", "101"))).andExpect(status().isBadRequest());
+        mvc.perform(scoped(post(path)).with(csrf().asHeader())).andExpect(status().isMethodNotAllowed());
+    }
+
     @Test
     void pendingTicketFactsRequireSessionAndRemainNoStoreWithoutMutation() throws Exception {
         when(pendingReader.read(any())).thenReturn(new cn.mop.domain.dashboard.DashboardPendingTicketsReader.Snapshot(

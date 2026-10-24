@@ -1,0 +1,123 @@
+{
+  "status": "PASSED_WITH_RECORDED_LIMITATIONS",
+  "baseline": "6ca0569a",
+  "upstream_detected": "f5fc7637",
+  "java_targeted": [
+    {
+      "name": "DashboardActionableTicketsTest",
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "DashboardPendingTicketsTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "DashboardTicketSlaTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "DashboardReadAuthorizationTest",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "DashboardHttpSecurityTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "java_executed": 66,
+  "designated_pg": {
+    "executed": 4,
+    "failures": 0,
+    "skipped": 0,
+    "population": {
+      "registrations": 120,
+      "actionable": 112,
+      "excluded": 7,
+      "unconfigured": 1
+    },
+    "evidence": "ui01-postgres.json"
+  },
+  "web_full_regression": {
+    "files": 313,
+    "passed": 5221,
+    "failed": 0
+  },
+  "web_final_incremental": {
+    "files": 9,
+    "passed": 169,
+    "failed": 0
+  },
+  "root_contracts": {
+    "passed": 206,
+    "failed": 0
+  },
+  "demo_contracts": {
+    "passed": 4,
+    "failed": 0
+  },
+  "python_demo_plan": {
+    "passed": 17,
+    "environment_blocked": 1,
+    "blocked_test": "test_symlink_output_is_rejected",
+    "reason": "Windows WinError 1314: symbolic link creation privilege unavailable",
+    "assertion_removed": false
+  },
+  "synthetic_edge": {
+    "executed": 4,
+    "stats": {
+      "startTime": "2026-10-24T01:57:42.607Z",
+      "duration": 35476.339,
+      "expected": 4,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "viewports": [
+      1024,
+      1440
+    ],
+    "api": "SYNTHETIC",
+    "visual_attempt_1": "NOT_ACCEPTED_MISSING_PRODUCTION_STYLE_SCOPE",
+    "final_production_styles": true,
+    "axe": "PASSED_IN_CHANGED_PANEL",
+    "history_back": "PASSED"
+  },
+  "real_browser_evidence": "ui01-live-browser.json",
+  "real_http_evidence": "ui01-http.json",
+  "web_build": {
+    "status": "PASSED",
+    "files": 153,
+    "build_id": "c58c79a279c70ab9be81dafbc7004b96e3112f71f9e86472da827b5c8c31a8d6",
+    "chunk_warning_retained": true
+  },
+  "candidate_api": {
+    "sha256": "dd8d449cfb56ef5bc184b848cb8bf0d8908e2e61c058d00a758c686a88a3db79",
+    "scope": "UI01 source snapshot; A05 unverified sources excluded",
+    "attempt_1": "FAILED: snapshot omitted existing Maven config-baseline/presets resources; corrected and rebuilt, no guard bypass"
+  },
+  "migrations": 0,
+  "deployments": 0,
+  "external_messages": 0,
+  "formal_contract_acceptance": "NOT_RUN",
+  "remaining": [
+    "V42 enabled complete monitoring-t2/browser flow",
+    "Formal SLA policies and contract acceptance",
+    "Production performance qualification"
+  ],
+  "finished_at": "2026-10-24T02:00:51.393838+00:00"
+}

@@ -6,6 +6,7 @@ export interface NavigationModule { id: string; title: string; items: Navigation
 
 /** Detail pages inherit the navigation context of their authorized list entry. */
 export function navigationEntryName(name: unknown): unknown {
+  if (name === 'actionable-tickets') return 'dashboard'
   return name === 'contact-import-preview' ? 'contact-imports' : name
 }
 

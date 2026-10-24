@@ -43405,6 +43405,105 @@
         "x-mop-technical-evaluation-limit": 100
       }
     },
+    "/dashboard/actionable-tickets": {
+      "get": {
+        "operationId": "readDashboardActionableTickets",
+        "summary": "未关闭且未解决工单：同快照全量SLA计数、首页前五条及完整分页下钻",
+        "x-mop-capabilities": [
+          "dashboard:read",
+          "tickets:read"
+        ],
+        "x-mop-read-only": true,
+        "x-mop-allowed-query-keys": [
+          "page",
+          "page_size"
+        ],
+        "x-mop-customer-scope": "REPORTER_ONLY",
+        "x-mop-snapshot-isolation": "REPEATABLE_READ",
+        "responses": {
+          "200": {
+            "description": "All actionable SLA assessments and one complete page; page_size * page must be a safe integer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardActionableTicketsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid scope, permission, workflow state or dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid scope, permission, workflow state or dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid scope, permission, workflow state or dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Invalid scope, permission, workflow state or dependency",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-duplicate-query-keys": "REJECT",
+        "x-mop-excluded-states": [
+          "CLOSED",
+          "CANCELLED",
+          "RESOLVED"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740990,
+              "default": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 5
+            }
+          }
+        ]
+      }
+    },
     "/demo/examples/{page}": {
       "get": {
         "operationId": "readExplicitDemoPageExample",
@@ -88173,6 +88272,557 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/DashboardPendingTicketSla"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "DashboardActionableTickets": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "permission_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "scope": {
+            "enum": [
+              "CURRENT_TENANT_INTERNAL",
+              "REPORTER_ONLY"
+            ]
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "metric_version": {
+            "const": "MOP_ACTIONABLE_TICKETS_V1"
+          },
+          "projection_version": {
+            "const": "MOP_ACTIONABLE_TICKETS_SLA_V1"
+          },
+          "excluded_states": {
+            "const": [
+              "CLOSED",
+              "CANCELLED",
+              "RESOLVED"
+            ]
+          },
+          "registrations": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "known_pending": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "excluded": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "unconfigured": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "pending_tickets": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "overdue_sla": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "known_overdue": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "unknown_sla": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "evaluated_pending": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "unevaluated_pending": {
+            "const": 0
+          },
+          "evaluation_limit": {
+            "type": "null"
+          },
+          "unavailable_reasons": {
+            "type": "array",
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "REGISTRATIONS_WITHOUT_WORKFLOW",
+                "SLA_INPUTS_OR_READER_UNAVAILABLE"
+              ]
+            }
+          },
+          "item_limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "total_pages": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "sort": {
+            "const": "REGISTRATION_CREATED_AT_DESC_ID_DESC"
+          },
+          "writes_performed": {
+            "const": false
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "ticket_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "receipt_no": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "registered_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "workflow_model": {
+                  "enum": [
+                    "WORKFLOW_V33",
+                    "LIFECYCLE_V42"
+                  ]
+                },
+                "state": {
+                  "type": "string"
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740990
+                },
+                "priority": {
+                  "enum": [
+                    null,
+                    "P1",
+                    "P2",
+                    "P3"
+                  ]
+                },
+                "frozen_service_tier": {
+                  "enum": [
+                    null,
+                    "BASIC",
+                    "STANDARD",
+                    "ADVANCED"
+                  ]
+                },
+                "sla_metric_version": {
+                  "enum": [
+                    null,
+                    "SLA_CLOCK_V2",
+                    "LIFECYCLE_SLA_CLOCK_V1"
+                  ]
+                },
+                "sla_version": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740990
+                },
+                "overdue": {
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "response_clock": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "RUNNING",
+                        "PENDING_CONFIG",
+                        "CONFIG_PENDING",
+                        "BREACHED",
+                        "MET",
+                        "PAUSED_FOR_CUSTOMER_CONFIRM",
+                        "PAUSED",
+                        "COMPLETED",
+                        "CANCELLED"
+                      ]
+                    },
+                    "breached": {
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "missing_reason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "deadline_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "completed_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "remaining_millis": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740990
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "remaining_basis": {
+                      "enum": [
+                        null,
+                        "FROZEN_SERVICE_WINDOWS",
+                        "EXPLICIT_BUDGET_MINUS_ELAPSED"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "breached",
+                    "missing_reason",
+                    "deadline_at",
+                    "completed_at",
+                    "remaining_millis",
+                    "remaining_basis"
+                  ],
+                  "additionalProperties": false
+                },
+                "recovery_clock": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "RUNNING",
+                        "PENDING_CONFIG",
+                        "CONFIG_PENDING",
+                        "BREACHED",
+                        "MET",
+                        "PAUSED_FOR_CUSTOMER_CONFIRM",
+                        "PAUSED",
+                        "COMPLETED",
+                        "CANCELLED"
+                      ]
+                    },
+                    "breached": {
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "missing_reason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "deadline_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "completed_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "remaining_millis": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740990
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "remaining_basis": {
+                      "enum": [
+                        null,
+                        "FROZEN_SERVICE_WINDOWS",
+                        "EXPLICIT_BUDGET_MINUS_ELAPSED"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "breached",
+                    "missing_reason",
+                    "deadline_at",
+                    "completed_at",
+                    "remaining_millis",
+                    "remaining_basis"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "ticket_id",
+                "receipt_no",
+                "title",
+                "registered_at",
+                "workflow_model",
+                "state",
+                "version",
+                "priority",
+                "frozen_service_tier",
+                "sla_metric_version",
+                "sla_version",
+                "overdue",
+                "response_clock",
+                "recovery_clock"
+              ],
+              "additionalProperties": false,
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "workflow_model": {
+                        "const": "WORKFLOW_V33"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "state": {
+                        "enum": [
+                          "OPEN",
+                          "ACCEPTED",
+                          "IN_PROGRESS"
+                        ]
+                      }
+                    }
+                  },
+                  "else": {
+                    "properties": {
+                      "state": {
+                        "enum": [
+                          "NEW",
+                          "IN_PROGRESS",
+                          "WAITING_VENDOR",
+                          "PENDING_CUSTOMER",
+                          "REOPENED"
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "tenant_id",
+          "actor_id",
+          "permission_version",
+          "observed_at",
+          "scope",
+          "source",
+          "metric_version",
+          "projection_version",
+          "excluded_states",
+          "registrations",
+          "known_pending",
+          "excluded",
+          "unconfigured",
+          "pending_tickets",
+          "overdue_sla",
+          "known_overdue",
+          "unknown_sla",
+          "evaluated_pending",
+          "unevaluated_pending",
+          "evaluation_limit",
+          "unavailable_reasons",
+          "item_limit",
+          "page",
+          "page_size",
+          "total_pages",
+          "sort",
+          "writes_performed",
+          "items"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "unknown_sla": {
+                  "const": 0
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "overdue_sla": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740990
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "overdue_sla": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "unconfigured": {
+                  "const": 0
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "pending_tickets": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740990
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "pending_tickets": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Complete actionable population is evaluated in one read-only repeatable-read transaction. No 100-ticket SLA truncation; time budget exhaustion returns 503. Unknown inputs keep totals null. Pagination changes returned rows only; each HTTP request obtains a fresh snapshot."
+      },
+      "DashboardActionableTicketsResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DashboardActionableTickets"
           },
           "trace_id": {
             "type": "string"

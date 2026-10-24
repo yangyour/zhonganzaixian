@@ -33,7 +33,7 @@ test('all prepared demo request bodies match current API schemas, not runtime ex
 });
 
 test('demo account preparation does not assert granted access or all-feature acceptance', () => {
-  assert.equal(golden.coverage.pages_declared, 43); assert.equal(golden.coverage.capability_union_count, 48);
+  assert.equal(golden.coverage.pages_declared, 44); assert.equal(golden.coverage.capability_union_count, 48);
   assert.equal(golden.coverage.pages_accepted, 0); assert.equal(golden.coverage.all_functions_ready, false);
   for (const flag of ['account_created','credentials_created','permissions_granted','business_data_written','outbound_enabled']) assert.equal(golden[flag], false);
   assert.ok(golden.blockers.includes('GLOBAL_POLICY_SCOPE_UNRESOLVED'));

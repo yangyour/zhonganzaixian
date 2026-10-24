@@ -1,0 +1,17 @@
+{
+  "environment": "lan-test-20261008",
+  "status": "PASSED",
+  "business_writes": 0,
+  "migrations": 0,
+  "components_started": 0,
+  "stage": "COMPLETE",
+  "host_trust": "PINNED_MATCH",
+  "project_ownership": "MATCH",
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "runtime_restricted": true,
+  "ticket_read_available": true,
+  "migration_latest": "50",
+  "migration_count": 50,
+  "history_sha256": "9e521446d1999642f0380e37f71d0fd3b758b92bd82db2f8643ebe727ccf3aa3",
+  "finished_at": "2026-10-24T01:43:16.222751+00:00"
+}

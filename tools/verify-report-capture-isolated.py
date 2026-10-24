@@ -45,8 +45,8 @@ def protected_fingerprints(connection):
 
 def run(output: Path, suite: str):
     output.mkdir(parents=True, exist_ok=False)
-    owner = {'session': 'reports', 'branch': 'codex/launch-reports-20261023',
-             'operation': 'isolated-report-capture-pg', 'owner': str(uuid.uuid4()),
+    owner = {'session': 'local-astra-ut' if suite == 'dashboard-actionable' else 'reports',
+             'operation': 'isolated-' + suite + '-pg', 'owner': str(uuid.uuid4()),
              'started_at': datetime.datetime.now(datetime.timezone.utc).isoformat()}
     with LOCK.open('x', encoding='utf-8') as stream:
         json.dump(owner, stream)
@@ -55,7 +55,7 @@ def run(output: Path, suite: str):
     admin = None
     seeded = False
     actor = str(uuid.uuid4())
-    viewers = [str(uuid.uuid4()), str(uuid.uuid4())] if suite in ('dashboard', 'dashboard-sla') else []
+    viewers = [str(uuid.uuid4()), str(uuid.uuid4())] if suite in ('dashboard', 'dashboard-sla', 'dashboard-actionable') else []
     tenants = [str(uuid.uuid4()), str(uuid.uuid4())]
     assets = [str(uuid.uuid4()), str(uuid.uuid4())]
     summary = {'environment': 'lan-test-20261008', 'schema_migrations': 0,
@@ -128,9 +128,12 @@ def run(output: Path, suite: str):
                         'MOP_DASHBOARD_TEST_OTHER_VIEWER': viewers[1]})
         if suite == 'dashboard-sla':
             env['MOP_RUN_DASHBOARD_SLA_PG_TESTS'] = 'true'
+        if suite == 'dashboard-actionable':
+            env['MOP_RUN_DASHBOARD_ACTIONABLE_PG_TESTS'] = 'true'
         selected_test = {'report': 'PostgresReportCaptureIsolatedIntegrationTest',
                          'dashboard': 'PostgresDashboardPendingTicketsIntegrationTest',
-                         'dashboard-sla': 'PostgresDashboardPendingTicketSlaIntegrationTest'}[suite]
+                         'dashboard-sla': 'PostgresDashboardPendingTicketSlaIntegrationTest',
+                         'dashboard-actionable': 'PostgresDashboardActionableTicketsIntegrationTest'}[suite]
         with (output / 'maven.log').open('w', encoding='utf-8') as log:
             result = subprocess.run(['mvn.cmd', '-pl', 'server/persistence', '-am',
                                      '-Dtest=' + selected_test,
@@ -182,6 +185,6 @@ def run(output: Path, suite: str):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', required=True, type=Path)
-    parser.add_argument('--suite', choices=('report', 'dashboard', 'dashboard-sla'), default='report')
+    parser.add_argument('--suite', choices=('report', 'dashboard', 'dashboard-sla', 'dashboard-actionable'), default='report')
     args = parser.parse_args()
     raise SystemExit(run(args.output.resolve(), args.suite))

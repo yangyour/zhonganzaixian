@@ -6,7 +6,7 @@ import { api } from '../api/client'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { createDashboardWorkspace, emptyDashboardState } from '../utils/dashboardWorkspace'
 import { dashboardWindows, type DashboardWindow } from '../utils/dashboardAvailability'
-import { emptyPendingTickets, type PendingTicketState } from '../utils/dashboardPendingTickets'
+import { emptyActionableTickets, type ActionableTicketState } from '../utils/dashboardActionableTickets'
 import { clockTime, displayTime } from '../utils/display'
 import { routeAllowed } from '../utils/routeAccess'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
@@ -19,7 +19,7 @@ const eventPanel = ref<{ refresh: () => unknown } | null>(null)
 const workflowPanel = ref<{ refresh: () => unknown } | null>(null)
 const resourcePanel = ref<{ refresh: () => unknown } | null>(null)
 const state = shallowRef(emptyDashboardState())
-const pending = shallowRef(emptyPendingTickets())
+const pending = shallowRef(emptyActionableTickets())
 const workspace = createDashboardWorkspace(api, value => { state.value = value })
 const autoRefresh = ref(true), now = ref(performance.now()), loadedAt = ref<number | null>(null)
 const permitted = computed(() => Boolean(session.value?.mode === 'remote_test' && ['viewer', 'tadmin', 'msp', 'padmin'].includes(session.value.user.role) && can('dashboard:read') && !switchingTenant.value))
@@ -31,7 +31,7 @@ const kpis = [
   { id: 'ASSET_ONLINE_RATE', title: '资产在线率', route: 'assets', target: '资产列表', parts: [['正常', '—'], ['未知', '—']], note: '未知单独计数，不并入正常' },
   { id: 'CURRENT_PROBLEMS', title: '当前问题', route: 'monitoring-events', target: '事件中心', severities: true, note: '已排除已抑制事件' },
   { id: 'MONTH_SERVICE_AVAILABILITY', title: '本月服务可用率', route: 'sla-reports', target: 'SLA 报表', note: '本月1日至今 · 无样本不视为可用' },
-  { id: 'PENDING_TICKETS', title: '待处理工单', route: 'tickets', target: '工单登记', parts: [['已超 SLA', '—']] },
+  { id: 'PENDING_TICKETS', title: '待处理工单', route: 'actionable-tickets', target: '全部待处理与SLA' },
   { id: 'MTTA_24H', title: 'MTTA', period: '近24小时', route: 'monitoring-events', target: '事件中心', note: '首次有效人工确认 · 样本量未知' },
   { id: 'DELIVERY_RATE_24H', title: '通知送达率', period: '近24小时', route: 'ticket-notifications', target: '工单通知', parts: [['受理', '—'], ['送达', '—']] },
 ] as const
@@ -39,8 +39,8 @@ const severities = [['disaster', '灾难'], ['high', '严重'], ['average', '一
 // Drill-down entries follow the same route gates as the menu; the tenant context is the session's.
 const allowedRoutes = computed(() => new Set((router?.getRoutes() ?? []).filter(route => typeof route.name === 'string' && routeAllowed(route.meta, session.value)).map(route => String(route.name))))
 const kpiValue = computed(() => state.value.busy ? '读取中' : state.value.error ? '读取失败' : '未知')
-function updatePending(value: PendingTicketState) {
-  pending.value = permitted.value && can('tickets:read') ? value : emptyPendingTickets()
+function updatePending(value: ActionableTicketState) {
+  pending.value = permitted.value && can('tickets:read') ? value : emptyActionableTickets()
 }
 function metricValue(id: string) {
   if (id !== 'PENDING_TICKETS') return kpiValue.value
@@ -56,7 +56,7 @@ const pendingNote = computed(() => {
   const current = pending.value.current
   if (!current) return ''
   return (current.scope === 'REPORTER_ONLY' ? '仅本人报障' : '当前租户')
-    + (current.unconfigured ? ' · 另有 ' + current.unconfigured + ' 条登记未配置流程' : ' · 未结束流程合计')
+    + (current.unconfigured ? ' · 另有 ' + current.unconfigured + ' 条登记未配置流程' : ' · 未关闭且未解决')
 })
 const freshness = computed(() => loadedAt.value === null ? '尚未读取首页状态' : `数据 ${Math.max(0, Math.floor((now.value - loadedAt.value) / 1000))} 秒前 · 指标采样未知`)
 // M1-4: a 24-hour axis with 6-hour ticks taken from the server-issued period.
@@ -80,7 +80,7 @@ function refreshAll() {
 function selectWindow(window: DashboardWindow) { if (!state.value.busy) void refresh(window) }
 watch(contextKey, () => {
   loadedAt.value = null
-  pending.value = emptyPendingTickets()
+  pending.value = emptyActionableTickets()
   const current = session.value
   workspace.reset(permitted.value && current ? { tenantId: current.tenant.id, actorId: current.user.id, permissionVersion: current.permission_version, role: current.user.role, canRead: true } : null)
   if (permitted.value) void refresh()
@@ -117,6 +117,7 @@ onUnmounted(() => { alive = false; clearInterval(timer); workspace.dispose() })
           <div v-if="'severities' in kpi" class="kpi-severities" aria-label="按严重级别计数">
             <span v-for="[key, label] in severities" :key="key" class="mop-sev" :class="key">{{ label }} —</span>
           </div>
+          <p v-else-if="kpi.id === 'PENDING_TICKETS'" class="mop-kpi-detail kpi-parts"><span>已超 SLA <b :class="{ 'kpi-failed': (pending.current?.overdue_sla ?? pending.current?.known_overdue ?? 0) > 0 }">{{ pending.current?.overdue_sla ?? '未知' }}</b></span><span v-if="pending.current?.overdue_sla === null">已确认 {{ pending.current.known_overdue }} · 未知 {{ pending.current.unknown_sla }}</span></p>
           <p v-else-if="'parts' in kpi" class="mop-kpi-detail kpi-parts"><span v-for="[label, value] in kpi.parts" :key="label">{{ label }} <b>{{ value }}</b></span></p>
           <div class="kpi-foot">
             <span v-if="kpi.id === 'PENDING_TICKETS' && pending.current" class="mop-kpi-detail">{{ pendingNote }}</span>

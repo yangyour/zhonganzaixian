@@ -68,4 +68,40 @@ export function addDashboardPendingTicketsContract(contract) {
       200: { description: 'Versioned V2 projection; no browser time calculation or unknown-to-zero conversion',
         content: { 'application/json': { schema: ref('DashboardPendingTicketSlaResult') } } } }
   } };
+
+  // M1-6 is additive: legacy nonterminal consumers still include RESOLVED.
+  const actionableItem = structuredClone(slaItem);
+  actionableItem.allOf = [{ if: { properties: { workflow_model: { const: 'WORKFLOW_V33' } } },
+    then: { properties: { state: { enum: ['OPEN', 'ACCEPTED', 'IN_PROGRESS'] } } },
+    else: { properties: { state: { enum: ['NEW', 'IN_PROGRESS', 'WAITING_VENDOR', 'PENDING_CUSTOMER', 'REOPENED'] } } } }];
+  const actionable = object({ tenant_id: uuid, actor_id: uuid, permission_version: { ...count, minimum: 1 },
+    observed_at: time, scope: snapshot.properties.scope, source: { const: 'postgresql' },
+    metric_version: { const: 'MOP_ACTIONABLE_TICKETS_V1' }, projection_version: { const: 'MOP_ACTIONABLE_TICKETS_SLA_V1' },
+    excluded_states: { const: ['CLOSED', 'CANCELLED', 'RESOLVED'] }, registrations: count,
+    known_pending: count, excluded: count, unconfigured: count, pending_tickets: nullable(count),
+    overdue_sla: nullable(count), known_overdue: count, unknown_sla: count, evaluated_pending: count,
+    unevaluated_pending: { const: 0 }, evaluation_limit: { type: 'null' },
+    unavailable_reasons: { type: 'array', maxItems: 2, uniqueItems: true, items: { enum: [
+      'REGISTRATIONS_WITHOUT_WORKFLOW', 'SLA_INPUTS_OR_READER_UNAVAILABLE'] } },
+    item_limit: { type: 'integer', minimum: 1, maximum: 100 }, page: { ...count, minimum: 1 },
+    page_size: { type: 'integer', minimum: 1, maximum: 100 }, total_pages: count,
+    sort: snapshot.properties.sort, writes_performed: { const: false },
+    items: { type: 'array', maxItems: 100, items: actionableItem } });
+  actionable.allOf = structuredClone(enhanced.allOf);
+  actionable.description = 'Complete actionable population is evaluated in one read-only repeatable-read transaction. '
+    + 'No 100-ticket SLA truncation; time budget exhaustion returns 503. Unknown inputs keep totals null. '
+    + 'Pagination changes returned rows only; each HTTP request obtains a fresh snapshot.';
+  contract.components.schemas.DashboardActionableTickets = actionable;
+  contract.components.schemas.DashboardActionableTicketsResult = object({ data: ref('DashboardActionableTickets'), trace_id: text });
+  contract.paths['/dashboard/actionable-tickets'] = { get: {
+    ...contract.paths['/dashboard/pending-tickets'].get, operationId: 'readDashboardActionableTickets',
+    summary: '未关闭且未解决工单：同快照全量SLA计数、首页前五条及完整分页下钻',
+    'x-mop-allowed-query-keys': ['page', 'page_size'], 'x-mop-duplicate-query-keys': 'REJECT',
+    'x-mop-excluded-states': ['CLOSED', 'CANCELLED', 'RESOLVED'],
+    parameters: [{ name: 'page', in: 'query', required: false, schema: { ...count, minimum: 1, default: 1 } },
+      { name: 'page_size', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 100, default: 5 } }],
+    responses: { ...contract.paths['/dashboard/pending-tickets'].get.responses,
+      200: { description: 'All actionable SLA assessments and one complete page; page_size * page must be a safe integer',
+        content: { 'application/json': { schema: ref('DashboardActionableTicketsResult') } } } }
+  } };
 }

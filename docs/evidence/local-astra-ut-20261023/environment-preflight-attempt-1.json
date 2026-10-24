@@ -1,0 +1,10 @@
+{
+  "environment": "lan-test-20261008",
+  "status": "BLOCKED",
+  "business_writes": 0,
+  "migrations": 0,
+  "components_started": 0,
+  "stage": "SSH_CONNECT",
+  "failure_type": "SSHException",
+  "finished_at": "2026-10-24T01:40:47.641012+00:00"
+}

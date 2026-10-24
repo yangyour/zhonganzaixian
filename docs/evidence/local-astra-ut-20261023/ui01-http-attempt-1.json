@@ -1,0 +1,18 @@
+{
+  "environment": "lan-test-20261008",
+  "api_origin": "http://127.0.0.1:18217",
+  "status": "FAILED",
+  "business_writes": 0,
+  "migrations": 0,
+  "external_messages": 0,
+  "new_local_components": 0,
+  "local_application_candidate": true,
+  "full_readiness_claimed": false,
+  "checks": [],
+  "formal_tc": "NOT_RUN",
+  "jar_sha256": "3b19d30e8801aa59dfe00321485d0097ebf04a68be2f178744cf446944b8c460",
+  "failure_type": "RuntimeError",
+  "details": "private details withheld",
+  "candidate_stopped": true,
+  "finished_at": "2026-10-24T01:55:49.062047+00:00"
+}

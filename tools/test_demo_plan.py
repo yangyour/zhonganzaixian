@@ -10,7 +10,7 @@ class DemoPlanTest(unittest.TestCase):
     def config(self):return {'version':1,'namespace_id':'79000000-0000-4000-8000-000000000090','username':'demo','anchor_time':'2026-10-22T12:00:00Z','deployment_mode':'dedicated'}
     def test_golden_is_reproducible(self):self.assertEqual(demo.prepare(self.config()),demo.read_json(demo.ROOT/'fixtures/demo-preparation-golden.json'))
     def test_pages_and_permission_union_are_not_runtime_acceptance(self):
-        p=demo.prepare(self.config());self.assertEqual(43,p['coverage']['pages_declared']);self.assertEqual(48,p['coverage']['capability_union_count']);self.assertEqual(0,p['coverage']['pages_accepted']);self.assertFalse(p['coverage']['all_functions_ready']);self.assertTrue(all(f['acceptance_status']=='NOT_RUN' and not f['data_initialized'] and not f['interaction_verified'] for f in p['features']))
+        p=demo.prepare(self.config());self.assertEqual(44,p['coverage']['pages_declared']);self.assertEqual(48,p['coverage']['capability_union_count']);self.assertEqual(0,p['coverage']['pages_accepted']);self.assertFalse(p['coverage']['all_functions_ready']);self.assertTrue(all(f['acceptance_status']=='NOT_RUN' and not f['data_initialized'] and not f['interaction_verified'] for f in p['features']))
     def test_no_credentials_accounts_or_grants_are_created(self):
         p=demo.prepare(self.config())
         for key in ['account_created','credentials_created','permissions_granted','business_data_written','outbound_enabled']:self.assertIs(False,p[key])

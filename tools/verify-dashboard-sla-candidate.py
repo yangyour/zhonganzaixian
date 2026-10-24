@@ -34,20 +34,22 @@ def require(condition, message):
         raise RuntimeError(message)
 
 
-def verify(output: Path, hold: bool = False):
+def verify(output: Path, hold: bool = False, actionable: bool = False, port: int = PORT, artifact: Path | None = None):
     output.mkdir(parents=True, exist_ok=False)
-    marker = {'session': 'reports', 'operation': 'R03-SLA-candidate-http', 'token': str(uuid.uuid4())}
+    marker = {'session': 'local-astra-ut' if actionable else 'reports',
+              'operation': 'UI01-actionable-candidate-http' if actionable else 'R03-SLA-candidate-http',
+              'token': str(uuid.uuid4())}
     with LOCK.open('x', encoding='utf-8') as stream:
         json.dump(marker, stream)
     ssh = paramiko.SSHClient()
     tunnel = process = log = None
-    result = {'environment': 'lan-test-20261008', 'api_origin': f'http://127.0.0.1:{PORT}',
+    result = {'environment': 'lan-test-20261008', 'api_origin': f'http://127.0.0.1:{port}',
               'status': 'NOT_RUN', 'business_writes': 0, 'migrations': 0, 'external_messages': 0,
               'new_local_components': 0, 'local_application_candidate': True,
               'full_readiness_claimed': False, 'checks': [], 'formal_tc': 'NOT_RUN'}
     try:
         with socket.socket() as probe:
-            probe.bind(('127.0.0.1', PORT))
+            probe.bind(('127.0.0.1', port))
         connection = json.loads((PRIVATE / 'lan-test-connection.json').read_text(encoding='utf-8-sig'))
         runtime = json.loads((PRIVATE / 'lan-test-runtime.json').read_text(encoding='utf-8-sig'))
         demo = json.loads((PRIVATE / 'demo-full-20261023.json').read_text(encoding='utf-8-sig'))
@@ -74,14 +76,14 @@ def verify(output: Path, hold: bool = False):
         tunnel = module.Server(('127.0.0.1', 0), module.handler(transport, False))
         threading.Thread(target=tunnel.serve_forever, daemon=True).start()
         env = {key: value for key, value in os.environ.items() if not key.startswith(('MOP_', 'SPRING_', 'OBJECT_STORAGE_'))}
-        env.update({'SERVER_ADDRESS': '127.0.0.1', 'SERVER_PORT': str(PORT), 'SPRING_PROFILES_ACTIVE': 'remote_test',
+        env.update({'SERVER_ADDRESS': '127.0.0.1', 'SERVER_PORT': str(port), 'SPRING_PROFILES_ACTIVE': 'remote_test',
                     'SPRING_DATASOURCE_URL': f'jdbc:postgresql://127.0.0.1:{tunnel.server_address[1]}/mop_test',
                     'SPRING_DATASOURCE_USERNAME': 'mop_test_runtime', 'SPRING_DATASOURCE_PASSWORD': runtime['runtime_password'],
                     'MOP_AUTH_MODE': 'project_local', 'MOP_AUTH_COMMAND_KEY': runtime['auth_command_key'],
                     'MOP_TICKET_LIFECYCLE_ENABLED': 'false', 'MOP_WECOM_ENABLED': 'false', 'MOP_EMAIL_ENABLED': 'false',
                     'MOP_WECOM_DISPATCH_ENABLED': 'false', 'MOP_EMAIL_DISPATCH_ENABLED': 'false',
                     'MOP_OIDC_ENABLED': 'false', 'MOP_DEMO_CHANNEL_TENANT_IDS': ','.join(sorted(tenants))})
-        jar = ROOT / 'server/api/target/mop-api-0.1.0-SNAPSHOT.jar'
+        jar = artifact.resolve() if artifact is not None else ROOT / 'server/api/target/mop-api-0.1.0-SNAPSHOT.jar'
         require(jar.is_file(), 'Build the candidate API jar first')
         result['jar_sha256'] = hashlib.sha256(jar.read_bytes()).hexdigest()
         log = (output / 'api.log').open('w', encoding='utf-8')
@@ -101,6 +103,10 @@ def verify(output: Path, hold: bool = False):
         denied = requests.get(origin + '/api/v1/dashboard/pending-tickets/sla', timeout=10)
         require(denied.status_code == 401 and 'data' not in denied.json(), 'Anonymous SLA data leaked')
         result['anonymous_read_denied'] = True
+        if actionable:
+            denied = requests.get(origin + '/api/v1/dashboard/actionable-tickets', timeout=10)
+            require(denied.status_code == 401 and 'data' not in denied.json(), 'Anonymous actionable data leaked')
+            result['anonymous_actionable_read_denied'] = True
         for role in ('padmin', 'msp', 'tadmin'):
             http = requests.Session()
             csrf = None
@@ -144,11 +150,43 @@ def verify(output: Path, hold: bool = False):
             result['checks'].append({'role': role, 'scope': v2['scope'], 'visible_items': len(v2['items']),
                                      'known_pending': v2['known_pending'], 'known_overdue': v2['known_overdue'],
                                      'unknown_sla': v2['unknown_sla'], 'overdue_sla': v2['overdue_sla'], 'status': 'PASSED'})
+            if actionable:
+                current = call('/dashboard/actionable-tickets')
+                require(current['metric_version'] == 'MOP_ACTIONABLE_TICKETS_V1'
+                        and current['projection_version'] == 'MOP_ACTIONABLE_TICKETS_SLA_V1', 'Wrong actionable projection')
+                require(current['tenant_id'] == tenant and current['actor_id'] == session['user']['id']
+                        and current['permission_version'] == session['permission_version'], 'Actionable authorization mismatch')
+                require(current['registrations'] == v1['registrations']
+                        and current['known_pending'] + current['excluded'] + current['unconfigured'] == current['registrations'],
+                        'Actionable population mismatch')
+                require(current['known_pending'] == current['evaluated_pending']
+                        and current['unevaluated_pending'] == 0 and current['evaluation_limit'] is None, 'Truncated SLA total')
+                require(current['overdue_sla'] is None if current['unknown_sla'] else current['overdue_sla'] == current['known_overdue'],
+                        'Unknown actionable SLA converted to zero')
+                full = call('/dashboard/actionable-tickets?page=1&page_size=100')
+                require(full['known_pending'] == current['known_pending']
+                        and [(row['ticket_id'], row['version'], row['state']) for row in full['items'][:5]]
+                        == [(row['ticket_id'], row['version'], row['state']) for row in current['items']],
+                        'Homepage and list differ')
+                require(full['known_pending'] <= 100, 'Existing DEMO changed; extend explicit page verification')
+                require(len(full['items']) == full['known_pending'], 'Incomplete actionable page')
+                for row in full['items']:
+                    require(row['state'] not in ('CLOSED', 'CANCELLED', 'RESOLVED')
+                            and row['version'] == row['sla_version'], 'Resolved or mixed-version row')
+                # Even a valid authenticated session cannot override tenant, time, status, or duplicate query keys.
+                for query in ('tenant_id=' + tenant, 'page=0', 'page_size=101', 'page=1&page=2', 'state=RESOLVED'):
+                    bad = http.get(origin + '/api/v1/dashboard/actionable-tickets?' + query, timeout=15)
+                    require(bad.status_code == 400 and 'data' not in bad.json(), 'Unsafe query accepted')
+                result['checks'].append({'role': role, 'projection': 'actionable', 'scope': current['scope'],
+                                         'registrations': current['registrations'], 'known_pending': current['known_pending'],
+                                         'excluded': current['excluded'], 'overdue_sla': current['overdue_sla'],
+                                         'unknown_sla': current['unknown_sla'], 'homepage_matches_full_page': True,
+                                         'invalid_queries_rejected': 5, 'status': 'PASSED'})
             http.close()
         result['status'] = 'PASSED'
         if hold:
             print(json.dumps({'candidate_ready': True, 'origin': origin, 'environment_lock_held': True}), flush=True)
-            while process.poll() is None:
+            while process.poll() is None and not (output / 'stop').exists():
                 time.sleep(1)
     except Exception as failure:
         result.update(status='FAILED', failure_type=type(failure).__name__, details='private details withheld')
@@ -179,5 +217,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--hold', action='store_true', help='Keep this local candidate and its environment lock until Ctrl+C')
+    parser.add_argument('--actionable', action='store_true', help='Also verify the additive full-population M1-6 projection')
+    parser.add_argument('--port', type=int, default=PORT)
+    parser.add_argument('--jar', type=Path, help='Explicit locally built candidate artifact; does not deploy it')
     args = parser.parse_args()
-    raise SystemExit(verify(args.output.resolve(), args.hold))
+    raise SystemExit(verify(args.output.resolve(), args.hold, args.actionable, args.port, args.jar))

@@ -44,20 +44,26 @@ class NotificationRoutingPostgresTest {
     private static PostgresPlatformRepository platform;
     private static UUID tenant, foreignTenant, actor, receiver, draftId, requestId, bindingId, poolId;
     private static long draftVersion;
+    private static NotificationRetainedSchemaVerification retainedSchema;
 
     @BeforeAll
     static void initializeIsolatedDatabase() throws Exception {
         String url = System.getenv("SPRING_DATASOURCE_URL");
+        assertNotNull(url);
         assertTrue(url.matches("jdbc:postgresql://127\\.0\\.0\\.1:[0-9]+/mop_notification_test_[a-f0-9]{12}"));
         NotificationControlSchemaVerifier.resource();
-        var flyway = Flyway.configure().dataSource(url, "mop_test_migrator", System.getenv("MOP_MIGRATION_PASSWORD"))
-                .locations("classpath:db/migration").schemas("public").defaultSchema("public").createSchemas(false)
-                .cleanDisabled(true).baselineOnMigrate(false).outOfOrder(false).target("51").load();
-        assertEquals(1, flyway.migrate().migrationsExecuted);
-        assertEquals(0, flyway.migrate().migrationsExecuted);
-        flyway.validate();
-        try (var connection = java.sql.DriverManager.getConnection(url, "mop_test_migrator", System.getenv("MOP_MIGRATION_PASSWORD"))) {
-            NotificationControlSchemaVerifier.verify(connection);
+        retainedSchema = NotificationRetainedSchemaVerification.inspectIfRequested(url);
+        if (retainedSchema == null) {
+            // Default fresh-database mode retains its original apply/repeat assertions in full.
+            var flyway = Flyway.configure().dataSource(url, "mop_test_migrator", System.getenv("MOP_MIGRATION_PASSWORD"))
+                    .locations("classpath:db/migration").schemas("public").defaultSchema("public").createSchemas(false)
+                    .cleanDisabled(true).baselineOnMigrate(false).outOfOrder(false).target("51").load();
+            assertEquals(1, flyway.migrate().migrationsExecuted);
+            assertEquals(0, flyway.migrate().migrationsExecuted);
+            flyway.validate();
+            try (var connection = java.sql.DriverManager.getConnection(url, "mop_test_migrator", System.getenv("MOP_MIGRATION_PASSWORD"))) {
+                NotificationControlSchemaVerifier.verify(connection);
+            }
         }
         var config = new HikariConfig();
         config.setJdbcUrl(url);
@@ -72,11 +78,17 @@ class NotificationRoutingPostgresTest {
         receiver = id("MOP_NOTIFICATION_TEST_RECEIVER");
         poolId = UUID.randomUUID();
         assertNotEquals(UUID.fromString("55000000-0000-4000-8000-000000000001"), tenant);
-        try (var connection = source.getConnection(); var query = connection.prepareStatement("SELECT name FROM public.mop_tenant WHERE id=?")) {
-            query.setObject(1, tenant);
-            try (var row = query.executeQuery()) {
-                assertTrue(row.next());
-                assertEquals("SYNTHETIC_NOTIFICATION_" + tenant, row.getString(1));
+        if (retainedSchema != null) {
+            verifyFreshSyntheticScope();
+        } else {
+            // Preserve the original fresh runner's fixture premise; retained reuse has stricter independent gates.
+            try (var connection = source.getConnection();
+                 var query = connection.prepareStatement("SELECT name FROM public.mop_tenant WHERE id=?")) {
+                query.setObject(1, tenant);
+                try (var row = query.executeQuery()) {
+                    assertTrue(row.next());
+                    assertEquals("SYNTHETIC_NOTIFICATION_" + tenant, row.getString(1));
+                }
             }
         }
         store = new NotificationControlStore(source, MAPPER);
@@ -88,9 +100,68 @@ class NotificationRoutingPostgresTest {
     }
 
     @AfterAll
-    static void close() {
-        if (source != null) {
-            source.close();
+    static void close() throws Exception {
+        try {
+            if (source != null) {
+                source.close();
+            }
+        } finally {
+            if (retainedSchema != null) {
+                retainedSchema.finish(source == null || source.isClosed());
+            }
+        }
+    }
+
+    /** Retained reuse requires this run's new credential-free principals and empty tenant-local routing journal. */
+    private static void verifyFreshSyntheticScope() throws Exception {
+        assertNotEquals(tenant, foreignTenant);
+        assertNotEquals(actor, receiver);
+        try (var connection = source.getConnection()) {
+            try (var query = connection.prepareStatement("SELECT current_user,session_user,current_database()")) {
+                try (var row = query.executeQuery()) {
+                    assertTrue(row.next());
+                    assertEquals("mop_test_runtime", row.getString(1));
+                    assertEquals("mop_test_runtime", row.getString(2));
+                    assertTrue(row.getString(3).matches("mop_notification_test_[a-f0-9]{12}"));
+                }
+            }
+            for (UUID scope : List.of(tenant, foreignTenant)) {
+                assertFalse(scope.toString().startsWith("55000000-"));
+                try (var query = connection.prepareStatement("SELECT name FROM public.mop_tenant WHERE id=?")) {
+                    query.setObject(1, scope);
+                    try (var row = query.executeQuery()) {
+                        assertTrue(row.next());
+                        assertEquals("SYNTHETIC_NOTIFICATION_" + scope, row.getString(1));
+                    }
+                }
+                try (var query = connection.prepareStatement("SELECT count(*) FROM public.mop_notification_control WHERE tenant_id=?")) {
+                    query.setObject(1, scope);
+                    try (var row = query.executeQuery()) {
+                        assertTrue(row.next());
+                        assertEquals(0, row.getLong(1));
+                    }
+                }
+            }
+            for (UUID user : List.of(actor, receiver)) {
+                try (var query = connection.prepareStatement("SELECT identity_source,subject,active,"
+                        + "EXISTS(SELECT 1 FROM public.mop_local_account WHERE user_id=u.id),"
+                        + "EXISTS(SELECT 1 FROM public.mop_external_identity_binding WHERE user_id=u.id),"
+                        + "EXISTS(SELECT 1 FROM public.mop_membership WHERE user_id=u.id AND tenant_id NOT IN (?,?)) "
+                        + "FROM public.mop_user u WHERE id=?")) {
+                    query.setObject(1, tenant);
+                    query.setObject(2, foreignTenant);
+                    query.setObject(3, user);
+                    try (var row = query.executeQuery()) {
+                        assertTrue(row.next());
+                        assertEquals("isolated_notification_routing", row.getString(1));
+                        assertEquals("SYNTHETIC_NOTIFICATION_" + user, row.getString(2));
+                        assertTrue(row.getBoolean(3));
+                        assertFalse(row.getBoolean(4));
+                        assertFalse(row.getBoolean(5));
+                        assertFalse(row.getBoolean(6));
+                    }
+                }
+            }
         }
     }
 

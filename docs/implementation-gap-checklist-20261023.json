@@ -405,7 +405,9 @@
         "docs/designated-candidate-schema-chain-20261023.md",
         "docs/evidence/local-astra-ut-20261023/schema-chain/summary.json",
         "docs/notification-routing-return-scope-20261023.md",
-        "docs/evidence/local-astra-ut-20261023/upstream-batch/return-guards.json"
+        "docs/evidence/local-astra-ut-20261023/upstream-batch/return-guards.json",
+        "docs/notification-routing-retained-business-20261024.md",
+        "docs/evidence/local-astra-ut-20261023/n01-retained-business/summary.json"
       ],
       "commits": [
         "f69fa0dd",
@@ -418,13 +420,14 @@
         "Complete actual dispatch, authenticated receipts, controlled retry and dead-letter API/UI",
         "Formal contract acceptance",
         "Supplier dispatch/verified receipts/dead-letter manual workflow and remaining portal wiring",
-        "Retained V51 database business/worker and real browser verification; previous private/network blockage resolved, schema-only success does not verify business"
+        "Real HTTP/browser routing/preference interaction and continuous scheduler lifecycle; supplier sends/authenticated receipts remain separate"
       ],
       "completed_subitems": [
         "Restored immutable V51 routing/preference controls and actual API/page/explicit worker wiring, keeping external dispatch disabled",
         "Explicit-scope V50 local delivery journal listing, full-chain verification, immutable history and original-command read-only recovery, actual API/notification workspace and context revocation tests; delivered declarations remain unverified and no resend is authorized.",
         "V51 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50",
-        "Six routing GET paths recheck current account/session/membership before releasing results; 54 targeted authorization tests passed"
+        "Six routing GET paths recheck current account/session/membership before releasing results; 54 targeted authorization tests passed",
+        "Six real designated retained-V51 PG business checks passed: idempotent durable discovery/routing, explicit publication and synthetic verified binding, preference withdrawal, concurrent CAS/original command, revocation and immutable history; no migrations or external dispatch"
       ],
       "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
@@ -447,7 +450,9 @@
       "evidence": [
         "docs/notification-routing-continuation-20261023.md",
         "docs/designated-candidate-schema-chain-20261023.md",
-        "docs/evidence/local-astra-ut-20261023/schema-chain/summary.json"
+        "docs/evidence/local-astra-ut-20261023/schema-chain/summary.json",
+        "docs/notification-routing-retained-business-20261024.md",
+        "docs/evidence/local-astra-ut-20261023/n01-retained-business/summary.json"
       ],
       "commits": [
         "25a17013",
@@ -455,12 +460,13 @@
       ],
       "completed_subitems": [
         "Restored immutable V51 routing/preference controls and actual API/page/explicit worker wiring, keeping external dispatch disabled",
-        "V51 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50"
+        "V51 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50",
+        "Six real designated retained-V51 PG business checks passed: idempotent durable discovery/routing, explicit publication and synthetic verified binding, preference withdrawal, concurrent CAS/original command, revocation and immutable history; no migrations or external dispatch"
       ],
       "remaining_subitems": [
         "Supplier dispatch/verified receipts/dead-letter manual workflow and remaining portal wiring",
         "Formal contract acceptance",
-        "Retained V51 database business/worker and real browser verification; previous private/network blockage resolved, schema-only success does not verify business"
+        "Real HTTP/browser routing/preference interaction and continuous scheduler lifecycle; supplier sends/authenticated receipts remain separate"
       ],
       "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
@@ -2293,7 +2299,7 @@
       "P01 diagnostic matrix": "71bc7a95",
       "A05 same-ID tenant and wire regression": "df92a03d"
     },
-    "remaining": "See each task; retained N01/R02 business checks in preparation are not marked passed"
+    "remaining": "See each task; N01 retained PG business checks now separately evidenced, R02 business/rendering checks are still in preparation"
   },
   "reviewed_main_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
 }

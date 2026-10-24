@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "status": "PASSED",
+  "run_id": "9bbe984ae0ed49719dcdd9c5657eeecc",
+  "environment": "lan-test-20261008",
+  "schema_mode": "PREAPPLIED_V51",
+  "database": "mop_notification_test_59ca183a056d",
+  "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:N01:e8275c231eaa4f6e896ad4135a7d144e",
+  "source_summary": ".local\\candidate-schema-chain-attempt-1\\summary.json",
+  "source_summary_sha256": "0295ff4b9ec23441ebb28b9a839458efa24d90fa5ed5baad1c16a949f894b1a7",
+  "schema_migrations": 0,
+  "database_created": false,
+  "database_removed": false,
+  "records_deleted": 0,
+  "actual_tenant_written": false,
+  "external_messages": 0,
+  "production_approved": false,
+  "synthetic_tenants": [
+    "e32bf7a9-dca0-4e00-8868-becefcde034f",
+    "88b293a9-844d-411e-9eb9-31526d2b00d2"
+  ],
+  "synthetic_actors": [
+    "670d8dca-77cd-4154-b961-e661b0916e84",
+    "9d6d4b52-46ed-480e-b2f5-4df78d41adfb"
+  ],
+  "started_at": "2026-10-24T04:03:41.562718+00:00",
+  "business_validation": {
+    "status": "PASSED",
+    "test_count": 6,
+    "scope": "SYNTHETIC_ISOLATED_DURABLE_ROUTING_NO_EXTERNAL_DISPATCH",
+    "limitations": [
+      "NO_REAL_PROVIDER_SEND_OR_DELIVERY_ACCEPTANCE",
+      "SYNTHETIC_POLICY_AND_VERIFIED_BINDING_FIXTURES",
+      "NO_CUSTOMER_PRODUCTION_APPROVAL"
+    ]
+  },
+  "retained_metadata_before": {
+    "history_sha256": "5f5438da50ca8d69893deb1edff5cd1f485096313c58dea6f175cc31520807c3",
+    "canonical_history_sha256": "34dd1a5629b46bb8b3e044226dea14cf7d269b6939a29acc87ff3796be6a6d58",
+    "capabilities_sha256": "2b0cc4459a86b81c0bf26937ae4acfb0d30cba5f26070c00efbf3c16a96307d4",
+    "v51_checksum": -930297811,
+    "v51_installed_on": "2026-10-23T23:24:34.839676",
+    "history_rows": 51
+  },
+  "active_history_before_sha256": "6fa366487907d87627afb9775740ee68b5d671acb91f829c533f2b1ce2509a69",
+  "active_protected_before": {
+    "mop_inspection_source_collection": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_source_collection_item": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_quarterly_report": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_worksheet": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_worksheet_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_membership": {
+      "count": 1,
+      "md5": "440ffbc5f7524eea75de6adf6212b2e3"
+    },
+    "mop_asset": {
+      "count": 4,
+      "md5": "6fd9eac57b972735155dbe38fde8511c"
+    },
+    "mop_ticket": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_ticket_workflow_event": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_ticket_lifecycle_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_asset_manual_details": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_asset_manual_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    }
+  },
+  "java_started": true,
+  "java_process_completed": true,
+  "test_class": "NotificationRoutingPostgresTest",
+  "maven_exit_code": 0,
+  "junit": {
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "java_schema_evidence": {
+    "schema_mode": "PREAPPLIED_V51",
+    "database": "mop_notification_test_59ca183a056d",
+    "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:N01:e8275c231eaa4f6e896ad4135a7d144e",
+    "migration_calls": 0,
+    "schema_mutations": 0,
+    "v51_resource_sha256": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b",
+    "history_before": {
+      "v51_checksum": -930297811,
+      "sha256": "34dd1a5629b46bb8b3e044226dea14cf7d269b6939a29acc87ff3796be6a6d58",
+      "v51_installed_on": "2026-10-23 23:24:34.839676",
+      "rows": 51
+    },
+    "history_after": {
+      "v51_checksum": -930297811,
+      "sha256": "34dd1a5629b46bb8b3e044226dea14cf7d269b6939a29acc87ff3796be6a6d58",
+      "v51_installed_on": "2026-10-23 23:24:34.839676",
+      "rows": 51
+    },
+    "history_unchanged": true,
+    "status": "PASSED",
+    "pools_closed": true
+  },
+  "java_lifecycle_confirmed_closed": true,
+  "connections_before_actor_cleanup": 0,
+  "actor_cleanup": {
+    "status": "DEACTIVATED",
+    "users_changed": 2,
+    "memberships_changed": 4,
+    "records_deleted": 0,
+    "database_removed": false
+  },
+  "retained_metadata_after": {
+    "history_sha256": "5f5438da50ca8d69893deb1edff5cd1f485096313c58dea6f175cc31520807c3",
+    "canonical_history_sha256": "34dd1a5629b46bb8b3e044226dea14cf7d269b6939a29acc87ff3796be6a6d58",
+    "capabilities_sha256": "2b0cc4459a86b81c0bf26937ae4acfb0d30cba5f26070c00efbf3c16a96307d4",
+    "v51_checksum": -930297811,
+    "v51_installed_on": "2026-10-23T23:24:34.839676",
+    "history_rows": 51
+  },
+  "retained_metadata_unchanged": true,
+  "prior_retained_scope_unchanged": true,
+  "active_history_unchanged": true,
+  "active_capabilities_unchanged": true,
+  "active_protected_unchanged": true,
+  "active_protected_after": {
+    "mop_inspection_source_collection": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_source_collection_item": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_quarterly_report": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_worksheet": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_worksheet_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_membership": {
+      "count": 1,
+      "md5": "440ffbc5f7524eea75de6adf6212b2e3"
+    },
+    "mop_asset": {
+      "count": 4,
+      "md5": "6fd9eac57b972735155dbe38fde8511c"
+    },
+    "mop_ticket": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_ticket_workflow_event": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_ticket_lifecycle_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_asset_manual_details": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_asset_manual_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    }
+  },
+  "retained_database_open_connections": 0,
+  "source_summary_unchanged": true,
+  "v51_resource_unchanged": true,
+  "finished_at": "2026-10-24T04:04:31.239029+00:00",
+  "environment_lock_released": true,
+  "test_cases": [
+    "durableDiscoveryIsIdempotentAndMissingPolicyDoesNotBecomeAnEmptySuccessfulSend",
+    "explicitPublicationAndVerifiedBindingProduceOneScopedDurableRoute",
+    "repeatedSchedulerAndPreferenceWithdrawalDoNotDuplicateOrKeepStaleQueuedRoutes",
+    "concurrentPolicyWritesHaveOneWinnerAndOriginalCommandsRemainRecoverable",
+    "revokedMembershipAndOldPermissionVersionCannotReadOrReplay",
+    "runtimeCannotRewriteOrDeleteControlHistory"
+  ],
+  "execution_source": {
+    "base_commit": "32163c0ff7c0908df10abb10dbb0f29efada2823",
+    "validation_overlay_sha256": {
+      "tools/verify-notification-routing-retained.py": "07aee511a7958d25674cf426be11271d68681dba85d0babe41c391e9c9a04b84",
+      "server/worker/src/test/java/cn/mop/persistence/NotificationRoutingPostgresTest.java": "e334b34795c802b35ebd5cff8adbfbdbb758f06a444c974347e59352b037264e",
+      "server/worker/src/test/java/cn/mop/persistence/NotificationRetainedSchemaVerification.java": "efb3f2b1f5235dbe98f9977dada8d0f8abb485ec7df7f91f5bb12caaab9e3ed8"
+    }
+  },
+  "postgresql_version_reference": {
+    "version": "17.9 (Debian 17.9-1.pgdg12+1)",
+    "source": "docs/evidence/local-astra-ut-20261023/schema-chain/summary.json",
+    "note": "Same designated instance; runner queried active version but did not serialize that value in this attempt. Version reference is the earlier same-instance schema-chain observation."
+  },
+  "formal_contract_acceptance": "NOT_RUN"
+}

@@ -21,7 +21,8 @@
         "docs/evidence/local-astra-ut-20261023/ui01-validation.json"
       ],
       "commits": [
-        "f90acc97"
+        "f90acc97",
+        "4e034a71"
       ],
       "completed_subitems": [
         "Shared authorized V1 snapshot, numeric zero/nonzero and partial-coverage semantics",

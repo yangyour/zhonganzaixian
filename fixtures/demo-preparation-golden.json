@@ -5,11 +5,11 @@
   "namespace_id": "79000000-0000-4000-8000-000000000090",
   "username": "demo",
   "anchor_time": "2026-10-22T12:00:00Z",
-  "catalog_sha256": "2400dd8eb416e68079d42996b2a2e99518c970ba521a85e056a63813733d09e1",
+  "catalog_sha256": "313fff50559249c5651c762825b003e30d84c75c9a0ad4357a5008ee5c9bbfc2",
   "source_sha256": {
     "apps/web/src/router.ts": "170299ac467972db389013a78a5138c8b995a7a7b8ef662053888952cb0050dd",
     "server/domain/src/main/java/cn/mop/domain/Capabilities.java": "6f97ea30fd15e067db3eb6fe72d55c2dedf12a07b5e09678164384c04b366d1f",
-    "contracts/local-api.openapi.json": "d22f201e2b8d17e6bc62db9d277340e9d893c690bc02d4db8a3cfbfd58036d37"
+    "contracts/local-api.openapi.json": "838233be4d640e7f3b124447b76af75e6edae27a945492a63b795bd81592ccd2"
   },
   "contexts": [
     {
@@ -2202,5 +2202,5 @@
     "ADVANCED_SCENARIOS_NOT_INITIALIZED",
     "GLOBAL_POLICY_SCOPE_UNRESOLVED"
   ],
-  "plan_sha256": "5827ae7db422b83f931050b51c93212027251a7597240608895fe2da4a37250b"
+  "plan_sha256": "f2591da1ebcab7dca43f75d7caf138e36841595237de34eda24fe604cf530a94"
 }

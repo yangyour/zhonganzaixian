@@ -1,0 +1,19 @@
+{
+  "status": "SEMANTICALLY_EQUIVALENT_COMPACT_GENERATED_ARTIFACT",
+  "base_main": "6ca0569ae9a1091185082e3689a75f3b09a23409",
+  "paths": 236,
+  "schemas": 455,
+  "before_bytes": 2592862,
+  "after_bytes": 1265021,
+  "before_sha256": "7944350a655e9cbf52ad6fcafbbfce9d225bc39c5c96fe49e7d560d1ba07ed62",
+  "after_sha256": "dbc9c7d47bef9d855704cb0cdb84c8a9bcda68235aa6c347e644872217bb5b8d",
+  "uploaded_git_blob": "e92c57f889d8299904ce7d4220c8c5a2d87bb98b",
+  "json_deep_equality": true,
+  "node_contracts": 235,
+  "demo_plan_tests": 18,
+  "generator_check": "PASSED",
+  "remote_ci": "NOT_RUN",
+  "business_logic_changed": false,
+  "migrations_applied": 0,
+  "deployed": false
+}

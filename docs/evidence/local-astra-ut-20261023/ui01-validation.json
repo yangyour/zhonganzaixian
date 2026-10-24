@@ -119,5 +119,8 @@
     "Formal SLA policies and contract acceptance",
     "Production performance qualification"
   ],
-  "finished_at": "2026-10-24T02:00:51.393838+00:00"
+  "finished_at": "2026-10-24T02:00:51.393838+00:00",
+  "feature_commit": "4e034a71",
+  "integrated_upstream": "f5fc7637",
+  "generated_contract_format": "compact_json_preserved"
 }

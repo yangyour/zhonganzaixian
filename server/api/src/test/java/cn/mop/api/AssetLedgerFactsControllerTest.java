@@ -155,6 +155,23 @@ class AssetLedgerFactsControllerTest {
         assertTrue(json.get("items").get(0).get("metadata_recorded_at").isNull());
     }
 
+    @Test
+    void recordedOwnerAndTimePreservePublicWireNames() {
+        var recorded = Instant.parse("2026-10-22T23:59:59.999Z");
+        when(facts.read(any(), any())).thenReturn(new AssetLedgerFactsRepository.Snapshot(TENANT,
+                Instant.parse("2026-10-23T00:00:00Z"), List.of(new AssetLedgerFactsRepository.Facts(
+                        ASSET, 2, "site-a", "Synthetic site", 2L, recorded, "MANUAL_DECLARATION",
+                        "Synthetic declaration",
+                        new AssetLedgerFactsRepository.Owner(ACTOR, "Synthetic owner", "INACTIVE")))));
+        var json = new com.fasterxml.jackson.databind.ObjectMapper()
+                .valueToTree(controller.read(request(), new MockHttpServletResponse())).get("data");
+        assertEquals(recorded.toString(), json.get("items").get(0).get("metadata_recorded_at").asText());
+        assertEquals("Synthetic owner",
+                json.get("items").get(0).get("owner").get("display_name").asText());
+        assertFalse(json.get("items").get(0).get("owner").has("displayName"));
+        assertEquals("INACTIVE", json.get("items").get(0).get("owner").get("status").asText());
+    }
+
     @Test void malformedIdentityAndSelectionsAreRejectedBeforeRepositoryRead() {
         for(String ids:List.of("bad", ASSET+","+ASSET, ASSET+",", "")) {
             var r=request();r.setParameter("ids",ids);

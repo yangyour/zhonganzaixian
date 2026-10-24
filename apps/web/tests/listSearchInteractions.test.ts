@@ -8,14 +8,6 @@ import ElementPlus from 'element-plus'
 import type { Asset, AssetPage, Session } from '../src/api/types'
 import { context, page as ticketPage, ticket } from './ticketReader.fixture'
 
-// This suite asserts primary list-query dispatch; the independent public-facts batch is
-// exercised with the actual reader and page in assetLedgerFacts / assetsLedgerFactsPage.
-vi.mock('../src/utils/assetLedgerFacts', async () => {
-  const { ref } = await import('vue')
-  return { useAssetLedgerFacts: () => ({ items: ref({}), stale: ref([]), observedAt: ref(null), cancelled: ref(false),
-    error: ref(null), busy: ref(false), refresh: vi.fn(), cancel: vi.fn(), dispose: vi.fn(), find: () => null }) }
-})
-
 vi.mock('../src/components/AppTable.vue', () => ({ default: {
   props: ['rows', 'loading', 'error', 'emptyText'],
   setup: (props: { rows: object[]; loading: boolean; error: unknown; emptyText: string }, { slots }: { slots: Record<string, (() => unknown) | undefined> }) =>

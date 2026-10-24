@@ -78,7 +78,7 @@ export function useAssetLedgerFacts(assets: () => readonly Asset[], enabled: () 
   function cancel() { clear(); cancelled.value = true }
   const stop = watch(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id,
     session.value?.user.role, session.value?.mode, session.value?.permission_version, session.value?.account_version, session.value?.capabilities, permitted.value,
-    assets().map(a => [a.id, a.version, a.site_id, a.name, a.type, a.management_ip, a.source])]), () => { clear(); void refresh() }, { immediate: true, flush: 'sync' })
+    assets().map(a => [a.id, a.version, a.site_id, a.tenant_id, a.name, a.type, a.management_ip, a.source])]), () => { clear(); void refresh() }, { immediate: true, flush: 'sync' })
   function dispose() { disposed = true; stop(); clear() }
   function find(asset: Asset) {
     const value = items.value[asset.id]

@@ -1,5 +1,7 @@
 # A05 资产登记资料批量读取
 
+2026-10-23后续远端去重：云端批次`25a17013`及合并`e8362fd6`已进入main。复用其显式snake_case响应及列表请求分流，保留本地核心漂移、精确时间和返回授权修复。补齐同ID资产的`tenant_id`变更监听，使旧公开资料同步清空；新增有记录时间和停用负责人序列化回归。51项前端定向测试、18项API控制器测试通过，0失败/跳过。此为既有A05的隔离与协议回归，不重复计算为新功能或新一轮真实PG验收；原分层证据仍按下文的运行时点保存。
+
 本轮从已审阅WIP `3b219461`逐文件恢复公开资料读取，不整体覆盖主干。规范仓库`yangyour/zhonganzaixian`，独立检出`E:\work\wxw9\zhonganzaixian\.parallel\local-astra-ut-20261023`，分支`codex/local-astra-ut-a05-20261023`，起点`d53697df`。用户要求再次核对最新推送后，已fetch全部60个远端引用，六份WIP均未更新，未发现重复实现；见[去重记录](evidence/local-astra-ut-20261023/remote-dedup-check.json)。
 
 ## 功能与API

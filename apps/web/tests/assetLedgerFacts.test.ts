@@ -148,3 +148,9 @@ it('does not expose an old successful batch after future metadata or stale asset
   request.mockResolvedValueOnce(stale); expect(await flow.refresh()).toBe(true)
   expect(flow.find(asset)).toBeNull(); expect(flow.stale.value).toEqual([id])
 })
+it('same-id foreign tenant replacement immediately removes public facts', async () => {
+  const flow = open(); await settle(); expect(flow.find(asset)).not.toBeNull()
+  assets.value = [{ ...asset, tenant_id: actor }]
+  await settle(); expect(flow.find(assets.value[0]!)).toBeNull(); expect(flow.items.value).toEqual({})
+  expect(flow.error.value).not.toBeNull()
+})

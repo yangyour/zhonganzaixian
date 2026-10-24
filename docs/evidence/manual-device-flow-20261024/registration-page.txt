@@ -1,0 +1,162 @@
+Browser tab: 2, Title: "监控接入配置 · MOP", URL: "http://mop.all-online.com.cn/monitoring-onboarding".
+0 AXWebArea 监控接入配置 · MOP, URL: mop.all-online.com.cn/monitoring-onboarding
+	1 container app
+		2 link Description: 跳过导航，进入主要内容, Value: mop.all-online.com.cn/monitoring-onboarding#main-content
+		3 container
+			4 link Description: M MOP 运维托管 网络设备管理平台, Value: mop.all-online.com.cn/assets
+			5 container 模块导航
+				6 link Description: 首页门户, Value: mop.all-online.com.cn/dashboard
+				7 link Description: 租户与权限管理, Value: mop.all-online.com.cn/tenant-inventory
+				8 link Description: 设备台账, Value: mop.all-online.com.cn/assets
+				9 link Description: 监控与告警, Value: mop.all-online.com.cn/network-monitoring
+				10 link Description: 工单与SLA, Value: mop.all-online.com.cn/tickets
+				11 link Description: 配置备份, Value: mop.all-online.com.cn/backup-plan-drafts
+				12 link Description: 客户门户与通知, Value: mop.all-online.com.cn/ticket-notifications
+				13 link Description: 月报与体检报告, Value: mop.all-online.com.cn/inspection-quarterly-reports
+				14 link Description: 经营数据看板, Value: mop.all-online.com.cn/operational-comparison
+				15 link Description: 系统设置, Value: mop.all-online.com.cn/runtime-configurations
+			16 container Description: 功能菜单, ID: workspace-sidebar
+				17 text 监控与告警
+				18 container 监控与告警功能导航
+					19 text 监控与接入
+					20 link Description: 设备监控, Value: mop.all-online.com.cn/network-monitoring
+					21 link Description: 服务与设备接入, Value: mop.all-online.com.cn/monitoring-onboarding
+					22 text 告警与诊断
+					23 link Description: 事件中心, Value: mop.all-online.com.cn/monitoring-events
+					24 link Description: 手工故障登记, Value: mop.all-online.com.cn/manual-incidents
+					25 link Description: 告警阈值诊断, Value: mop.all-online.com.cn/threshold-diagnostics
+					26 link Description: 采样观察窗诊断, Value: mop.all-online.com.cn/observation-window-diagnostics
+			27 pop up button (collapsed) Description: 当前租户未确认告警 2 条, Secondary Actions: Expand
+			28 button Description: 打开全局搜索，快捷键斜杠、Control K 或 Command K, Help: 搜索当前租户（/ 或 Ctrl+K / ⌘K）
+			29 text [ [DEMO] 全功能测试用户 平台管理员
+			30 button 我的账号
+			31 button 退出
+		32 container
+			33 button (expanded) Description: 收起功能菜单, Secondary Actions: Collapse
+				34 image
+			35 container 面包屑
+				36 link 监控与告警
+					37 text 监控与告警
+				38 text /
+				39 link 监控接入配置
+					40 text 监控接入配置
+			41 container
+				42 combo box (collapsed, settable) Description: 切换租户, ID: el-id-8531-10, Secondary Actions: Expand
+				43 text [DEMO] 全功能测试·管理
+				44 image
+		45 container main-content
+			46 container
+				47 heading 监控接入配置, Value: 1
+					48 text 监控接入配置
+				49 container 服务器登记目标
+					50 heading 服务器登记目标, Value: 2, ID: registered-monitoring-title
+						51 text 服务器登记目标
+					52 button 读取登记目标
+					128 container
+						129 image
+						130 text 服务暂时不可用 如果刚提交过内容，请先核对处理结果，避免重复提交。
+						131 button 重新读取登记目标
+						132 button (expanded) 查看排查信息, Secondary Actions: Collapse
+							133 text 查看排查信息
+						138 text 错误代码：CONFIG_PENDING
+						139 text 排查编号（请求追踪号）：ab45080a-28ed-485a-90c1-ff6aa1a8c45d
+						140 text 服务器尚未配置登记目标目录
+				53 container
+					54 text 监控场景
+					55 pop up button (collapsed, settable) Description: 监控场景, Value: 网络设备 / Zabbix SNMP, Secondary Actions: Expand
+						56 menu
+							57 container 服务器
+								58 Linux 主机
+								59 Windows 主机
+								60 Linux / Zabbix agent
+								61 Windows / Zabbix agent
+							62 container 网络设备
+								63 交换机 / 路由器接口
+								64 ICMP 连通性
+								65 (selected) 网络设备 / Zabbix SNMP
+							66 container 业务服务
+								67 HTTP / HTTPS 服务
+								68 TCP 端口
+							69 container 数据库
+								70 PostgreSQL 数据库
+								71 MySQL 数据库
+								72 Redis 服务
+							73 container 容器
+								74 容器资源（cAdvisor）
+				75 container
+					76 text 资产 ID
+					77 text field (settable) Description: 资产 ID, Value: 7a928c86-3487-4ca5-b587-92d1b5479734
+				78 button 读取资产信息
+				113 text [DEMO] 手动添加交换机-20261024 · 192.0.2.60
+				114 button 使用资产 IP
+				79 link Description: 查看预设来源, Value: zabbix.com/documentation/7.0/en/manual/config/templates_out_of_the_box
+				80 container
+					81 text 采集端点 IPv4
+					82 text field (settable) Description: 采集端点 IPv4, Value: 192.0.2.60
+				83 container
+					84 text 端口
+					85 text field (settable) Description: 端口, Value: 161
+				92 container
+					93 text 单次超时（秒）
+					94 text field (settable) Description: 单次超时, Value: 5
+				95 container
+					96 text 采集周期（秒，可留空）
+					97 text field (settable) Description: 采集周期, Value: 60
+				98 container
+					99 checkbox (settable, integer) Description: 输出启用配置, Value: 0
+					100 text 在导出配置中启用此目标
+				112 text 当前只生成接入配置，不会修改现有监控或自动部署。Zabbix 模板ID、组及安全配置仍需在实际实例核对。
+				102 button 校验配置
+				103 button 下载接入配置
+				104 button 清空配置
+				105 container 持久监控登记
+					106 heading 持久监控登记, Value: 2
+						107 text 持久监控登记
+					108 button (disabled) 读取登记任务
+					109 text 使用当前资产的管理地址和已选场景；本地填写的地址、凭据及启用选项不会写入登记。
+					141 container
+						142 button (disabled) 核对服务器计划
+						143 button (disabled) 保存 1 个停用目标的登记申请
+					147 container
+						148 image
+						149 text 服务暂时不可用 如果刚提交过内容，请先核对处理结果，避免重复提交。
+						150 button (expanded) 查看排查信息, Secondary Actions: Collapse
+							151 text 查看排查信息
+						152 text 错误代码：CONFIG_PENDING
+						153 text 排查编号（请求追踪号）：924c0b49-7fc6-4e71-b684-fa034ec5bde7
+						154 text 持久监控登记尚未显式启用；现有静态目标配置不受影响
+					144 container
+						145 text 操作结果待确认，请保留原请求。
+						146 button 按原请求核对
+				127 text 已发起配置下载；未部署、未启用采集。配置文件的地址与标识请妥善保管。
+				116 heading 连接测试, Value: 2
+					117 text 连接测试
+				118 text 在能访问目标的采集机运行下方命令，将 JSON 输出保存后导入；导入报告只核对其与当前配置一致，报告来源未独立核验。
+				119 container
+					120 text 测试命令
+					121 text entry area Description: 测试命令, Value: python tools/monitoring_presets.py test --config monitoring-target-47af2b69-3e40-4aa7-a8e2-e15d6efb0e4b.json --target-id 47af2b69-3e40-4aa7-a8e2-e15d6efb0e4b --allow-endpoint 'udp://192.0.2.60:161'
+				122 container
+					123 text 导入测试报告 JSON
+					124 button 导入测试报告
+				134 container
+					135 button (expanded) 查看配置 JSON, Secondary Actions: Collapse
+						136 text 查看配置 JSON
+					137 text {
+  "version": 1,
+  "targets": [
+    {
+      "id": "47af2b69-3e40-4aa7-a8e2-e15d6efb0e4b",
+      "tenant_id": "43ad0f67-7d50-5e2d-b1b5-1bd91ff18a26",
+      "asset_id": "7a928c86-3487-4ca5-b587-92d1b5479734",
+      "preset_id": "zabbix-snmp",
+      "enabled": false,
+      "endpoint": "udp://192.0.2.60:161",
+      "target": null,
+      "auth_profile": null,
+      "interval_seconds": 60,
+      "timeout_seconds": 5
+    }
+  ]
+}
+
+The focused UI element is 150 button (expanded) 查看排查信息, Secondary Actions: Collapse

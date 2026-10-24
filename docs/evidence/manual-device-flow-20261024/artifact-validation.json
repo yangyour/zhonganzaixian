@@ -1,0 +1,26 @@
+{
+  "text_secret_scan_files": 9,
+  "matching_files": [],
+  "image_provenance": "ORIGINAL_BROWSER_SCREENSHOTS_AFTER_LOGIN",
+  "files_sha256": {
+    "01-assets-before.png": "1064c4690239f8c67feb0b83d4c1e261b461f836493e8ae192197bcf47d5a195",
+    "02-manual-form.png": "b1af6085b3096599eb5a9d0ff454c9a8c3e9b8b1c4dde1888d25c07cb917e898",
+    "03-asset-created.png": "be925452b7832f1138c29f8d7f74b7bbef9b35b0bc508b8bb02a8c9c1fee1f4a",
+    "04-onboarding-gate.png": "1506a0f00113a33b46e761044c5a3160946a8e2b2bfa177599e8b98f4085e4b9",
+    "05-config-validated.png": "7595c24ed63036bd44863b049ac734626bf295f956db6b2b2b8043d01d642aab",
+    "06-registration-blocked.png": "6edde249f970f04f956914d997c5d306168ebcee85d381ab0912d21ed283f2b6",
+    "07-list-readback.png": "c0beb9c59213e7c70fcc4ece75b10ecf90b0e503bf660cbd38323195b2fe89de",
+    "08-config-json.png": "5f1b048d23b289b64cf61e78337639d8245328f8bf83d0f3c139469dc561e9e5",
+    "09-monitoring-not-bound.png": "e8179a187a99194e81d926a420cbeefeb9c413e05e8e23d6c10b6b8aa67f8ed1",
+    "10-final-asset-detail.png": "8a551ba033c3b96157f07715b6d9575e11f5adfc1a897da58ccb30edd1584c0d",
+    "after.json": "42aabfdb1ef3208e6c2bc9430b828e7ae38908efe75abf746eef9313a355ac72",
+    "asset-page.txt": "1b6333ac4f367f59fff9f2c1c96e1daf68f4488ec908ade2d9c11d76076fdafe",
+    "before.json": "75f19fd6bcb0e1ac37bc46e01bc11a37bf6c37e801623fd43fa1d113cabdb82a",
+    "generated-config.json": "2fd4e1ba9eef0d7ac780fd2b516b719132d2db2377e0f313ddb0cc3a95599f1d",
+    "monitoring-page.txt": "e6ccc0209f6209212f3cdc1fcd601252ea41b5030696cc020e086bbe3647bff4",
+    "registration-page.txt": "75ffda81c5b16ed6148c28c8162d792c33d99d6a32d8bc77ef277fff1e4fe654",
+    "result.json": "e869f73b00d05e9be422b1b251281e1140d89ba0def2ed7fd4b8d2666abd81b2"
+  },
+  "application_source_changed": false,
+  "hash_representation": "COMMITTED_FILE_BYTES; TEXT_NORMALIZED_TO_LF_BY_REPOSITORY"
+}

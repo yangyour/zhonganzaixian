@@ -1,0 +1,45 @@
+{
+  "status": "PASSED",
+  "source": "ISOLATED_INDEX_SNAPSHOT_WITH_TWO_RETURN_GUARD_OVERLAYS",
+  "suites": [
+    {
+      "suite": "cn.mop.api.AttachmentSecurityHttpTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.api.FileContentReturnAuthorizationTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.api.FileControllerTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.api.NotificationRoutingHttpSecurityTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.api.NotificationRoutingReadAuthorizationTest",
+      "tests": 48,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "executed": 80,
+  "failures": 0,
+  "real_components": "NOT_RUN",
+  "formal_acceptance": "NOT_RUN"
+}

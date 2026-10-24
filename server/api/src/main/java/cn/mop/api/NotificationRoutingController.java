@@ -1,6 +1,7 @@
 package cn.mop.api;
 
 import cn.mop.domain.DomainException;
+import cn.mop.domain.Membership;
 import cn.mop.domain.PlatformRepository;
 import cn.mop.persistence.NotificationControlStore;
 import cn.mop.persistence.NotificationControlStore.Access;
@@ -49,8 +50,11 @@ public final class NotificationRoutingController {
     @GetMapping("/notification-routing/policy")
     Object policy(HttpServletRequest request) {
         noQuery(request);
-        return success(map("record", dto(routing.policy(access(request, "ticket_notes:read_internal"))),
-                "external_dispatch_enabled", false, "customer_production_approved", false), request);
+        var subject = subject(request, "ticket_notes:read_internal");
+        var result = map("record", dto(routing.policy(subject.access())),
+                "external_dispatch_enabled", false, "customer_production_approved", false);
+        DashboardReadAuthorization.recheck(request, platform, subject.membership());
+        return success(result, request);
     }
 
     @PostMapping(value = "/notification-routing/policy", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -63,8 +67,10 @@ public final class NotificationRoutingController {
     @GetMapping("/my/notification-preferences/publication")
     Object publication(HttpServletRequest request) {
         noQuery(request);
-        return success(map("record", dto(routing.preference(access(request, "notification_preferences:read_own"))),
-                "external_dispatch_enabled", false), request);
+        var subject = subject(request, "notification_preferences:read_own");
+        var result = map("record", dto(routing.preference(subject.access())), "external_dispatch_enabled", false);
+        DashboardReadAuthorization.recheck(request, platform, subject.membership());
+        return success(result, request);
     }
 
     @PostMapping(value = "/my/notification-preferences/publication", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -95,12 +101,16 @@ public final class NotificationRoutingController {
         } catch (IllegalArgumentException invalid) {
             throw invalid();
         }
-        return success(map("record", dto(routing.binding(access(request, "ticket_notes:read_internal"), uuid(receiver), selected))), request);
+        var subject = subject(request, "ticket_notes:read_internal");
+        var result = map("record", dto(routing.binding(subject.access(), uuid(receiver), selected)));
+        DashboardReadAuthorization.recheck(request, platform, subject.membership());
+        return success(result, request);
     }
 
     @GetMapping("/notification-routing/entries")
     Object list(HttpServletRequest request) {
-        Access access = access(request, "ticket_notes:read_internal");
+        var subject = subject(request, "ticket_notes:read_internal");
+        Access access = subject.access();
         Set<String> allowed = Set.of("kind", "page_size", "before_time", "before_id");
         request.getParameterMap().forEach((key, values) -> {
             if (!allowed.contains(key) || values.length != 1 || values[0].isBlank()) {
@@ -127,14 +137,19 @@ public final class NotificationRoutingController {
             }
         }
         var page = store.page(access, kind, limit, time, beforeId == null ? null : uuid(beforeId));
-        return success(map("items", page.items().stream().map(NotificationRoutingController::dto).toList(),
-                "next_id", page.nextId(), "next_time", page.nextTime(), "source", "postgresql"), request);
+        var result = map("items", page.items().stream().map(NotificationRoutingController::dto).toList(),
+                "next_id", page.nextId(), "next_time", page.nextTime(), "source", "postgresql");
+        DashboardReadAuthorization.recheck(request, platform, subject.membership());
+        return success(result, request);
     }
 
     @GetMapping("/notification-routing/entries/{kind}/{id}")
     Object detail(@PathVariable String kind, @PathVariable String id, HttpServletRequest request) {
         noQuery(request);
-        return success(dto(routing.detail(access(request, "ticket_notes:read_internal"), kind(kind), uuid(id))), request);
+        var subject = subject(request, "ticket_notes:read_internal");
+        var result = dto(routing.detail(subject.access(), kind(kind), uuid(id)));
+        DashboardReadAuthorization.recheck(request, platform, subject.membership());
+        return success(result, request);
     }
 
     @PostMapping(value = "/notification-routing/requests/{id}/plan", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -152,12 +167,21 @@ public final class NotificationRoutingController {
     @GetMapping("/notification-routing/commands/{id}")
     Object recover(@PathVariable String id, HttpServletRequest request) {
         noQuery(request);
-        var entry = store.command(access(request, "notification_preferences:read_own"), uuid(id))
+        var subject = subject(request, "notification_preferences:read_own");
+        var entry = store.command(subject.access(), uuid(id))
                 .orElseThrow(() -> new DomainException(404, "NOT_FOUND", "当前身份未找到这条原命令"));
+        DashboardReadAuthorization.recheck(request, platform, subject.membership());
         return success(dto(entry), request);
     }
 
+    /** Retains the complete effective membership for the final read boundary after storage releases its locks. */
+    private record Subject(Access access, Membership membership) {}
+
     private Access access(HttpServletRequest request, String capability) {
+        return subject(request, capability).access();
+    }
+
+    private Subject subject(HttpServletRequest request, String capability) {
         if (request.getUserPrincipal() == null || request.getSession(false) == null) {
             throw new DomainException(401, "SESSION_EXPIRED", "当前会话已失效");
         }
@@ -173,7 +197,7 @@ public final class NotificationRoutingController {
         if (!enabled) {
             throw new DomainException(503, "NOTIFICATION_ROUTING_NOT_CONFIGURED", "通知路由控制尚未启用，已有站内通知仍可使用");
         }
-        return new Access(uuid(tenantId), uuid(actor), member.permissionVersion(), trace(request));
+        return new Subject(new Access(uuid(tenantId), uuid(actor), member.permissionVersion(), trace(request)), member);
     }
 
     private static Map<String, Object> dto(Entry entry) {

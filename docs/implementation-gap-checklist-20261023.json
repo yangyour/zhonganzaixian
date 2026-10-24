@@ -381,12 +381,14 @@
       "completion_criterion": "补统一快照、正式导出和对账审批/舍入，费用和未确认口径可配置且缺失为空；不自动支付。",
       "evidence": [
         "docs/sla-monitoring-source-20261024.md",
-        "docs/evidence/sla-monitoring-source-20261024/validation.json"
+        "docs/evidence/sla-monitoring-source-20261024/validation.json",
+        "docs/remote-release-20261024.md"
       ],
       "commits": [],
       "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
       "completed_subitems": [
-        "Live SLA total/service MTTA and MTTR now use original monitoring event clocks and verified exact t2, with explicit unknown/source metadata; nanosecond recovery comparisons and new monthly freeze/readback verified on designated PG; historic frozen rows retained"
+        "Live SLA total/service MTTA and MTTR now use original monitoring event clocks and verified exact t2, with explicit unknown/source metadata; nanosecond recovery comparisons and new monthly freeze/readback verified on designated PG; historic frozen rows retained",
+        "Runtime source b964701b deployed to designated active V55; 462 HTTP checks and seven actual-API desktop reads verified. Empty publication lists and read checks do not complete nonempty write/customer workflows."
       ],
       "remaining_subitems": [
         "Unified availability denominators and actual health coverage",
@@ -598,7 +600,8 @@
         "docs/evidence/local-astra-ut-20261023/r02-retained-business/summary.json",
         "docs/evidence/local-astra-ut-20261023/r02-retained-business/pdf-qa.json",
         "docs/report-revisions-20261024.md",
-        "docs/evidence/report-revisions-20261024/validation.json"
+        "docs/evidence/report-revisions-20261024/validation.json",
+        "docs/remote-release-20261024.md"
       ],
       "commits": [
         "25a17013",
@@ -611,7 +614,8 @@
         "Designated retained-V53 PG integration scenario passed: real source capture/frozen read and actual HTML/PDF failed-render retry, idempotency and return while source/template approval remains gated",
         "Separate ISOLATED_TEST initial-state fixture verified actual repository/FOP approval/publication/recipient ACL/first read/replay/resend-intent/revocation; no external dispatch or customer approval",
         "Two actual PDFs (four pages) and three HTML artifacts produced; normalized text equality, bounds and all-page Poppler visual inspection passed; generic technical layout is not a customer-approved template",
-        "Immutable report revisions now connect same-quarter frozen sources, parent/version locking, no-fork concurrency, durable replay, API and source-selection UI; designated retained V53 business tests and synthetic real-browser flow verified separately"
+        "Immutable report revisions now connect same-quarter frozen sources, parent/version locking, no-fork concurrency, durable replay, API and source-selection UI; designated retained V53 business tests and synthetic real-browser flow verified separately",
+        "Runtime source b964701b deployed to designated active V55; 462 HTTP checks and seven actual-API desktop reads verified. Empty publication lists and read checks do not complete nonempty write/customer workflows."
       ],
       "remaining_subitems": [
         "Monthly boss/full, health-check and annual source/template adapters",
@@ -646,7 +650,8 @@
         "docs/event-operational-metrics-20261023.md",
         "docs/evidence/dot-continuation-20261023/ui02-event-metrics.json",
         "docs/sla-monitoring-source-20261024.md",
-        "docs/evidence/sla-monitoring-source-20261024/validation.json"
+        "docs/evidence/sla-monitoring-source-20261024/validation.json",
+        "docs/remote-release-20261024.md"
       ],
       "commits": [
         "d58ea011",
@@ -660,7 +665,8 @@
       ],
       "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
       "completed_subitems": [
-        "Live SLA total/service MTTA and MTTR now use original monitoring event clocks and verified exact t2, with explicit unknown/source metadata; nanosecond recovery comparisons and new monthly freeze/readback verified on designated PG; historic frozen rows retained"
+        "Live SLA total/service MTTA and MTTR now use original monitoring event clocks and verified exact t2, with explicit unknown/source metadata; nanosecond recovery comparisons and new monthly freeze/readback verified on designated PG; historic frozen rows retained",
+        "Runtime source b964701b deployed to designated active V55; 462 HTTP checks and seven actual-API desktop reads verified. Empty publication lists and read checks do not complete nonempty write/customer workflows."
       ]
     },
     {

@@ -1,0 +1,77 @@
+{
+  "status": "PASSED",
+  "source_commit": "b964701b5a148978cf761bf550dd7f24745fdb43",
+  "origin": "http://mop.all-online.com.cn",
+  "transport": "ACTUAL_DEPLOYED_API",
+  "business_writes": 0,
+  "external_messages": 0,
+  "checks": [
+    {
+      "role": "padmin",
+      "page": "report-publications",
+      "viewport": 1440,
+      "api": "ACTUAL",
+      "empty_is_real": true,
+      "status": "PASSED"
+    },
+    {
+      "role": "padmin",
+      "page": "sla-reports",
+      "viewport": 1440,
+      "api": "ACTUAL",
+      "source_version": "mop-monitoring-recovery-t2-v1",
+      "unknown_count": 0,
+      "services": 7,
+      "status": "PASSED"
+    },
+    {
+      "role": "padmin",
+      "page": "sla-reports",
+      "viewport": 1024,
+      "api": "ACTUAL",
+      "source_version": "mop-monitoring-recovery-t2-v1",
+      "unknown_count": 0,
+      "services": 7,
+      "status": "PASSED"
+    },
+    {
+      "role": "msp",
+      "page": "report-publications",
+      "viewport": 1440,
+      "api": "ACTUAL",
+      "empty_is_real": true,
+      "status": "PASSED"
+    },
+    {
+      "role": "msp",
+      "page": "sla-reports",
+      "viewport": 1440,
+      "api": "ACTUAL",
+      "source_version": "mop-monitoring-recovery-t2-v1",
+      "unknown_count": 0,
+      "services": 7,
+      "status": "PASSED"
+    },
+    {
+      "role": "msp",
+      "page": "sla-reports",
+      "viewport": 1024,
+      "api": "ACTUAL",
+      "source_version": "mop-monitoring-recovery-t2-v1",
+      "unknown_count": 0,
+      "services": 7,
+      "status": "PASSED"
+    },
+    {
+      "role": "tadmin",
+      "page": "report-publications",
+      "viewport": 1440,
+      "api": "ACTUAL",
+      "empty_is_real": true,
+      "status": "PASSED"
+    }
+  ],
+  "formal_contract_acceptance": "NOT_RUN",
+  "browser_version": "156.0.4314.42",
+  "finished_at": "2026-10-24T06:45:07.487Z"
+}

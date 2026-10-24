@@ -1,0 +1,537 @@
+{
+  "status": "PREFLIGHT_PASSED",
+  "observed_at": "2026-10-24T06:32:45.003111+00:00",
+  "source_commit": "b964701b5a148978cf761bf550dd7f24745fdb43",
+  "origin": "https://github.com/yangyour/zhonganzaixian.git",
+  "branch": "codex/remaining-gaps-20261024",
+  "upstream": "origin/codex/remaining-gaps-20261024",
+  "schema_before": 50,
+  "history": [
+    {
+      "installed_rank": 1,
+      "version": "1",
+      "script": "V1__remote_test_platform.sql",
+      "checksum": -1484181377,
+      "success": true
+    },
+    {
+      "installed_rank": 2,
+      "version": "2",
+      "script": "V2__tenant_configuration_revisions.sql",
+      "checksum": 1161094071,
+      "success": true
+    },
+    {
+      "installed_rank": 3,
+      "version": "3",
+      "script": "V3__configuration_review_test_identity.sql",
+      "checksum": -1273598682,
+      "success": true
+    },
+    {
+      "installed_rank": 4,
+      "version": "4",
+      "script": "V4__durable_customer_report_registration.sql",
+      "checksum": 1369050258,
+      "success": true
+    },
+    {
+      "installed_rank": 5,
+      "version": "5",
+      "script": "V5__durable_report_photos.sql",
+      "checksum": 1887903094,
+      "success": true
+    },
+    {
+      "installed_rank": 6,
+      "version": "6",
+      "script": "V6__asset_import_sources_and_mapping.sql",
+      "checksum": -636230002,
+      "success": true
+    },
+    {
+      "installed_rank": 7,
+      "version": "7",
+      "script": "V7__asset_dependency_draft_revisions.sql",
+      "checksum": -545292092,
+      "success": true
+    },
+    {
+      "installed_rank": 8,
+      "version": "8",
+      "script": "V8__manual_worklog_revisions.sql",
+      "checksum": 1211360336,
+      "success": true
+    },
+    {
+      "installed_rank": 9,
+      "version": "9",
+      "script": "V9__manual_asset_metadata_revisions.sql",
+      "checksum": -340432871,
+      "success": true
+    },
+    {
+      "installed_rank": 10,
+      "version": "10",
+      "script": "V10__immutable_internal_ticket_notes.sql",
+      "checksum": -896663071,
+      "success": true
+    },
+    {
+      "installed_rank": 11,
+      "version": "11",
+      "script": "V11__immutable_ticket_comments.sql",
+      "checksum": -1655668462,
+      "success": true
+    },
+    {
+      "installed_rank": 12,
+      "version": "12",
+      "script": "V12__unpublished_working_calendar_drafts.sql",
+      "checksum": -2068183288,
+      "success": true
+    },
+    {
+      "installed_rank": 13,
+      "version": "13",
+      "script": "V13__immutable_manual_incident_registrations.sql",
+      "checksum": 1030816869,
+      "success": true
+    },
+    {
+      "installed_rank": 14,
+      "version": "14",
+      "script": "V14__immutable_manual_recovery_confirmations.sql",
+      "checksum": -30124348,
+      "success": true
+    },
+    {
+      "installed_rank": 15,
+      "version": "15",
+      "script": "V15__manual_warranty_details.sql",
+      "checksum": 836542553,
+      "success": true
+    },
+    {
+      "installed_rank": 16,
+      "version": "16",
+      "script": "V16__immutable_capacity_scenario_drafts.sql",
+      "checksum": 1367595086,
+      "success": true
+    },
+    {
+      "installed_rank": 17,
+      "version": "17",
+      "script": "V17__customer_contact_revisions.sql",
+      "checksum": 2031946591,
+      "success": true
+    },
+    {
+      "installed_rank": 18,
+      "version": "18",
+      "script": "V18__durable_contact_import_jobs.sql",
+      "checksum": -1130281417,
+      "success": true
+    },
+    {
+      "installed_rank": 19,
+      "version": "19",
+      "script": "V19__contact_import_generated_hash_guard.sql",
+      "checksum": -268577672,
+      "success": true
+    },
+    {
+      "installed_rank": 20,
+      "version": "20",
+      "script": "V20__durable_asset_export_jobs.sql",
+      "checksum": -319450001,
+      "success": true
+    },
+    {
+      "installed_rank": 21,
+      "version": "21",
+      "script": "V21__inspection_template_revisions.sql",
+      "checksum": 951051044,
+      "success": true
+    },
+    {
+      "installed_rank": 22,
+      "version": "22",
+      "script": "V22__manual_inspection_worksheet_drafts.sql",
+      "checksum": -650061710,
+      "success": true
+    },
+    {
+      "installed_rank": 23,
+      "version": "23",
+      "script": "V23__immutable_inspection_source_collections.sql",
+      "checksum": 1321810212,
+      "success": true
+    },
+    {
+      "installed_rank": 24,
+      "version": "24",
+      "script": "V24__unpublished_backup_plan_drafts.sql",
+      "checksum": -424372040,
+      "success": true
+    },
+    {
+      "installed_rank": 25,
+      "version": "25",
+      "script": "V25__unreviewed_change_notice_drafts.sql",
+      "checksum": 552033867,
+      "success": true
+    },
+    {
+      "installed_rank": 26,
+      "version": "26",
+      "script": "V26__own_notification_preference_drafts.sql",
+      "checksum": -324766275,
+      "success": true
+    },
+    {
+      "installed_rank": 27,
+      "version": "27",
+      "script": "V27__project_identity_and_roles.sql",
+      "checksum": 511191109,
+      "success": true
+    },
+    {
+      "installed_rank": 28,
+      "version": "28",
+      "script": "V28__identity_inventory_and_password_formats.sql",
+      "checksum": 1559449245,
+      "success": true
+    },
+    {
+      "installed_rank": 29,
+      "version": "29",
+      "script": "V29__immutable_raw_monitoring_events.sql",
+      "checksum": -1977882733,
+      "success": true
+    },
+    {
+      "installed_rank": 30,
+      "version": "30",
+      "script": "V30__immutable_monitoring_quarantine.sql",
+      "checksum": 2028775275,
+      "success": true
+    },
+    {
+      "installed_rank": 31,
+      "version": "31",
+      "script": "V31__own_export_inbox.sql",
+      "checksum": -486321876,
+      "success": true
+    },
+    {
+      "installed_rank": 32,
+      "version": "32",
+      "script": "V32__runtime_configuration_publications.sql",
+      "checksum": -606158601,
+      "success": true
+    },
+    {
+      "installed_rank": 33,
+      "version": "33",
+      "script": "V33__ticket_lifecycle_and_durable_clocks.sql",
+      "checksum": -2063474061,
+      "success": true
+    },
+    {
+      "installed_rank": 34,
+      "version": "34",
+      "script": "V34__ticket_notification_intents.sql",
+      "checksum": -1167997960,
+      "success": true
+    },
+    {
+      "installed_rank": 35,
+      "version": "35",
+      "script": "V35__service_tiers_and_change_history.sql",
+      "checksum": -1509422434,
+      "success": true
+    },
+    {
+      "installed_rank": 36,
+      "version": "36",
+      "script": "V36__oncall_escalation_and_sla_monthly_results.sql",
+      "checksum": -131315136,
+      "success": true
+    },
+    {
+      "installed_rank": 37,
+      "version": "37",
+      "script": "V37__monitoring_events_noise_funnel_and_maintenance_windows.sql",
+      "checksum": 125697472,
+      "success": true
+    },
+    {
+      "installed_rank": 38,
+      "version": "38",
+      "script": "V38__wecom_bindings_deliveries_and_login_state.sql",
+      "checksum": 845758090,
+      "success": true
+    },
+    {
+      "installed_rank": 39,
+      "version": "39",
+      "script": "V39__email_bindings_and_delivery_ledger.sql",
+      "checksum": -373908053,
+      "success": true
+    },
+    {
+      "installed_rank": 40,
+      "version": "40",
+      "script": "V40__immutable_change_notice_approval_events.sql",
+      "checksum": 14806533,
+      "success": true
+    },
+    {
+      "installed_rank": 41,
+      "version": "41",
+      "script": "V41__immutable_inspection_quarterly_reports.sql",
+      "checksum": 1456236875,
+      "success": true
+    },
+    {
+      "installed_rank": 42,
+      "version": "42",
+      "script": "V42__ticket_lifecycle_revisions.sql",
+      "checksum": -956552339,
+      "success": true
+    },
+    {
+      "installed_rank": 43,
+      "version": "43",
+      "script": "V43__ticket_autoclose_jobs.sql",
+      "checksum": 2102398138,
+      "success": true
+    },
+    {
+      "installed_rank": 44,
+      "version": "44",
+      "script": "V44__ticket_sla_policy_bindings.sql",
+      "checksum": 1869511343,
+      "success": true
+    },
+    {
+      "installed_rank": 45,
+      "version": "45",
+      "script": "V45__sla_reminder_intents.sql",
+      "checksum": 1011894633,
+      "success": true
+    },
+    {
+      "installed_rank": 46,
+      "version": "46",
+      "script": "V46__backup_device_coordination_journal.sql",
+      "checksum": -143003885,
+      "success": true
+    },
+    {
+      "installed_rank": 47,
+      "version": "47",
+      "script": "V47__backup_run_event_journal.sql",
+      "checksum": 829577921,
+      "success": true
+    },
+    {
+      "installed_rank": 48,
+      "version": "48",
+      "script": "V48__durable_backup_archive_staging.sql",
+      "checksum": 2106091134,
+      "success": true
+    },
+    {
+      "installed_rank": 49,
+      "version": "49",
+      "script": "V49__atomic_backup_version_registration.sql",
+      "checksum": -655264389,
+      "success": true
+    },
+    {
+      "installed_rank": 50,
+      "version": "50",
+      "script": "V50__delivery_receipt_journal.sql",
+      "checksum": -1248651202,
+      "success": true
+    }
+  ],
+  "postgres_loopback_port": 12060,
+  "application_sources": {
+    "mop-lan-api": "c3e1c35b19bb80f483a89a4aacac43c6255a6b00",
+    "mop-lan-web": "c3e1c35b19bb80f483a89a4aacac43c6255a6b00",
+    "mop-lan-photo-worker": "2291ddf83bca358cb2b54c539e029d9db13e8739",
+    "mop-lan-import-worker": "2291ddf83bca358cb2b54c539e029d9db13e8739",
+    "mop-lan-contact-worker": "2291ddf83bca358cb2b54c539e029d9db13e8739",
+    "mop-lan-export-preparation-worker": "2291ddf83bca358cb2b54c539e029d9db13e8739",
+    "mop-lan-af-collector": "2291ddf83bca358cb2b54c539e029d9db13e8739"
+  },
+  "application_images": {
+    "mop-lan-api": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+    "mop-lan-web": "sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2",
+    "mop-lan-photo-worker": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+    "mop-lan-import-worker": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+    "mop-lan-contact-worker": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+    "mop-lan-export-preparation-worker": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+    "mop-lan-af-collector": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90"
+  },
+  "application_lifecycles": {
+    "mop-lan-api": {
+      "id": "456119ce0236ef11d2937639cb203984ed4c3ff88436966ffe44e792dc8cba68",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-23T09:51:41.169621357Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-web": {
+      "id": "a6e1b592f7b42a7edf3c7b232e9409dcd56a44bd48c88d195b66c64014773c80",
+      "image": "sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2",
+      "started_at": "2026-10-23T09:51:41.170642894Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-photo-worker": {
+      "id": "be603a400097f4afe80995b8cdefbac82e36fdca4d49427af507deb8cabe8023",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-23T08:50:10.710389332Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-import-worker": {
+      "id": "c68ce31e127a3882848941501a6c9d8128c01e1309e87e75ed2ae6b5252a3f0a",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-23T08:50:10.734369602Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-contact-worker": {
+      "id": "7e1ed9342c8cbdce7b6188d0463e22a2b52a392421b181eef60908f7975392e5",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-23T08:50:10.73949859Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-export-preparation-worker": {
+      "id": "9b58580b95b60a5deb7b9e2f9f8fae524a6ddb9cabe18c2c4bdc5a4e4ce4295c",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-23T08:50:10.731942097Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-af-collector": {
+      "id": "5fa521cec6b33184ed88f71f3d673511d8e8f23906b705fda3f71b38eb6343aa",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-23T08:50:10.736625275Z",
+      "restart_count": 0,
+      "running": true
+    }
+  },
+  "protected_lifecycles": {
+    "mop-lan-zabbix-web": {
+      "id": "61bb1692e7da5a54e4dcf51c3cf8965d9ae1d45a735cb1bf865d9627833d2c0e",
+      "image": "sha256:cd216a9968b62eb6fddd789872b9e8eb4d064539ef40b6356dd2d8c1588a3f91",
+      "started_at": "2026-10-08T12:21:37.244174288Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-agent": {
+      "id": "008118b2bd32f4da65bc766614c305973fcead8b2cc0e5cdf4c88880b9eb454b",
+      "image": "sha256:ba55e6d146d0f0bc550da82b29b22134655db6e31d2c9eae9b1d15f659ad86cd",
+      "started_at": "2026-10-08T12:18:48.243454374Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-server": {
+      "id": "303bbd1f5767a733137de772945fc46506143d0933d036f3412cad85d125ae66",
+      "image": "sha256:415452211dea59cd4ea3346f2c2b38403660408273c672ebf91603353ce1073f",
+      "started_at": "2026-10-08T12:18:48.248721584Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-postgres": {
+      "id": "3aebabee32b1812ff37aeb84341a7d67e736941d2bd0d82bbb7192919bea8a97",
+      "image": "sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641",
+      "started_at": "2026-10-08T12:15:32.354957313Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-rabbitmq": {
+      "id": "9b8cc8ece2a07ae354f88e7f919f157a03d424ca160cd51217375cd76a0a443d",
+      "image": "sha256:e3b55503d81b67c93a2914a7473e59bbd53d5f4560c421e06015ed64a3034c9e",
+      "started_at": "2026-10-08T12:15:32.356127727Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-minio": {
+      "id": "e347d1402ead939abe1121094ed0d963ba07f8f88464819c46449757022104d7",
+      "image": "sha256:a16cad481969d7ddb6fcd2f1c58284af3d1266190b9bedc3ef0801aeb05a93a9",
+      "started_at": "2026-10-08T12:15:32.354248163Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-redis": {
+      "id": "cd68b313f967a54df7f8d5c59c9fe3146f9c261372683205822c71f3d64b24f3",
+      "image": "sha256:abbc5faf6f23b6835d3c357530e96c841e02cb66bd0e426573ef5acb434f597f",
+      "started_at": "2026-10-08T12:15:32.349268223Z",
+      "restart_count": 0,
+      "running": true
+    }
+  },
+  "reviewed_migrations": [
+    {
+      "version": 51,
+      "script": "V51__notification_routing_control.sql",
+      "sha256": "51f26c2d0d74903a10ea04525335fff8abfa8eecf1e048e1a623a535e609d37b",
+      "review": "ADD_NEW_TABLES_INDEXES_GUARDS_AND_SCOPED_RUNTIME_GRANTS_ONLY"
+    },
+    {
+      "version": 52,
+      "script": "V52__attachment_security_journal.sql",
+      "sha256": "ca8140bb6f6958408a7683d41ccb9ba0a03657bcfe3fb76f3f6fede361d103ef",
+      "review": "ADD_NEW_TABLES_INDEXES_GUARDS_AND_SCOPED_RUNTIME_GRANTS_ONLY"
+    },
+    {
+      "version": 53,
+      "script": "V53__report_publication_journal.sql",
+      "sha256": "b9ee9c9724b3bd4156799058ee24876c04e59d413180f4df4db2d5673f4faddb",
+      "review": "ADD_NEW_TABLES_INDEXES_GUARDS_AND_SCOPED_RUNTIME_GRANTS_ONLY"
+    },
+    {
+      "version": 54,
+      "script": "V54__monitoring_enrollment_journal.sql",
+      "sha256": "447bc4441943dbd3df4ead06915b4c05697dffb8c30cde6524009575c2ab3dc2",
+      "review": "ADD_NEW_TABLES_INDEXES_GUARDS_AND_SCOPED_RUNTIME_GRANTS_ONLY"
+    },
+    {
+      "version": 55,
+      "script": "V55__monitoring_object_mapping_journal.sql",
+      "sha256": "e55960373428ad10c95fd08d731c349666c92f85f521371de99dbe11600ad36e",
+      "review": "ADD_NEW_TABLES_INDEXES_GUARDS_AND_SCOPED_RUNTIME_GRANTS_ONLY"
+    }
+  ],
+  "runtime_feature_flags": {
+    "MOP_IMPORT_WORKER_ENABLED": "false",
+    "MOP_EMAIL_DISPATCH_ENABLED": "true",
+    "MOP_WECOM_ENABLED": "true",
+    "MOP_NETWORK_MONITORING_ENABLED": "true",
+    "MOP_WECOM_LOGIN_ENABLED": "true",
+    "MOP_EXPORT_PUBLICATION_ENABLED": "true",
+    "MOP_EXPORT_INBOX_ENABLED": "true",
+    "MOP_PHOTO_WORKER_ENABLED": "false",
+    "MOP_AF_RESOURCE_ENABLED": "true",
+    "MOP_EMAIL_ENABLED": "true",
+    "MOP_CONTACT_IMPORT_WORKER_ENABLED": "false",
+    "MOP_OIDC_ENABLED": "false",
+    "MOP_WECOM_DISPATCH_ENABLED": "true",
+    "MOP_NOTIFICATION_RELAY_ENABLED": "true"
+  },
+  "previous_active_transaction": "/opt/mop-lan-test/private/update-20261023T095104Z-demo-c3e1c35b19/transaction.json",
+  "mode": "remote_test",
+  "ready": true,
+  "production_ready": false,
+  "database_writes": 0,
+  "schema_migrations": 0,
+  "https": "DEFERRED_BY_USER"
+}

@@ -1,0 +1,20 @@
+{
+  "status": "PASSED",
+  "checked_at": "2026-10-24T06:52:34.025841+00:00",
+  "application_sources": {
+    "mop-lan-api": "b964701b5a148978cf761bf550dd7f24745fdb43",
+    "mop-lan-web": "b964701b5a148978cf761bf550dd7f24745fdb43",
+    "mop-lan-photo-worker": "b964701b5a148978cf761bf550dd7f24745fdb43",
+    "mop-lan-import-worker": "b964701b5a148978cf761bf550dd7f24745fdb43",
+    "mop-lan-contact-worker": "b964701b5a148978cf761bf550dd7f24745fdb43",
+    "mop-lan-export-preparation-worker": "b964701b5a148978cf761bf550dd7f24745fdb43",
+    "mop-lan-af-collector": "b964701b5a148978cf761bf550dd7f24745fdb43"
+  },
+  "schema_version": 55,
+  "ready": true,
+  "durable": true,
+  "production_ready": false,
+  "temporary_migration_credentials_absent": true,
+  "owned_cli_and_candidate_containers_remaining": 0,
+  "private_values_found_in_public_records": false
+}

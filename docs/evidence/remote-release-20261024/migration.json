@@ -1,0 +1,1714 @@
+{
+  "status": "MIGRATED_AND_DEPLOYED",
+  "run_id": "20261024T063707Z-v55-e83e205a",
+  "source_commit": "b964701b5a148978cf761bf550dd7f24745fdb43",
+  "environment": "lan-test-20261008",
+  "schema_before": 50,
+  "schema_target": 55,
+  "results": [
+    {
+      "step": "before-check",
+      "mode": "--check",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=DELIVERY_RECEIPT_JOURNAL_APPLIED mode=READ_ONLY_CHECK migrations_executed=0 baseline=V1_V49_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "step": "v51-apply",
+      "mode": "--apply-notification-control",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=NOTIFICATION_CONTROL_APPLIED mode=APPLY_NOTIFICATION_CONTROL migrations_executed=1 baseline=V1_V50_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "step": "v51-repeat",
+      "mode": "--apply-notification-control",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=NOTIFICATION_CONTROL_APPLIED mode=APPLY_NOTIFICATION_CONTROL migrations_executed=0 baseline=V1_V50_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "step": "v51-check",
+      "mode": "--check",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=NOTIFICATION_CONTROL_APPLIED mode=READ_ONLY_CHECK migrations_executed=0 baseline=V1_V50_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "step": "v52-apply",
+      "mode": "--apply-attachment-security",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=ATTACHMENT_SECURITY_APPLIED mode=APPLY_ATTACHMENT_SECURITY migrations_executed=1 baseline=V1_V51_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "step": "v52-repeat",
+      "mode": "--apply-attachment-security",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=ATTACHMENT_SECURITY_APPLIED mode=APPLY_ATTACHMENT_SECURITY migrations_executed=0 baseline=V1_V51_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "step": "v52-check",
+      "mode": "--check",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=ATTACHMENT_SECURITY_APPLIED mode=READ_ONLY_CHECK migrations_executed=0 baseline=V1_V51_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "step": "v53-apply",
+      "mode": "--apply-report-publication",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=REPORT_PUBLICATION_APPLIED mode=APPLY_REPORT_PUBLICATION migrations_executed=1 baseline=V1_V52_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "step": "v53-repeat",
+      "mode": "--apply-report-publication",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=REPORT_PUBLICATION_APPLIED mode=APPLY_REPORT_PUBLICATION migrations_executed=0 baseline=V1_V52_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "step": "v53-check",
+      "mode": "--check",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=REPORT_PUBLICATION_APPLIED mode=READ_ONLY_CHECK migrations_executed=0 baseline=V1_V52_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "step": "v54-apply",
+      "mode": "--apply-monitoring-enrollment",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=MONITORING_ENROLLMENT_APPLIED mode=APPLY_MONITORING_ENROLLMENT migrations_executed=1 baseline=V1_V53_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "step": "v54-repeat",
+      "mode": "--apply-monitoring-enrollment",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=MONITORING_ENROLLMENT_APPLIED mode=APPLY_MONITORING_ENROLLMENT migrations_executed=0 baseline=V1_V53_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "step": "v54-check",
+      "mode": "--check",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=MONITORING_ENROLLMENT_APPLIED mode=READ_ONLY_CHECK migrations_executed=0 baseline=V1_V53_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "step": "v55-apply",
+      "mode": "--apply-monitoring-object-mapping",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=MONITORING_OBJECT_MAPPING_APPLIED mode=APPLY_MONITORING_OBJECT_MAPPING migrations_executed=1 baseline=V1_V54_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "step": "v55-repeat",
+      "mode": "--apply-monitoring-object-mapping",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=MONITORING_OBJECT_MAPPING_APPLIED mode=APPLY_MONITORING_OBJECT_MAPPING migrations_executed=0 baseline=V1_V54_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "step": "v55-check",
+      "mode": "--check",
+      "exit_code": 0,
+      "safe_summary": "MOP_SCHEMA status=MONITORING_OBJECT_MAPPING_APPLIED mode=READ_ONLY_CHECK migrations_executed=0 baseline=V1_V54_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    }
+  ],
+  "migrations_executed": 5,
+  "temporary_migration_credentials_removed": true,
+  "database_backup_restored": false,
+  "component_installations": 0,
+  "external_messages": 0,
+  "https": "DEFERRED_BY_USER",
+  "protected_before": {
+    "mop-lan-zabbix-web": {
+      "id": "61bb1692e7da5a54e4dcf51c3cf8965d9ae1d45a735cb1bf865d9627833d2c0e",
+      "image": "sha256:cd216a9968b62eb6fddd789872b9e8eb4d064539ef40b6356dd2d8c1588a3f91",
+      "started_at": "2026-10-08T12:21:37.244174288Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-agent": {
+      "id": "008118b2bd32f4da65bc766614c305973fcead8b2cc0e5cdf4c88880b9eb454b",
+      "image": "sha256:ba55e6d146d0f0bc550da82b29b22134655db6e31d2c9eae9b1d15f659ad86cd",
+      "started_at": "2026-10-08T12:18:48.243454374Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-server": {
+      "id": "303bbd1f5767a733137de772945fc46506143d0933d036f3412cad85d125ae66",
+      "image": "sha256:415452211dea59cd4ea3346f2c2b38403660408273c672ebf91603353ce1073f",
+      "started_at": "2026-10-08T12:18:48.248721584Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-postgres": {
+      "id": "3aebabee32b1812ff37aeb84341a7d67e736941d2bd0d82bbb7192919bea8a97",
+      "image": "sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641",
+      "started_at": "2026-10-08T12:15:32.354957313Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-rabbitmq": {
+      "id": "9b8cc8ece2a07ae354f88e7f919f157a03d424ca160cd51217375cd76a0a443d",
+      "image": "sha256:e3b55503d81b67c93a2914a7473e59bbd53d5f4560c421e06015ed64a3034c9e",
+      "started_at": "2026-10-08T12:15:32.356127727Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-minio": {
+      "id": "e347d1402ead939abe1121094ed0d963ba07f8f88464819c46449757022104d7",
+      "image": "sha256:a16cad481969d7ddb6fcd2f1c58284af3d1266190b9bedc3ef0801aeb05a93a9",
+      "started_at": "2026-10-08T12:15:32.354248163Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-redis": {
+      "id": "cd68b313f967a54df7f8d5c59c9fe3146f9c261372683205822c71f3d64b24f3",
+      "image": "sha256:abbc5faf6f23b6835d3c357530e96c841e02cb66bd0e426573ef5acb434f597f",
+      "started_at": "2026-10-08T12:15:32.349268223Z",
+      "restart_count": 0,
+      "running": true
+    }
+  },
+  "old_history": [
+    {
+      "installed_rank": 1,
+      "version": "1",
+      "script": "V1__remote_test_platform.sql",
+      "checksum": -1484181377,
+      "success": true
+    },
+    {
+      "installed_rank": 2,
+      "version": "2",
+      "script": "V2__tenant_configuration_revisions.sql",
+      "checksum": 1161094071,
+      "success": true
+    },
+    {
+      "installed_rank": 3,
+      "version": "3",
+      "script": "V3__configuration_review_test_identity.sql",
+      "checksum": -1273598682,
+      "success": true
+    },
+    {
+      "installed_rank": 4,
+      "version": "4",
+      "script": "V4__durable_customer_report_registration.sql",
+      "checksum": 1369050258,
+      "success": true
+    },
+    {
+      "installed_rank": 5,
+      "version": "5",
+      "script": "V5__durable_report_photos.sql",
+      "checksum": 1887903094,
+      "success": true
+    },
+    {
+      "installed_rank": 6,
+      "version": "6",
+      "script": "V6__asset_import_sources_and_mapping.sql",
+      "checksum": -636230002,
+      "success": true
+    },
+    {
+      "installed_rank": 7,
+      "version": "7",
+      "script": "V7__asset_dependency_draft_revisions.sql",
+      "checksum": -545292092,
+      "success": true
+    },
+    {
+      "installed_rank": 8,
+      "version": "8",
+      "script": "V8__manual_worklog_revisions.sql",
+      "checksum": 1211360336,
+      "success": true
+    },
+    {
+      "installed_rank": 9,
+      "version": "9",
+      "script": "V9__manual_asset_metadata_revisions.sql",
+      "checksum": -340432871,
+      "success": true
+    },
+    {
+      "installed_rank": 10,
+      "version": "10",
+      "script": "V10__immutable_internal_ticket_notes.sql",
+      "checksum": -896663071,
+      "success": true
+    },
+    {
+      "installed_rank": 11,
+      "version": "11",
+      "script": "V11__immutable_ticket_comments.sql",
+      "checksum": -1655668462,
+      "success": true
+    },
+    {
+      "installed_rank": 12,
+      "version": "12",
+      "script": "V12__unpublished_working_calendar_drafts.sql",
+      "checksum": -2068183288,
+      "success": true
+    },
+    {
+      "installed_rank": 13,
+      "version": "13",
+      "script": "V13__immutable_manual_incident_registrations.sql",
+      "checksum": 1030816869,
+      "success": true
+    },
+    {
+      "installed_rank": 14,
+      "version": "14",
+      "script": "V14__immutable_manual_recovery_confirmations.sql",
+      "checksum": -30124348,
+      "success": true
+    },
+    {
+      "installed_rank": 15,
+      "version": "15",
+      "script": "V15__manual_warranty_details.sql",
+      "checksum": 836542553,
+      "success": true
+    },
+    {
+      "installed_rank": 16,
+      "version": "16",
+      "script": "V16__immutable_capacity_scenario_drafts.sql",
+      "checksum": 1367595086,
+      "success": true
+    },
+    {
+      "installed_rank": 17,
+      "version": "17",
+      "script": "V17__customer_contact_revisions.sql",
+      "checksum": 2031946591,
+      "success": true
+    },
+    {
+      "installed_rank": 18,
+      "version": "18",
+      "script": "V18__durable_contact_import_jobs.sql",
+      "checksum": -1130281417,
+      "success": true
+    },
+    {
+      "installed_rank": 19,
+      "version": "19",
+      "script": "V19__contact_import_generated_hash_guard.sql",
+      "checksum": -268577672,
+      "success": true
+    },
+    {
+      "installed_rank": 20,
+      "version": "20",
+      "script": "V20__durable_asset_export_jobs.sql",
+      "checksum": -319450001,
+      "success": true
+    },
+    {
+      "installed_rank": 21,
+      "version": "21",
+      "script": "V21__inspection_template_revisions.sql",
+      "checksum": 951051044,
+      "success": true
+    },
+    {
+      "installed_rank": 22,
+      "version": "22",
+      "script": "V22__manual_inspection_worksheet_drafts.sql",
+      "checksum": -650061710,
+      "success": true
+    },
+    {
+      "installed_rank": 23,
+      "version": "23",
+      "script": "V23__immutable_inspection_source_collections.sql",
+      "checksum": 1321810212,
+      "success": true
+    },
+    {
+      "installed_rank": 24,
+      "version": "24",
+      "script": "V24__unpublished_backup_plan_drafts.sql",
+      "checksum": -424372040,
+      "success": true
+    },
+    {
+      "installed_rank": 25,
+      "version": "25",
+      "script": "V25__unreviewed_change_notice_drafts.sql",
+      "checksum": 552033867,
+      "success": true
+    },
+    {
+      "installed_rank": 26,
+      "version": "26",
+      "script": "V26__own_notification_preference_drafts.sql",
+      "checksum": -324766275,
+      "success": true
+    },
+    {
+      "installed_rank": 27,
+      "version": "27",
+      "script": "V27__project_identity_and_roles.sql",
+      "checksum": 511191109,
+      "success": true
+    },
+    {
+      "installed_rank": 28,
+      "version": "28",
+      "script": "V28__identity_inventory_and_password_formats.sql",
+      "checksum": 1559449245,
+      "success": true
+    },
+    {
+      "installed_rank": 29,
+      "version": "29",
+      "script": "V29__immutable_raw_monitoring_events.sql",
+      "checksum": -1977882733,
+      "success": true
+    },
+    {
+      "installed_rank": 30,
+      "version": "30",
+      "script": "V30__immutable_monitoring_quarantine.sql",
+      "checksum": 2028775275,
+      "success": true
+    },
+    {
+      "installed_rank": 31,
+      "version": "31",
+      "script": "V31__own_export_inbox.sql",
+      "checksum": -486321876,
+      "success": true
+    },
+    {
+      "installed_rank": 32,
+      "version": "32",
+      "script": "V32__runtime_configuration_publications.sql",
+      "checksum": -606158601,
+      "success": true
+    },
+    {
+      "installed_rank": 33,
+      "version": "33",
+      "script": "V33__ticket_lifecycle_and_durable_clocks.sql",
+      "checksum": -2063474061,
+      "success": true
+    },
+    {
+      "installed_rank": 34,
+      "version": "34",
+      "script": "V34__ticket_notification_intents.sql",
+      "checksum": -1167997960,
+      "success": true
+    },
+    {
+      "installed_rank": 35,
+      "version": "35",
+      "script": "V35__service_tiers_and_change_history.sql",
+      "checksum": -1509422434,
+      "success": true
+    },
+    {
+      "installed_rank": 36,
+      "version": "36",
+      "script": "V36__oncall_escalation_and_sla_monthly_results.sql",
+      "checksum": -131315136,
+      "success": true
+    },
+    {
+      "installed_rank": 37,
+      "version": "37",
+      "script": "V37__monitoring_events_noise_funnel_and_maintenance_windows.sql",
+      "checksum": 125697472,
+      "success": true
+    },
+    {
+      "installed_rank": 38,
+      "version": "38",
+      "script": "V38__wecom_bindings_deliveries_and_login_state.sql",
+      "checksum": 845758090,
+      "success": true
+    },
+    {
+      "installed_rank": 39,
+      "version": "39",
+      "script": "V39__email_bindings_and_delivery_ledger.sql",
+      "checksum": -373908053,
+      "success": true
+    },
+    {
+      "installed_rank": 40,
+      "version": "40",
+      "script": "V40__immutable_change_notice_approval_events.sql",
+      "checksum": 14806533,
+      "success": true
+    },
+    {
+      "installed_rank": 41,
+      "version": "41",
+      "script": "V41__immutable_inspection_quarterly_reports.sql",
+      "checksum": 1456236875,
+      "success": true
+    },
+    {
+      "installed_rank": 42,
+      "version": "42",
+      "script": "V42__ticket_lifecycle_revisions.sql",
+      "checksum": -956552339,
+      "success": true
+    },
+    {
+      "installed_rank": 43,
+      "version": "43",
+      "script": "V43__ticket_autoclose_jobs.sql",
+      "checksum": 2102398138,
+      "success": true
+    },
+    {
+      "installed_rank": 44,
+      "version": "44",
+      "script": "V44__ticket_sla_policy_bindings.sql",
+      "checksum": 1869511343,
+      "success": true
+    },
+    {
+      "installed_rank": 45,
+      "version": "45",
+      "script": "V45__sla_reminder_intents.sql",
+      "checksum": 1011894633,
+      "success": true
+    },
+    {
+      "installed_rank": 46,
+      "version": "46",
+      "script": "V46__backup_device_coordination_journal.sql",
+      "checksum": -143003885,
+      "success": true
+    },
+    {
+      "installed_rank": 47,
+      "version": "47",
+      "script": "V47__backup_run_event_journal.sql",
+      "checksum": 829577921,
+      "success": true
+    },
+    {
+      "installed_rank": 48,
+      "version": "48",
+      "script": "V48__durable_backup_archive_staging.sql",
+      "checksum": 2106091134,
+      "success": true
+    },
+    {
+      "installed_rank": 49,
+      "version": "49",
+      "script": "V49__atomic_backup_version_registration.sql",
+      "checksum": -655264389,
+      "success": true
+    },
+    {
+      "installed_rank": 50,
+      "version": "50",
+      "script": "V50__delivery_receipt_journal.sql",
+      "checksum": -1248651202,
+      "success": true
+    }
+  ],
+  "previous_active_transaction": "/opt/mop-lan-test/private/update-20261023T095104Z-demo-c3e1c35b19/transaction.json",
+  "temporary_migration_credentials_created": false,
+  "active_step": "v55-check",
+  "paused_applications": [
+    "mop-lan-api",
+    "mop-lan-photo-worker",
+    "mop-lan-import-worker",
+    "mop-lan-contact-worker",
+    "mop-lan-export-preparation-worker",
+    "mop-lan-af-collector"
+  ],
+  "legacy_before": [
+    {
+      "name": "flyway_schema_history",
+      "rows": 50,
+      "digest": "9a3abdaca2f6f40ebc7d8c57c747cd89"
+    },
+    {
+      "name": "mop_asset",
+      "rows": 68,
+      "digest": "97a80b598be34849576858aa19c20533"
+    },
+    {
+      "name": "mop_asset_dependency_edge",
+      "rows": 15,
+      "digest": "2128c0e34d46fde4ace1e2cd131d5b2e"
+    },
+    {
+      "name": "mop_asset_dependency_graph",
+      "rows": 3,
+      "digest": "1f11550a252d54f6d07d3e5c4681bbc6"
+    },
+    {
+      "name": "mop_asset_dependency_revision",
+      "rows": 3,
+      "digest": "f8e289bb11792a9f72e7a62a39edc7b1"
+    },
+    {
+      "name": "mop_asset_export_attempt",
+      "rows": 4,
+      "digest": "344eb770eac8f99028461abbe75976e9"
+    },
+    {
+      "name": "mop_asset_export_job",
+      "rows": 2,
+      "digest": "1d21897af782df8cb4c9fdc77de0b1ab"
+    },
+    {
+      "name": "mop_asset_import_artifact",
+      "rows": 3,
+      "digest": "27527827cf29f8df22f605e20674fb95"
+    },
+    {
+      "name": "mop_asset_import_job",
+      "rows": 6,
+      "digest": "f17a9eaecf86a13761e81a524340143f"
+    },
+    {
+      "name": "mop_asset_import_mapping",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_asset_import_operation",
+      "rows": 6,
+      "digest": "fb37195ecb90d25848d5d01750e0b90e"
+    },
+    {
+      "name": "mop_asset_import_source",
+      "rows": 3,
+      "digest": "287c15044c4644c9dbb89a447b0abb87"
+    },
+    {
+      "name": "mop_asset_manual_details",
+      "rows": 26,
+      "digest": "34351c1e05551443e380ab58b24c27b3"
+    },
+    {
+      "name": "mop_asset_manual_revision",
+      "rows": 36,
+      "digest": "16c35832d4f5e8decbfe6db3292f95de"
+    },
+    {
+      "name": "mop_audit",
+      "rows": 3394,
+      "digest": "bc218fe0c031e0dc383a9e9d6f8d6ea4"
+    },
+    {
+      "name": "mop_autoticket_attempt",
+      "rows": 91,
+      "digest": "e5f742c39ca9acec4f0ef17727aa9708"
+    },
+    {
+      "name": "mop_backup_archive_event",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_backup_archive_submission",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_backup_device_lease_event",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_backup_plan_draft",
+      "rows": 3,
+      "digest": "468191b4f48100b005df55b0354fa3c6"
+    },
+    {
+      "name": "mop_backup_plan_revision",
+      "rows": 3,
+      "digest": "0009aa87991f59b135db96deda1e95b1"
+    },
+    {
+      "name": "mop_backup_plan_target",
+      "rows": 3,
+      "digest": "cdaae61ba3210b298b50a4538c31507d"
+    },
+    {
+      "name": "mop_backup_run_event",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_backup_version_registration",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_capacity_scenario_draft",
+      "rows": 3,
+      "digest": "4a650d6e24f703d713f6a32455b0ab08"
+    },
+    {
+      "name": "mop_change_notice_approval_event",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_change_notice_asset",
+      "rows": 3,
+      "digest": "1faa1dff2531123e013981fad2344c8d"
+    },
+    {
+      "name": "mop_change_notice_draft",
+      "rows": 3,
+      "digest": "ab3ce5b42e9c4cd9f8a57ceb85c29fac"
+    },
+    {
+      "name": "mop_change_notice_revision",
+      "rows": 3,
+      "digest": "e1529067cac39658d7d451538b292398"
+    },
+    {
+      "name": "mop_configuration",
+      "rows": 186,
+      "digest": "4c9faf6a067ab14d07d123a81ad3f31a"
+    },
+    {
+      "name": "mop_configuration_revision",
+      "rows": 78,
+      "digest": "fdcd85c9eb4091befcf99aa97012a669"
+    },
+    {
+      "name": "mop_configuration_revision_history",
+      "rows": 216,
+      "digest": "bc615740299a13219f8c593b66106c7d"
+    },
+    {
+      "name": "mop_contact_import_job",
+      "rows": 3,
+      "digest": "2ee6a6e3b843f4a2dae72f9d715c257f"
+    },
+    {
+      "name": "mop_contact_import_result",
+      "rows": 3,
+      "digest": "a2e12f96845ffbfb3fe522fb5d2cab4d"
+    },
+    {
+      "name": "mop_contact_tenant_guard",
+      "rows": 4,
+      "digest": "183905cb327282bd1ed4603e1cfe4ca8"
+    },
+    {
+      "name": "mop_customer_contact",
+      "rows": 12,
+      "digest": "b70f683160253ea04f7384d37edeb04e"
+    },
+    {
+      "name": "mop_customer_contact_revision",
+      "rows": 12,
+      "digest": "c4ec1672ca7712de378e2c899d8e18c1"
+    },
+    {
+      "name": "mop_delivery_receipt_journal",
+      "rows": 15,
+      "digest": "47ae242dcecaad451d31d05cb1e6ab4e"
+    },
+    {
+      "name": "mop_email_binding",
+      "rows": 4,
+      "digest": "350c7ce590b7d3599aed00dced23c782"
+    },
+    {
+      "name": "mop_email_delivery",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_escalation_policy",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_escalation_step_run",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_event_noise_record",
+      "rows": 279,
+      "digest": "22b1208c73ad10b0f6d1c04b12f20510"
+    },
+    {
+      "name": "mop_export_inbox",
+      "rows": 2,
+      "digest": "c29fea4ee3efef79ccbebbdb2482ad5f"
+    },
+    {
+      "name": "mop_external_identity_binding",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_file",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_file_grant",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_idempotency",
+      "rows": 1365,
+      "digest": "92ea359e3de3d33e956c318866a49169"
+    },
+    {
+      "name": "mop_identity_policy",
+      "rows": 1,
+      "digest": "abaec5050d3b4f9c3b37a7d5f2c68c26"
+    },
+    {
+      "name": "mop_identity_security",
+      "rows": 60,
+      "digest": "7a85261c92479b3f9ea497dee9df3a48"
+    },
+    {
+      "name": "mop_inspection_quarterly_report",
+      "rows": 15,
+      "digest": "d64a5536d21614a730140549eef76965"
+    },
+    {
+      "name": "mop_inspection_source_collection",
+      "rows": 12,
+      "digest": "fffe3b1faea797cb9d7403b6d65dd92b"
+    },
+    {
+      "name": "mop_inspection_source_collection_item",
+      "rows": 12,
+      "digest": "ca1421e18f5fdd4873f989dcb0c4bf9e"
+    },
+    {
+      "name": "mop_inspection_template",
+      "rows": 17,
+      "digest": "8fcf346138f542b5835bc603b0989a67"
+    },
+    {
+      "name": "mop_inspection_template_item",
+      "rows": 20,
+      "digest": "ef8d0d9c36d363104a8d8679219c2f45"
+    },
+    {
+      "name": "mop_inspection_template_revision",
+      "rows": 17,
+      "digest": "4ff2d5e57a449ebfc46106f4d2c93a64"
+    },
+    {
+      "name": "mop_inspection_worksheet",
+      "rows": 17,
+      "digest": "3b9cdd223e1a7b06a4f8c60b9862ecc6"
+    },
+    {
+      "name": "mop_inspection_worksheet_revision",
+      "rows": 19,
+      "digest": "f6149131d20d03f382f68906ab6431f6"
+    },
+    {
+      "name": "mop_local_account",
+      "rows": 25,
+      "digest": "8dedd226e7ea32ce99079e3bbeef7a13"
+    },
+    {
+      "name": "mop_local_password_history",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_maintenance_window",
+      "rows": 3,
+      "digest": "06ea53df360831124fc6a88cfae7d203"
+    },
+    {
+      "name": "mop_manual_incident_registration",
+      "rows": 3,
+      "digest": "7f724257987f016c26d1358196b5d1f1"
+    },
+    {
+      "name": "mop_manual_recovery_confirmation",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_member_role_assignment",
+      "rows": 1,
+      "digest": "e496d492b9a618028f17f2804399e974"
+    },
+    {
+      "name": "mop_membership",
+      "rows": 108,
+      "digest": "08c144b8d6f8e531e58fde7b2862a934"
+    },
+    {
+      "name": "mop_monitoring_event",
+      "rows": 91,
+      "digest": "48d9f60fbae7baf97377e10fa8a05a9f"
+    },
+    {
+      "name": "mop_monitoring_event_member",
+      "rows": 152,
+      "digest": "5cb7a8d48594c16722e51f53b2465ae1"
+    },
+    {
+      "name": "mop_monitoring_quarantine",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_monitoring_quarantine_decision",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_notification_intent",
+      "rows": 123,
+      "digest": "a2c5123fe3c7316c1bba9c8aeefcc0b1"
+    },
+    {
+      "name": "mop_notification_message",
+      "rows": 95,
+      "digest": "4904df84c086e00515b28de51bf01291"
+    },
+    {
+      "name": "mop_notification_preference_draft",
+      "rows": 3,
+      "digest": "18b36c455af23458be84edcf457414ce"
+    },
+    {
+      "name": "mop_notification_preference_revision",
+      "rows": 3,
+      "digest": "7ea0b205c9b98f3cb02e4417af85481a"
+    },
+    {
+      "name": "mop_oncall_handoff",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_oncall_roster",
+      "rows": 3,
+      "digest": "a2401c0a8dfc2cae0ba580607371ef8f"
+    },
+    {
+      "name": "mop_operation",
+      "rows": 266,
+      "digest": "2f7af3d084a4977d668eb1e4188539d6"
+    },
+    {
+      "name": "mop_outbox",
+      "rows": 266,
+      "digest": "eb836d79e3664809cb4165a6804b51a3"
+    },
+    {
+      "name": "mop_photo_job",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_project_role",
+      "rows": 192,
+      "digest": "1e5cdb734b26c9e704d7afe0f6b5c15d"
+    },
+    {
+      "name": "mop_raw_monitoring_event",
+      "rows": 50,
+      "digest": "4702848ec16becb05e86cc84cea225f5"
+    },
+    {
+      "name": "mop_role_capability_limit",
+      "rows": 87,
+      "digest": "db375f9c14f6655a59e80983e5b8db8d"
+    },
+    {
+      "name": "mop_runtime_configuration_release",
+      "rows": 78,
+      "digest": "772f90936e7c050affdfa95ae4aa18b9"
+    },
+    {
+      "name": "mop_service_tier",
+      "rows": 4,
+      "digest": "5e19e65dd0dfc2fb130e929fae867402"
+    },
+    {
+      "name": "mop_service_tier_change",
+      "rows": 4,
+      "digest": "8647d3ba52215453761da60bae262217"
+    },
+    {
+      "name": "mop_site",
+      "rows": 47,
+      "digest": "ba9796dad09c84d295b9406e97f992cf"
+    },
+    {
+      "name": "mop_sla_monthly_result",
+      "rows": 4,
+      "digest": "a8d675e305f4ca06aba8499791ddbe46"
+    },
+    {
+      "name": "mop_sla_notification_intent",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_tenant",
+      "rows": 48,
+      "digest": "04df0379367f0329b83b7da4a4b6d5b4"
+    },
+    {
+      "name": "mop_ticket",
+      "rows": 266,
+      "digest": "f66c7e07b4054a751c27fdb509dc0306"
+    },
+    {
+      "name": "mop_ticket_autoclose_job",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_ticket_comment",
+      "rows": 9,
+      "digest": "e4244ac97a9bf7af8b7a0e0ba0fcc7fd"
+    },
+    {
+      "name": "mop_ticket_history",
+      "rows": 266,
+      "digest": "e8fb749f7d569f0d74cc731a7f204e31"
+    },
+    {
+      "name": "mop_ticket_internal_note",
+      "rows": 9,
+      "digest": "9590ad15d1ee299e0d90cb839ed3fc60"
+    },
+    {
+      "name": "mop_ticket_lifecycle_revision",
+      "rows": 1,
+      "digest": "f777394c551a77d1e0e905d0daa73bff"
+    },
+    {
+      "name": "mop_ticket_resolution_snapshot",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_ticket_sla_policy_binding",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_ticket_sla_reminder",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_ticket_sla_scan_job",
+      "rows": 1,
+      "digest": "e1d07894805d6e6185d324ad6f2eead7"
+    },
+    {
+      "name": "mop_ticket_workflow_authority",
+      "rows": 197,
+      "digest": "65e87653a214dfa179cf1217e3a8230d"
+    },
+    {
+      "name": "mop_ticket_workflow_clock",
+      "rows": 909,
+      "digest": "b1ad5965862ea2c482f156b5a4641de2"
+    },
+    {
+      "name": "mop_ticket_workflow_clock_receipt",
+      "rows": 90,
+      "digest": "65fbe170bf17b910cd3392fb2bee49bd"
+    },
+    {
+      "name": "mop_ticket_workflow_event",
+      "rows": 288,
+      "digest": "8e25babf9d229cf8b34745cfa1e71d63"
+    },
+    {
+      "name": "mop_ticket_workflow_outbox",
+      "rows": 367,
+      "digest": "3a9be9e8df97c63e407ee0507ffa1880"
+    },
+    {
+      "name": "mop_user",
+      "rows": 60,
+      "digest": "d5b46da132fc2854c74c4c594d454207"
+    },
+    {
+      "name": "mop_wecom_binding",
+      "rows": 4,
+      "digest": "19ef1bd318fe80c7a97dd1100161ecf7"
+    },
+    {
+      "name": "mop_wecom_delivery",
+      "rows": 1,
+      "digest": "3907285f63999eb992e9ca224aabcb3c"
+    },
+    {
+      "name": "mop_wecom_login_state",
+      "rows": 7,
+      "digest": "364f0c3557b4468ecc73f11228191988"
+    },
+    {
+      "name": "mop_working_calendar_draft",
+      "rows": 3,
+      "digest": "860e0683208954c14273e4baee6cb260"
+    },
+    {
+      "name": "mop_working_calendar_revision",
+      "rows": 3,
+      "digest": "67d711cc0233af92066e6b8580997453"
+    },
+    {
+      "name": "mop_worklog",
+      "rows": 3,
+      "digest": "02d1b9c9981a28b33b09f09c4425e30b"
+    },
+    {
+      "name": "mop_worklog_revision",
+      "rows": 3,
+      "digest": "fc7ee040d5d82d4966d4bdf1c2851b95"
+    }
+  ],
+  "backup": {
+    "remote_private_path": "/opt/mop-lan-test/private/schema-20261024T063707Z-v55-e83e205a/mop-test-before-v51-v55.dump",
+    "local_git_ignored": true,
+    "sha256": "4dbc443d06ad38903857bcd9c12546665f4ba6125900323c3378f071546bde96",
+    "bytes": 1969503,
+    "pg_restore_list_verified": true
+  },
+  "schema_after": 55,
+  "new_empty_tables": [
+    {
+      "name": "mop_attachment_security_revision",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_monitoring_enrollment",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_monitoring_enrollment_revision",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_monitoring_object_binding",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_monitoring_object_binding_revision",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_notification_control",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_report_publication_artifact",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_report_publication_delivery_intent",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_report_publication_document",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_report_publication_read",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_report_publication_revision",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    }
+  ],
+  "legacy_after": [
+    {
+      "name": "flyway_schema_history",
+      "rows": 55,
+      "digest": "ec25106034eb614b64bbd27e7e891bfe"
+    },
+    {
+      "name": "mop_asset",
+      "rows": 68,
+      "digest": "97a80b598be34849576858aa19c20533"
+    },
+    {
+      "name": "mop_asset_dependency_edge",
+      "rows": 15,
+      "digest": "2128c0e34d46fde4ace1e2cd131d5b2e"
+    },
+    {
+      "name": "mop_asset_dependency_graph",
+      "rows": 3,
+      "digest": "1f11550a252d54f6d07d3e5c4681bbc6"
+    },
+    {
+      "name": "mop_asset_dependency_revision",
+      "rows": 3,
+      "digest": "f8e289bb11792a9f72e7a62a39edc7b1"
+    },
+    {
+      "name": "mop_asset_export_attempt",
+      "rows": 4,
+      "digest": "344eb770eac8f99028461abbe75976e9"
+    },
+    {
+      "name": "mop_asset_export_job",
+      "rows": 2,
+      "digest": "1d21897af782df8cb4c9fdc77de0b1ab"
+    },
+    {
+      "name": "mop_asset_import_artifact",
+      "rows": 3,
+      "digest": "27527827cf29f8df22f605e20674fb95"
+    },
+    {
+      "name": "mop_asset_import_job",
+      "rows": 6,
+      "digest": "f17a9eaecf86a13761e81a524340143f"
+    },
+    {
+      "name": "mop_asset_import_mapping",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_asset_import_operation",
+      "rows": 6,
+      "digest": "fb37195ecb90d25848d5d01750e0b90e"
+    },
+    {
+      "name": "mop_asset_import_source",
+      "rows": 3,
+      "digest": "287c15044c4644c9dbb89a447b0abb87"
+    },
+    {
+      "name": "mop_asset_manual_details",
+      "rows": 26,
+      "digest": "34351c1e05551443e380ab58b24c27b3"
+    },
+    {
+      "name": "mop_asset_manual_revision",
+      "rows": 36,
+      "digest": "16c35832d4f5e8decbfe6db3292f95de"
+    },
+    {
+      "name": "mop_audit",
+      "rows": 3394,
+      "digest": "bc218fe0c031e0dc383a9e9d6f8d6ea4"
+    },
+    {
+      "name": "mop_autoticket_attempt",
+      "rows": 91,
+      "digest": "e5f742c39ca9acec4f0ef17727aa9708"
+    },
+    {
+      "name": "mop_backup_archive_event",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_backup_archive_submission",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_backup_device_lease_event",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_backup_plan_draft",
+      "rows": 3,
+      "digest": "468191b4f48100b005df55b0354fa3c6"
+    },
+    {
+      "name": "mop_backup_plan_revision",
+      "rows": 3,
+      "digest": "0009aa87991f59b135db96deda1e95b1"
+    },
+    {
+      "name": "mop_backup_plan_target",
+      "rows": 3,
+      "digest": "cdaae61ba3210b298b50a4538c31507d"
+    },
+    {
+      "name": "mop_backup_run_event",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_backup_version_registration",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_capacity_scenario_draft",
+      "rows": 3,
+      "digest": "4a650d6e24f703d713f6a32455b0ab08"
+    },
+    {
+      "name": "mop_change_notice_approval_event",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_change_notice_asset",
+      "rows": 3,
+      "digest": "1faa1dff2531123e013981fad2344c8d"
+    },
+    {
+      "name": "mop_change_notice_draft",
+      "rows": 3,
+      "digest": "ab3ce5b42e9c4cd9f8a57ceb85c29fac"
+    },
+    {
+      "name": "mop_change_notice_revision",
+      "rows": 3,
+      "digest": "e1529067cac39658d7d451538b292398"
+    },
+    {
+      "name": "mop_configuration",
+      "rows": 186,
+      "digest": "4c9faf6a067ab14d07d123a81ad3f31a"
+    },
+    {
+      "name": "mop_configuration_revision",
+      "rows": 78,
+      "digest": "fdcd85c9eb4091befcf99aa97012a669"
+    },
+    {
+      "name": "mop_configuration_revision_history",
+      "rows": 216,
+      "digest": "bc615740299a13219f8c593b66106c7d"
+    },
+    {
+      "name": "mop_contact_import_job",
+      "rows": 3,
+      "digest": "2ee6a6e3b843f4a2dae72f9d715c257f"
+    },
+    {
+      "name": "mop_contact_import_result",
+      "rows": 3,
+      "digest": "a2e12f96845ffbfb3fe522fb5d2cab4d"
+    },
+    {
+      "name": "mop_contact_tenant_guard",
+      "rows": 4,
+      "digest": "183905cb327282bd1ed4603e1cfe4ca8"
+    },
+    {
+      "name": "mop_customer_contact",
+      "rows": 12,
+      "digest": "b70f683160253ea04f7384d37edeb04e"
+    },
+    {
+      "name": "mop_customer_contact_revision",
+      "rows": 12,
+      "digest": "c4ec1672ca7712de378e2c899d8e18c1"
+    },
+    {
+      "name": "mop_delivery_receipt_journal",
+      "rows": 15,
+      "digest": "47ae242dcecaad451d31d05cb1e6ab4e"
+    },
+    {
+      "name": "mop_email_binding",
+      "rows": 4,
+      "digest": "350c7ce590b7d3599aed00dced23c782"
+    },
+    {
+      "name": "mop_email_delivery",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_escalation_policy",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_escalation_step_run",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_event_noise_record",
+      "rows": 279,
+      "digest": "22b1208c73ad10b0f6d1c04b12f20510"
+    },
+    {
+      "name": "mop_export_inbox",
+      "rows": 2,
+      "digest": "c29fea4ee3efef79ccbebbdb2482ad5f"
+    },
+    {
+      "name": "mop_external_identity_binding",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_file",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_file_grant",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_idempotency",
+      "rows": 1365,
+      "digest": "92ea359e3de3d33e956c318866a49169"
+    },
+    {
+      "name": "mop_identity_policy",
+      "rows": 1,
+      "digest": "abaec5050d3b4f9c3b37a7d5f2c68c26"
+    },
+    {
+      "name": "mop_identity_security",
+      "rows": 60,
+      "digest": "7a85261c92479b3f9ea497dee9df3a48"
+    },
+    {
+      "name": "mop_inspection_quarterly_report",
+      "rows": 15,
+      "digest": "d64a5536d21614a730140549eef76965"
+    },
+    {
+      "name": "mop_inspection_source_collection",
+      "rows": 12,
+      "digest": "fffe3b1faea797cb9d7403b6d65dd92b"
+    },
+    {
+      "name": "mop_inspection_source_collection_item",
+      "rows": 12,
+      "digest": "ca1421e18f5fdd4873f989dcb0c4bf9e"
+    },
+    {
+      "name": "mop_inspection_template",
+      "rows": 17,
+      "digest": "8fcf346138f542b5835bc603b0989a67"
+    },
+    {
+      "name": "mop_inspection_template_item",
+      "rows": 20,
+      "digest": "ef8d0d9c36d363104a8d8679219c2f45"
+    },
+    {
+      "name": "mop_inspection_template_revision",
+      "rows": 17,
+      "digest": "4ff2d5e57a449ebfc46106f4d2c93a64"
+    },
+    {
+      "name": "mop_inspection_worksheet",
+      "rows": 17,
+      "digest": "3b9cdd223e1a7b06a4f8c60b9862ecc6"
+    },
+    {
+      "name": "mop_inspection_worksheet_revision",
+      "rows": 19,
+      "digest": "f6149131d20d03f382f68906ab6431f6"
+    },
+    {
+      "name": "mop_local_account",
+      "rows": 25,
+      "digest": "8dedd226e7ea32ce99079e3bbeef7a13"
+    },
+    {
+      "name": "mop_local_password_history",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_maintenance_window",
+      "rows": 3,
+      "digest": "06ea53df360831124fc6a88cfae7d203"
+    },
+    {
+      "name": "mop_manual_incident_registration",
+      "rows": 3,
+      "digest": "7f724257987f016c26d1358196b5d1f1"
+    },
+    {
+      "name": "mop_manual_recovery_confirmation",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_member_role_assignment",
+      "rows": 1,
+      "digest": "e496d492b9a618028f17f2804399e974"
+    },
+    {
+      "name": "mop_membership",
+      "rows": 108,
+      "digest": "08c144b8d6f8e531e58fde7b2862a934"
+    },
+    {
+      "name": "mop_monitoring_event",
+      "rows": 91,
+      "digest": "48d9f60fbae7baf97377e10fa8a05a9f"
+    },
+    {
+      "name": "mop_monitoring_event_member",
+      "rows": 152,
+      "digest": "5cb7a8d48594c16722e51f53b2465ae1"
+    },
+    {
+      "name": "mop_monitoring_quarantine",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_monitoring_quarantine_decision",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_notification_intent",
+      "rows": 123,
+      "digest": "a2c5123fe3c7316c1bba9c8aeefcc0b1"
+    },
+    {
+      "name": "mop_notification_message",
+      "rows": 95,
+      "digest": "4904df84c086e00515b28de51bf01291"
+    },
+    {
+      "name": "mop_notification_preference_draft",
+      "rows": 3,
+      "digest": "18b36c455af23458be84edcf457414ce"
+    },
+    {
+      "name": "mop_notification_preference_revision",
+      "rows": 3,
+      "digest": "7ea0b205c9b98f3cb02e4417af85481a"
+    },
+    {
+      "name": "mop_oncall_handoff",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_oncall_roster",
+      "rows": 3,
+      "digest": "a2401c0a8dfc2cae0ba580607371ef8f"
+    },
+    {
+      "name": "mop_operation",
+      "rows": 266,
+      "digest": "2f7af3d084a4977d668eb1e4188539d6"
+    },
+    {
+      "name": "mop_outbox",
+      "rows": 266,
+      "digest": "eb836d79e3664809cb4165a6804b51a3"
+    },
+    {
+      "name": "mop_photo_job",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_project_role",
+      "rows": 192,
+      "digest": "1e5cdb734b26c9e704d7afe0f6b5c15d"
+    },
+    {
+      "name": "mop_raw_monitoring_event",
+      "rows": 50,
+      "digest": "4702848ec16becb05e86cc84cea225f5"
+    },
+    {
+      "name": "mop_role_capability_limit",
+      "rows": 87,
+      "digest": "db375f9c14f6655a59e80983e5b8db8d"
+    },
+    {
+      "name": "mop_runtime_configuration_release",
+      "rows": 78,
+      "digest": "772f90936e7c050affdfa95ae4aa18b9"
+    },
+    {
+      "name": "mop_service_tier",
+      "rows": 4,
+      "digest": "5e19e65dd0dfc2fb130e929fae867402"
+    },
+    {
+      "name": "mop_service_tier_change",
+      "rows": 4,
+      "digest": "8647d3ba52215453761da60bae262217"
+    },
+    {
+      "name": "mop_site",
+      "rows": 47,
+      "digest": "ba9796dad09c84d295b9406e97f992cf"
+    },
+    {
+      "name": "mop_sla_monthly_result",
+      "rows": 4,
+      "digest": "a8d675e305f4ca06aba8499791ddbe46"
+    },
+    {
+      "name": "mop_sla_notification_intent",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_tenant",
+      "rows": 48,
+      "digest": "04df0379367f0329b83b7da4a4b6d5b4"
+    },
+    {
+      "name": "mop_ticket",
+      "rows": 266,
+      "digest": "f66c7e07b4054a751c27fdb509dc0306"
+    },
+    {
+      "name": "mop_ticket_autoclose_job",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_ticket_comment",
+      "rows": 9,
+      "digest": "e4244ac97a9bf7af8b7a0e0ba0fcc7fd"
+    },
+    {
+      "name": "mop_ticket_history",
+      "rows": 266,
+      "digest": "e8fb749f7d569f0d74cc731a7f204e31"
+    },
+    {
+      "name": "mop_ticket_internal_note",
+      "rows": 9,
+      "digest": "9590ad15d1ee299e0d90cb839ed3fc60"
+    },
+    {
+      "name": "mop_ticket_lifecycle_revision",
+      "rows": 1,
+      "digest": "f777394c551a77d1e0e905d0daa73bff"
+    },
+    {
+      "name": "mop_ticket_resolution_snapshot",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_ticket_sla_policy_binding",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_ticket_sla_reminder",
+      "rows": 0,
+      "digest": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "name": "mop_ticket_sla_scan_job",
+      "rows": 1,
+      "digest": "e1d07894805d6e6185d324ad6f2eead7"
+    },
+    {
+      "name": "mop_ticket_workflow_authority",
+      "rows": 197,
+      "digest": "65e87653a214dfa179cf1217e3a8230d"
+    },
+    {
+      "name": "mop_ticket_workflow_clock",
+      "rows": 909,
+      "digest": "b1ad5965862ea2c482f156b5a4641de2"
+    },
+    {
+      "name": "mop_ticket_workflow_clock_receipt",
+      "rows": 90,
+      "digest": "65fbe170bf17b910cd3392fb2bee49bd"
+    },
+    {
+      "name": "mop_ticket_workflow_event",
+      "rows": 288,
+      "digest": "8e25babf9d229cf8b34745cfa1e71d63"
+    },
+    {
+      "name": "mop_ticket_workflow_outbox",
+      "rows": 367,
+      "digest": "3a9be9e8df97c63e407ee0507ffa1880"
+    },
+    {
+      "name": "mop_user",
+      "rows": 60,
+      "digest": "d5b46da132fc2854c74c4c594d454207"
+    },
+    {
+      "name": "mop_wecom_binding",
+      "rows": 4,
+      "digest": "19ef1bd318fe80c7a97dd1100161ecf7"
+    },
+    {
+      "name": "mop_wecom_delivery",
+      "rows": 1,
+      "digest": "3907285f63999eb992e9ca224aabcb3c"
+    },
+    {
+      "name": "mop_wecom_login_state",
+      "rows": 7,
+      "digest": "364f0c3557b4468ecc73f11228191988"
+    },
+    {
+      "name": "mop_working_calendar_draft",
+      "rows": 3,
+      "digest": "860e0683208954c14273e4baee6cb260"
+    },
+    {
+      "name": "mop_working_calendar_revision",
+      "rows": 3,
+      "digest": "67d711cc0233af92066e6b8580997453"
+    },
+    {
+      "name": "mop_worklog",
+      "rows": 3,
+      "digest": "02d1b9c9981a28b33b09f09c4425e30b"
+    },
+    {
+      "name": "mop_worklog_revision",
+      "rows": 3,
+      "digest": "fc7ee040d5d82d4966d4bdf1c2851b95"
+    }
+  ],
+  "changed_legacy_tables": [
+    "flyway_schema_history"
+  ],
+  "old_history_unchanged": true,
+  "old_business_tables_unchanged": true,
+  "protected_component_lifecycles_unchanged": true,
+  "original_applications_resumed_ready": true,
+  "finished_at": "2026-10-24T06:40:47.606775+00:00",
+  "local_locks_released": true
+}

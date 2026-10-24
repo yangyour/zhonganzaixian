@@ -189,7 +189,9 @@
         "docs/asset-ledger-public-facts-20261023.md",
         "docs/evidence/local-astra-ut-20261023/a05/validation.json"
       ],
-      "commits": [],
+      "commits": [
+        "8dc5d412"
+      ],
       "completed_subitems": [
         "Recovered reviewed 3b219461 public-facts batch and list/detail consumers on latest main",
         "Return-time membership/account checks, same-snapshot four-core-field drift guard, nanosecond future-time rejection",

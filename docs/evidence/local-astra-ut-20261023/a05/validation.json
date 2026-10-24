@@ -100,5 +100,6 @@
     "build_id": "f5b51f1c25f59a10c42cdb0a03e22727d5b70583553cfe7debe2d7977c2979ec",
     "static_files": 153,
     "chunk_warning_retained": true
-  }
+  },
+  "feature_commit": "8dc5d412"
 }

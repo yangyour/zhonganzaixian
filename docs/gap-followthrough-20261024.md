@@ -1,5 +1,7 @@
 # 剩余业务接续（2026-10-24）
 
+本次唯一新接续会话复用`E:\work\wxw9\zhonganzaixian\.worktrees\remaining-gaps-20261024`，分支`codex/remaining-gaps-20261024`，上游`origin/codex/remaining-gaps-20261024`；规范origin及组织仍为`https://github.com/yangyour/zhonganzaixian.git` / `yangyour/zhonganzaixian`。fetch后HEAD/main/上游均为`83432839`，无新增远端提交。原目录三处未提交前端修改仍保留。只读复测确认远端源码`b964701b`、活动V55、14服务运行、4台实际设备、11成功/9明确配置门禁；原始实测保存在仓库外`output/monitoring-intake-20261024/`。之后收到远端`52666007`/`22a7638b`只读设备诊断与27项真实采样证据，已正常快进吸收，不重复开发或重跑其设备流程。没有重跑迁移/发布，HTTPS和手机专项后置，M7/Q01保持。下文旧基线和先前执行顺序保留为历史。
+
 用户随后明确要求“部署远程”。两项功能及当前已提交主干已按b964701b发布7应用，独立迁移至活动V55；462HTTP和7实际API浏览器读取通过，详见[远程发布](remote-release-20261024.md)。实际报告列表为空，非空修订/正式发布门禁仍独立保留。
 
 报告修订已以a4b31f87推送功能分支并正常快进合入main。第二功能补齐SLA事件时长、未知来源、精确t2月度冻结回读，验证与范围见[时间来源](sla-monitoring-source-20261024.md)。本轮无部署、迁移或外发；HTTPS继续后置。

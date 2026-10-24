@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "date": "2026-10-23",
-  "source_commit": "f45891bad39f7964b462a18fb5cc4f93ba2957d0",
+  "source_commit": "83432839cdaf25579ace499a7e9f91e26c1d4ab1",
   "scope": "Implementation gap work and review coverage; not formal acceptance or a completion percentage",
   "tasks": [
     {
@@ -56,17 +56,20 @@
         "docs/event-operational-metrics-20261023.md",
         "docs/evidence/dot-continuation-20261023/ui02-event-metrics.json",
         "docs/event-noise-trend-20261023.md",
-        "docs/evidence/dot-continuation-20261023/ui02-noise-trend.json"
+        "docs/evidence/dot-continuation-20261023/ui02-noise-trend.json",
+        "docs/sla-monitoring-source-20261024.md"
       ],
       "commits": [
         "25a17013"
       ],
       "remaining": [
         "Designated PostgreSQL and browser integration; formal acceptance",
-        "Remaining source aggregates, effective denominators, frozen reports and customer-confirmed inputs",
-        "Existing SLA workflow timestamps are not yet replaced by event problem/first-ack timestamps; shared math alone is not full source unification"
+        "Remaining source aggregates, effective denominators, frozen reports and customer-confirmed inputs"
       ],
-      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "completed_subitems": [
+        "b964701b 已统一事件t0、首次确认t1及可信精确t2；真实指定PG与月度冻结回读已验证。剩余健康覆盖、有效分母及对账另验。"
+      ]
     },
     {
       "id": "UI03",
@@ -127,7 +130,10 @@
         "08a3a47c",
         "494400cf"
       ],
-      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "remaining": [
+        "全33列扩展属性结构化和权威引用；正式异步operation与错误回执文件；500行/60秒及并发、进程故障验证。实际导入执行/回执恢复已实现并有旧真实证据。"
+      ]
     },
     {
       "id": "A02",
@@ -143,7 +149,11 @@
       "completion_criterion": "实现申请/审核/开通/失败补偿、预留与释放、配额计量；实际租户/限额配置化，生产物理隔离待Q02。",
       "evidence": [],
       "commits": [],
-      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "remaining": [
+        "租户申请/审核/开通步骤持久化、失败补偿和恢复页面；主机/Item/NVPS/Worker多维配额预留、释放、计量。已有设备登记原子配额不等于整组完成。",
+        "首批租户/管理员/审批人/正式限额及Q02生产隔离方案仍需明确。"
+      ]
     },
     {
       "id": "A03",
@@ -191,7 +201,10 @@
       "completion_criterion": "补定期到期处理、通知意图、退役/迁移及保留/删除状态机和历史可追溯；真实删除默认关闭。",
       "evidence": [],
       "commits": [],
-      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "remaining": [
+        "维保到期周期处理/通知意图；退役、迁移、保留/删除审批状态机及历史。已有手工维保和草稿不等于定期治理。"
+      ]
     },
     {
       "id": "A05",
@@ -319,7 +332,7 @@
         "Persistent pool/HOST-or-ITEM object mapping draft/activation/revocation journal, bound own-host Zabbix metadata verification, current-authority/expiry checks, idempotent acknowledgment-only API and asset-detail actions; V55 applied/frozen in designated isolated schema validation; business integration pending",
         "Public event intake rejects deliberate auto-ticket failure; internal simulation is limited to explicit isolated PostgreSQL and non-protected tenants, with historical customer-tenant fixture fallback removed. No real component run.",
         "Explicit one-event HOST source capture from current published mapping, bound metadata/event reads, shared raw/quarantine/audit/idempotency transaction and asset-detail original-command recovery; V29/V30 remain UNVERIFIED and never process recovery or dispatch.",
-        "V54/V55 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50"
+        "V54/V55 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; historical active mop_test was V50 at that verification; superseded by the 2026-10-24 deployment to active V55"
       ],
       "remaining_subitems": [
         "Complete continuous pull/watermarks, source-proof journal and durable raw-to-business consumption; one-event HOST capture now wired but unverified storage is not business authority",
@@ -343,7 +356,10 @@
       "completion_criterion": "补版本/摘要、分批发布/观察/回退、站点与Proxy/资源池生命周期和容量校验；真实外部操作另行受控。",
       "evidence": [],
       "commits": [],
-      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "remaining": [
+        "模板版本/摘要、灰度观察与回退；Proxy/站点/资源池生命周期和容量治理。既有草稿和预设不能替代正式治理。"
+      ]
     },
     {
       "id": "M04",
@@ -365,7 +381,10 @@
       "completion_criterion": "核销已有流转后补正式激活、外部ITSM补偿接口、升级/提醒/关单/重开及工时合同遗漏；外发由通知线接收意图。",
       "evidence": [],
       "commits": [],
-      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "remaining": [
+        "现有工单生命周期正式装配和真实链路；外部ITSM适配/补偿；升级、提醒、关闭、重开和工时剩余合同项。V42生命周期开关当前未设置，默认关闭。"
+      ]
     },
     {
       "id": "M05",
@@ -439,7 +458,7 @@
       "completed_subitems": [
         "Restored immutable V51 routing/preference controls and actual API/page/explicit worker wiring, keeping external dispatch disabled",
         "Explicit-scope V50 local delivery journal listing, full-chain verification, immutable history and original-command read-only recovery, actual API/notification workspace and context revocation tests; delivered declarations remain unverified and no resend is authorized.",
-        "V51 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50",
+        "V51 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; historical active mop_test was V50 at that verification; superseded by the 2026-10-24 deployment to active V55",
         "Six routing GET paths recheck current account/session/membership before releasing results; 54 targeted authorization tests passed",
         "Six real designated retained-V51 PG business checks passed: idempotent durable discovery/routing, explicit publication and synthetic verified binding, preference withdrawal, concurrent CAS/original command, revocation and immutable history; no migrations or external dispatch"
       ],
@@ -475,7 +494,7 @@
       ],
       "completed_subitems": [
         "Restored immutable V51 routing/preference controls and actual API/page/explicit worker wiring, keeping external dispatch disabled",
-        "V51 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50",
+        "V51 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; historical active mop_test was V50 at that verification; superseded by the 2026-10-24 deployment to active V55",
         "Six real designated retained-V51 PG business checks passed: idempotent durable discovery/routing, explicit publication and synthetic verified binding, preference withdrawal, concurrent CAS/original command, revocation and immutable history; no migrations or external dispatch"
       ],
       "remaining_subitems": [
@@ -575,7 +594,10 @@
         "cbc6d874",
         "d86a913f"
       ],
-      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "remaining": [
+        "跨业务同版本冻结来源、指标下钻和定时月报任务；实际PDF运行配置和完整交付链。原子捕获/来源摘要/请求恢复已有实现。"
+      ]
     },
     {
       "id": "R02",
@@ -610,7 +632,7 @@
       ],
       "completed_subitems": [
         "Quarterly frozen-source publication repository, V53 applied/frozen in designated isolated schema validation, exact XHTML/PDF renderer, authenticated API/report center, durable command recovery and read receipts; no outbound dispatch",
-        "V53 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50",
+        "V53 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; historical active mop_test was V50 at that verification; superseded by the 2026-10-24 deployment to active V55",
         "Designated retained-V53 PG integration scenario passed: real source capture/frozen read and actual HTML/PDF failed-render retry, idempotency and return while source/template approval remains gated",
         "Separate ISOLATED_TEST initial-state fixture verified actual repository/FOP approval/publication/recipient ACL/first read/replay/resend-intent/revocation; no external dispatch or customer approval",
         "Two actual PDFs (four pages) and three HTML artifacts produced; normalized text equality, bounds and all-page Poppler visual inspection passed; generic technical layout is not a customer-approved template",
@@ -651,7 +673,8 @@
         "docs/evidence/dot-continuation-20261023/ui02-event-metrics.json",
         "docs/sla-monitoring-source-20261024.md",
         "docs/evidence/sla-monitoring-source-20261024/validation.json",
-        "docs/remote-release-20261024.md"
+        "docs/remote-release-20261024.md",
+        "docs/sla-monitoring-source-20261024.md"
       ],
       "commits": [
         "d58ea011",
@@ -660,13 +683,13 @@
       ],
       "remaining": [
         "Designated PostgreSQL and browser integration; formal acceptance",
-        "Remaining source aggregates, effective denominators, frozen reports and customer-confirmed inputs",
-        "Existing SLA workflow timestamps are not yet replaced by event problem/first-ack timestamps; shared math alone is not full source unification"
+        "Remaining source aggregates, effective denominators, frozen reports and customer-confirmed inputs"
       ],
       "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
       "completed_subitems": [
         "Live SLA total/service MTTA and MTTR now use original monitoring event clocks and verified exact t2, with explicit unknown/source metadata; nanosecond recovery comparisons and new monthly freeze/readback verified on designated PG; historic frozen rows retained",
-        "Runtime source b964701b deployed to designated active V55; 462 HTTP checks and seven actual-API desktop reads verified. Empty publication lists and read checks do not complete nonempty write/customer workflows."
+        "Runtime source b964701b deployed to designated active V55; 462 HTTP checks and seven actual-API desktop reads verified. Empty publication lists and read checks do not complete nonempty write/customer workflows.",
+        "b964701b 已统一事件t0、首次确认t1及可信精确t2；真实指定PG与月度冻结回读已验证。剩余健康覆盖、有效分母及对账另验。"
       ]
     },
     {
@@ -736,7 +759,7 @@
       ],
       "completed_subitems": [
         "Attachment quarantine repository/API/download revalidation and actual photo panel with durable unknown-command recovery; explicit scan-once worker; V52 applied/frozen in designated isolated schema validation",
-        "V52 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50",
+        "V52 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; historical active mop_test was V50 at that verification; superseded by the 2026-10-24 deployment to active V55",
         "Binary content rechecks account/session/member after digest/release validation and before success audit/bytes; 26 targeted security tests passed"
       ],
       "remaining_subitems": [
@@ -761,7 +784,10 @@
       "commits": [
         "c2b8f0d7"
       ],
-      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "remaining": [
+        "真实规模和持续时间压测、故障切换、隔离恢复及RPO/RTO演练；同一制品上的128条正式TC与签收。现有备份和回退守卫不能替代实际恢复演练。"
+      ]
     },
     {
       "id": "G01",
@@ -2337,5 +2363,24 @@
     },
     "remaining": "See each task; N01 retained business and R02 retained transaction/FOP evidence now recorded separately, full customer/provider/browser gates remain"
   },
-  "reviewed_main_commit": "ecced75cbf057e007afe7263631a1ad7bbc30774"
+  "reviewed_main_commit": "22a7638b",
+  "previous_source_commit": "f45891bad39f7964b462a18fb5cc4f93ba2957d0",
+  "last_reconciled_date": "2026-10-24",
+  "runtime_baseline": {
+    "source_commit": "b964701b5a148978cf761bf550dd7f24745fdb43",
+    "schema": "V55",
+    "verified_again": "2026-10-24T08:05:51.973497+00:00",
+    "evidence": "docs/remote-release-20261024.md",
+    "production_ready": false
+  },
+  "tracking_corrections_20261024": [
+    "保留历史验证记录；活动mop_test当前V55，V1–V55均冻结。",
+    "删除UI02/R03已失效的工单时钟来源缺口，保留原始历史文档。",
+    "A01/A02/A04/M03/M04/R01/P03补明确剩余子项；25组覆盖与128项正式NOT_RUN状态保持。"
+  ],
+  "late_upstream_reconciled": {
+    "commit": "22a7638b",
+    "evidence": "docs/device-monitoring-check-20261024.md",
+    "runtime_source_unchanged": true
+  }
 }

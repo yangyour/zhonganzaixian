@@ -103,3 +103,14 @@ it('keeps failure distinct from unknown successful metadata', async () => {
 it('keeps event source failure independent from available dashboard metadata',async()=>{await settle();vi.mocked(api.request).mockImplementation(async path=>{if(path.startsWith('/metrics/monitoring-events?'))throw new Error('event read failed');return response(path)});host.querySelector<HTMLButtonElement>('button.dashboard-refresh')!.click();await settle();expect(host.querySelector('[data-kpi="CURRENT_PROBLEMS"] strong')?.textContent).toBe('读取失败');expect(host.querySelector('[data-kpi="MTTA_24H"] strong')?.textContent).toBe('读取失败');expect(host.querySelector('[data-kpi="ASSET_ONLINE_RATE"] strong')?.textContent).toBe('未知')})
 
 it('refreshes actual trend once per due interval and skips hidden-page polling',async()=>{app.unmount();vi.useFakeTimers();let now=0;vi.spyOn(performance,'now').mockImplementation(()=>now);const hidden=vi.spyOn(document,'hidden','get').mockReturnValue(false);app=createApp(Page);app.mount(host);await settle();vi.mocked(api.request).mockClear();now=31000;vi.advanceTimersByTime(1000);await settle();expect(vi.mocked(api.request).mock.calls.filter(([path])=>path==='/metrics/event-noise-trend?window=HOURS_24')).toHaveLength(1);hidden.mockReturnValue(true);now=62000;vi.advanceTimersByTime(1000);await settle();expect(vi.mocked(api.request).mock.calls.filter(([path])=>path==='/metrics/event-noise-trend?window=HOURS_24')).toHaveLength(1)})
+
+it.each(['account','tenant','revoke','unmount'])('discards pending service observations on %s change',async change=>{
+  await settle();let finish!:(value:unknown)=>void;let signal:AbortSignal|undefined;
+  vi.mocked(api.request).mockImplementation(async(path,options)=>{if(path==='/dashboard/service-observations'){signal=options?.signal;return new Promise(resolve=>finish=resolve)}return response(path)})
+  session.value={...auth,capabilities:[...auth.capabilities,'sla_scenarios:read'],account_version:1};await settle();expect(signal).toBeDefined();const old=signal;const complete=finish;
+  if(change==='account')session.value={...session.value!,account_version:2};
+  else if(change==='tenant')switchingTenant.value=true;
+  else if(change==='revoke')session.value={...auth};
+  else app.unmount();
+  await settle();expect(old!.aborted).toBe(true);complete({services:[{name:'STALE_SECRET'}]});await settle();expect(host.textContent).not.toContain('STALE_SECRET');
+})

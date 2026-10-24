@@ -15,7 +15,12 @@ import LiveMonitoringPanel from '../components/LiveMonitoringPanel.vue'
 import DashboardEventsPanel from '../components/DashboardEventsPanel.vue'
 import EventNoiseTrendPanel from '../components/EventNoiseTrendPanel.vue'
 import DashboardWorkflowsPanel from '../components/DashboardWorkflowsPanel.vue'
+import ServiceObservationsPanel from '../components/ServiceObservationsPanel.vue'
+import {createServiceReader,emptyServiceState} from '../utils/serviceObservations'
 
+const serviceState=shallowRef(emptyServiceState())
+const serviceReader=createServiceReader(api,value=>serviceState.value=value)
+const serviceAccess=computed(()=>permitted.value&&['msp','padmin'].includes(session.value?.user.role??'')&&['assets:read','tickets:read','sla_scenarios:read'].every(can))
 const router = useRouter()
 const trendPanel = ref<{refresh:()=>void}|null>(null)
 const eventPanel = ref<{ refresh: () => unknown } | null>(null)
@@ -77,18 +82,11 @@ const pendingNote = computed(() => {
     + (current.unconfigured ? ' · 另有 ' + current.unconfigured + ' 条登记未配置流程' : ' · 未关闭且未解决')
 })
 const freshness = computed(() => loadedAt.value === null ? '尚未读取首页状态' : `数据 ${Math.max(0, Math.floor((now.value - loadedAt.value) / 1000))} 秒前 · 指标采样未知`)
-// M1-4: a 24-hour axis with 6-hour ticks taken from the server-issued period.
-const timelineTicks = computed(() => {
-  const period = state.value.current?.last_24_hours
-  if (!period) return []
-  const from = Date.parse(period.from), to = Date.parse(period.to)
-  if (!Number.isFinite(from) || !Number.isFinite(to) || to <= from) return []
-  return [0, 1, 2, 3, 4].map(step => ({ offset: step * 25, label: clockTime(from + (to - from) * step / 4) }))
-})
 let timer: ReturnType<typeof setInterval> | undefined, lastRefresh = 0, alive = true
 async function refresh(window: DashboardWindow = state.value.window) {
   const owner = contextKey.value
   lastRefresh = performance.now()
+  if(serviceAccess.value)void serviceReader.load()
   if(permitted.value&&eventAccess.value)void metricReader.load()
   if (await workspace.load(window) && alive && owner === contextKey.value) loadedAt.value = performance.now()
 }
@@ -101,6 +99,7 @@ watch(contextKey, () => {
   loadedAt.value = null
   pending.value = emptyActionableTickets()
   const current = session.value
+  serviceReader.reset(serviceAccess.value&&current?{tenantId:current.tenant.id,actorId:current.user.id,permissionVersion:current.permission_version,canRead:true}:null)
   metricReader.reset(permitted.value&&eventAccess.value&&current?{tenantId:current.tenant.id,actorId:current.user.id,permissionVersion:current.permission_version,canRead:true}:null)
   workspace.reset(permitted.value && current ? { tenantId: current.tenant.id, actorId: current.user.id, permissionVersion: current.permission_version, role: current.user.role, canRead: true } : null)
   if (permitted.value) void refresh()
@@ -111,7 +110,7 @@ onMounted(() => {
     if (permitted.value && autoRefresh.value && !document.hidden && now.value - lastRefresh >= 30000) { void refresh(); trendPanel.value?.refresh(); void eventPanel.value?.refresh(); void workflowPanel.value?.refresh() }
   }, 1000)
 })
-onUnmounted(() => { alive = false; clearInterval(timer); workspace.dispose(); metricReader.dispose() })
+onUnmounted(() => { alive = false; clearInterval(timer); workspace.dispose(); metricReader.dispose(); serviceReader.dispose() })
 </script>
 <template>
   <section class="dashboard-page" aria-labelledby="dashboard-title">
@@ -156,18 +155,16 @@ onUnmounted(() => { alive = false; clearInterval(timer); workspace.dispose(); me
           </div>
         </section>
         <section class="dashboard-card mop-card span-4" data-block="SERVICE_HEALTH" aria-labelledby="service-health-title">
-          <header class="mop-card-head"><div class="mop-card-title"><h2 id="service-health-title">服务健康</h2></div><span class="mop-badge unknown">接入中</span></header>
+          <header class="mop-card-head"><div class="mop-card-title"><h2 id="service-health-title">服务健康</h2></div></header>
           <div class="mop-card-body">
             <div class="dashboard-legend"><span class="legend-dot ok">达标</span><span class="legend-dot danger">未达标</span><span class="legend-dot unknown">未知</span></div>
-            <div class="mop-unavailable"><strong>接入中</strong><span>服务可用率与目标尚无可核验数据，不显示为达标。</span></div>
+            <ServiceObservationsPanel :state="serviceState" mode="health" :permitted="serviceAccess" @refresh="serviceReader.load()" @cancel="serviceReader.cancel()" />
           </div>
         </section>
         <section class="dashboard-card mop-card span-12" data-block="FAULT_TIMELINE" aria-labelledby="fault-timeline-title">
           <header class="mop-card-head"><div class="mop-card-title"><h2 id="fault-timeline-title">故障时间线</h2><span>近24小时 · 最多 8 个服务</span></div><div class="dashboard-legend"><span class="legend-bar fault">故障</span><span class="legend-bar maint">维护</span><span class="legend-bar unknown-interval">未知区间</span></div></header>
           <div class="mop-card-body">
-            <div class="timeline-track" title="数据缺失·记为未知"><span>服务区间尚未接入 · 数据缺失记为未知</span></div>
-            <div v-if="timelineTicks.length" class="timeline-axis" aria-hidden="true"><span v-for="tick in timelineTicks" :key="tick.offset" :style="{ left: tick.offset + '%' }">{{ tick.label }}</span></div>
-            <p class="sr-only">服务区间尚未接入，暂无可核验的故障时间线。</p>
+            <ServiceObservationsPanel :state="serviceState" mode="timeline" :permitted="serviceAccess" />
           </div>
         </section>
         <section class="dashboard-card mop-card dashboard-list span-12" data-block="RECENT_EVENTS" aria-label="最近事件">

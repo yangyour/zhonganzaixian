@@ -1,0 +1,49 @@
+{
+  "status": "CODE_VALIDATED_RUNTIME_NOT_RUN",
+  "scope": "UI02 service health and 24-hour fault/maintenance/unknown timeline",
+  "java": {
+    "command": "mvn -o test",
+    "total": 5516,
+    "passed": 4337,
+    "skipped": 1179,
+    "failures": 0,
+    "errors": 0
+  },
+  "web": {
+    "command": "npm --prefix apps/web test",
+    "passed": 5670,
+    "failed": 0
+  },
+  "build": {
+    "web_typecheck": "PASSED",
+    "web_release_and_policy": "PASSED",
+    "backend_verify": "BLOCKED_MISSING_OFFLINE_MAVEN_JAR_PLUGIN_3_4_2"
+  },
+  "node_contracts": {
+    "passed": 231,
+    "failed": 0,
+    "generated_contract": "PASSED"
+  },
+  "targeted": {
+    "java": 29,
+    "pg_declared": 5,
+    "pg_executed": 0,
+    "browser_new": 3,
+    "browser_all_discovered": 193,
+    "browser_files": 29,
+    "browser_executed": 0
+  },
+  "runtime": {
+    "postgresql": "NOT_RUN_DESIGNATED_CONNECTION_CONFIGURATION_MISSING",
+    "browser": "NOT_RUN_PREVIOUS_LAUNCH_PERMISSION_LIMIT_NOT_BYPASSED",
+    "deployment": false,
+    "migrations": false,
+    "external_dispatch": false
+  },
+  "limits": [
+    "No positive-health evidence adapter; absence of a problem is unknown",
+    "Explicit tenant service mapping and customer target configuration required",
+    "UI02 and formal contract acceptance remain IN_PROGRESS"
+  ],
+  "contract_sha256": "eedeac126dd4a7d5b6f48e3624b8976604f279bfba52eba0bc63f6e3f552241c"
+}

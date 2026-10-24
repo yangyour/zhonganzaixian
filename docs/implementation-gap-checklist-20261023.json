@@ -651,7 +651,9 @@
         "docs/evidence/report-revisions-20261024/validation.json",
         "docs/remote-release-20261024.md",
         "docs/report-readership-20261024.md",
-        "docs/evidence/report-readership-20261024/validation.json"
+        "docs/evidence/report-readership-20261024/validation.json",
+        "docs/report-followup-worklist-20261024.md",
+        "docs/evidence/report-followup-worklist-20261024/validation.json"
       ],
       "commits": [
         "25a17013",
@@ -666,11 +668,12 @@
         "Two actual PDFs (four pages) and three HTML artifacts produced; normalized text equality, bounds and all-page Poppler visual inspection passed; generic technical layout is not a customer-approved template",
         "Immutable report revisions now connect same-quarter frozen sources, parent/version locking, no-fork concurrency, durable replay, API and source-selection UI; designated retained V53 business tests and synthetic real-browser flow verified separately",
         "Runtime source b964701b deployed to designated active V55; 462 HTTP checks and seven actual-API desktop reads verified. Empty publication lists and read checks do not complete nonempty write/customer workflows.",
-        "Published-revision readership API/panel with same-receipt-set counts, ALL/UNREAD/strict-over-7-days filtering, 50-reader UUID cursor and scoped retries/revocation; designated retained PG first-read/isolation and 1440/1024 synthetic Edge keyboard/axe verified"
+        "Published-revision readership API/panel with same-receipt-set counts, ALL/UNREAD/strict-over-7-days filtering, 50-reader UUID cursor and scoped retries/revocation; designated retained PG first-read/isolation and 1440/1024 synthetic Edge keyboard/axe verified",
+        "Complete bounded cross-report readership followup worklist, actual RR repository/API and compact explicit-query panel, original-page retry and revocation guards; component/browser execution separately limited."
       ],
       "remaining_subitems": [
         "Monthly boss/full, health-check and annual source/template adapters",
-        "Cross-report readership worklist, recorded followup actions and notification intent/dispatch; per-revision read-only dashboard is implemented and independently verified",
+        "Recorded followup actions and notification intent/dispatch; per-revision dashboard and cross-report read-only worklist now implemented, latest worklist real PG/browser verification remains blocked in this dot",
         "Source verification, customer approval policy/template gates",
         "Real HTTP/browser integration and formal customer template/layout acceptance; retained-V53 transaction/FOP scope is separately verified"
       ],
@@ -2280,7 +2283,7 @@
       "formal_acceptance": "NOT_RUN"
     }
   ],
-  "execution_status": "LOCAL_SINGLE_SESSION_ACTIVE",
+  "execution_status": "IN_PROGRESS",
   "closeout_document": "docs/development-closeout-and-remaining-20261023.md",
   "status_note": "Current authorized local chat continues from latest main; upstream dot and original six chats remain stopped. Each implementation, code test, designated component validation, customer gate and formal acceptance is recorded separately.",
   "preserved_unverified_work": [
@@ -2380,7 +2383,7 @@
     "cloud_session": "STOPPED_UPSTREAM_DOT",
     "status": "HISTORICAL_HANDOFF_SUPERSEDED_BY_LOCAL_CONTINUATION"
   },
-  "execution_note": "Upstream batch 25a17013 is on main through e8362fd6. Current main includes reviewed local fixes and separate designated-component evidence; no deployment or formal acceptance is implied. Do not restore old WIP over current main.",
+  "execution_note": "2026-10-24 11:52 UTC user explicitly resumed this dot, then requested timely per-feature commit/push. Latest main reused; no deployment or new sessions.",
   "upstream_batch_review": {
     "commit": "25a17013",
     "main_before_review": "0bcd0e34",

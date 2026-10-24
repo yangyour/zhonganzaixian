@@ -85,6 +85,12 @@ public final class PostgresPlatformRepository implements PlatformRepository {
         }catch(SQLException exception){logSqlFailure(exception);throw unavailable();}
     }
     <T>T identityTransaction(java.util.function.Function<Connection,T> work){return inTransaction(()->work.apply(transaction.get()));}
+    /** Independent identity-scoped RR read; never upgrade a caller's already-started write transaction. */
+    <T>T identitySnapshot(java.util.function.Function<Connection,T> work){
+        if(transaction.get()!=null)throw new IllegalStateException("Identity snapshot requires an independent transaction");
+        return inTransaction(()->{try{transaction.get().setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);}
+            catch(SQLException e){throw unavailable();}return work.apply(transaction.get());});
+    }
     private <T>T inTransaction(Supplier<T> work){
         if(transaction.get()!=null)return work.get();
         try(Connection connection=dataSource.getConnection()){

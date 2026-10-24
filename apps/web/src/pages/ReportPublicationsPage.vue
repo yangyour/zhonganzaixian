@@ -9,6 +9,7 @@ import { createReportCommands, readPublication, type Publication } from '../util
 import { fetchPublicationContent } from '../utils/reportPublicationContent'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import ReportReadershipPanel from '../components/ReportReadershipPanel.vue'
+import ReportFollowupPanel from '../components/ReportFollowupPanel.vue'
 const route=useRoute(),items=ref<Publication[]>([]),selected=ref<Publication|null>(null),loading=ref(false),error=ref<unknown>(null),next=ref<{before:string;before_id:string}|null>(null),reason=ref('')
 const router=useRouter()
 const detailHeading=ref<HTMLElement|null>(null)
@@ -104,6 +105,7 @@ onUnmounted(()=>{epoch++;abort?.abort();command.dispose();unregister();window.re
 <template>
  <section aria-label="报告中心" class="proto-panel">
   <div class="actions"><h1>报告中心</h1><button :disabled="locked||!allowed" @click="browse()">刷新</button><router-link v-if="writable" to="/inspection-quarterly-reports">冻结来源草稿</router-link></div>
+  <ReportFollowupPanel v-if="writable" :disabled="locked" @open="select" />
   <p v-if="!allowed">当前模式或授权不支持读取报告中心。</p><ApiErrorNotice :error="error"/><ApiErrorNotice :error="command.error.value"/>
   <p v-if="command.pending.value" role="alert">上次操作结果待确认，请按原请求核对。<button :disabled="command.busy.value" @click="retry">核对原请求</button><button v-if="command.busy.value" @click="command.cancel">停止等待</button></p>
   <p v-if="command.blocked.value" role="alert">无法安全恢复原请求，已阻止新增操作。</p>

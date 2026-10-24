@@ -45,8 +45,12 @@ public final class PostgresReportPublicationRepository implements ReportPublicat
     }
 
     private <T> T transaction(Access a, boolean write, Work<T> work) {
+        return transaction(a,write,false,work);
+    }
+
+    private <T> T transaction(Access a, boolean write, boolean snapshot, Work<T> work) {
         validate(a);
-        return platform.identityTransaction(c -> {
+        Function<Connection,T> operation = c -> {
             try {
                 ReportPublicationSchemaVerifier.verify(c);
                 PostgresAuthorization.require(
@@ -77,13 +81,19 @@ public final class PostgresReportPublicationRepository implements ReportPublicat
                 if (!m.active() || m.permissionVersion() != a.permissionVersion()) {
                     throw expired();
                 }
-                return work.run(c, m);
+                T result = work.run(c, m);
+                if(snapshot){
+                    PostgresAuthorization.require(c,a.actorId(),a.tenantId(),a.permissionVersion(),"dashboard:read");
+                    PostgresAuthorization.require(c,a.actorId(),a.tenantId(),a.permissionVersion(),"inspection_quarterly_reports:write");
+                }
+                return result;
             } catch (DomainException e) {
                 throw e;
             } catch (Exception failure) {
                 throw unavailable();
             }
-        });
+        };
+        return snapshot ? platform.identitySnapshot(operation) : platform.identityTransaction(operation);
     }
 
     private Actor actor(Access a, Membership m) {
@@ -729,31 +739,8 @@ public final class PostgresReportPublicationRepository implements ReportPublicat
         // The write capability controls management visibility; this transaction performs SELECTs only.
         return transaction(access, true, (connection, member) -> {
             var stored = get(connection, access, member, id, false);
-            var receipts = new ArrayList<ReadReceipt>();
+            var receipts = readReceipts(connection,access,id);
             var names = new HashMap<UUID, String>();
-            try (
-                var statement = query(
-                    connection,
-                    "SELECT customer_id,document_sha256,first_read_at FROM public.mop_report_publication_read " +
-                        "WHERE tenant_id=?::uuid AND document_id=?::uuid"
-                )
-            ) {
-                statement.setString(1, access.tenantId());
-                statement.setString(2, id);
-                try (var rows = statement.executeQuery()) {
-                    while (rows.next()) {
-                        receipts.add(
-                            new ReadReceipt(
-                                UUID.fromString(access.tenantId()),
-                                UUID.fromString(id),
-                                rows.getObject(1, UUID.class),
-                                rows.getString(2),
-                                rows.getObject(3, OffsetDateTime.class).toInstant()
-                            )
-                        );
-                    }
-                }
-            }
             try (
                 var statement = query(
                     connection,
@@ -775,6 +762,64 @@ public final class PostgresReportPublicationRepository implements ReportPublicat
                 }
             }
             return ReportReadership.page(stored.state(), receipts, names, now(connection), filter, after);
+        });
+    }
+
+    private List<ReadReceipt> readReceipts(Connection connection, Access access, String id) throws SQLException {
+        var receipts = new ArrayList<ReadReceipt>();
+        try (
+            var statement = query(
+                connection,
+                "SELECT customer_id,document_sha256,first_read_at FROM public.mop_report_publication_read " +
+                "WHERE tenant_id=?::uuid AND document_id=?::uuid LIMIT 1001"
+            )
+        ) {
+            statement.setString(1, access.tenantId());
+            statement.setString(2, id);
+            try (var rows = statement.executeQuery()) {
+                while (rows.next()) {
+                    if(receipts.size()>=1000)throw unavailable();
+                receipts.add(
+                    new ReadReceipt(
+                        UUID.fromString(access.tenantId()),
+                        UUID.fromString(id),
+                        rows.getObject(1, UUID.class),
+                        rows.getString(2),
+                        rows.getObject(3, OffsetDateTime.class).toInstant()
+                    )
+                );
+                }
+            }
+        }
+        return receipts;
+    }
+
+    @Override
+    public ReportFollowupWorklist.Page followups(Access access, ReportFollowupWorklist.Query criteria) {
+        Objects.requireNonNull(criteria);
+        long started=System.nanoTime();
+        return transaction(access,true,true,(connection,member)->{
+            PostgresAuthorization.require(connection,access.actorId(),access.tenantId(),access.permissionVersion(),"dashboard:read");
+            if(!member.capabilities().containsAll(List.of("dashboard:read","inspection_quarterly_reports:read","inspection_quarterly_reports:write")))
+                throw new DomainException(403,"ACTION_FORBIDDEN","当前成员无报告跟进管理权限");
+            var observed=now(connection);var ids=new ArrayList<String>();long payloadBytes=0;
+            try(var statement=query(connection,"SELECT id,octet_length(payload) FROM public.mop_report_publication_document WHERE tenant_id=?::uuid AND captured_at>=? AND captured_at<? ORDER BY captured_at DESC,id DESC LIMIT 1001")){
+                statement.setString(1,access.tenantId());time(statement,2,criteria.from());time(statement,3,criteria.until());
+                try(var rows=statement.executeQuery()){while(rows.next()){ids.add(rows.getString(1));payloadBytes+=rows.getLong(2);}}
+            }
+            if(ids.size()>ReportFollowupWorklist.DOCUMENT_LIMIT||payloadBytes>33554432L)throw ReportFollowupWorklist.limit();
+            var summaries=new ArrayList<ReportFollowupWorklist.Row>();int recipientCount=0;
+            for(var id:ids){
+                if(System.nanoTime()-started>java.util.concurrent.TimeUnit.SECONDS.toNanos(30))throw ReportFollowupWorklist.limit();
+                var stored=get(connection,access,member,id,false);
+                if(stored.state().phase()!=Phase.PUBLISHED)continue;
+                recipientCount+=stored.state().recipients().size();
+                if(recipientCount>ReportFollowupWorklist.RECIPIENT_LIMIT)throw ReportFollowupWorklist.limit();
+                var readership=ReportReadership.page(stored.state(),readReceipts(connection,access,id),Map.of(),observed,ReportReadership.Filter.ALL,null);
+                summaries.add(ReportFollowupWorklist.row(stored.label(),stored.state(),readership));
+            }
+            if(System.nanoTime()-started>java.util.concurrent.TimeUnit.SECONDS.toNanos(30))throw ReportFollowupWorklist.limit();
+            return ReportFollowupWorklist.page(UUID.fromString(access.tenantId()),observed,criteria,ids.size(),summaries);
         });
     }
 

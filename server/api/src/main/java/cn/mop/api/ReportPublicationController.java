@@ -4,6 +4,7 @@ import cn.mop.domain.*;
 import cn.mop.domain.reporting.ReportPublication.*;
 import cn.mop.domain.reporting.ReportPublicationRepository;
 import cn.mop.domain.reporting.ReportReadership;
+import cn.mop.domain.reporting.ReportFollowupWorklist;
 import cn.mop.domain.reporting.ReportPublicationRepository.*;
 import com.fasterxml.jackson.databind.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -155,6 +156,39 @@ public final class ReportPublicationController {
             },
             true
         );
+    }
+
+    /** Complete bounded management worklist. Never writes read receipts, reminder intents or provider requests. */
+    @GetMapping("/followups")
+    Object followups(HttpServletRequest request) {
+        var subject=subject(request);
+        if(!subject.membership().capabilities().containsAll(List.of("inspection_quarterly_reports:read","inspection_quarterly_reports:write")))
+            throw new DomainException(403,"ACTION_FORBIDDEN","当前成员无报告跟进管理权限");
+        var keys=request.getParameterMap().keySet();
+        if(!Set.of("from","until","filter","before","before_id").containsAll(keys)
+            ||!keys.containsAll(Set.of("from","until"))||keys.contains("before")!=keys.contains("before_id")
+            ||request.getParameterMap().values().stream().anyMatch(v->v.length!=1||v[0]==null||v[0].isBlank()||v[0].length()>64))throw invalid();
+        ReportFollowupWorklist.Query query;
+        try{
+            var filter=request.getParameter("filter")==null?ReportReadership.Filter.FOLLOWUP_DUE:ReportReadership.Filter.valueOf(request.getParameter("filter"));
+            var before=keys.contains("before")?new ReportFollowupWorklist.Cursor(worklistTime(request.getParameter("before")),UUID.fromString(uuid(request.getParameter("before_id")))):null;
+            query=new ReportFollowupWorklist.Query(worklistTime(request.getParameter("from")),worklistTime(request.getParameter("until")),filter,before);
+        }catch(Exception bad){throw invalid();}
+        var page=reports.followups(subject.access(),query);
+        if(page==null||!subject.access().tenantId().equals(page.tenantId().toString())||!query.equals(page.query()))throw unavailable();
+        DashboardReadAuthorization.recheck(request,platform,subject.membership());
+        @SuppressWarnings("unchecked") var data=(Map<String,Object>)json.convertValue(page,Map.class);
+        data.put("population_scope","COMPLETE_BOUNDED_CAPTURE_WINDOW");
+        data.put("document_scan_limit",ReportFollowupWorklist.DOCUMENT_LIMIT);
+        data.put("recipient_scan_limit",ReportFollowupWorklist.RECIPIENT_LIMIT);
+        data.put("page_size",ReportFollowupWorklist.PAGE_SIZE);
+        data.put("external_dispatch_enabled",false);data.put("writes_performed",false);
+        return ApiResponse.success(data,request);
+    }
+    private static Instant worklistTime(String value){
+        var at=Instant.parse(value);
+        if(!at.toString().equals(value)||at.getNano()%1000000!=0)throw invalid();
+        return at;
     }
 
     /** Management-only readership of one published revision; reading never creates reminders or sends messages. */

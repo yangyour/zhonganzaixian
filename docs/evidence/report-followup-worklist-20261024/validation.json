@@ -1,0 +1,98 @@
+{
+  "status": "CODE_CHECKS_PASSED_COMPONENT_VERIFICATION_BLOCKED",
+  "base_commit": "5a4f66c82ad5b4691b6be966b022f3a9d0724cc7",
+  "included_startup_test_fix": "97fa60d2f242515eade88e397de549f0581817e9",
+  "java": {
+    "discovered": 5436,
+    "executed_passed": 4265,
+    "skipped": 1171,
+    "failures": 0,
+    "errors": 0
+  },
+  "targeted_java": {
+    "passed": 40,
+    "scope": "report rules/controller/HTTP/SQL protocol doubles"
+  },
+  "web": {
+    "files": 347,
+    "passed": 5608,
+    "scope": "Vitest/jsdom, not browser"
+  },
+  "node_contracts": {
+    "passed": 283
+  },
+  "offline_demo_plan": {
+    "passed": 18,
+    "runtime_initialization": false
+  },
+  "typecheck": "PASSED",
+  "build": "PASSED",
+  "static_release_policy": "PASSED",
+  "contract_generation": "PASSED",
+  "browser": {
+    "status": "BLOCKED_BEFORE_PAGE",
+    "scenarios": 2,
+    "passed": 0,
+    "widths": [
+      1440,
+      1024
+    ],
+    "attempts": [
+      "Chromium launch socket() Operation not permitted",
+      "Reviewed escalation could not initialize execution sandbox"
+    ],
+    "scope": "Synthetic interception only; no screenshot/axe result"
+  },
+  "designated_postgres": {
+    "status": "NOT_RUN",
+    "reason": "No explicit MOP_RUN_REPORT_PUBLICATION_BUSINESS_PG_TESTS or MOP_REPORT_PUBLICATION_TEST_* restricted connection configuration in this dot",
+    "harness_extended": true
+  },
+  "initial_failures": [
+    {
+      "kind": "compile",
+      "detail": "Audit mock expected six args; actual interface is eight; corrected test invocation only"
+    },
+    {
+      "kind": "frontend assertion",
+      "detail": "Full concatenated text confused report 2 plus date 2026 with report 22; exact table-cell assertions retained intended pagination verification"
+    },
+    {
+      "kind": "full reactor",
+      "detail": "Three ProfilePolicy startup assertions masked by upstream monitoring HTTP configuration collision; independent profile isolation commit 97fa60d2 restored safety assertions"
+    }
+  ],
+  "writes_performed": false,
+  "provider_calls": 0,
+  "migrations_applied": 0,
+  "deployed": false,
+  "formal_acceptance": "NOT_COMPLETED",
+  "source_sha256": {
+    "AGENTS.md": "6bbee30ddcfaf40fbe591cfc98da3fd46c148ac18e1fdcf1b724aaad234a08a4",
+    "apps/web/src/pages/ReportPublicationsPage.vue": "39ad9632c176aaf89b28230633324b161c0b3f2c18a15e0deefbcbc92677c8af",
+    "config/demo/catalog.v1.json": "c2272797879dab787ef0600ca84392e09d024a5872fcd013fe1fdad08ee66576",
+    "contracts/local-api.openapi.json": "7534ca9458b679b0b9ed76ecba23fa9f9766e9711442eadcda5b42b399f641e2",
+    "docs/implementation-gap-checklist-20261023.json": "7365177d28ef75272ba7ad76f9c90c8757850897a29d4987f9eaa5dbafdf9e0b",
+    "docs/implementation-gap-checklist-20261023.md": "0413a853ab10cab493c000b2b851c130ed9ca4c549d8b1c48c84540270d82081",
+    "fixtures/demo-preparation-golden.json": "23cb3e2540ebe3bcee010f25957164abc556fa10d9701d0eeab38673657f0c8d",
+    "server/api/src/main/java/cn/mop/api/ReportPublicationController.java": "20d9c24544e33114e870eb1596a5cd52ea96b423d74d18cd3edb15c281970634",
+    "server/api/src/test/java/cn/mop/api/ReportPublicationHttpSecurityTest.java": "05cc1477d7c8ede6601e696158db44056e017a100151503922811605348faeb2",
+    "server/api/src/test/java/cn/mop/persistence/PostgresReportPublicationBusinessIntegrationTest.java": "f402afaa0d36de575544872e9a45e73c52e0f1d4380e7c2e5c2a3bc04c535126",
+    "server/domain/src/main/java/cn/mop/domain/reporting/ReportPublicationRepository.java": "c3a41eb1c3edcc693b08a86135f4ebc676028f5a9ff5d87a0090c26ce7c2e1ec",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresPlatformRepository.java": "4814e3e0506d938105a61a53c02f47a80e2f12ff630d2de429e6a56682566ffd",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresReportPublicationRepository.java": "7ebf8fc2eb1027c8bb48682e3fc17c675ac8d4708ad5100c4a69b4698b983fe2",
+    "tools/report-publication-contract.mjs": "d98a7393d4080ac1677b936e41f5b817e6d256ccaa0e19bff8b81285a21e26be",
+    "apps/web/qa/browser/report-followups.pw.ts": "12edf424c997e1aef4cb1a36e13873f4c33568666857070d63aab0972948bddb",
+    "apps/web/src/components/ReportFollowupPanel.vue": "6aa13e2f1f5684b4374359a497c666f8e222e3e26c204717afbcdfa7cf6eeae1",
+    "apps/web/src/utils/reportFollowups.ts": "b8f2f00f1c211e49e5c70381fac94d25d66c67d00495faa547ec384401d35bb3",
+    "apps/web/tests/reportFollowupPanel.test.ts": "9159821d5dada062c2dd23983fef74b9b3e8bc2f81085b40cce92bc33f824432",
+    "apps/web/tests/reportFollowups.fixture.ts": "e2302cd3d07b68013536bb52077a51d0047eb05ba4ea0768507491e481d2cc93",
+    "apps/web/tests/reportFollowups.test.ts": "12568bf5090296128099e9482bef811d08f1e875e9680050f8e47916a48a1fac",
+    "docs/report-followup-worklist-20261024.md": "518578277b99e928b9062f8313802ad82fda2f825ddb8e75aed301d78058f8d5",
+    "server/api/src/test/java/cn/mop/api/ReportFollowupControllerTest.java": "742a551731315341e10dee4065d389ffe2a3aeb30fa0bc9cedf921d1cf620dd3",
+    "server/api/src/test/java/cn/mop/api/ReportFollowupWorklistTest.java": "22de98c998cb68d32c16c4d9df0044ea77275da5bc6345509b4866a2c2eef7fe",
+    "server/api/src/test/java/cn/mop/persistence/ReportFollowupRepositoryTest.java": "b7939a409ddc6074041a0a16d533d5d88093c61f2c7b45dbee0ead087e2f961b",
+    "server/domain/src/main/java/cn/mop/domain/reporting/ReportFollowupWorklist.java": "de061d4200223cb762d0fe328ad94df1342b40469eaa04efa11aaa52ef127eaa",
+    "tests/report-followups-contract.test.mjs": "735c8312fbedb47e61c688bbfb82fd569e8730c757db6c55a71e4f475dd526ac"
+  }
+}

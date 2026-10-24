@@ -48,3 +48,7 @@ UI02 由 OPEN 更新为 IN_PROGRESS，R03 继续 IN_PROGRESS。当前问题/五�
 M02新增持久对象映射切片：草稿/发布分离、显式自身标签归属核验、当前资产/复核资格/时效、API与资产详情操作、幂等回执及恢复已接线。V54/V55已在指定PG隔离库首次应用并冻结，schema/ACL/非空行锁/首revision通过；采集器消费、正式派发、更多提供者及完整业务PG/浏览器验收仍未完成。详见[对象映射说明](monitoring-object-mapping-20261023.md)和[schema链验证](designated-candidate-schema-chain-20261023.md)，不能将此切片记为M02全项VERIFIED。
 
 M02新增有界主机来源页消费入口，13个指定PG场景逐项通过（12项全套通过＋1项失败后定向通过），页面、恢复和分层证据见[实施记录](monitoring-source-page-intake-20261024.md)。每页回执不是全局水位；后台持续调度、迟到补读和真实设备完整链仍未完成，M02保持IN_PROGRESS。
+
+## 2026-10-24 dot明确恢复
+
+用户重新授权拉取最新主干并继续缺口，逐功能提交推送。R02跨报告未读跟进只读工作列表见[说明](report-followup-worklist-20261024.md)；真实组件和浏览器限制单独记录，不将完整覆盖等同全部完成。

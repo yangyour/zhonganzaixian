@@ -65,5 +65,6 @@ public interface ReportPublicationRepository {
     ReadReceipt read(Access access, String id, long expectedVersion);
     /** Read-only management view of frozen recipients and explicit first-read receipts. */
     ReportReadership.Page readership(Access access, String id, ReportReadership.Filter filter, java.util.UUID after);
+    ReportFollowupWorklist.Page followups(Access access, ReportFollowupWorklist.Query query);
     Content content(Access access, String id, Format format);
 }

@@ -461,6 +461,12 @@ class PostgresReportPublicationBusinessIntegrationTest {
         );
         assertDomain(404, "OBJECT_NOT_FOUND", () -> repository.get(access(excluded, tenant), id));
         assertDomain(404, "OBJECT_NOT_FOUND", () -> repository.get(access(foreignActor, foreignTenant), id));
+        var followupQuery = new cn.mop.domain.reporting.ReportFollowupWorklist.Query(
+            published.document().capturedAt().minusMillis(1), Instant.now().plusSeconds(60).truncatedTo(java.time.temporal.ChronoUnit.MILLIS), ReportReadership.Filter.UNREAD, null);
+        var followupBefore = repository.followups(access(creator,tenant), followupQuery);
+        assertTrue(followupBefore.items().stream().anyMatch(row -> row.documentId().toString().equals(id) && row.unreadCount()==1));
+        assertDomain(403,"ACTION_FORBIDDEN",()->repository.followups(access(recipient,tenant),followupQuery));
+        assertTrue(repository.followups(access(foreignActor,foreignTenant),followupQuery).items().stream().noneMatch(row -> row.documentId().toString().equals(id)));
         var unread = repository.readership(access(creator, tenant), id, ReportReadership.Filter.UNREAD, null);
         assertEquals(1, unread.totalRecipients());
         assertEquals(1, unread.unreadCount());
@@ -493,6 +499,7 @@ class PostgresReportPublicationBusinessIntegrationTest {
             )
         );
         assertEquals(first.documentSha256(), published.document().documentSha256());
+        assertTrue(repository.followups(access(creator,tenant),followupQuery).items().stream().noneMatch(row -> row.documentId().toString().equals(id)));
         var readStats = repository.readership(access(creator, tenant), id, ReportReadership.Filter.ALL, null);
         assertEquals(1, readStats.readCount());
         assertEquals(0, readStats.unreadCount());

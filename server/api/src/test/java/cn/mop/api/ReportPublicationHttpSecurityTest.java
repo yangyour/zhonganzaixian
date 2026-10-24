@@ -104,6 +104,21 @@ class ReportPublicationHttpSecurityTest {
     }
 
     @Test
+    void followupRouteIsReadOnlyScopedAndNoStore() throws Exception {
+        when(reports.followups(any(),any())).thenAnswer(call->cn.mop.domain.reporting.ReportFollowupWorklist.page(
+            UUID.fromString(TENANT),java.time.Instant.parse("2026-10-24T00:00:00Z"),call.getArgument(1),0,List.of()));
+        var from="2026-10-01T00:00:00Z";var until="2026-11-01T00:00:00Z";
+        mvc.perform(get(BASE+"/followups").session(session()).with(user(ACTOR)).param("from",from).param("until",until))
+            .andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store"))
+            .andExpect(jsonPath("$.data.tenant_id").value(TENANT)).andExpect(jsonPath("$.data.writes_performed").value(false))
+            .andExpect(jsonPath("$.data.query.filter").value("FOLLOWUP_DUE"));
+        mvc.perform(head(BASE+"/followups").session(session()).with(user(ACTOR)).param("from",from).param("until",until)).andExpect(status().isOk());
+        mvc.perform(get(BASE+"/followups")).andExpect(status().isUnauthorized());
+        mvc.perform(post(BASE+"/followups").session(session()).with(user(ACTOR)).with(csrf())).andExpect(status().isMethodNotAllowed());
+        mvc.perform(get(BASE+"/followups").session(session()).with(user(ACTOR)).param("from",from).param("until",until).param("tenant_id",TENANT)).andExpect(status().isBadRequest());
+    }
+
+    @Test
     void unauthenticatedReadAndCsrfFreeWriteRejected() throws Exception {
         mvc.perform(get(BASE)).andExpect(status().isUnauthorized());
         mvc.perform(

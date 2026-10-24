@@ -47,7 +47,8 @@ def protected_fingerprints(connection, excluded_tenants):
 
 def run(output: Path, suite: str = 'recurrence', live_source: bool = False):
     output.mkdir(parents=True, exist_ok=False)
-    owner = {'session': 'monitoring', 'branch': 'codex/launch-monitoring-20261023',
+    owner = {'session': 'local-astra-ut-20261023',
+             'branch': subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip(),
              'operation': 'isolated-monitoring-' + suite + '-pg', 'owner': str(uuid.uuid4()),
              'started_at': datetime.datetime.now(datetime.timezone.utc).isoformat()}
     try:

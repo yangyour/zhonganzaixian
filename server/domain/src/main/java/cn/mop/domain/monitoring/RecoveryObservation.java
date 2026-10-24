@@ -133,6 +133,41 @@ public final class RecoveryObservation {
         return new Result(passed ? Status.CONFIRMABLE : Status.OBSERVING, start, latest, count, span, candidate);
     }
 
+    /**
+     * A bounded healthy tail cannot establish the beginning of recovery. Require a known non-recovery
+     * sample in this fault episode immediately before the retained healthy run, within the published gap.
+     * Unknown samples, missing history and an earlier already-healthy run do not authorize a later t2.
+     */
+    public static Instant requireCoveredTransition(Rule rule, Instant problemFrom, Instant eligibleFrom,
+                                                   RecoverySourceBatch batch, Result result) {
+        Objects.requireNonNull(rule);
+        Objects.requireNonNull(batch);
+        Objects.requireNonNull(result);
+        time(problemFrom);
+        time(eligibleFrom);
+        if (problemFrom.isAfter(eligibleFrom)) {
+            throw invalid();
+        }
+        if (result.spanStartedAt() == null) {
+            return null;
+        }
+        Sample predecessor = null;
+        for (Sample sample : batch.samples()) {
+            if (!sample.recordedAt().isBefore(result.spanStartedAt())) {
+                break;
+            }
+            predecessor = sample;
+        }
+        if (!rule.complete() || result.spanStartedAt().isBefore(eligibleFrom)
+                || predecessor == null || predecessor.recordedAt().isBefore(problemFrom)
+                || predecessor.quality() != Quality.KNOWN || matches(rule, predecessor.value())
+                || seconds(predecessor.recordedAt(), result.spanStartedAt()).compareTo(rule.maxGapSeconds()) > 0) {
+            throw new DomainException(422, "RECOVERY_HISTORY_INCOMPLETE",
+                    "来源历史未覆盖本次故障到连续恢复的转折，不能从健康尾部补造恢复时点");
+        }
+        return predecessor.recordedAt();
+    }
+
     private static boolean matches(Rule rule, BigDecimal value) {
         int order = value.compareTo(rule.threshold());
         return switch (rule.comparison()) {

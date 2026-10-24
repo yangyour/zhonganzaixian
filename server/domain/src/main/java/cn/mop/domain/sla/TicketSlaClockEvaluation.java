@@ -34,6 +34,20 @@ public final class TicketSlaClockEvaluation {
     /** confirmedRecoveryAt is t2 from a confirmed monitoring recovery, never the engineer's review time. */
     public static Evaluation evaluate(WorkflowLifecycle.Snapshot workflow, Tier currentTenantTier, Instant observedAt,
                                       boolean hasMonitoringEvents, Instant confirmedRecoveryAt) {
+        return evaluateInternal(workflow, currentTenantTier, observedAt, hasMonitoringEvents, confirmedRecoveryAt, null);
+    }
+
+    /** Only the verified schema2 persistence path supplies source time with sub-millisecond precision. */
+    public static Evaluation evaluateSourceRecovery(WorkflowLifecycle.Snapshot workflow, Tier currentTenantTier,
+                                                    Instant observedAt, boolean hasMonitoringEvents,
+                                                    MonitoringRecoveryClockEvidence.SourceTime recovery) {
+        return evaluateInternal(workflow, currentTenantTier, observedAt, hasMonitoringEvents,
+                recovery == null ? null : recovery.recoveredAt(), recovery);
+    }
+
+    private static Evaluation evaluateInternal(WorkflowLifecycle.Snapshot workflow, Tier currentTenantTier,
+                                               Instant observedAt, boolean hasMonitoringEvents,
+                                               Instant confirmedRecoveryAt, MonitoringRecoveryClockEvidence.SourceTime sourceTime) {
         if (workflow == null || observedAt == null)
             throw new DomainException(400, "VALIDATION_ERROR", "工单SLA评估输入不能为空");
         TicketSlaSnapshot.time(observedAt);
@@ -42,9 +56,11 @@ public final class TicketSlaClockEvaluation {
         boolean tierChanged = currentTenantTier != null && currentTenantTier != frozen;
 
         ClockStatus response = evaluateResponse(workflow, sla, observedAt);
-        MonitoringRecoveryClockEvidence.requireConsistent(
-            sla.startedAt(), observedAt, hasMonitoringEvents, confirmedRecoveryAt
-        );
+        if (sourceTime == null) {
+            MonitoringRecoveryClockEvidence.requireConsistent(sla.startedAt(), observedAt, hasMonitoringEvents, confirmedRecoveryAt);
+        } else {
+            MonitoringRecoveryClockEvidence.requireConsistentSource(sla.startedAt(), observedAt, hasMonitoringEvents, sourceTime);
+        }
         ClockStatus recovery = hasMonitoringEvents
             ? evaluateMonitoringRecovery(workflow,sla,observedAt,confirmedRecoveryAt)
             : evaluateRecovery(workflow, sla, observedAt);

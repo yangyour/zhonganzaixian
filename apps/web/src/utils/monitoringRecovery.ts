@@ -13,6 +13,7 @@ export interface RecoveryView {
  rule:RecoveryRule|null;observed_at:string;source:'postgresql';source_binding_available:boolean
 }
 export interface RecoveryReceipt {
+ evidence_version:2;recovery_time_basis:'SOURCE_NTH_MATCHING_SAMPLE';
  tenant_id:string;actor_id:string;permission_version:number;event_id:string;event_version:number;proof_id:string;status:string;applied:boolean;confirmed_at:string|null;candidate_recovered_at:string|null;recovered_at:string|null;
  policy_release_id:string;policy_release_version:number;observed_at:string;latest_sample_at:string|null;span_started_at:string|null;span_seconds:string|null;
  matching_samples:number;source_binding_sha256:string;source:'ZABBIX_SIMPLE_CHECK';production_approved:false
@@ -35,7 +36,7 @@ export function readRecoveryView(value:unknown,scope:RecoveryScope):RecoveryView
  return structuredClone(value) as unknown as RecoveryView
 }
 export function readRecoveryReceipt(value:unknown,scope:RecoveryScope,attempt:Attempt):RecoveryReceipt {
- if(!exportExact(value,['tenant_id','actor_id','permission_version','event_id','event_version','proof_id','status','applied','confirmed_at','candidate_recovered_at','recovered_at','policy_release_id','policy_release_version','observed_at','latest_sample_at','span_started_at','span_seconds','matching_samples','source_binding_sha256','source','production_approved'])||!sameScope(value,scope)||typeof value.applied!=='boolean'||!exportUuid(value.proof_id)||value.event_version!==attempt.body.expected_version+(value.applied?1:0)||value.policy_release_id!==attempt.body.policy_release_id||value.policy_release_version!==attempt.body.policy_release_version||!exportInteger(value.matching_samples,0,2000)||value.source!=='ZABBIX_SIMPLE_CHECK'||value.production_approved!==false||typeof value.source_binding_sha256!=='string'||!/^[0-9a-f]{64}$/.test(value.source_binding_sha256))throw invalid()
+ if(!exportExact(value,['evidence_version','recovery_time_basis','tenant_id','actor_id','permission_version','event_id','event_version','proof_id','status','applied','confirmed_at','candidate_recovered_at','recovered_at','policy_release_id','policy_release_version','observed_at','latest_sample_at','span_started_at','span_seconds','matching_samples','source_binding_sha256','source','production_approved'])||value.evidence_version!==2||value.recovery_time_basis!=='SOURCE_NTH_MATCHING_SAMPLE'||!sameScope(value,scope)||typeof value.applied!=='boolean'||!exportUuid(value.proof_id)||value.event_version!==attempt.body.expected_version+(value.applied?1:0)||value.policy_release_id!==attempt.body.policy_release_id||value.policy_release_version!==attempt.body.policy_release_version||!exportInteger(value.matching_samples,0,2000)||value.source!=='ZABBIX_SIMPLE_CHECK'||value.production_approved!==false||typeof value.source_binding_sha256!=='string'||!/^[0-9a-f]{64}$/.test(value.source_binding_sha256))throw invalid()
  const observed=exportTime(value.observed_at)
  if(!['RECOVERY_CONFIRMED','NO_SAMPLES','UNKNOWN_LATEST','STALE_LATEST','NOT_RECOVERED','OBSERVING'].includes(value.status as string)||(value.status==='RECOVERY_CONFIRMED')!==value.applied||(value.applied?value.confirmed_at!==value.observed_at:value.confirmed_at!==null))throw invalid()
  let latest:bigint|null=null,start:bigint|null=null
@@ -45,7 +46,8 @@ export function readRecoveryReceipt(value:unknown,scope:RecoveryScope,attempt:At
  if(value.latest_sample_at!==null){latest=utcInstantNanos(value.latest_sample_at);if(latest===null||latest>observed)throw invalid()}
  if(value.span_started_at!==null){start=utcInstantNanos(value.span_started_at);if(start===null||latest===null||start>latest)throw invalid()}
  if(candidate!==null&&(start===null||latest===null||candidate<start||candidate>latest))throw invalid()
- if(value.applied?(candidate===null||recovered!==candidate/1000000n*1000000n):recovered!==null)throw invalid()
+ // V2 carries the exact source instant. Millisecond rounding could move a real breach across its deadline.
+ if(value.applied?(candidate===null||recovered!==candidate):recovered!==null)throw invalid()
  if(value.span_seconds!==null&&(!decimal(value.span_seconds)||value.span_seconds.startsWith('-')))throw invalid()
  if(value.applied&&(start===null||latest===null||value.span_seconds===null||value.matching_samples===0))throw invalid()
  if(['RECOVERY_CONFIRMED','OBSERVING'].includes(value.status as string)){

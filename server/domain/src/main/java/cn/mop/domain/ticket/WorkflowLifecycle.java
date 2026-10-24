@@ -91,24 +91,52 @@ public final class WorkflowLifecycle {
         return dueNotices(s,now,false,null);
     }
     public static List<ClockNotice> dueNotices(Snapshot s,Instant now,boolean hasMonitoringEvents,Instant confirmedRecoveryAt) {
-        if(now==null||now.isBefore(s.updatedAt()))throw invalid();TicketSlaSnapshot.time(now);
-        MonitoringRecoveryClockEvidence.requireConsistent(
-            s.sla().startedAt(), now, hasMonitoringEvents, confirmedRecoveryAt
-        );
-        if(s.state()==State.CANCELLED)return List.of();
-        var result=new ArrayList<ClockNotice>();
-        for(String clock:List.of("response","recovery")) {
-            Instant completed=clock.equals("response")?s.acceptedAt():hasMonitoringEvents?confirmedRecoveryAt:s.resolvedAt();
-            for(int percent:List.of(50,80,100)) {
-                Instant due=s.sla().threshold(clock,percent);
-                if(due!=null&&!now.isBefore(due)&&(completed==null||completed.isAfter(due)))
-                    result.add(new ClockNotice(clock+":"+percent,"ticket.sla_"+percent,due,0));
+        return dueNoticesInternal(s, now, hasMonitoringEvents, confirmedRecoveryAt, null);
+    }
+
+    /** Uses the same verified exact source t2 as the read-side SLA projection. */
+    public static List<ClockNotice> dueNoticesSourceRecovery(Snapshot snapshot, Instant observed,
+                                                            boolean hasMonitoringEvents,
+                                                            MonitoringRecoveryClockEvidence.SourceTime recovery) {
+        return dueNoticesInternal(snapshot, observed, hasMonitoringEvents,
+                recovery == null ? null : recovery.recoveredAt(), recovery);
+    }
+
+    private static List<ClockNotice> dueNoticesInternal(Snapshot s, Instant now, boolean hasMonitoringEvents,
+                                                       Instant confirmedRecoveryAt,
+                                                       MonitoringRecoveryClockEvidence.SourceTime sourceTime) {
+        if (now == null || now.isBefore(s.updatedAt())) {
+            throw invalid();
+        }
+        TicketSlaSnapshot.time(now);
+        if (sourceTime == null) {
+            MonitoringRecoveryClockEvidence.requireConsistent(s.sla().startedAt(), now, hasMonitoringEvents, confirmedRecoveryAt);
+        } else {
+            MonitoringRecoveryClockEvidence.requireConsistentSource(s.sla().startedAt(), now, hasMonitoringEvents, sourceTime);
+        }
+        if (s.state() == State.CANCELLED) {
+            return List.of();
+        }
+        var result = new ArrayList<ClockNotice>();
+        for (String clock : List.of("response", "recovery")) {
+            Instant completed = clock.equals("response") ? s.acceptedAt()
+                    : hasMonitoringEvents ? confirmedRecoveryAt : s.resolvedAt();
+            for (int percent : List.of(50, 80, 100)) {
+                Instant due = s.sla().threshold(clock, percent);
+                if (due != null && !now.isBefore(due) && (completed == null || completed.isAfter(due))) {
+                    result.add(new ClockNotice(clock + ":" + percent, "ticket.sla_" + percent, due, 0));
+                }
             }
         }
-        if(s.state()==State.RESOLVED&&s.confirmDueAt()!=null&&now.isBefore(s.confirmDueAt())) {
-            Instant reminder=s.confirmDueAt().minus(Duration.ofHours(12));
-            if(reminder.isBefore(s.resolvedAt()))reminder=s.resolvedAt();
-            if(!now.isBefore(reminder))result.add(new ClockNotice("confirmation:"+s.confirmationCycle(),"ticket.confirmation_reminder",reminder,s.confirmationCycle()));
+        if (s.state() == State.RESOLVED && s.confirmDueAt() != null && now.isBefore(s.confirmDueAt())) {
+            Instant reminder = s.confirmDueAt().minus(Duration.ofHours(12));
+            if (reminder.isBefore(s.resolvedAt())) {
+                reminder = s.resolvedAt();
+            }
+            if (!now.isBefore(reminder)) {
+                result.add(new ClockNotice("confirmation:" + s.confirmationCycle(), "ticket.confirmation_reminder",
+                        reminder, s.confirmationCycle()));
+            }
         }
         return List.copyOf(result);
     }

@@ -140,6 +140,7 @@ public final class PostgresMonitoringRecoveryRepository {
             if (!policy.id().equals(command.releaseId()) || policy.version() != command.releaseVersion()) {
                 throw new DomainException(409, "CONFIG_RELEASE_CONFLICT", "恢复策略已变化，请重新核对当前发布");
             }
+            Instant problemFrom = problemBoundary(c, access.tenantId(), current.id());
             RecoverySourceBatch batch = reader.read(access.tenantId(), current.asset(), policy.rule().metric());
             if (batch == null || !batch.tenantId().toString().equals(access.tenantId())
                     || !batch.assetId().toString().equals(current.asset()) || !batch.metric().equals(policy.rule().metric())
@@ -155,17 +156,18 @@ public final class PostgresMonitoringRecoveryRepository {
             if (!afterRead.id().equals(policy.id()) || afterRead.version() != policy.version()) {
                 throw new DomainException(409, "CONFIG_RELEASE_CONFLICT", "来源读取期间恢复策略已变化");
             }
-            Instant eligibleFrom = current.lastOccurredAt().isAfter(policy.effectiveAt())
-                ? current.lastOccurredAt() : policy.effectiveAt();
+            Instant eligibleFrom = problemFrom.isAfter(policy.effectiveAt()) ? problemFrom : policy.effectiveAt();
             var evaluation = RecoveryObservation.evaluate(policy.rule(), batch.unit(), eligibleFrom, observed, batch.samples());
+            Instant predecessor = RecoveryObservation.requireCoveredTransition(policy.rule(), problemFrom, eligibleFrom,
+                    batch, evaluation);
             // t2 is the source time at which N consecutive samples first passed, confirmed only after the hold.
-            // V37 event columns are millisecond precision; the original nanos remain in the evidence/candidate field.
-            Instant recoveredAt = evaluation.confirmable()
-                ? evaluation.candidateRecoveredAt().truncatedTo(java.time.temporal.ChronoUnit.MILLIS) : null;
+            // V29/schema2 is authoritative; V37 receives only its explicitly truncated display projection.
+            Instant recoveredAt = evaluation.confirmable() ? evaluation.candidateRecoveredAt() : null;
             String proofId = UUID.randomUUID().toString();
             var response = map("tenant_id", access.tenantId(), "actor_id", access.actorId(), "permission_version", access.permissionVersion(),
                 "event_id", current.id(), "event_version", current.version() + (evaluation.confirmable() ? 1 : 0),
                 "proof_id", proofId, "status", evaluation.confirmable() ? "RECOVERY_CONFIRMED" : evaluation.status().name(),
+                "evidence_version", 2, "recovery_time_basis", "SOURCE_NTH_MATCHING_SAMPLE",
                 "applied", evaluation.confirmable(), "candidate_recovered_at", string(evaluation.candidateRecoveredAt()),
                 "recovered_at", string(recoveredAt), "confirmed_at", evaluation.confirmable() ? observed.toString() : null,
                 "policy_release_id", policy.id(), "policy_release_version", policy.version(), "observed_at", observed.toString(),
@@ -173,14 +175,18 @@ public final class PostgresMonitoringRecoveryRepository {
                 "span_seconds", evaluation.spanSeconds() == null ? null : evaluation.spanSeconds().toPlainString(),
                 "matching_samples", evaluation.matchingSamples(), "source_binding_sha256", batch.bindingSha256(),
                 "source", "ZABBIX_SIMPLE_CHECK", "production_approved", false);
-            Map<String, Object> evidence = map("schema_version", 1, "event_id", current.id(),
+            Map<String, Object> evidence = map("schema_version", 2, "event_id", current.id(),
+                "tenant_id", access.tenantId(), "asset_id", current.asset(), "event_fingerprint", current.fingerprint(),
+                "rule_code", current.ruleCode(), "source_namespace", batch.sourceNamespace().toString(),
+                "source_address", batch.assetAddress(), "problem_boundary_at", problemFrom.toString(),
+                "history_from", batch.historyFrom().toString(), "history_to_exclusive", batch.historyToExclusive().toString(),
+                "transition_predecessor_at", string(predecessor),
                 "event_version_before", current.version(), "policy_release_id", policy.id(),
                 "policy_release_version", policy.version(), "policy_definition_hash", definitionHash,
                 "eligible_from", eligibleFrom.toString(), "rule", ruleDto(policy.rule()),
                 "source_binding_sha256", batch.bindingSha256(), "source", "ZABBIX_SIMPLE_CHECK",
                 "sample_unit", batch.unit(), "source_points_read", batch.samples().size(),
-                "sample_selection", "AT_OR_AFTER_ELIGIBLE_FROM", "samples", batch.samples().stream()
-                    .filter(sample -> !sample.recordedAt().isBefore(eligibleFrom)).map(sample -> map(
+                "sample_selection", "COMPLETE_RETURNED_SOURCE_WINDOW", "samples", batch.samples().stream().map(sample -> map(
                     "recorded_at", sample.recordedAt().toString(), "quality", sample.quality().name(),
                     "value", sample.value() == null ? null : sample.value().toPlainString())).toList(), "result", response);
             String sourceEventId = "recovery-observation:" + current.id() + ":" + command.commandSha256();
@@ -233,7 +239,12 @@ public final class PostgresMonitoringRecoveryRepository {
                             throw unavailable();
                         }
                         JsonNode result = proof.path("result");
-                        if (proof.path("schema_version").intValue() != 1 || !eventId.equals(proof.path("event_id").asText())
+                        if (!access.actorId().equals(result.path("actor_id").asText())) {
+                            throw new DomainException(404, "RESOURCE_NOT_FOUND", "尚未找到本人原恢复观察请求的已提交证据");
+                        }
+                        if (proof.path("schema_version").intValue() != 2 || !eventId.equals(proof.path("event_id").asText())
+                                || !access.tenantId().equals(result.path("tenant_id").asText())
+                                || result.path("evidence_version").intValue() != 2
                                 || !eventId.equals(result.path("event_id").asText())
                                 || !r.getString("id").equals(result.path("proof_id").asText())
                                 || !result.path("applied").isBoolean() || result.path("applied").booleanValue() != r.getBoolean("applied")) {
@@ -286,15 +297,16 @@ public final class PostgresMonitoringRecoveryRepository {
     }
 
     private void applyRecovery(Connection c, Access a, Event event, String proof, String sourceId, Instant at, Instant recordedAt) throws SQLException {
+        Instant summaryAt = at.truncatedTo(java.time.temporal.ChronoUnit.MILLIS);
         var handling = MonitoringEventPipeline.HandlingState.PENDING_REVIEW;
         var flap = MonitoringEventPipeline.evaluateFlap(event.flips(), !event.monitorState().equals("RECOVERED"),
-            event.lastOccurredAt(), at, event.silenceUntil());
+            event.lastOccurredAt(), summaryAt, event.silenceUntil());
         try (var s = statement(c, "UPDATE public.mop_monitoring_event SET version=version+1,occurrence_count=occurrence_count+1,"
                 + "monitor_state='RECOVERED',handling_state=?,last_occurred_at=?,recovered_at=?,flap_flip_count=?,"
                 + "flap_silenced_until=?,updated_by=?::uuid,updated_at=? WHERE tenant_id=?::uuid AND id=?::uuid AND version=?")) {
             s.setString(1, handling.name());
-            instant(s, 2, at);
-            instant(s, 3, at);
+            instant(s, 2, summaryAt);
+            instant(s, 3, summaryAt);
             s.setInt(4, flap.flipCountInWindow());
             instant(s, 5, flap.silencedUntil());
             s.setString(6, a.actorId());
@@ -315,7 +327,7 @@ public final class PostgresMonitoringRecoveryRepository {
             s.setString(4, proof);
             s.setInt(5, Math.incrementExact(event.sequence()));
             s.setString(6, sourceId);
-            instant(s, 7, at);
+            instant(s, 7, summaryAt);
             instant(s, 8, recordedAt);
             s.executeUpdate();
         }
@@ -370,6 +382,21 @@ public final class PostgresMonitoringRecoveryRepository {
                 } catch (java.io.IOException failure) {
                     throw unavailable();
                 }
+            }
+        }
+    }
+
+    /** Legacy RECOVERED observations are not the beginning of the current fault episode. */
+    private static Instant problemBoundary(Connection connection, String tenant, String eventId) throws SQLException {
+        try (var statement = statement(connection, "SELECT max(occurred_at) FROM public.mop_monitoring_event_member "
+                + "WHERE tenant_id=?::uuid AND event_id=?::uuid AND source_phase='PROBLEM'")) {
+            statement.setString(1, tenant);
+            statement.setString(2, eventId);
+            try (var rows = statement.executeQuery()) {
+                if (!rows.next() || rows.getObject(1) == null) {
+                    throw new DomainException(422, "RECOVERY_HISTORY_INCOMPLETE", "事件缺少当前故障周期的持久来源边界");
+                }
+                return rows.getObject(1, OffsetDateTime.class).toInstant();
             }
         }
     }

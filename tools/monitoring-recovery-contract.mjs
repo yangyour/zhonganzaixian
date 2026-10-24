@@ -13,6 +13,7 @@ export function addMonitoringRecoveryContract(contract) {
     missing_reason:nullable({type:'string'}),policy_release_id:nullable(uuid),policy_release_version:nullable(version),rule:nullable(rule),
     observed_at:time,source:{const:'postgresql'},source_binding_available:{type:'boolean'}});
   const result = object({...scope,proof_id:uuid,status:{enum:['RECOVERY_CONFIRMED','NO_SAMPLES','UNKNOWN_LATEST','STALE_LATEST','NOT_RECOVERED','OBSERVING']},
+    evidence_version:{const:2},recovery_time_basis:{const:'SOURCE_NTH_MATCHING_SAMPLE'},
     applied:{type:'boolean'},candidate_recovered_at:nullable(time),recovered_at:nullable(time),confirmed_at:nullable(time),policy_release_id:uuid,policy_release_version:version,observed_at:time,
     latest_sample_at:nullable(time),span_started_at:nullable(time),span_seconds:nullable(decimal),matching_samples:{type:'integer',minimum:0,maximum:2000},
     source_binding_sha256:{type:'string',pattern:'^[0-9a-f]{64}$'},source:{const:'ZABBIX_SIMPLE_CHECK'},production_approved:{const:false}});
@@ -29,12 +30,13 @@ export function addMonitoringRecoveryContract(contract) {
   contract.paths['/events/{eventId}/recovery-observations']={
     get:{...base('inspectMonitoringRecovery','MonitoringRecoveryContextResult','tickets:read'),summary:'读取恢复观察策略与来源绑定是否配置，不采样、不写入',parameters:[event]},
     post:{...base('observeMonitoringRecovery','MonitoringRecoveryObservationResult','ticket_notes:write_internal'),summary:'读取服务端绑定来源，按精确发布策略保存观察证据，满足条件才确认t2',
+      description:'最终summary的时间、值和单位必须匹配历史末点；本故障周期内必须存在已知失败到连续恢复的转折，覆盖不足返回422 RECOVERY_HISTORY_INCOMPLETE，新采样未被覆盖返回503 RECOVERY_SOURCE_CHANGED。第N个合格采样为candidate_recovered_at，后续观察窗通过后recovered_at与其纳秒精确相等；confirmed_at为确认处理时刻。schema2原始证据独立验证后用于SLA停钟，不使用事件毫秒摘要替代。',
       parameters:[event,{name:'X-CSRF-Token',in:'header',required:true,schema:{type:'string'}},{name:'Idempotency-Key',in:'header',required:true,schema:{type:'string',minLength:1,maxLength:128}}],
       requestBody:{required:true,content:{'application/json':{schema:ref('MonitoringRecoveryObserveInput')}}},
       'x-mop-idempotent-replay-reauthorization':true,'x-mop-client-samples-accepted':false,'x-mop-atomic-evidence-event-audit':true},
   };
   contract.paths['/events/{eventId}/recovery-observations/receipts/{commandSha256}']={
-    get:{...base('readMonitoringRecoveryReceipt','MonitoringRecoveryObservationResult','tickets:read'),summary:'只读恢复原请求回执；尚未发现已提交证据时返回404，不重发写入',
+    get:{...base('readMonitoringRecoveryReceipt','MonitoringRecoveryObservationResult','tickets:read'),summary:'只读恢复本人原请求回执；非原actor或未发现已提交证据时返回404，不重发写入',
       parameters:[event,{name:'commandSha256',in:'path',required:true,schema:{type:'string',pattern:'^[0-9a-f]{64}$'}}]},
   };
 }

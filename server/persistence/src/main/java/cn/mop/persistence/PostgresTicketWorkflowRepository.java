@@ -50,7 +50,8 @@ public final class PostgresTicketWorkflowRepository implements TicketWorkflowRep
                 "tier_changed_since_open",false,"response_clock",null,"recovery_clock",null,"clock_tasks",List.of(),"sla_missing",Map.of(),"sla_references",List.of(),
                 "reopen_count",0,"reopen_policy_status","NOT_REOPENED","metric_version",TicketSlaClockEvaluation.METRIC_VERSION,"observed_at",observed.toString(),"source","postgresql");
             var recovery=monitoringRecovery(c,a.tenantId(),ticket);
-            var eval=TicketSlaClockEvaluation.evaluate(event.snapshot(),currentTenantTier,observed,recovery.linked(),recovery.recoveredAt());
+            var eval = TicketSlaClockEvaluation.evaluateSourceRecovery(event.snapshot(), currentTenantTier, observed,
+                    recovery.linked(), recovery.sourceTime());
             if(!customer)TicketSlaDiagnosticLimits.requireWithinLimits(0,eval.slaReferences().size());
             var tasks=new ArrayList<Map<String,Object>>();
             if(!customer)try(var s=statement(c,"SELECT j.clock_key,j.kind,j.due_at,r.outcome,r.completed_at FROM public.mop_ticket_workflow_clock j LEFT JOIN public.mop_ticket_workflow_clock_receipt r ON r.task_id=j.id AND r.tenant_id=j.tenant_id WHERE j.tenant_id=?::uuid AND j.ticket_id=?::uuid ORDER BY j.due_at,j.clock_key LIMIT "+TicketSlaDiagnosticLimits.CLOCK_TASK_LOOKAHEAD)){
@@ -230,8 +231,8 @@ public final class PostgresTicketWorkflowRepository implements TicketWorkflowRep
                     }
                 }else if(!job.kind().equals("AUTO_CLOSE")){
                     var recovery=monitoringRecovery(c,tenant,job.ticket());
-                    List<ClockNotice> notices = WorkflowLifecycle.dueNotices(
-                        current.snapshot(), at, recovery.linked(), recovery.recoveredAt()
+                    List<ClockNotice> notices = WorkflowLifecycle.dueNoticesSourceRecovery(
+                        current.snapshot(), at, recovery.linked(), recovery.sourceTime()
                     );
                     MonitoringRecurrenceClock cycle;
                     try {
@@ -277,36 +278,56 @@ public final class PostgresTicketWorkflowRepository implements TicketWorkflowRep
     private Event latest(Connection c,String tenant,String ticket)throws SQLException{
         try(var s=statement(c,"SELECT id::text,snapshot,snapshot_hash FROM public.mop_ticket_workflow_event WHERE tenant_id=?::uuid AND ticket_id=?::uuid ORDER BY version DESC LIMIT 1")){s.setString(1,tenant);s.setString(2,ticket);try(var r=s.executeQuery()){return r.next()?new Event(r.getString(1),decode(r.getString(2)),r.getString(3)):null;}}
     }
-    /** A raw RECOVERED flag, old unproved rows, or raw storage alone cannot authorize SLA completion/closure. */
-    private static final String RECOVERY_PROOF = "EXISTS(SELECT 1 FROM public.mop_monitoring_event_member rm "
-        + "JOIN public.mop_raw_monitoring_event rp ON rp.id=rm.raw_event_id AND rp.tenant_id=rm.tenant_id "
-        + "WHERE rm.tenant_id=e.tenant_id AND rm.event_id=e.id AND rm.source_phase='RECOVERED' "
-        + "AND rm.occurred_at=e.recovered_at AND rp.source_phase='RECOVERED' AND rp.asset_id=e.asset_id AND rp.source_event_id=rm.source_event_id "
-        + "AND rp.source_event_id LIKE 'recovery-observation:'||e.id::text||':%' "
-        + "AND EXISTS(SELECT 1 FROM public.mop_audit ra WHERE ra.tenant_id=e.tenant_id "
-        + "AND ra.payload->>'action'='monitoring.recovery.observe' AND ra.payload->>'resource_type'='monitoring_recovery_observation' "
-        + "AND ra.payload->>'resource_id'=rp.id::text AND ra.payload->>'result'='SUCCEEDED' "
-        + "AND position('_RESULT_RECOVERY_CONFIRMED_RELEASE_' IN ra.payload->>'reason')>0))";
-    static boolean recoveryConfirmed(Connection c, String tenant, String eventId) throws SQLException {
-        try (var s = statement(c, "SELECT monitor_state='RECOVERED' AND recovered_at IS NOT NULL AND "
-                + RECOVERY_PROOF + " FROM public.mop_monitoring_event e WHERE tenant_id=?::uuid AND id=?::uuid")) {
-            s.setString(1, tenant);
-            s.setString(2, eventId);
-            try (var r = s.executeQuery()) {
-                return r.next() && r.getBoolean(1);
+    /** Only validated current-cycle schema2 evidence can authorize review completion or an SLA stop. */
+    static boolean recoveryConfirmed(Connection connection, String tenant, String eventId) throws SQLException {
+        return PostgresMonitoringRecoveryEvidence.read(connection, tenant, eventId).isPresent();
+    }
+
+    private static boolean linkedEventsReviewed(Connection connection, String tenant, String ticket) throws SQLException {
+        try (var statement = statement(connection,
+                "SELECT id::text,handling_state FROM public.mop_monitoring_event WHERE tenant_id=?::uuid AND ticket_id=?::uuid")) {
+            statement.setString(1, tenant);
+            statement.setString(2, ticket);
+            try (var rows = statement.executeQuery()) {
+                while (rows.next()) {
+                    if (!Set.of("RESOLVED", "CLOSED").contains(rows.getString(2))
+                            || !recoveryConfirmed(connection, tenant, rows.getString(1))) {
+                        return false;
+                    }
+                }
             }
         }
+        return true;
     }
-    private static boolean linkedEventsReviewed(Connection c,String tenant,String ticket)throws SQLException{
-        try(var s=statement(c,"SELECT NOT EXISTS(SELECT 1 FROM public.mop_monitoring_event e WHERE tenant_id=?::uuid AND ticket_id=?::uuid AND (monitor_state<>'RECOVERED' OR handling_state NOT IN ('RESOLVED','CLOSED') OR NOT " + RECOVERY_PROOF + "))")){
-            s.setString(1,tenant);s.setString(2,ticket);try(var r=s.executeQuery()){r.next();return r.getBoolean(1);}
+
+    record MonitoringRecovery(boolean linked, cn.mop.domain.sla.MonitoringRecoveryClockEvidence.SourceTime sourceTime) {
+        Instant recoveredAt() {
+            return sourceTime == null ? null : sourceTime.recoveredAt();
         }
     }
-    record MonitoringRecovery(boolean linked,Instant recoveredAt){}
-    static MonitoringRecovery monitoringRecovery(Connection c,String tenant,String ticket)throws SQLException{
-        try(var s=statement(c,"SELECT count(*)>0,CASE WHEN bool_and(monitor_state='RECOVERED' AND recovered_at IS NOT NULL AND " + RECOVERY_PROOF + ") THEN max(recovered_at) ELSE NULL END FROM public.mop_monitoring_event e WHERE tenant_id=?::uuid AND ticket_id=?::uuid")){
-            s.setString(1,tenant);s.setString(2,ticket);try(var r=s.executeQuery()){r.next();return new MonitoringRecovery(r.getBoolean(1),r.getObject(2)==null?null:r.getObject(2,OffsetDateTime.class).toInstant());}
+
+    /** Every linked event must have valid current-cycle evidence before taking the maximum exact source t2. */
+    static MonitoringRecovery monitoringRecovery(Connection connection, String tenant, String ticket) throws SQLException {
+        boolean linked = false;
+        boolean incomplete = false;
+        cn.mop.domain.sla.MonitoringRecoveryClockEvidence.SourceTime latest = null;
+        try (var statement = statement(connection,
+                "SELECT id::text FROM public.mop_monitoring_event WHERE tenant_id=?::uuid AND ticket_id=?::uuid ORDER BY id")) {
+            statement.setString(1, tenant);
+            statement.setString(2, ticket);
+            try (var rows = statement.executeQuery()) {
+                while (rows.next()) {
+                    linked = true;
+                    var proof = PostgresMonitoringRecoveryEvidence.read(connection, tenant, rows.getString(1));
+                    if (proof.isEmpty()) {
+                        incomplete = true;
+                    } else if (latest == null || proof.get().recoveredAt().isAfter(latest.recoveredAt())) {
+                        latest = proof.get();
+                    }
+                }
+            }
         }
+        return new MonitoringRecovery(linked, incomplete ? null : latest);
     }
     private static boolean lock(Connection c,String tenant,String ticket,boolean attempt)throws SQLException{
         try(var s=statement(c,"SELECT "+(attempt?"pg_try_advisory_xact_lock":"pg_advisory_xact_lock")+"(hashtextextended(?,0))")){s.setString(1,"mop.ticket.workflow|"+tenant+"|"+ticket);try(var r=s.executeQuery()){r.next();return !attempt||r.getBoolean(1);}}

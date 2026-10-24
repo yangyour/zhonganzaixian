@@ -165,11 +165,15 @@ class MonitoringRecoveryDesignatedIntegrationTest {
         } catch (SQLException failure) { throw new AssertionError(failure); }
     }
     static RecoverySourceBatch samples(List<RecoveryObservation.Sample> values) {
+        Instant from = values.isEmpty() ? dbNow().minusSeconds(60) : values.get(0).recordedAt().minusSeconds(1);
+        Instant to = values.isEmpty() ? dbNow().plusSeconds(1) : values.get(values.size() - 1).recordedAt().plusSeconds(1);
         return new RecoverySourceBatch(UUID.fromString("10000000-0000-4000-8000-000000000099"),
-            UUID.fromString(tenant), UUID.fromString(asset), address, "icmp", "", "e".repeat(64), values);
+            UUID.fromString(tenant), UUID.fromString(asset), address, "icmp", "", "e".repeat(64), from, to, values);
     }
     static RecoverySourceBatch matching() {
-        return samples(List.of(new RecoveryObservation.Sample(dbNow().minusMillis(2), RecoveryObservation.Quality.KNOWN, BigDecimal.ONE)));
+        Instant recovered = dbNow().minusMillis(2);
+        return samples(List.of(new RecoveryObservation.Sample(recovered.minusMillis(1), RecoveryObservation.Quality.KNOWN, BigDecimal.ZERO),
+                new RecoveryObservation.Sample(recovered, RecoveryObservation.Quality.KNOWN, BigDecimal.ONE)));
     }
     static PostgresMonitoringRecoveryRepository repository(PostgresMonitoringRecoveryRepository.SourceReader reader) {
         return new PostgresMonitoringRecoveryRepository(pool, platform, reader, definitionHash);
@@ -223,12 +227,17 @@ class MonitoringRecoveryDesignatedIntegrationTest {
         assertEquals("RECOVERY_CONFIRMED", result.get("status")); assertEquals(true, result.get("applied"));
         var current = events.eventDetail(access(), event.id());
         assertEquals(HandlingState.PENDING_REVIEW, current.event().handlingState());
-        assertEquals(result.get("recovered_at"), current.event().recoveredAt().toString());
+        assertEquals(Instant.parse(result.get("recovered_at").toString()).truncatedTo(ChronoUnit.MILLIS), current.event().recoveredAt());
         assertEquals(result.get("proof_id"), current.members().get(1).rawEventId());
         var sla = workflows.readSla(access, event.ticketId(), Tier.STANDARD);
         assertEquals(result.get("recovered_at"), ((Map<?, ?>) sla.get("recovery_clock")).get("completed_at"));
         assertEquals(wire(result), wire(observe(platform, repo, command, "confirmed")));
         assertEquals(wire(result), wire(repo.receipt(access(), event.id(), command.commandSha256())));
+        assertEquals(2, ((Number) result.get("evidence_version")).intValue());
+        assertEquals("SOURCE_NTH_MATCHING_SAMPLE", result.get("recovery_time_basis"));
+        var otherActor = new Access(tenant, reviewer, platform.membership(reviewer, tenant).orElseThrow().permissionVersion(), "other-actor");
+        assertEquals(404, assertThrows(DomainException.class,
+                () -> repo.receipt(otherActor, event.id(), command.commandSha256())).status);
         assertEquals(1, calls.get()); assertEquals(1, proofs(event.id()));
     }
 
@@ -295,7 +304,7 @@ class MonitoringRecoveryDesignatedIntegrationTest {
         var unavailable = repository((t, a, m) -> { throw new DomainException(503, "SOURCE_UNKNOWN", "source unavailable"); });
         assertEquals(503, assertThrows(DomainException.class, () -> observe(platform, unavailable, command, "source-error")).status);
         var mismatch = repository((t, a, m) -> new RecoverySourceBatch(UUID.randomUUID(), UUID.fromString(foreignTenant),
-            UUID.fromString(asset), address, "icmp", "", "e".repeat(64), matching().samples()));
+            UUID.fromString(asset), address, "icmp", "", "e".repeat(64), dbNow().minusSeconds(60), dbNow().plusSeconds(60), matching().samples()));
         assertEquals(503, assertThrows(DomainException.class, () -> observe(platform, mismatch, command, "source-mismatch")).status);
         assertEquals(0, proofs(event.id())); assertEquals(MonitorState.PROBLEM, events.eventDetail(access(), event.id()).event().monitorState());
     }
@@ -309,6 +318,13 @@ class MonitoringRecoveryDesignatedIntegrationTest {
             () -> events.ingestEvent(a, new IngestEventCommand(asset, rule, "SYNTHETIC_LEGACY_SIGNAL", Severity.HIGH,
                 MonitorState.RECOVERED, "legacy-" + rule, Instant.now().truncatedTo(ChronoUnit.MILLIS), false)));
         assertNull(((Map<?, ?>) workflows.readSla(ticketAccess, legacy.ticketId(), Tier.STANDARD).get("recovery_clock")).get("completed_at"));
+        for (String action : List.of("RESOLVE", "CLOSE")) {
+            var rejected = assertThrows(DomainException.class, () -> platform.idempotentAuthorized(actor, tenant,
+                    "POST /integration/recovery/legacy-gate/" + action, UUID.randomUUID().toString(), "a".repeat(64),
+                    a.permissionVersion(), () -> events.authorizeWrite(a), () -> events.transitionEvent(a,
+                            new TransitionEventCommand(legacy.id(), legacy.version(), action, "SYNTHETIC root cause"))));
+            assertEquals("RECOVERY_OBSERVATION_REQUIRED", rejected.code);
+        }
         var release = publish(rule, "0", 1, null); var repo = repository((t, target, m) -> matching());
         assertEquals("UNVERIFIED", repo.inspect(a, legacy.id()).get("recovery_evidence_status"));
         var result = observe(platform, repo, command(legacy, release, "9".repeat(64)), "legacy-observation");
@@ -342,33 +358,48 @@ class MonitoringRecoveryDesignatedIntegrationTest {
     @Test
     @Order(10)
     @EnabledIfEnvironmentVariable(named = "MOP_MONITORING_LIVE_SOURCE", matches = "true")
-    void liveBoundTestServerSampleConfirmsOnlyAfterPublicationAndKeepsRawTimes() throws Exception {
+    void liveBoundSourceReadCannotClaimRecoveryForAnUnobservedSyntheticFault() throws Exception {
         var bindings = NetworkMonitoringService.parseBindings(System.getenv("MOP_MONITORING_SOURCE_BINDING"));
         assertEquals(1, bindings.size()); assertEquals(tenant, bindings.get(0).tenantId()); assertEquals(asset, bindings.get(0).assetId());
         assertEquals("192.168.1.215", bindings.get(0).ip()); assertEquals("DEMO", bindings.get(0).brand());
         String endpoint = System.getenv("MOP_MONITORING_SOURCE_ENDPOINT");
         var client = new ZabbixReadClient(endpoint, System.getenv("MOP_MONITORING_SOURCE_TOKEN"));
         var source = new MonitoringRecoverySource(new NetworkMonitoringService(bindings, client::call, Clock.systemUTC(), true), endpoint);
+        // Real source read evidence remains separate from the synthetic PG transition cases above.
+        // Capture before registering the synthetic fault: these points cannot prove recovery of that later fault.
+        RecoverySourceBatch actual = source.read(tenant, asset, "icmp");
+        assertFalse(actual.samples().isEmpty());
         String rule = ruleCode(); var event = problem(rule); var release = publish(rule, "30", 2, null);
         var ticketAccess = activate(event);
-        var repo = repository(source); Map<String, Object> result = null;
-        for (int attempt = 0; attempt < 18; attempt++) {
-            String nonce = UUID.randomUUID().toString();
-            String hash = java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(nonce.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
-            result = observe(platform, repo, command(event, release, hash), nonce);
-            if (Boolean.TRUE.equals(result.get("applied"))) { break; }
-            assertTrue(java.util.Set.of("NO_SAMPLES", "OBSERVING").contains(result.get("status")),
-                "Do not treat unexpected source conditions as recovery");
-            Thread.sleep(10_000);
-        }
-        assertNotNull(result); assertEquals(true, result.get("applied"), "A new actual sample after policy publication is required");
-        assertEquals("RECOVERY_CONFIRMED", result.get("status"));
-        assertTrue(((Number) result.get("matching_samples")).intValue() >= 2);
-        assertTrue(new BigDecimal(result.get("span_seconds").toString()).compareTo(new BigDecimal("30")) >= 0);
-        assertTrue(Instant.parse(result.get("latest_sample_at").toString()).compareTo(Instant.parse(release.get("effective_at").toString())) >= 0);
-        assertEquals(HandlingState.PENDING_REVIEW, events.eventDetail(access(), event.id()).event().handlingState());
-        assertEquals(result.get("recovered_at"), ((Map<?, ?>) workflows.readSla(ticketAccess, event.ticketId(), Tier.STANDARD)
-            .get("recovery_clock")).get("completed_at"));
+        var repo = repository((t, a, m) -> actual);
+        var result = observe(platform, repo, command(event, release, "c".repeat(64)), "actual-source-prior-to-fault");
+        assertEquals(false, result.get("applied"));
+        assertEquals("NO_SAMPLES", result.get("status"));
+        assertNull(result.get("recovered_at"));
+        assertNull(result.get("confirmed_at"));
+        assertEquals(event.version(), events.eventDetail(access(), event.id()).event().version());
+        assertEquals(MonitorState.PROBLEM, events.eventDetail(access(), event.id()).event().monitorState());
+        assertNull(((Map<?, ?>) workflows.readSla(ticketAccess, event.ticketId(), Tier.STANDARD)
+                .get("recovery_clock")).get("completed_at"));
+    }
+
+    @Test
+    @Order(11)
+    void healthyHistoryTailWithoutThisFaultTransitionCannotCommitALaterInventedT2() throws Exception {
+        String rule = ruleCode();
+        var event = problem(rule);
+        var release = publish(rule, "0", 1, null);
+        var repository = repository((t, a, m) -> {
+            Instant latest = dbNow().minusMillis(2);
+            return samples(List.of(new RecoveryObservation.Sample(latest.minusMillis(1), RecoveryObservation.Quality.KNOWN, BigDecimal.ONE),
+                    new RecoveryObservation.Sample(latest, RecoveryObservation.Quality.KNOWN, BigDecimal.ONE)));
+        });
+        var error = assertThrows(DomainException.class,
+                () -> observe(platform, repository, command(event, release, "d".repeat(64)), "healthy-tail-only"));
+        assertEquals("RECOVERY_HISTORY_INCOMPLETE", error.code);
+        assertEquals(0, proofs(event.id()));
+        assertEquals(event.version(), events.eventDetail(access(), event.id()).event().version());
+        assertEquals(MonitorState.PROBLEM, events.eventDetail(access(), event.id()).event().monitorState());
     }
 
     static DataSource missedCas(AtomicBoolean hit) {

@@ -86,8 +86,8 @@ public final class PostgresDashboardPendingTicketSlaReader implements DashboardP
                     || workflow.updatedAt().isAfter(observed)) {
                 throw unavailable();
             }
-            var evaluated = TicketSlaClockEvaluation.evaluate(workflow, tier, observed,
-                    recovery.linked(), recovery.recoveredAt());
+            var evaluated = TicketSlaClockEvaluation.evaluateSourceRecovery(workflow, tier, observed,
+                    recovery.linked(), recovery.sourceTime());
             var recoveryClock = "PENDING_Q27".equals(evaluated.reopenPolicyStatus())
                     ? DashboardTicketSla.unavailable("REOPEN_POLICY_MISSING")
                     : DashboardTicketSla.workflow(evaluated.recoveryClock(), observed);

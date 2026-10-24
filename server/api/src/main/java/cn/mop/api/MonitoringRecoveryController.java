@@ -2,6 +2,7 @@ package cn.mop.api;
 
 import cn.mop.domain.Capabilities;
 import cn.mop.domain.DomainException;
+import cn.mop.domain.Membership;
 import cn.mop.domain.PlatformRepository;
 import cn.mop.domain.monitoring.MonitoringEventCenterRepository.Access;
 import cn.mop.persistence.PostgresMonitoringRecoveryRepository;
@@ -52,28 +53,31 @@ public final class MonitoringRecoveryController {
 
     @GetMapping
     Object inspect(@PathVariable String eventId, HttpServletRequest request) {
-        Access a = access(request, false);
+        var subject = access(request, false);
+        Access a = subject.access();
         requireNoQuery(request);
         uuid(eventId);
         var result = repository.inspect(a, eventId);
         result.put("source_binding_available", source.available(a.tenantId(), (String) result.get("asset_id")));
-        recheck(a, request, false);
+        DashboardReadAuthorization.recheck(request, platform, subject.membership());
         return success(result, request);
     }
 
     @GetMapping("/receipts/{commandSha256}")
     Object receipt(@PathVariable String eventId, @PathVariable String commandSha256, HttpServletRequest request) {
-        Access a = access(request, false);
+        var subject = access(request, false);
+        Access a = subject.access();
         requireNoQuery(request);
         uuid(eventId);
         var result = repository.receipt(a, eventId, commandSha256);
-        recheck(a, request, false);
+        DashboardReadAuthorization.recheck(request, platform, subject.membership());
         return success(result, request);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     Object observe(@PathVariable String eventId, HttpServletRequest request) {
-        Access a = access(request, true);
+        var subject = access(request, true);
+        Access a = subject.access();
         requireNoQuery(request);
         uuid(eventId);
         JsonNode input;
@@ -101,34 +105,35 @@ public final class MonitoringRecoveryController {
         var command = new PostgresMonitoringRecoveryRepository.Command(eventId, version, release, releaseVersion,
             requestIdentity(a, eventId, key));
         Object result = platform.idempotentAuthorized(a.actorId(), a.tenantId(), "POST " + route(request), key,
-            hash("RECOVERY_OBSERVATION_V1|" + eventId + "|" + version + "|" + release + "|" + releaseVersion),
+            hash("RECOVERY_OBSERVATION_V2|" + eventId + "|" + version + "|" + release + "|" + releaseVersion),
             a.permissionVersion(), () -> repository.authorizeCommand(a, eventId), () -> repository.observe(a, command));
         return success(result, request);
     }
 
-    private Access access(HttpServletRequest request, boolean write) {
+    private record Subject(Access access, Membership membership) { }
+
+    private Subject access(HttpServletRequest request, boolean write) {
         if (request.getUserPrincipal() == null || request.getSession(false) == null
                 || !(request.getSession(false).getAttribute("mop.tenant_id") instanceof String tenant)) {
             throw new DomainException(401, "SESSION_EXPIRED", "当前会话已失效");
         }
         String actor = request.getUserPrincipal().getName();
+        try {
+            uuid(actor);
+            uuid(tenant);
+        } catch (DomainException malformedIdentity) {
+            throw new DomainException(401, "SESSION_EXPIRED", "当前会话身份无效");
+        }
         var member = platform.membership(actor, tenant)
             .orElseThrow(() -> new DomainException(401, "SESSION_EXPIRED", "当前成员已失效"));
-        if (!member.active() || !actor.equals(member.userId()) || !tenant.equals(member.tenantId()) || member.permissionVersion() < 1) {
+        if (!member.active() || !actor.equals(member.userId()) || !tenant.equals(member.tenantId())
+                || member.permissionVersion() < 1 || member.permissionVersion() > 9_007_199_254_740_990L) {
             throw new DomainException(401, "SESSION_EXPIRED", "当前成员已失效");
         }
         if (!Capabilities.internal(member.role()) || !member.capabilities().contains(write ? "ticket_notes:write_internal" : "tickets:read")) {
             throw new DomainException(403, "ACTION_FORBIDDEN", "当前成员无权核验监控恢复");
         }
-        return new Access(tenant, actor, member.permissionVersion(), trace(request));
-    }
-
-    private void recheck(Access before, HttpServletRequest request, boolean write) {
-        Access after = access(request, write);
-        if (!before.tenantId().equals(after.tenantId()) || !before.actorId().equals(after.actorId())
-                || before.permissionVersion() != after.permissionVersion()) {
-            throw new DomainException(401, "SESSION_EXPIRED", "读取期间当前授权已变化");
-        }
+        return new Subject(new Access(tenant, actor, member.permissionVersion(), trace(request)), member);
     }
     private static String requestIdentity(Access a, String event, String key) {
         return hash(a.actorId() + "|" + a.tenantId() + "|" + event + "|" + key);

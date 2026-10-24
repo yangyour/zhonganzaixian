@@ -36,11 +36,14 @@ final class MonitoringRecoverySource implements SourceReader {
         if (!NetworkMonitoringService.METRICS.contains(metric)) {
             throw unavailable();
         }
-        requireFresh(monitoring.summary(binding, ""), metric);
+        var before = freshMetric(monitoring.summary(binding, ""), binding, metric);
         Map<String, Object> history = monitoring.history(binding, metric, "HOURS_24");
         if (!asset.equals(history.get("asset_id")) || !metric.equals(history.get("metric"))
                 || !"ZABBIX_SIMPLE_CHECK".equals(history.get("source")) || !(history.get("unit") instanceof String unit)
-                || !(history.get("points") instanceof java.util.List<?> points)) {
+                || !(history.get("points") instanceof java.util.List<?> points)
+                || !(history.get("from") instanceof String from)
+                || !(history.get("to") instanceof String to)
+                || !"ZABBIX_RECORD_TIME".equals(history.get("timestamp_meaning"))) {
             throw unavailable();
         }
         var samples = new ArrayList<RecoveryObservation.Sample>();
@@ -56,19 +59,59 @@ final class MonitoringRecoverySource implements SourceReader {
                 throw unavailable();
             }
         }
-        requireFresh(monitoring.summary(binding, ""), metric);
+        var after = freshMetric(monitoring.summary(binding, ""), binding, metric);
+        if (samples.isEmpty()) {
+            throw changed();
+        }
+        var tail = samples.get(samples.size() - 1);
+        // item.get exposes seconds only; history retains the exact ns. Never fabricate ns for the summary.
+        if (!unit.equals(before.unit()) || !unit.equals(after.unit())
+                || after.at().isBefore(before.at())
+                || after.at().equals(before.at()) && after.value().compareTo(before.value()) != 0
+                || tail.recordedAt().getEpochSecond() != after.at().getEpochSecond()
+                || tail.value().compareTo(after.value()) != 0) {
+            throw changed();
+        }
         String identity = sourceIdentity + "|" + tenant + "|" + asset + "|" + binding.ip()
             + "|" + binding.hostId() + "|" + metric + "|" + binding.items().get(metric);
-        return new RecoverySourceBatch(UUID.nameUUIDFromBytes(("MOP_RECOVERY_SOURCE_V1|" + sourceIdentity)
-            .getBytes(StandardCharsets.UTF_8)), UUID.fromString(tenant), UUID.fromString(asset), binding.ip(), metric,
-            unit, hash(identity), samples);
+        try {
+            // Zabbix time_till includes its whole final second, including ns-valued history points.
+            return new RecoverySourceBatch(UUID.nameUUIDFromBytes(("MOP_RECOVERY_SOURCE_V1|" + sourceIdentity)
+                    .getBytes(StandardCharsets.UTF_8)), UUID.fromString(tenant), UUID.fromString(asset), binding.ip(), metric,
+                    unit, hash(identity), Instant.parse(from), Instant.parse(to).plusSeconds(1), samples);
+        } catch (IllegalArgumentException | java.time.DateTimeException invalidWindow) {
+            throw unavailable();
+        }
     }
 
-    private static void requireFresh(Map<String, Object> snapshot, String metric) {
+    /** Current item identity, value, unit and source seconds are the final history-read fence. */
+    private record FreshMetric(Instant at, BigDecimal value, String unit) { }
+
+    private static FreshMetric freshMetric(Map<String, Object> snapshot, NetworkMonitoringService.Binding binding,
+                                          String metric) {
         if (!(snapshot.get("metrics") instanceof Map<?, ?> metrics)
                 || !(metrics.get(metric) instanceof Map<?, ?> value) || !"FRESH".equals(value.get("state"))) {
             throw new DomainException(503, "RECOVERY_SOURCE_NOT_FRESH", "恢复观察来源未知、陈旧或采集错误，未确认恢复");
         }
+        if (!binding.assetId().equals(snapshot.get("asset_id")) || !binding.ip().equals(snapshot.get("management_ip"))
+                || !(value.get("recorded_at") instanceof String at) || !(value.get("value") instanceof String numeric)
+                || !(value.get("unit") instanceof String unit)) {
+            throw unavailable();
+        }
+        try {
+            Instant time = Instant.parse(at);
+            if (time.getNano() != 0) {
+                throw unavailable();
+            }
+            return new FreshMetric(time, NetworkMonitoringService.number(metric, numeric), unit);
+        } catch (IllegalArgumentException | java.time.DateTimeException invalidMetric) {
+            throw unavailable();
+        }
+    }
+
+    private static DomainException changed() {
+        return new DomainException(503, "RECOVERY_SOURCE_CHANGED",
+                "最新采样尚未被本次历史完整覆盖或读取期间来源变化，请重新核验，未确认恢复");
     }
 
     private static String hash(String value) {

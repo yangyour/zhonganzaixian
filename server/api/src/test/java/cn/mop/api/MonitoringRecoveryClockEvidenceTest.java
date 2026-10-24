@@ -2,6 +2,7 @@ package cn.mop.api;
 
 import cn.mop.domain.DomainException;
 import cn.mop.domain.sla.TicketSlaClockEvaluation;
+import cn.mop.domain.sla.MonitoringRecoveryClockEvidence.SourceTime;
 import cn.mop.domain.ticket.CustomerConfirmationWindow.Tier;
 import cn.mop.domain.ticket.TicketSlaSnapshot;
 import cn.mop.domain.ticket.WorkflowLifecycle;
@@ -13,6 +14,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -111,5 +113,30 @@ class MonitoringRecoveryClockEvidenceTest {
             TicketSlaClockEvaluation.evaluate(workflow, Tier.STANDARD, OBSERVED, false, null));
         assertEquals(WorkflowLifecycle.dueNotices(workflow, OBSERVED),
             WorkflowLifecycle.dueNotices(workflow, OBSERVED, false, null));
+    }
+
+    @Test
+    void verifiedSourceOneNanosecondAfterDeadlineIsBreachedForReadAndWorker() {
+        var exact = START.plusSeconds(3600).plusNanos(1);
+        var source = new SourceTime(exact, UUID.randomUUID());
+        var result = TicketSlaClockEvaluation.evaluateSourceRecovery(opened(), Tier.STANDARD, OBSERVED, true, source);
+        assertEquals(exact, result.recoveryClock().completedAt());
+        assertEquals("BREACHED", result.recoveryClock().status());
+        assertTrue(WorkflowLifecycle.dueNoticesSourceRecovery(opened(), OBSERVED, true, source).stream()
+                .anyMatch(notice -> notice.key().equals("recovery:100")));
+    }
+
+    @Test
+    void verifiedSourceEqualityIsMetAndLaterReadDoesNotMoveTheSourceStop() {
+        var due = new SourceTime(START.plusSeconds(3600), UUID.randomUUID());
+        assertEquals("MET", TicketSlaClockEvaluation.evaluateSourceRecovery(opened(), Tier.STANDARD, OBSERVED, true, due)
+                .recoveryClock().status());
+        assertTrue(WorkflowLifecycle.dueNoticesSourceRecovery(opened(), OBSERVED, true, due).stream()
+                .noneMatch(notice -> notice.key().equals("recovery:100")));
+        var recovered = new SourceTime(START.plusSeconds(1500), UUID.randomUUID());
+        var atConfirmation = TicketSlaClockEvaluation.evaluateSourceRecovery(opened(), Tier.STANDARD, START.plusSeconds(1800), true, recovered);
+        var later = TicketSlaClockEvaluation.evaluateSourceRecovery(opened(), Tier.STANDARD, OBSERVED, true, recovered);
+        assertEquals(atConfirmation.recoveryClock().completedAt(), later.recoveryClock().completedAt());
+        assertEquals(Duration.ofMinutes(25), Duration.between(START, later.recoveryClock().completedAt()));
     }
 }

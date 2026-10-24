@@ -1,0 +1,12 @@
+{
+  "status": "PASSED",
+  "discovered": 5287,
+  "executed": 4157,
+  "skipped": 1130,
+  "failures": 0,
+  "errors": 0,
+  "suites": 508,
+  "command": "mvn -q test",
+  "scope": "Full code regression; environment-gated tests remain skipped",
+  "finished_at": "2026-10-24T03:20:33.697937+00:00"
+}

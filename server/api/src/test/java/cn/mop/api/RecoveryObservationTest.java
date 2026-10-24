@@ -3,11 +3,13 @@ package cn.mop.api;
 import cn.mop.domain.DomainException;
 import cn.mop.domain.monitoring.RecoveryObservation;
 import cn.mop.domain.monitoring.RecoveryObservation.*;
+import cn.mop.domain.monitoring.RecoverySourceBatch;
 import cn.mop.persistence.MonitoringRecoveryRuleSet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -123,5 +125,50 @@ class RecoveryObservationTest {
         assertEquals(rule(), MonitoringRecoveryRuleSet.resolve(matrix, asset, "ICMP"));
         assertEquals("CONFIG_PENDING", assertThrows(DomainException.class,
             () -> MonitoringRecoveryRuleSet.resolve(matrix, asset, "OTHER")).code);
+    }
+
+    static RecoverySourceBatch batch(List<Sample> points) {
+        return new RecoverySourceBatch(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), "192.0.2.1",
+                "icmp", "", "a".repeat(64), START, START.plusSeconds(3600), points);
+    }
+
+    @Test
+    void boundedHealthyTailCannotInventARecoveryTransitionOrLaterT2() {
+        var points = List.of(known(60), known(120), known(180));
+        var result = evaluate(points, 180);
+        assertEquals(Status.CONFIRMABLE, result.status());
+        assertEquals("RECOVERY_HISTORY_INCOMPLETE", assertThrows(DomainException.class,
+                () -> RecoveryObservation.requireCoveredTransition(rule(), START, START, batch(points), result)).code);
+    }
+
+    @Test
+    void knownFailureImmediatelyBeforeHealthyRunEstablishesCoveredNthSampleT2() {
+        var points = List.of(new Sample(START, Quality.KNOWN, BigDecimal.ZERO), known(60), known(120), known(180));
+        var result = evaluate(points, 180);
+        assertEquals(START, RecoveryObservation.requireCoveredTransition(rule(), START, START, batch(points), result));
+        assertEquals(START.plusSeconds(120), result.candidateRecoveredAt());
+        assertEquals(Status.CONFIRMABLE, result.status());
+    }
+
+    @Test
+    void unknownOrGapBeforeRunCannotBeSubstitutedForAKnownFaultTransition() {
+        for (Sample predecessor : List.of(new Sample(START, Quality.UNKNOWN, null),
+                new Sample(START, Quality.COLLECTOR_ERROR, null), known(0))) {
+            var points = List.of(predecessor, known(61), known(121), known(181));
+            var result = evaluate(points, 181);
+            assertEquals("RECOVERY_HISTORY_INCOMPLETE", assertThrows(DomainException.class,
+                    () -> RecoveryObservation.requireCoveredTransition(rule(), START, START, batch(points), result)).code);
+        }
+    }
+
+    @Test
+    void faultOutsideThisEpisodeAndPolicyCuttingAnAlreadyHealthyRunCannotMoveT2() {
+        var points = List.of(new Sample(START, Quality.KNOWN, BigDecimal.ZERO), known(60), known(120), known(180), known(240));
+        var result = RecoveryObservation.evaluate(rule(), "", START.plusSeconds(90), START.plusSeconds(240), points);
+        assertEquals("RECOVERY_HISTORY_INCOMPLETE", assertThrows(DomainException.class,
+                () -> RecoveryObservation.requireCoveredTransition(rule(), START, START.plusSeconds(90), batch(points), result)).code);
+        var original = evaluate(points, 240);
+        assertEquals("RECOVERY_HISTORY_INCOMPLETE", assertThrows(DomainException.class,
+                () -> RecoveryObservation.requireCoveredTransition(rule(), START.plusSeconds(1), START.plusSeconds(1), batch(points), original)).code);
     }
 }

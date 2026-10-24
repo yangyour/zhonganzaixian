@@ -1,12 +1,13 @@
 import {describe,it,expect,vi} from 'vitest'
 import {ApiError,type RequestOptions} from '../src/api/client'
 import {createMonitoringRecovery,emptyRecoveryState,readRecoveryView,readRecoveryReceipt,type RecoveryScope,type RecoveryState} from '../src/utils/monitoringRecovery'
+import {actionableClockLabel,type ActionableTicketClock} from '../src/utils/dashboardActionableTickets'
 
 const tenant='10000000-0000-4000-8000-000000000001',actor='10000000-0000-4000-8000-000000000002',event='10000000-0000-4000-8000-000000000003',asset='10000000-0000-4000-8000-000000000004',release='10000000-0000-4000-8000-000000000005',proof='10000000-0000-4000-8000-000000000006'
 const scope:RecoveryScope={tenantId:tenant,actorId:actor,permissionVersion:7,eventId:event,canWrite:true}
 const rule={metric:'icmp',comparison:'GE',threshold:'1',unit:'',hold_seconds:'60',max_gap_seconds:'120',minimum_samples:2}
 const view=()=>({tenant_id:tenant,actor_id:actor,permission_version:7,event_id:event,asset_id:asset,event_version:2,monitor_state:'PROBLEM',handling_state:'NEW',recovery_evidence_status:'NOT_CONFIRMED',configuration_status:'ACTIVE',missing_reason:null,policy_release_id:release,policy_release_version:1,rule:{...rule},observed_at:'2026-10-23T10:02:00Z',source:'postgresql',source_binding_available:true})
-const receipt=()=>({tenant_id:tenant,actor_id:actor,permission_version:7,event_id:event,event_version:3,proof_id:proof,status:'RECOVERY_CONFIRMED',applied:true,candidate_recovered_at:'2026-10-23T10:00:59.123456789Z',recovered_at:'2026-10-23T10:00:59.123Z',confirmed_at:'2026-10-23T10:02:00Z',policy_release_id:release,policy_release_version:1,observed_at:'2026-10-23T10:02:00Z',latest_sample_at:'2026-10-23T10:01:59.123456789Z',span_started_at:'2026-10-23T10:00:29.123456789Z',span_seconds:'90.000000000',matching_samples:3,source_binding_sha256:'a'.repeat(64),source:'ZABBIX_SIMPLE_CHECK',production_approved:false})
+const receipt=()=>({evidence_version:2,recovery_time_basis:'SOURCE_NTH_MATCHING_SAMPLE',tenant_id:tenant,actor_id:actor,permission_version:7,event_id:event,event_version:3,proof_id:proof,status:'RECOVERY_CONFIRMED',applied:true,candidate_recovered_at:'2026-10-23T10:00:59.123456789Z',recovered_at:'2026-10-23T10:00:59.123456789Z',confirmed_at:'2026-10-23T10:02:00Z',policy_release_id:release,policy_release_version:1,observed_at:'2026-10-23T10:02:00Z',latest_sample_at:'2026-10-23T10:01:59.123456789Z',span_started_at:'2026-10-23T10:00:29.123456789Z',span_seconds:'90.000000000',matching_samples:3,source_binding_sha256:'a'.repeat(64),source:'ZABBIX_SIMPLE_CHECK',production_approved:false})
 const attempt=()=>({key:'test-key',hash:'b'.repeat(64),body:{expected_version:2,policy_release_id:release,policy_release_version:1},rule:{...rule},uncertain:false})
 function harness(response:(path:string,options?:RequestOptions)=>Promise<unknown>){
  let state:RecoveryState=emptyRecoveryState()
@@ -24,11 +25,49 @@ describe('server sourced recovery observation',()=>{
  })
  it('retains source t2 after the observation window and rejects substituting request time',()=>{
   const result=readRecoveryReceipt(receipt(),scope,attempt())
-  expect(result.recovered_at).toBe('2026-10-23T10:00:59.123Z')
+  expect(result.recovered_at).toBe('2026-10-23T10:00:59.123456789Z')
   expect(result.candidate_recovered_at).toBe('2026-10-23T10:00:59.123456789Z')
   expect(result.confirmed_at).toBe('2026-10-23T10:02:00Z')
   expect(()=>readRecoveryReceipt({...receipt(),recovered_at:receipt().confirmed_at},scope,attempt())).toThrow()
   expect(()=>readRecoveryReceipt({...receipt(),candidate_recovered_at:'2026-10-23T10:01:30Z',recovered_at:'2026-10-23T10:01:30Z'},scope,attempt())).toThrow()
+ })
+ it('requires explicit v2 precision evidence for applied and unapplied receipts',()=>{
+  const applied=receipt()
+  const unapplied={...receipt(),event_version:2,status:'NO_SAMPLES',applied:false,confirmed_at:null,candidate_recovered_at:null,recovered_at:null,
+   latest_sample_at:null,span_started_at:null,span_seconds:null,matching_samples:0}
+  expect(readRecoveryReceipt(unapplied,scope,attempt()).applied).toBe(false)
+  for(const raw of [applied,unapplied]){
+   const {evidence_version:_version,...missingVersion}=raw
+   const {recovery_time_basis:_basis,...missingBasis}=raw
+   for(const invalid of [missingVersion,missingBasis,{...raw,evidence_version:1},{...raw,evidence_version:'2'},
+    {...raw,recovery_time_basis:'REQUEST_TIME'},{...raw,recovery_time_basis:'MILLISECOND_TRUNCATED'}]){
+    expect(()=>readRecoveryReceipt(invalid,scope,attempt())).toThrow()
+   }
+  }
+  expect(()=>readRecoveryReceipt({...unapplied,recovered_at:receipt().recovered_at},scope,attempt())).toThrow()
+  expect(()=>readRecoveryReceipt({...unapplied,confirmed_at:receipt().observed_at},scope,attempt())).toThrow()
+ })
+ it('rejects the old millisecond floor and preserves a source recovery one nanosecond after a deadline',()=>{
+  expect(()=>readRecoveryReceipt({...receipt(),recovered_at:'2026-10-23T10:00:59.123Z'},scope,attempt())).toThrow()
+  const sourceAt='2026-10-23T10:00:59.000000001Z'
+  const raw={...receipt(),candidate_recovered_at:sourceAt,recovered_at:sourceAt,
+   span_started_at:'2026-10-23T10:00:29.000000001Z',latest_sample_at:'2026-10-23T10:01:59.000000001Z'}
+  const parsed=readRecoveryReceipt(raw,scope,attempt())
+  expect(parsed.recovered_at).toBe(sourceAt)
+  // Breach comes from the backend clock response; the browser neither floors t2 nor recomputes SLA.
+  const clock:ActionableTicketClock={status:'BREACHED',breached:true,missing_reason:null,deadline_at:'2026-10-23T10:00:59Z',
+   completed_at:parsed.recovered_at,remaining_millis:0,remaining_basis:'FROZEN_SERVICE_WINDOWS'}
+  const now=vi.spyOn(Date,'now')
+  try{
+   for(const at of [0,Date.parse('2099-01-01T00:00:00Z')]){now.mockReturnValue(at);expect(actionableClockLabel(clock)).toBe('已超时 · 已停钟')}
+  }finally{now.mockRestore()}
+ })
+ it('a delayed confirmation changes only the confirmation instant and never moves source t2',()=>{
+  const raw={...receipt(),observed_at:'2026-10-23T10:03:00Z',confirmed_at:'2026-10-23T10:03:00Z'}
+  const parsed=readRecoveryReceipt(raw,scope,attempt())
+  expect(parsed.recovered_at).toBe(receipt().recovered_at)
+  expect(parsed.confirmed_at).toBe(raw.observed_at)
+  expect(parsed.recovered_at).not.toBe(parsed.confirmed_at)
  })
  it.each([
   {tenant_id:asset},{actor_id:asset},{permission_version:8},{event_id:asset},{event_version:4},{policy_release_version:2},{production_approved:true},
@@ -96,5 +135,11 @@ describe('server sourced recovery observation',()=>{
   expect(await h.workspace.submit()).toBe(false)
   h.workspace.reset({...scope,eventId:'invalid'});expect(await h.workspace.load()).toBe(false)
   expect(h.request).toHaveBeenCalledTimes(1)
+ })
+ it.each([[422,'RECOVERY_HISTORY_INCOMPLETE'],[503,'RECOVERY_SOURCE_CHANGED']] as const)('does not expose a successful receipt after %s %s',async(status,code)=>{
+  const h=harness(async(_path,options)=>{if(options?.method==='POST')throw new ApiError(status,code,'synthetic evidence unavailable','unit');return view()})
+  await h.workspace.load();expect(await h.workspace.submit()).toBe(false)
+  expect(h.state.receipt).toBeNull();expect(h.state.error).toMatchObject({status,code})
+  expect(h.request.mock.calls.filter(([,options])=>options?.method==='POST')).toHaveLength(1)
  })
 })

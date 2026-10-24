@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Set;
 
 /**
  * PostgreSQL repository for V37 D15 Monitoring Event Center, Deduplication (xN),
@@ -366,6 +367,12 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
                 lock(c, "mop.ticket.workflow|" + a.tenantId() + "|" + current.ticketId());
             if (current.version() != cmd.expectedVersion())
                 throw new DomainException(409, "VERSION_CONFLICT", "监控事件版本已变化，请刷新后重试");
+
+            if (Set.of("RESOLVE", "CLOSE").contains(cmd.action())
+                    && !PostgresTicketWorkflowRepository.recoveryConfirmed(c, a.tenantId(), current.id())) {
+                throw new DomainException(422, "RECOVERY_OBSERVATION_REQUIRED",
+                        "事件缺少当前故障周期的已确认来源恢复证据，不能解决或关闭");
+            }
 
             HandlingState nextState = MonitoringEventPipeline.transitionHandlingState(
                 current.handlingState(), current.monitorState(), cmd.action(), cmd.rootCauseNote()

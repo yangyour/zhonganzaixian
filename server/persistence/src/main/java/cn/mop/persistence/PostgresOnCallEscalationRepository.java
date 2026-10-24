@@ -421,16 +421,38 @@ public final class PostgresOnCallEscalationRepository implements OnCallEscalatio
             var unavailable=new HashMap<String,List<Interval>>();var exclusions=new HashMap<String,List<Interval>>();
             var unknown=new HashMap<String,List<Interval>>();
             var assetTickets=new HashMap<String,Set<String>>();
-            // Only monitoring events contribute unavailability. Customer/manual ticket duration is not a monitor signal.
-            try(var q=statement(c,"SELECT asset_id::text,problem_at,recovered_at,ticket_id::text,sla_unknown_marked FROM public.mop_monitoring_event WHERE tenant_id=?::uuid AND problem_at<? AND (recovered_at IS NULL OR recovered_at>?) ORDER BY problem_at,id LIMIT 10001")){
-                q.setString(1,a.tenantId());instant(q,2,agreedWindow.end());instant(q,3,monthStart);
-                try(var r=q.executeQuery()){int count=0;while(r.next()){
-                    if(++count>10000)throw new DomainException(422,"SLA_REPORT_LIMIT","监控事件超过单次核算上限，未截断结果");
-                    String asset=r.getString(1);Instant from=time(r,"problem_at"),to=nullableTime(r,"recovered_at");
-                    if(to==null||to.isAfter(agreedWindow.end()))to=agreedWindow.end();
-                    if(from.isBefore(to))(r.getBoolean(5)?unknown:unavailable).computeIfAbsent(asset,k->new ArrayList<>()).add(new Interval(from,to));
-                    if(r.getString(4)!=null)assetTickets.computeIfAbsent(asset,k->new HashSet<>()).add(r.getString(4));
-                }}
+            // Only verified exact monitoring evidence ends an outage; a legacy recovered flag stays unknown.
+            try (var query = statement(c, "SELECT asset_id::text,problem_at,id::text,ticket_id::text,sla_unknown_marked,monitor_state "
+                    + "FROM public.mop_monitoring_event WHERE tenant_id=?::uuid AND problem_at<? "
+                    + "ORDER BY problem_at,id LIMIT 10001")) {
+                query.setString(1, a.tenantId());
+                instant(query, 2, agreedWindow.end());
+                try (var rows = query.executeQuery()) {
+                    int count = 0;
+                    while (rows.next()) {
+                        if (++count > 10000) {
+                            throw new DomainException(422, "SLA_REPORT_LIMIT", "监控事件超过单次核算上限，未截断结果");
+                        }
+                        String asset = rows.getString(1);
+                        Instant from = time(rows, "problem_at");
+                        var proof = PostgresMonitoringRecoveryEvidence.read(c, a.tenantId(), rows.getString(3));
+                        Instant to = proof.map(value -> value.recoveredAt()).orElse(null);
+                        if (to != null && !to.isAfter(monthStart)) {
+                            continue;
+                        }
+                        if (to == null || to.isAfter(agreedWindow.end())) {
+                            to = agreedWindow.end();
+                        }
+                        boolean unverifiedRecovery = "RECOVERED".equals(rows.getString(6)) && proof.isEmpty();
+                        if (from.isBefore(to)) {
+                            (rows.getBoolean(5) || unverifiedRecovery ? unknown : unavailable)
+                                    .computeIfAbsent(asset, key -> new ArrayList<>()).add(new Interval(from, to));
+                        }
+                        if (rows.getString(4) != null) {
+                            assetTickets.computeIfAbsent(asset, key -> new HashSet<>()).add(rows.getString(4));
+                        }
+                    }
+                }
             }
             try(var q=statement(c,"SELECT asset_id::text,starts_at,ends_at FROM public.mop_maintenance_window WHERE tenant_id=?::uuid AND sla_exclusion_confirmed AND status<>'CANCELLED' AND starts_at<? AND ends_at>? ORDER BY starts_at,id LIMIT 10001")){
                 q.setString(1,a.tenantId());instant(q,2,agreedWindow.end());instant(q,3,monthStart);

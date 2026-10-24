@@ -1,0 +1,23 @@
+{
+  "unit_tests": {
+    "run": 35,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": true
+  },
+  "secret_scan": {
+    "files_checked": 17,
+    "matching_files": [],
+    "credentials_output": false
+  },
+  "source_sha256": {
+    "tools/lan_monitoring_diagnostics.py": "693d0473424398e628b0af59442052789ea542af42a0ded52a472e9c33c55839",
+    "tools/test_lan_monitoring_diagnostics.py": "a18360d33da3ca9a89fc4944f50614cd2f1fe2688327474c00412ba4bb5e8419",
+    "tools/probe-huawei-snmp.py": "96847892d3f74ebd92538e1dac7f81ad0a3e6e7526c16335c876978bd5b1756f",
+    "tools/test_huawei_snmp_probe.py": "0e27a2c48af031a169eb9e91c1716d31e100bf34dd5f7b1f58278e988078da76"
+  },
+  "real_component_evidence": "continuity.json",
+  "real_http_evidence": "mop-http.json",
+  "formal_contract_acceptance": "NOT_RUN"
+}

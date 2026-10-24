@@ -1,0 +1,398 @@
+{
+  "environment": "lan-test-20261008",
+  "verified_at": "2026-10-24T08:17:29.824345+00:00",
+  "origin": "http://192.168.1.215:10010",
+  "credentials_output": false,
+  "business_writes": 0,
+  "checks": [
+    {
+      "method": "GET",
+      "path": "/health/ready",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources",
+      "expected": 401,
+      "actual": 401
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "POST",
+      "path": "/auth/local/login",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=icmp&window=HOUR_1",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=latency&window=HOUR_1",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=icmp&window=HOUR_1",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=latency&window=HOUR_1",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=icmp&window=HOUR_1",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=latency&window=HOUR_1",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=icmp&window=HOUR_1",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=latency&window=HOUR_1",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=cpu&window=HOUR_1",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=cpu&window=HOURS_24",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=memory&window=HOUR_1",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=memory&window=HOURS_24",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "method": "GET",
+      "path": "/network-monitoring/00000000-0000-4000-8000-000000000000/resources",
+      "expected": 404,
+      "actual": 404
+    },
+    {
+      "method": "DELETE",
+      "path": "/session",
+      "expected": 200,
+      "actual": 200
+    }
+  ],
+  "history": [
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=icmp&window=HOUR_1",
+      "points": 60,
+      "first": "2026-10-24T07:18:00.449276332Z",
+      "last": "2026-10-24T08:17:00.586045765Z"
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=latency&window=HOUR_1",
+      "points": 60,
+      "first": "2026-10-24T07:18:00.449276332Z",
+      "last": "2026-10-24T08:17:00.586045765Z"
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=icmp&window=HOUR_1",
+      "points": 60,
+      "first": "2026-10-24T07:18:00.449276332Z",
+      "last": "2026-10-24T08:17:00.586045765Z"
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=latency&window=HOUR_1",
+      "points": 60,
+      "first": "2026-10-24T07:18:00.449276332Z",
+      "last": "2026-10-24T08:17:00.586045765Z"
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=icmp&window=HOUR_1",
+      "points": 60,
+      "first": "2026-10-24T07:18:00.449276332Z",
+      "last": "2026-10-24T08:17:00.586045765Z"
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=latency&window=HOUR_1",
+      "points": 60,
+      "first": "2026-10-24T07:18:00.449276332Z",
+      "last": "2026-10-24T08:17:00.586045765Z"
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=icmp&window=HOUR_1",
+      "points": 60,
+      "first": "2026-10-24T07:18:00.449276332Z",
+      "last": "2026-10-24T08:17:00.586045765Z"
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=latency&window=HOUR_1",
+      "points": 60,
+      "first": "2026-10-24T07:18:00.449276332Z",
+      "last": "2026-10-24T08:17:00.586045765Z"
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=cpu&window=HOUR_1",
+      "points": 60,
+      "first": "2026-10-24T07:18:29.165337310Z",
+      "last": "2026-10-24T08:17:29.229672060Z"
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=cpu&window=HOURS_24",
+      "points": 1439,
+      "first": "2026-10-23T08:17:37.065262865Z",
+      "last": "2026-10-24T08:17:29.229672060Z"
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=memory&window=HOUR_1",
+      "points": 60,
+      "first": "2026-10-24T07:18:29.165337310Z",
+      "last": "2026-10-24T08:17:29.229672060Z"
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=memory&window=HOURS_24",
+      "points": 1439,
+      "first": "2026-10-23T08:17:37.065262865Z",
+      "last": "2026-10-24T08:17:29.229672060Z"
+    }
+  ],
+  "status": "PASSED",
+  "devices": [
+    {
+      "asset_id": "90cdb296-c3c6-47fb-bf1e-1e82761226e3",
+      "management_ip": "192.168.1.170",
+      "network_state": "REACHABLE",
+      "metrics": {
+        "icmp": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:17:00Z"
+        },
+        "loss": {
+          "state": "FRESH",
+          "value": "0",
+          "unit": "%",
+          "recorded_at": "2026-10-24T08:17:00Z"
+        },
+        "latency": {
+          "state": "FRESH",
+          "value": "0.00010133333333333333",
+          "unit": "s",
+          "recorded_at": "2026-10-24T08:17:00Z"
+        },
+        "tcp_22": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:16:44Z"
+        },
+        "tcp_80": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:16:45Z"
+        },
+        "tcp_443": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:16:46Z"
+        }
+      }
+    },
+    {
+      "asset_id": "9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45",
+      "management_ip": "192.168.1.2",
+      "network_state": "REACHABLE",
+      "metrics": {
+        "icmp": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:17:00Z"
+        },
+        "loss": {
+          "state": "FRESH",
+          "value": "0",
+          "unit": "%",
+          "recorded_at": "2026-10-24T08:17:00Z"
+        },
+        "latency": {
+          "state": "FRESH",
+          "value": "0.0001",
+          "unit": "s",
+          "recorded_at": "2026-10-24T08:17:00Z"
+        },
+        "tcp_22": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:16:50Z"
+        },
+        "tcp_80": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:16:51Z"
+        },
+        "tcp_443": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:16:52Z"
+        }
+      }
+    },
+    {
+      "asset_id": "b409d0cf-a8ef-4f8a-bf93-176444421ddd",
+      "management_ip": "192.168.1.125",
+      "network_state": "REACHABLE",
+      "metrics": {
+        "icmp": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:17:00Z"
+        },
+        "loss": {
+          "state": "FRESH",
+          "value": "0",
+          "unit": "%",
+          "recorded_at": "2026-10-24T08:17:00Z"
+        },
+        "latency": {
+          "state": "FRESH",
+          "value": "0.00029466666666666666",
+          "unit": "s",
+          "recorded_at": "2026-10-24T08:17:00Z"
+        },
+        "tcp_22": {
+          "state": "FRESH",
+          "value": "0",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:16:56Z"
+        },
+        "tcp_80": {
+          "state": "FRESH",
+          "value": "0",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:16:57Z"
+        },
+        "tcp_443": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:16:58Z"
+        }
+      }
+    },
+    {
+      "asset_id": "8a8b5f47-5bd4-4abd-8f39-8d6f43794299",
+      "management_ip": "192.169.11.1",
+      "network_state": "REACHABLE",
+      "metrics": {
+        "icmp": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:17:00Z"
+        },
+        "loss": {
+          "state": "FRESH",
+          "value": "0",
+          "unit": "%",
+          "recorded_at": "2026-10-24T08:17:00Z"
+        },
+        "latency": {
+          "state": "FRESH",
+          "value": "0.00023433333333333336",
+          "unit": "s",
+          "recorded_at": "2026-10-24T08:17:00Z"
+        },
+        "tcp_22": {
+          "state": "FRESH",
+          "value": "0",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:17:05Z"
+        },
+        "tcp_80": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:17:03Z"
+        },
+        "tcp_443": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-24T08:17:04Z"
+        }
+      }
+    }
+  ],
+  "firewall_resources": {
+    "state": "FRESH",
+    "metrics": {
+      "cpu": {
+        "value": "11",
+        "unit": "%"
+      },
+      "memory": {
+        "value": "56",
+        "unit": "%"
+      }
+    },
+    "received_at": "2026-10-24T08:17:29Z",
+    "source_sampled_at": null,
+    "timestamp_meaning": "COLLECTOR_RECEIPT_TIME",
+    "tls_mode": "TEST_INSECURE",
+    "tls_trust_verified": false
+  },
+  "production_ready": false,
+  "http_checks": 20
+}

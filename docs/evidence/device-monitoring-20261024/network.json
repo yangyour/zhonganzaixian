@@ -1,0 +1,472 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-24T08:09:34.135303+00:00",
+  "environment": "lan-test-20261008",
+  "host": "192.168.1.215",
+  "read_only": true,
+  "credentials_output": false,
+  "manifest_sha256": "09b594fbd3053731b536af1952c24bab68c89e2caecb0335289ae4b42cbd3ce1",
+  "vantage_points": {
+    "test_server": {
+      "status": "COMPLETED",
+      "probe": {
+        "schema_version": 1,
+        "environment": "lan-test-20261008",
+        "completed_at": "2026-10-24T08:09:37.801891+00:00",
+        "read_only": true,
+        "ports_checked": [
+          22,
+          80,
+          443
+        ],
+        "tcp_timeout_seconds": 2,
+        "devices": [
+          {
+            "key": "sangfor-firewall",
+            "device_type": "防火墙",
+            "brand": "深信服",
+            "model": "AF-1000-B1800",
+            "ip": "192.169.11.1",
+            "started_at": "2026-10-24T08:09:34.741180+00:00",
+            "completed_at": "2026-10-24T08:09:37.798913+00:00",
+            "route": {
+              "state": "FOUND",
+              "dst": "192.169.11.1",
+              "gateway": "192.168.1.2",
+              "dev": "ens18",
+              "prefsrc": "192.168.1.215"
+            },
+            "icmp": {
+              "state": "REPLY",
+              "sent": 2,
+              "received": 2,
+              "average_rtt_ms": 0.273
+            },
+            "tcp": [
+              {
+                "port": 22,
+                "state": "TIMEOUT",
+                "elapsed_ms": 2005
+              },
+              {
+                "port": 80,
+                "state": "OPEN",
+                "elapsed_ms": 1
+              },
+              {
+                "port": 443,
+                "state": "OPEN",
+                "elapsed_ms": 1
+              }
+            ],
+            "network_observation": "RESPONSE_OBSERVED",
+            "device_identity_verified": false,
+            "monitoring_ready": false,
+            "monitoring_status": "CONFIG_PENDING",
+            "unknown_reason": "READ_ONLY_CREDENTIALS_AND_VERIFIED_MAPPING_REQUIRED",
+            "device_health": null,
+            "snmp": {
+              "status": "NOT_ATTEMPTED",
+              "reason": "CREDENTIALS_NOT_CONFIGURED"
+            },
+            "firmware": null,
+            "sys_object_id": null,
+            "template_ref": null
+          },
+          {
+            "key": "sangfor-hci",
+            "device_type": "超融合",
+            "brand": "深信服",
+            "model": "aServer-P-2200",
+            "ip": "192.168.1.170",
+            "started_at": "2026-10-24T08:09:34.741626+00:00",
+            "completed_at": "2026-10-24T08:09:35.795978+00:00",
+            "route": {
+              "state": "FOUND",
+              "dst": "192.168.1.170",
+              "dev": "ens18",
+              "prefsrc": "192.168.1.215"
+            },
+            "icmp": {
+              "state": "REPLY",
+              "sent": 2,
+              "received": 2,
+              "average_rtt_ms": 0.084
+            },
+            "tcp": [
+              {
+                "port": 22,
+                "state": "OPEN",
+                "elapsed_ms": 2
+              },
+              {
+                "port": 80,
+                "state": "OPEN",
+                "elapsed_ms": 0
+              },
+              {
+                "port": 443,
+                "state": "OPEN",
+                "elapsed_ms": 0
+              }
+            ],
+            "network_observation": "RESPONSE_OBSERVED",
+            "device_identity_verified": false,
+            "monitoring_ready": false,
+            "monitoring_status": "CONFIG_PENDING",
+            "unknown_reason": "READ_ONLY_CREDENTIALS_AND_VERIFIED_MAPPING_REQUIRED",
+            "device_health": null,
+            "snmp": {
+              "status": "NOT_ATTEMPTED",
+              "reason": "CREDENTIALS_NOT_CONFIGURED"
+            },
+            "firmware": null,
+            "sys_object_id": null,
+            "template_ref": null
+          },
+          {
+            "key": "huawei-switch",
+            "device_type": "交换机",
+            "brand": "华为",
+            "model": "S5731-S24P4X",
+            "ip": "192.168.1.2",
+            "started_at": "2026-10-24T08:09:34.742824+00:00",
+            "completed_at": "2026-10-24T08:09:35.800483+00:00",
+            "route": {
+              "state": "FOUND",
+              "dst": "192.168.1.2",
+              "dev": "ens18",
+              "prefsrc": "192.168.1.215"
+            },
+            "icmp": {
+              "state": "REPLY",
+              "sent": 2,
+              "received": 2,
+              "average_rtt_ms": 0.092
+            },
+            "tcp": [
+              {
+                "port": 22,
+                "state": "OPEN",
+                "elapsed_ms": 3
+              },
+              {
+                "port": 80,
+                "state": "OPEN",
+                "elapsed_ms": 2
+              },
+              {
+                "port": 443,
+                "state": "OPEN",
+                "elapsed_ms": 2
+              }
+            ],
+            "network_observation": "RESPONSE_OBSERVED",
+            "device_identity_verified": false,
+            "monitoring_ready": false,
+            "monitoring_status": "CONFIG_PENDING",
+            "unknown_reason": "READ_ONLY_CREDENTIALS_AND_VERIFIED_MAPPING_REQUIRED",
+            "device_health": null,
+            "snmp": {
+              "status": "NOT_ATTEMPTED",
+              "reason": "CREDENTIALS_NOT_CONFIGURED"
+            },
+            "firmware": null,
+            "sys_object_id": null,
+            "template_ref": null
+          },
+          {
+            "key": "sundray-switch",
+            "device_type": "交换机",
+            "brand": "信锐",
+            "model": "aRS6300-50Q-EI-24X",
+            "ip": "192.168.1.125",
+            "started_at": "2026-10-24T08:09:34.743396+00:00",
+            "completed_at": "2026-10-24T08:09:35.796649+00:00",
+            "route": {
+              "state": "FOUND",
+              "dst": "192.168.1.125",
+              "dev": "ens18",
+              "prefsrc": "192.168.1.215"
+            },
+            "icmp": {
+              "state": "REPLY",
+              "sent": 2,
+              "received": 2,
+              "average_rtt_ms": 0.308
+            },
+            "tcp": [
+              {
+                "port": 22,
+                "state": "REFUSED",
+                "elapsed_ms": 2
+              },
+              {
+                "port": 80,
+                "state": "REFUSED",
+                "elapsed_ms": 0
+              },
+              {
+                "port": 443,
+                "state": "OPEN",
+                "elapsed_ms": 0
+              }
+            ],
+            "network_observation": "RESPONSE_OBSERVED",
+            "device_identity_verified": false,
+            "monitoring_ready": false,
+            "monitoring_status": "CONFIG_PENDING",
+            "unknown_reason": "READ_ONLY_CREDENTIALS_AND_VERIFIED_MAPPING_REQUIRED",
+            "device_health": null,
+            "snmp": {
+              "status": "NOT_ATTEMPTED",
+              "reason": "CREDENTIALS_NOT_CONFIGURED"
+            },
+            "firmware": null,
+            "sys_object_id": null,
+            "template_ref": null
+          }
+        ]
+      }
+    },
+    "zabbix_network_namespace": {
+      "status": "COMPLETED",
+      "probe": {
+        "schema_version": 1,
+        "environment": "lan-test-20261008",
+        "completed_at": "2026-10-24T08:09:41.196215+00:00",
+        "read_only": true,
+        "ports_checked": [
+          22,
+          80,
+          443
+        ],
+        "tcp_timeout_seconds": 2,
+        "devices": [
+          {
+            "key": "sangfor-firewall",
+            "device_type": "防火墙",
+            "brand": "深信服",
+            "model": "AF-1000-B1800",
+            "ip": "192.169.11.1",
+            "started_at": "2026-10-24T08:09:38.158378+00:00",
+            "completed_at": "2026-10-24T08:09:41.190792+00:00",
+            "route": {
+              "state": "FOUND",
+              "dst": "192.169.11.1",
+              "gateway": "172.18.0.1",
+              "dev": "eth0",
+              "prefsrc": "172.18.0.6"
+            },
+            "icmp": {
+              "state": "REPLY",
+              "sent": 2,
+              "received": 2,
+              "average_rtt_ms": 0.258
+            },
+            "tcp": [
+              {
+                "port": 22,
+                "state": "TIMEOUT",
+                "elapsed_ms": 2004
+              },
+              {
+                "port": 80,
+                "state": "OPEN",
+                "elapsed_ms": 1
+              },
+              {
+                "port": 443,
+                "state": "OPEN",
+                "elapsed_ms": 1
+              }
+            ],
+            "network_observation": "RESPONSE_OBSERVED",
+            "device_identity_verified": false,
+            "monitoring_ready": false,
+            "monitoring_status": "CONFIG_PENDING",
+            "unknown_reason": "READ_ONLY_CREDENTIALS_AND_VERIFIED_MAPPING_REQUIRED",
+            "device_health": null,
+            "snmp": {
+              "status": "NOT_ATTEMPTED",
+              "reason": "CREDENTIALS_NOT_CONFIGURED"
+            },
+            "firmware": null,
+            "sys_object_id": null,
+            "template_ref": null
+          },
+          {
+            "key": "sangfor-hci",
+            "device_type": "超融合",
+            "brand": "深信服",
+            "model": "aServer-P-2200",
+            "ip": "192.168.1.170",
+            "started_at": "2026-10-24T08:09:38.158705+00:00",
+            "completed_at": "2026-10-24T08:09:39.187787+00:00",
+            "route": {
+              "state": "FOUND",
+              "dst": "192.168.1.170",
+              "gateway": "172.18.0.1",
+              "dev": "eth0",
+              "prefsrc": "172.18.0.6"
+            },
+            "icmp": {
+              "state": "REPLY",
+              "sent": 2,
+              "received": 2,
+              "average_rtt_ms": 0.119
+            },
+            "tcp": [
+              {
+                "port": 22,
+                "state": "OPEN",
+                "elapsed_ms": 1
+              },
+              {
+                "port": 80,
+                "state": "OPEN",
+                "elapsed_ms": 0
+              },
+              {
+                "port": 443,
+                "state": "OPEN",
+                "elapsed_ms": 0
+              }
+            ],
+            "network_observation": "RESPONSE_OBSERVED",
+            "device_identity_verified": false,
+            "monitoring_ready": false,
+            "monitoring_status": "CONFIG_PENDING",
+            "unknown_reason": "READ_ONLY_CREDENTIALS_AND_VERIFIED_MAPPING_REQUIRED",
+            "device_health": null,
+            "snmp": {
+              "status": "NOT_ATTEMPTED",
+              "reason": "CREDENTIALS_NOT_CONFIGURED"
+            },
+            "firmware": null,
+            "sys_object_id": null,
+            "template_ref": null
+          },
+          {
+            "key": "huawei-switch",
+            "device_type": "交换机",
+            "brand": "华为",
+            "model": "S5731-S24P4X",
+            "ip": "192.168.1.2",
+            "started_at": "2026-10-24T08:09:38.159833+00:00",
+            "completed_at": "2026-10-24T08:09:39.194141+00:00",
+            "route": {
+              "state": "FOUND",
+              "dst": "192.168.1.2",
+              "gateway": "172.18.0.1",
+              "dev": "eth0",
+              "prefsrc": "172.18.0.6"
+            },
+            "icmp": {
+              "state": "REPLY",
+              "sent": 2,
+              "received": 2,
+              "average_rtt_ms": 0.139
+            },
+            "tcp": [
+              {
+                "port": 22,
+                "state": "OPEN",
+                "elapsed_ms": 3
+              },
+              {
+                "port": 80,
+                "state": "OPEN",
+                "elapsed_ms": 3
+              },
+              {
+                "port": 443,
+                "state": "OPEN",
+                "elapsed_ms": 3
+              }
+            ],
+            "network_observation": "RESPONSE_OBSERVED",
+            "device_identity_verified": false,
+            "monitoring_ready": false,
+            "monitoring_status": "CONFIG_PENDING",
+            "unknown_reason": "READ_ONLY_CREDENTIALS_AND_VERIFIED_MAPPING_REQUIRED",
+            "device_health": null,
+            "snmp": {
+              "status": "NOT_ATTEMPTED",
+              "reason": "CREDENTIALS_NOT_CONFIGURED"
+            },
+            "firmware": null,
+            "sys_object_id": null,
+            "template_ref": null
+          },
+          {
+            "key": "sundray-switch",
+            "device_type": "交换机",
+            "brand": "信锐",
+            "model": "aRS6300-50Q-EI-24X",
+            "ip": "192.168.1.125",
+            "started_at": "2026-10-24T08:09:38.160870+00:00",
+            "completed_at": "2026-10-24T08:09:39.188398+00:00",
+            "route": {
+              "state": "FOUND",
+              "dst": "192.168.1.125",
+              "gateway": "172.18.0.1",
+              "dev": "eth0",
+              "prefsrc": "172.18.0.6"
+            },
+            "icmp": {
+              "state": "REPLY",
+              "sent": 2,
+              "received": 2,
+              "average_rtt_ms": 0.356
+            },
+            "tcp": [
+              {
+                "port": 22,
+                "state": "REFUSED",
+                "elapsed_ms": 3
+              },
+              {
+                "port": 80,
+                "state": "REFUSED",
+                "elapsed_ms": 0
+              },
+              {
+                "port": 443,
+                "state": "OPEN",
+                "elapsed_ms": 0
+              }
+            ],
+            "network_observation": "RESPONSE_OBSERVED",
+            "device_identity_verified": false,
+            "monitoring_ready": false,
+            "monitoring_status": "CONFIG_PENDING",
+            "unknown_reason": "READ_ONLY_CREDENTIALS_AND_VERIFIED_MAPPING_REQUIRED",
+            "device_health": null,
+            "snmp": {
+              "status": "NOT_ATTEMPTED",
+              "reason": "CREDENTIALS_NOT_CONFIGURED"
+            },
+            "firmware": null,
+            "sys_object_id": null,
+            "template_ref": null
+          }
+        ]
+      },
+      "collector": {
+        "name": "/mop-lan-zabbix-server",
+        "id": "303bbd1f5767a733137de772945fc46506143d0933d036f3412cad85d125ae66",
+        "image": "sha256:415452211dea59cd4ea3346f2c2b38403660408273c672ebf91603353ce1073f",
+        "pid": 83707,
+        "started_at": "2026-10-08T12:18:48.248721584Z"
+      },
+      "execution_context": "host Python and ping in collector network namespace; not Zabbix item execution"
+    }
+  },
+  "monitoring_ready": false,
+  "mop_business_monitoring": "CONFIG_PENDING",
+  "formal_contract_acceptance": "NOT_RUN",
+  "probe_source_sha256": "d024a3b7f6b33e99c2b6ddb4336b08ae5e86109ec8a935aff668340e5420484a",
+  "completed_at": "2026-10-24T08:09:42.028491+00:00",
+  "network_exit_status": 0
+}

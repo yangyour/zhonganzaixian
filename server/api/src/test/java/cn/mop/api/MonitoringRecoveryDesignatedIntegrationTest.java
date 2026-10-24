@@ -219,15 +219,25 @@ class MonitoringRecoveryDesignatedIntegrationTest {
     @Test
     @Order(2)
     void confirmedEvidenceCommitsWithEventAndSlaAndOriginalReplayDoesNotResample() throws Exception {
-        String rule = ruleCode(); var event = problem(rule); var release = publish(rule, "0", 1, null);
+        String rule = ruleCode();
+        var event = problem(rule);
+        var release = publish(rule, "0", 1, null);
         var access = activate(event);
-        var calls = new AtomicInteger(); var repo = repository((t, a, m) -> { calls.incrementAndGet(); return matching(); });
+        var calls = new AtomicInteger();
+        var repo = repository((t, a, m) -> {
+            calls.incrementAndGet();
+            return matching();
+        });
         var command = command(event, release, "2".repeat(64));
         var result = observe(platform, repo, command, "confirmed");
-        assertEquals("RECOVERY_CONFIRMED", result.get("status")); assertEquals(true, result.get("applied"));
+        assertEquals("RECOVERY_CONFIRMED", result.get("status"));
+        assertEquals(true, result.get("applied"));
         var current = events.eventDetail(access(), event.id());
         assertEquals(HandlingState.PENDING_REVIEW, current.event().handlingState());
-        assertEquals(Instant.parse(result.get("recovered_at").toString()).truncatedTo(ChronoUnit.MILLIS), current.event().recoveredAt());
+        assertEquals(
+            Instant.parse(result.get("recovered_at").toString()).truncatedTo(ChronoUnit.MILLIS),
+            current.event().recoveredAt()
+        );
         assertEquals(result.get("proof_id"), current.members().get(1).rawEventId());
         var sla = workflows.readSla(access, event.ticketId(), Tier.STANDARD);
         assertEquals(result.get("recovered_at"), ((Map<?, ?>) sla.get("recovery_clock")).get("completed_at"));
@@ -235,10 +245,105 @@ class MonitoringRecoveryDesignatedIntegrationTest {
         assertEquals(wire(result), wire(repo.receipt(access(), event.id(), command.commandSha256())));
         assertEquals(2, ((Number) result.get("evidence_version")).intValue());
         assertEquals("SOURCE_NTH_MATCHING_SAMPLE", result.get("recovery_time_basis"));
-        var otherActor = new Access(tenant, reviewer, platform.membership(reviewer, tenant).orElseThrow().permissionVersion(), "other-actor");
-        assertEquals(404, assertThrows(DomainException.class,
-                () -> repo.receipt(otherActor, event.id(), command.commandSha256())).status);
-        assertEquals(1, calls.get()); assertEquals(1, proofs(event.id()));
+        var oncall = new PostgresOnCallEscalationRepository(pool, platform);
+        var reportAccess = new cn.mop.domain.sla.OnCallEscalationRepository.Access(
+            tenant,
+            actor,
+            platform.membership(actor, tenant).orElseThrow().permissionVersion(),
+            UUID.randomUUID().toString()
+        );
+        String month = java.time.YearMonth.from(dbNow().atZone(java.time.ZoneId.of("Asia/Shanghai"))).toString();
+        var report = oncall.slaReport(reportAccess, month);
+        var duration = Duration.between(
+            current.event().problemAt(),
+            Instant.parse(result.get("recovered_at").toString())
+        );
+        long expectedSeconds = java.math.BigDecimal.valueOf(duration.getSeconds())
+            .add(java.math.BigDecimal.valueOf(duration.getNano(), 9))
+            .setScale(0, java.math.RoundingMode.HALF_UP)
+            .longValueExact();
+        assertEquals("mop-monitoring-recovery-t2-v1", report.mttr().sourceVersion());
+        assertEquals(1, report.mttr().sampleCount());
+        assertEquals(0, report.mttr().unknownCount());
+        assertEquals(expectedSeconds, report.mttr().meanSec());
+        var assetRow = report
+            .services()
+            .stream()
+            .filter(row -> row.serviceId().equals("ASSET_" + asset))
+            .findFirst()
+            .orElseThrow();
+        assertEquals(report.mttr(), assetRow.mttr());
+        assertEquals("mop-event-acknowledgement-v1", assetRow.mtta().sourceVersion());
+        assertTrue(assetRow.mtta().unknownCount() > 0);
+        assertNull(assetRow.mtta().meanSec());
+        var tiers = new PostgresServiceTierRepository(pool, platform);
+        var tierAccess = new cn.mop.domain.sla.ServiceTierRepository.Access(
+            tenant,
+            actor,
+            reportAccess.permissionVersion(),
+            UUID.randomUUID().toString()
+        );
+        platform.idempotentAuthorized(
+            actor,
+            tenant,
+            "POST /integration/recovery/synthetic-tier",
+            UUID.randomUUID().toString(),
+            "6".repeat(64),
+            reportAccess.permissionVersion(),
+            () -> tiers.authorizeWrite(tierAccess),
+            () ->
+                tiers.applyChange(
+                    tierAccess,
+                    new cn.mop.domain.sla.ServiceTierRepository.Command(
+                        0L,
+                        Tier.STANDARD,
+                        cn.mop.domain.sla.ServiceTierRepository.EffectiveMode.IMMEDIATE,
+                        null,
+                        null,
+                        null,
+                        "SYNTHETIC_MONITORING_SLA_SOURCE_TEST"
+                    ),
+                    null
+                )
+        );
+        var frozen = (cn.mop.domain.sla.OnCallEscalationRepository.MonthlyResultRecord) platform.idempotentAuthorized(
+            actor,
+            tenant,
+            "POST /integration/recovery/monthly-source-freeze",
+            UUID.randomUUID().toString(),
+            "5".repeat(64),
+            reportAccess.permissionVersion(),
+            () -> oncall.authorizeWrite(reportAccess),
+            () ->
+                oncall.evaluateMonthlyResult(
+                    reportAccess,
+                    new cn.mop.domain.sla.OnCallEscalationRepository.MonthlyResultCommand(month, 0, true)
+                )
+        );
+        assertTrue(frozen.frozen());
+        var judgment = frozen
+            .items()
+            .stream()
+            .filter(item -> item.ticketId().equals(event.ticketId()))
+            .findFirst()
+            .orElseThrow();
+        assertEquals(Instant.parse(result.get("recovered_at").toString()), judgment.recoveryActualAt());
+        assertEquals("MET", judgment.recoveryCheck());
+        assertEquals(frozen, oncall.slaReport(reportAccess, month).monthlyResult().orElseThrow());
+        var otherActor = new Access(
+            tenant,
+            reviewer,
+            platform.membership(reviewer, tenant).orElseThrow().permissionVersion(),
+            "other-actor"
+        );
+        assertEquals(
+            404,
+            assertThrows(DomainException.class, () ->
+                repo.receipt(otherActor, event.id(), command.commandSha256())
+            ).status
+        );
+        assertEquals(1, calls.get());
+        assertEquals(1, proofs(event.id()));
     }
 
     @Test

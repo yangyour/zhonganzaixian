@@ -34,7 +34,8 @@ def protected_fingerprints(connection, excluded_tenants):
                   'mop_monitoring_event', 'mop_monitoring_event_member', 'mop_autoticket_attempt',
                   'mop_event_noise_record', 'mop_ticket_workflow_clock', 'mop_ticket_workflow_clock_receipt',
                   'mop_ticket_workflow_outbox', 'mop_notification_intent', 'mop_notification_message',
-                  'mop_raw_monitoring_event', 'mop_configuration_revision', 'mop_runtime_configuration_release'):
+                  'mop_raw_monitoring_event', 'mop_configuration_revision', 'mop_runtime_configuration_release',
+                  'mop_sla_monthly_result', 'mop_service_tier', 'mop_service_tier_change'):
         # Fixed internal identifiers only; actual customer data never leaves the digest query.
         with connection.cursor() as cursor:
             cursor.execute('SELECT count(*), md5(COALESCE(string_agg(row_digest, \'\' ORDER BY row_digest),\'\')) '

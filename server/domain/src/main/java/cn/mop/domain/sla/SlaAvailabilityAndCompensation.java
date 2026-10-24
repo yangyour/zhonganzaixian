@@ -32,7 +32,13 @@ public final class SlaAvailabilityAndCompensation {
         }
     }
 
-    public record LatencyStats(int sampleCount, int unrecoveredCount, Long meanSec, Long p50Sec, Long p95Sec) {}
+    /** Monitoring projections retain source/unknown counts; legacy frozen results keep their original shape. */
+    public record LatencyStats(int sampleCount, int unrecoveredCount, Long meanSec, Long p50Sec, Long p95Sec,
+                               String sourceVersion, Integer unknownCount) {
+        public LatencyStats(int sampleCount, int unrecoveredCount, Long meanSec, Long p50Sec, Long p95Sec) {
+            this(sampleCount, unrecoveredCount, meanSec, p50Sec, p95Sec, null, null);
+        }
+    }
 
     public record ServiceRow(
         String serviceId,
@@ -270,64 +276,89 @@ public final class SlaAvailabilityAndCompensation {
 
 
     public static MonthlyEvaluation evaluateMonthly(Tier tierSnapshot, Long monthlyFeeFen, List<TicketSample> samples) {
-        if (samples == null || samples.size() > SlaComplianceScenario.MAX_TICKETS) throw invalid();
-        BigDecimal ratio = tierSnapshot == null ? null : switch (tierSnapshot) {
-            case BASIC -> new BigDecimal("0.10");
-            case STANDARD -> new BigDecimal("0.20");
-            case ADVANCED -> new BigDecimal("0.30");
-        };
-        List<Evidence> evidences = new ArrayList<>(samples.size());
-        Map<String, TicketSample> byId = new LinkedHashMap<>();
+        if (samples == null || samples.size() > SlaComplianceScenario.MAX_TICKETS) {
+            throw invalid();
+        }
+        BigDecimal ratio =
+            tierSnapshot == null
+                ? null
+                : switch (tierSnapshot) {
+                      case BASIC -> new BigDecimal("0.10");
+                      case STANDARD -> new BigDecimal("0.20");
+                      case ADVANCED -> new BigDecimal("0.30");
+                  };
+        List<SlaComplianceScenario.Decision> decisions = new ArrayList<>(samples.size());
+        List<TicketJudgment> items = new ArrayList<>(samples.size());
+        Set<String> ids = new HashSet<>();
         for (TicketSample s : samples) {
-            if (byId.put(s.ticketId(), s) != null) throw invalid();
-            evidences.add(new Evidence(
-                s.ticketId(),
-                s.priority(),
-                s.exclusion(),
-                s.exclusionApproval(),
-                new Reference("tier-" + s.tierSnapshot().name(), 1L),
-                s.responseDueAt(),
-                s.recoveryDueAt(),
-                s.responseActualAt(),
-                s.recoveryActualAt()
-            ));
+            if (!ids.add(s.ticketId())) {
+                throw invalid();
+            }
+            var decision = SlaComplianceScenario.evaluateSource(
+                new SlaComplianceScenario.SourceEvidence(
+                    s.priority(),
+                    s.exclusion(),
+                    s.exclusionApproval(),
+                    new Reference("tier-" + s.tierSnapshot().name(), 1L),
+                    s.responseDueAt(),
+                    s.recoveryDueAt(),
+                    s.responseActualAt(),
+                    s.recoveryActualAt()
+                )
+            );
+            decisions.add(decision);
+            items.add(
+                new TicketJudgment(
+                    s.ticketId(),
+                    s.priority().name(),
+                    s.tierSnapshot().name(),
+                    decision.applicable(),
+                    decision.outcome().name(),
+                    decision.response().name(),
+                    decision.recovery().name(),
+                    s.responseDueAt(),
+                    s.responseActualAt(),
+                    s.recoveryDueAt(),
+                    s.recoveryActualAt(),
+                    decision.reasons().stream().map(Enum::name).toList()
+                )
+            );
         }
-        Aggregate agg = SlaComplianceScenario.aggregate(evidences, true);
-        List<TicketJudgment> items = new ArrayList<>(agg.items().size());
-        for (Evaluation eval : agg.items()) {
-            Evidence ev = eval.evidence();
-            TicketSample orig = byId.get(ev.ticketId());
-            items.add(new TicketJudgment(
-                ev.ticketId(),
-                ev.priority().name(),
-                orig.tierSnapshot().name(),
-                eval.applicable(),
-                eval.outcome().name(),
-                eval.response().name(),
-                eval.recovery().name(),
-                ev.responseDueAt(),
-                ev.responseActualAt(),
-                ev.recoveryDueAt(),
-                ev.recoveryActualAt(),
-                eval.reasons().stream().map(Enum::name).toList()
-            ));
-        }
-        int applicable = agg.knownApplicable();
-        int met = agg.met();
-        int notMet = agg.notMet();
-        int unresolved = agg.timingUnresolved() + agg.applicabilityUnknown();
-        int notApplicable = agg.notApplicable();
+        int applicable = (int) decisions
+            .stream()
+            .filter(value -> Boolean.TRUE.equals(value.applicable()))
+            .count();
+        int met = (int) decisions
+            .stream()
+            .filter(value -> value.outcome() == Outcome.MET)
+            .count();
+        int notMet = (int) decisions
+            .stream()
+            .filter(value -> value.outcome() == Outcome.NOT_MET)
+            .count();
+        int unresolved = (int) decisions
+            .stream()
+            .filter(value -> value.outcome() == Outcome.UNRESOLVED)
+            .count();
+        int notApplicable = (int) decisions
+            .stream()
+            .filter(value -> value.outcome() == Outcome.NOT_APPLICABLE)
+            .count();
         Integer num = applicable > 0 ? met : null;
         Integer den = applicable > 0 ? applicable : null;
-        BigDecimal ratePct = applicable > 0
-            ? BigDecimal.valueOf(met * 100.0).divide(BigDecimal.valueOf(applicable), 2, RoundingMode.HALF_UP)
-            : null;
+        BigDecimal ratePct =
+            applicable > 0
+                ? BigDecimal.valueOf(met * 100.0).divide(BigDecimal.valueOf(applicable), 2, RoundingMode.HALF_UP)
+                : null;
 
         Long fixedCandidate = null;
         Long shortfallCandidate = null;
         if (ratio != null && monthlyFeeFen != null && monthlyFeeFen > 0 && applicable > 0 && notMet > 0) {
-            fixedCandidate = BigDecimal.valueOf(monthlyFeeFen).multiply(ratio)
-                .divide(BigDecimal.valueOf(100),0,RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).longValueExact();
+            fixedCandidate = BigDecimal.valueOf(monthlyFeeFen)
+                .multiply(ratio)
+                .divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100))
+                .longValueExact();
             // Customer specification 5.5 explicitly rejects shortfall-weighted compensation.
         }
         return new MonthlyEvaluation(

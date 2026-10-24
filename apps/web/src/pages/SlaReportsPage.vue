@@ -7,7 +7,7 @@ import {can,contextGeneration,session,switchingTenant} from '../stores/session'
 import {contextTransitionGuards} from '../utils/contextTransitionGuard'
 import {
  createSlaReportWorkspace,emptySlaReportState,formatDurationSec,formatFenToYuan,
- serviceStatusLabels,type SlaReportState
+ serviceStatusLabels,type SlaReportState,type SlaLatencyStats
 } from '../utils/onCallBoard'
 import {tierLabels} from '../utils/serviceTiers'
 import {displayTime} from '../utils/display'
@@ -16,6 +16,8 @@ import {slaServiceReviewExport,downloadSlaServiceReview} from '../utils/slaServi
 
 const state=shallowRef<SlaReportState>(emptySlaReportState())
 const workspace=createSlaReportWorkspace(api,s=>{state.value=s})
+const latencyDuration=(value:SlaLatencyStats,percentile:'p50_sec'|'p95_sec')=>
+ (value.unknown_count??0)>0?'来源待核验':formatDurationSec(value[percentile])
 const internal=computed(()=>['padmin','msp'].includes(session.value?.user.role??''))
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&internal.value&&can('sla_scenarios:read')&&!switchingTenant.value))
 const canWriteInternal=computed(()=>Boolean(permitted.value&&can('ticket_notes:write_internal')))
@@ -141,13 +143,13 @@ const demoExample = useDemoExample<{month:string}>('sla-reports', permitted, () 
      </div>
      <div>
       <span>响应耗时 MTTA</span>
-      <b>P50 {{ formatDurationSec(state.report.kpis.mtta.p50_sec) }}</b>
-      <small>P95 {{ formatDurationSec(state.report.kpis.mtta.p95_sec) }} · 样本 {{ state.report.kpis.mtta.sample_count }}</small>
+      <b>P50 {{ latencyDuration(state.report.kpis.mtta,'p50_sec') }}</b>
+      <small>P95 {{ latencyDuration(state.report.kpis.mtta,'p95_sec') }} · 样本 {{ state.report.kpis.mtta.sample_count }}<template v-if="state.report.kpis.mtta.unknown_count"> · 待核验 {{state.report.kpis.mtta.unknown_count}}</template></small>
      </div>
      <div>
       <span>恢复耗时 MTTR</span>
-      <b>P50 {{ formatDurationSec(state.report.kpis.mttr.p50_sec) }}</b>
-      <small>P95 {{ formatDurationSec(state.report.kpis.mttr.p95_sec) }} · 未恢复 {{ state.report.kpis.unrecovered_total_count }}</small>
+      <b>P50 {{ latencyDuration(state.report.kpis.mttr,'p50_sec') }}</b>
+      <small>P95 {{ latencyDuration(state.report.kpis.mttr,'p95_sec') }} · 未恢复 {{ state.report.kpis.unrecovered_total_count }}<template v-if="state.report.kpis.mttr.unknown_count"> · 恢复待核验 {{state.report.kpis.mttr.unknown_count}}</template></small>
      </div>
      <div>
       <span>未知区间单独隔离</span>
@@ -155,6 +157,8 @@ const demoExample = useDemoExample<{month:string}>('sla-reports', permitted, () 
       <small>不计入已核验可用（Q08）</small>
      </div>
     </div>
+
+    <p v-if="state.report.kpis.mttr.source_version" class="muted">响应耗时取告警首次人工确认，恢复耗时取已验证的监控恢复，均从原问题发生时刻起算。按问题发生月份归属，使用本次读取时已知的证据；不等同工单解决时长，也不改写已冻结月报。</p>
 
     <div class="proto-panel workspace">
      <h2>服务节点可用性与区间明细（M5-9 / M5-10）</h2>
@@ -181,7 +185,7 @@ const demoExample = useDemoExample<{month:string}>('sla-reports', permitted, () 
          <td>{{ svc.upper_bound_availability_pct!==null?`${svc.upper_bound_availability_pct}%`:'—' }}</td>
          <td>{{ formatDurationSec(svc.unavailable_union_sec) }}</td>
          <td>{{ formatDurationSec(svc.unknown_interval_sec) }} ({{ svc.unknown_policy_status }})</td>
-         <td>{{ formatDurationSec(svc.mtta.p50_sec) }} / {{ formatDurationSec(svc.mttr.p50_sec) }}</td>
+         <td>{{ latencyDuration(svc.mtta,'p50_sec') }} / {{ latencyDuration(svc.mttr,'p50_sec') }}</td>
          <td>{{ serviceStatusLabels[svc.status] }}</td>
          <td>
           <button type="button" :disabled="locked" @click="readDetail(svc.service_id,$event)">

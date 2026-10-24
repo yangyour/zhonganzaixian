@@ -345,13 +345,18 @@ public final class OnCallEscalationController {
     }
 
     private static Map<String, Object> latencyDto(LatencyStats l) {
-        return map(
+        var result = map(
             "sample_count", l.sampleCount(),
             "unrecovered_count", l.unrecoveredCount(),
             "mean_sec", l.meanSec(),
             "p50_sec", l.p50Sec(),
             "p95_sec", l.p95Sec()
         );
+        if (l.sourceVersion() != null) {
+            result.put("source_version", l.sourceVersion());
+            result.put("unknown_count", l.unknownCount());
+        }
+        return result;
     }
 
     private static Map<String, Object> serviceDto(ServiceRow s) {

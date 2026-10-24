@@ -1,0 +1,102 @@
+{
+  "status": "PASSED_WITH_EXPLICIT_SCOPE_LIMITS",
+  "baseline_commit": "a4b31f8714e6150348f5a53b451a4466619b539a",
+  "checked_at_utc": "2026-10-24T06:19:15.440044+00:00",
+  "java_full": {
+    "discovered": 5310,
+    "executed": 4179,
+    "skipped": 1131,
+    "failures": 0,
+    "errors": 0
+  },
+  "java_targeted": {
+    "passed": 48
+  },
+  "web_full": {
+    "files": 339,
+    "passed": 5522
+  },
+  "web_targeted": {
+    "passed": 122
+  },
+  "node_contracts": {
+    "passed": 271
+  },
+  "typecheck": "PASSED",
+  "build": {
+    "status": "PASSED",
+    "id": "f9351338e1695550fe0b7df67ec5e90f638a99be1ae214576eae195674f51cc6"
+  },
+  "designated_postgresql": {
+    "version": "17.9",
+    "schema": 50,
+    "executed": 10,
+    "skipped": 1,
+    "failures": 0,
+    "errors": 0,
+    "optional_live_source": "NOT_RUN",
+    "synthetic_source_positive_proof": true,
+    "monthly_exact_t2_freeze_and_readback": "PASSED",
+    "migrations": 0,
+    "all_preexisting_tenants_unchanged": true,
+    "test_principals_deactivated": true
+  },
+  "browser": {
+    "passed": 2,
+    "viewports": [
+      1440,
+      1024
+    ],
+    "engine": "Microsoft Edge Chromium",
+    "transport": "EXPLICIT_SYNTHETIC_INTERCEPTED_API",
+    "real_api_browser": "NOT_RUN",
+    "keyboard_table_scroll_1024": "PASSED",
+    "document_overflow": false,
+    "visual_review": "CONTENT_CHECKED; existing horizontal table is independently scrollable; not whole-site layout acceptance"
+  },
+  "failure_history": [
+    "Designated PG attempt 1: first_ack_at is nullable; reuse nullable timestamp reader",
+    "Attempt 2: verified t2 nanos rejected by legacy public scenario precision; add package-only exact source evidence with shared decision logic, preserve strict public input",
+    "Attempt 3: isolated tenant had no tier; keep SERVICE_TIER_UNCONFIGURED guard and register explicitly SYNTHETIC test tier with null fee",
+    "Attempt 4 passed including exact timestamp freeze/readback",
+    "Browser test loader initially required explicit JSON import handling; corrected test loader"
+  ],
+  "scope_limits": [
+    "No actual-device failure/recovery positive proof",
+    "No real HTTP/browser combined workflow",
+    "No weighted availability/health coverage unification",
+    "No formal contract acceptance, financial/customer approval or production activation"
+  ],
+  "https": "DEFERRED_BY_USER",
+  "deployment": false,
+  "external_messages": 0,
+  "source_sha256": {
+    "apps/web/qa/browser/sla-monitoring.pw.ts": "79eae8f62d516a347dd69f90d4e90794d59e4ff473c83136ea7a7775c48f86e0",
+    "apps/web/qa/sla-monitoring.fixture.html": "9fc4767650a528ec281c75d09fe014e9a42fe28cda7597743e5f2ead1a37e393",
+    "apps/web/qa/sla-monitoring.fixture.ts": "177580301cb1fb4e7543ac6b7f9a5349fef3221d3176f36f8738718f0ae6af11",
+    "apps/web/src/pages/SlaReportsPage.vue": "359037b2e2b058742c29bdf04568a6baf6b392c015a4bb449bc28e12d4b6fcb5",
+    "apps/web/src/utils/onCallBoard.ts": "b9f9b7518415564522223f2660c92f1b89530457d05d076565a082282ac6ecc6",
+    "apps/web/src/utils/slaPayloadIntegrity.ts": "40b1f3cbc6e38ec25fb9ab48d5c85605c96cb566b5ebf7515d4e17079b0e7970",
+    "apps/web/src/utils/slaServiceReviewExport.ts": "c3d91297fbba0cd83babac0a3155efd9d781896f48cdbe3f4e015d3f7a16083a",
+    "apps/web/tests/slaPayloadIntegrity.test.ts": "9ec43fa307423a4eeb7d07a827dc0fa8f340607b1329b0358b05a77b0f229058",
+    "apps/web/tests/slaReportsPage.test.ts": "494b0031621348e671157c058be587740736c25633d6e8838a021a771c6a0940",
+    "apps/web/tests/slaServiceReviewExport.test.ts": "d1913bccef7b8c3f6490e565abea293a65e959bc9216aef7375953928fdc2f67",
+    "config/demo/catalog.v1.json": "8f326c75e351c19416b7c0dd45805d20dccc682a01535421be39518aa97a3c64",
+    "contracts/local-api.openapi.json": "4e718d90c7b58670fd7b8f051091dcd29329efaff6dafe08a1de3c8e81aea126",
+    "fixtures/demo-preparation-golden.json": "54cb522fbcbdd6789e38633eef4b73bc4c2f09eff52ee62b16c82a7ca7f9b87a",
+    "server/api/src/main/java/cn/mop/api/OnCallEscalationController.java": "a6743d9e64e5212431d4f8b3a13e7ebea552f4172bbe26078523da771280d129",
+    "server/api/src/test/java/cn/mop/api/MonitoringRecoveryDesignatedIntegrationTest.java": "1430c518d9edffb09df0536cf3d3986d98f16840a541230d90cfba6d3f896351",
+    "server/api/src/test/java/cn/mop/api/MonitoringSlaLatencyTest.java": "ed674233a4c4eb2549f03b54587a731b906721ba937621076def2cbf574a5711",
+    "server/api/src/test/java/cn/mop/api/OnCallEscalationControllerTest.java": "98e70192675f9264a2f22aba27a49d76da6f7d102bcba8a06d6e6e4ade8a79c9",
+    "server/api/src/test/java/cn/mop/api/SourcePrecisionMonthlySlaTest.java": "1b108291fce3bf0fe854fb7052963268f310ce721564d04e781d9d61648992bc",
+    "server/domain/src/main/java/cn/mop/domain/operations/EventOperationalMetrics.java": "04912c5cd5f813e92e906d79dd277c44f04771ef82403a0c880840d7b73b025a",
+    "server/domain/src/main/java/cn/mop/domain/operations/OperationalLatencyStatistics.java": "ed4d963d88a1fa59c3bdc4d65e3b8a034a2ee66664e4cad1a16c64c54882b832",
+    "server/domain/src/main/java/cn/mop/domain/sla/MonitoringSlaLatency.java": "9696754776ad3df3d601c9889913406303edd6e6965cefd53f19bf6d1421d1fa",
+    "server/domain/src/main/java/cn/mop/domain/sla/SlaAvailabilityAndCompensation.java": "67e52c130d9da9458ff3547043b940965bd5808894299b772d9e7c2de5e40e54",
+    "server/domain/src/main/java/cn/mop/domain/sla/SlaComplianceScenario.java": "ad1a286d8583737f32e2d5161fbbb823c1b09dafffd27f98b35eeb0398ddbcfd",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresOnCallEscalationRepository.java": "f1c5195cca34cf7e0ec2010dd7f1298e4c80c4bd6a023a38b5ec98ffed62b44e",
+    "tests/sla-monitoring-latency-contract.test.mjs": "4e550d0cdf0009fc835e2e997244af08890bf4b462197081b85cc2f9a6374cba",
+    "tools/oncall-escalation-contract.mjs": "369427d54abfa50566caa3c14e0171aa7d0e054aff1a743ceec181e9abee6fe5",
+    "tools/verify-monitoring-isolated.py": "baa4c5459466f20a8e6e4fcea6ca5551808de1c1e2a6a8f21c40541b6fc36a13"
+  }
+}

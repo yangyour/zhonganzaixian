@@ -7,10 +7,21 @@ const pct=(value:unknown)=>value===null||typeof value==='number'&&Number.isFinit
 const optionalInteger=(value:unknown)=>value===null||exportInteger(value)
 const tiers=['BASIC','STANDARD','ADVANCED']
 export function validateSlaLatency(value:unknown){
- if(!exportExact(value,['sample_count','unrecovered_count','mean_sec','p50_sec','p95_sec'])||!exportInteger(value.sample_count)||!exportInteger(value.unrecovered_count))bad()
+ const sourceAware=typeof value==='object'&&value!==null&&'source_version' in value
+ const keys=['sample_count','unrecovered_count','mean_sec','p50_sec','p95_sec',...(sourceAware?['source_version','unknown_count']:[])]
+ if(!exportExact(value,keys)||!exportInteger(value.sample_count)||!exportInteger(value.unrecovered_count))bad()
+ if(sourceAware&&(!['mop-event-acknowledgement-v1','mop-monitoring-recovery-t2-v1'].includes(String(value.source_version))||!exportInteger(value.unknown_count)))bad()
  for(const key of ['mean_sec','p50_sec','p95_sec'])if(!optionalInteger(value[key]))bad()
- if(value.sample_count===0?[value.mean_sec,value.p50_sec,value.p95_sec].some(v=>v!==null):[value.mean_sec,value.p50_sec,value.p95_sec].some(v=>v===null))bad()
+ const unknown=sourceAware&&Number(value.unknown_count)>0
+ if(value.sample_count===0||unknown?[value.mean_sec,value.p50_sec,value.p95_sec].some(v=>v!==null):[value.mean_sec,value.p50_sec,value.p95_sec].some(v=>v===null))bad()
  if(value.p50_sec!==null&&value.p95_sec!==null&&Number(value.p50_sec)>Number(value.p95_sec))bad()
+}
+function validateLatencyPair(ack:unknown,recovery:unknown){
+ validateSlaLatency(ack);validateSlaLatency(recovery)
+ const a=ack as Record<string,unknown>,r=recovery as Record<string,unknown>
+ if(a.source_version!==undefined||r.source_version!==undefined){
+  if(a.source_version!=='mop-event-acknowledgement-v1'||r.source_version!=='mop-monitoring-recovery-t2-v1')bad()
+ }
 }
 export function validateSlaIntervals(value:unknown){
  if(!Array.isArray(value))bad()
@@ -26,12 +37,12 @@ export function validateSlaService(value:unknown){
  for(const key of ['target_pct','verified_availability_pct','upper_bound_availability_pct'])if(!pct(value[key]))bad()
  for(const key of ['agreed_service_sec','approved_exclusion_sec','effective_service_sec','unavailable_union_sec','unknown_interval_sec','known_available_sec','incident_count','unrecovered_count'])if(!exportInteger(value[key]))bad()
  if(Number(value.unknown_interval_sec)>0&&value.unknown_policy_status!=='UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR')bad()
- validateSlaLatency(value.mtta);validateSlaLatency(value.mttr);validateSlaIntervals(value.interval_details)
+ validateLatencyPair(value.mtta,value.mttr);validateSlaIntervals(value.interval_details)
 }
 export function validateSlaKpis(value:unknown){
  if(!exportExact(value,['mean_verified_availability_pct','unavailable_union_total_sec','mtta','mttr','unrecovered_total_count','unknown_interval_total_sec'])||!pct(value.mean_verified_availability_pct))bad()
  for(const key of ['unavailable_union_total_sec','unrecovered_total_count','unknown_interval_total_sec'])if(!exportInteger(value[key]))bad()
- validateSlaLatency(value.mtta);validateSlaLatency(value.mttr)
+ validateLatencyPair(value.mtta,value.mttr)
 }
 export function validateSlaJudgments(value:unknown){
  if(!Array.isArray(value))bad();const seen=new Set<string>()

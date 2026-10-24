@@ -5,7 +5,7 @@
   "source_sha256": {
     "apps/web/src/router.ts": "d91d2927f0b84ab3e85aef4139bef57efb749c6dd7c205d5613180709460c938",
     "server/domain/src/main/java/cn/mop/domain/Capabilities.java": "6f97ea30fd15e067db3eb6fe72d55c2dedf12a07b5e09678164384c04b366d1f",
-    "contracts/local-api.openapi.json": "eb0d65b12c35bab5df88d1ece80c7e7f18814a00d47a7c70baa848d27848dbfa"
+    "contracts/local-api.openapi.json": "4e718d90c7b58670fd7b8f051091dcd29329efaff6dafe08a1de3c8e81aea126"
   },
   "protected_tenant_ids": [
     "55000000-0000-4000-8000-000000000001",

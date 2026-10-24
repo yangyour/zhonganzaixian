@@ -1,0 +1,52 @@
+{
+  "tests": 11,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 1,
+  "cases": [
+    {
+      "name": "missingPublicationCannotReadSourceOrConfirm",
+      "status": "PASSED"
+    },
+    {
+      "name": "confirmedEvidenceCommitsWithEventAndSlaAndOriginalReplayDoesNotResample",
+      "status": "PASSED"
+    },
+    {
+      "name": "insufficientEvidenceIsDurableButDoesNotAdvanceEventAndNewCommandCanObserveAgain",
+      "status": "PASSED"
+    },
+    {
+      "name": "stalePolicyVersionAndForeignEventDoNotReadSource",
+      "status": "PASSED"
+    },
+    {
+      "name": "concurrentConfirmationsHaveOneWinnerAndOneEvidenceRecord",
+      "status": "PASSED"
+    },
+    {
+      "name": "failedEventCasRollsBackRawProofAndReceiptThenOriginalRequestCanRetry",
+      "status": "PASSED"
+    },
+    {
+      "name": "sourceErrorsAndBindingMismatchCannotStoreEvidence",
+      "status": "PASSED"
+    },
+    {
+      "name": "legacyRawRecoveryCannotStopSlaUntilBoundObservationIsConfirmed",
+      "status": "PASSED"
+    },
+    {
+      "name": "expiryDuringSourceReadCannotCommitRecoveryProof",
+      "status": "PASSED"
+    },
+    {
+      "name": "liveBoundSourceReadCannotClaimRecoveryForAnUnobservedSyntheticFault",
+      "status": "SKIPPED"
+    },
+    {
+      "name": "healthyHistoryTailWithoutThisFaultTransitionCannotCommitALaterInventedT2",
+      "status": "PASSED"
+    }
+  ]
+}

@@ -1,0 +1,191 @@
+{
+  "config": {
+    "argv": [
+      "D:\\nodejs\\node.exe",
+      "E:\\work\\wxw9\\zhonganzaixian\\.worktrees\\remaining-gaps-20261024\\apps\\web\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "sla-monitoring.pw.ts",
+      "--max-failures=1"
+    ],
+    "configFile": "E:\\work\\wxw9\\zhonganzaixian\\.worktrees\\remaining-gaps-20261024\\apps\\web\\playwright.config.ts",
+    "rootDir": "E:/work/wxw9/zhonganzaixian/.worktrees/remaining-gaps-20261024/apps/web/qa/browser",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 1,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "E:/work/wxw9/zhonganzaixian/.worktrees/remaining-gaps-20261024/tests/artifacts/frontend-browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "E:/work/wxw9/zhonganzaixian/.worktrees/remaining-gaps-20261024/apps/web/qa/browser",
+        "testIgnore": [],
+        "testMatch": [
+          "*.pw.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "E:\\work\\wxw9\\zhonganzaixian\\.worktrees\\remaining-gaps-20261024\\tests\\artifacts\\frontend-browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "E:\\work\\wxw9\\zhonganzaixian\\.worktrees\\remaining-gaps-20261024\\apps\\web\\qa\\browser",
+        "snapshotDir": "E:\\work\\wxw9\\zhonganzaixian\\.worktrees\\remaining-gaps-20261024\\apps\\web\\qa\\browser",
+        "testIgnore": [],
+        "testMatch": "*.pw.ts",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:28130",
+          "browserName": "chromium",
+          "headless": true,
+          "launchOptions": {
+            "executablePath": "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+          },
+          "screenshot": "only-on-failure",
+          "trace": "retain-on-failure"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../../tests/artifacts/frontend-browser-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev -- --port 28130",
+      "url": "http://127.0.0.1:28130/qa/cmdb-catalog.fixture.html",
+      "reuseExistingServer": false,
+      "timeout": 30000
+    }
+  },
+  "suites": [
+    {
+      "title": "sla-monitoring.pw.ts",
+      "file": "sla-monitoring.pw.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "monitoring timing distinguishes unknown from zero at 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 800,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-24T06:19:11.938Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2016504276a07e0603b7-399ee85d109dd9f9a996",
+          "file": "sla-monitoring.pw.ts",
+          "line": 5,
+          "column": 35
+        },
+        {
+          "title": "monitoring timing distinguishes unknown from zero at 1024px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 683,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-24T06:19:13.160Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2016504276a07e0603b7-9ec2dc955e8fd8d8ee09",
+          "file": "sla-monitoring.pw.ts",
+          "line": 5,
+          "column": 35
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-24T06:19:10.456Z",
+    "duration": 4448.165,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

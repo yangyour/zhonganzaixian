@@ -1,6 +1,7 @@
 import {it,expect,vi} from 'vitest'
 import wire from '../../../fixtures/customer-sla-controller.json'
 import {readSlaReport,readSlaServiceDetail,createSlaReportWorkspace,type OnCallContext} from '../src/utils/onCallBoard'
+import {validateSlaLatency} from '../src/utils/slaPayloadIntegrity'
 const scope:OnCallContext={tenantId:wire.report.tenant_id,actorId:wire.report.monthly_result.evaluated_by,permissionVersion:3,canWriteInternal:true,canWriteConfig:false}
 const report=():any=>structuredClone(wire.report)
 const detail=():any=>structuredClone(wire.detail)
@@ -25,3 +26,28 @@ it.each(['month','detail'])('synchronous revocation prevents %s GET dispatch',as
 it('synchronous revocation before write dispatch sends no monthly POST',async()=>{const request=vi.fn(),r=report();r.monthly_result.frozen=false;r.monthly_result.frozen_at=null;request.mockResolvedValue(r);let revoke=false,w:ReturnType<typeof createSlaReportWorkspace>;w=createSlaReportWorkspace({request},s=>{if(revoke&&s.busy==='write')w.reset(null)},()=> 'synthetic-key');w.reset(scope);expect(await w.load('2026-10')).toBe(true);revoke=true;expect(await w.submitMonthlyResult({report_month:'2026-10',expected_version:1,freeze:false})).toBe(false);expect(request).toHaveBeenCalledTimes(1);expect(w.state().attempt).toBeNull()})
 it('request-key callback cannot dispatch a write after authorization reset',async()=>{const request=vi.fn(),r=report();r.monthly_result.frozen=false;r.monthly_result.frozen_at=null;request.mockResolvedValue(r);let w:ReturnType<typeof createSlaReportWorkspace>;w=createSlaReportWorkspace({request},()=>{},()=>{w.reset(null);return 'synthetic-key'});w.reset(scope);await w.load('2026-10');expect(await w.submitMonthlyResult({report_month:'2026-10',expected_version:1,freeze:false})).toBe(false);expect(request).toHaveBeenCalledTimes(1);expect(w.state().attempt).toBeNull()})
 it('malformed replacement report clears old rendered state without inventing zeroes',async()=>{const request=vi.fn().mockResolvedValueOnce(report()),w=createSlaReportWorkspace({request},()=>{});w.reset(scope);expect(await w.load('2026-10')).toBe(true);const broken=report();broken.services[0].unavailable_union_sec='NaN';request.mockResolvedValueOnce(broken);expect(await w.load('2026-10')).toBe(false);expect(w.state().report).toBeNull();expect(w.state().error).not.toBeNull()})
+
+it('keeps known monitoring samples unknown when another source cannot be verified',()=>{
+ const latency={sample_count:1,unrecovered_count:2,mean_sec:null,p50_sec:null,p95_sec:null,
+  source_version:'mop-monitoring-recovery-t2-v1',unknown_count:1}
+ expect(()=>validateSlaLatency(latency)).not.toThrow()
+ expect(()=>validateSlaLatency({...latency,mean_sec:25})).toThrow()
+ expect(()=>validateSlaLatency({...latency,unknown_count:0})).toThrow()
+ expect(()=>validateSlaLatency({...latency,source_version:'unverified-client-clock'})).toThrow()
+ const {source_version:_source,...missingVersion}=latency
+ expect(()=>validateSlaLatency(missingVersion)).toThrow()
+})
+it('accepts explicit monitoring zero independently from missing samples',()=>{
+ expect(()=>validateSlaLatency({sample_count:1,unrecovered_count:0,mean_sec:0,p50_sec:0,p95_sec:0,
+  source_version:'mop-event-acknowledgement-v1',unknown_count:0})).not.toThrow()
+})
+
+it('cannot label recovery proof as acknowledgment or mix an old and a new clock',()=>{
+ const value=report()
+ Object.assign(value.kpis.mtta,{source_version:'mop-monitoring-recovery-t2-v1',unknown_count:0})
+ expect(()=>read(value)).toThrow()
+ Object.assign(value.kpis.mtta,{source_version:'mop-event-acknowledgement-v1',unknown_count:0})
+ expect(()=>read(value)).toThrow()
+ Object.assign(value.kpis.mttr,{source_version:'mop-monitoring-recovery-t2-v1',unknown_count:0})
+ expect(()=>read(value)).not.toThrow()
+})

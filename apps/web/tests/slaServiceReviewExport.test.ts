@@ -21,3 +21,16 @@ it('scope revocation before or during object URL creation prevents click and cle
 it('failed click still removes link and revokes the local URL',()=>{const x=downloads();x.click.mockImplementation(()=>{throw Error('synthetic click failure')});expect(()=>downloadSlaServiceReview(build(),()=>true)).toThrow();expect(document.querySelector('a[download]')).toBeNull();vi.advanceTimersByTime(1000);expect(x.revoke).toHaveBeenCalledOnce()})
 it('anchor construction failure still revokes its owned object URL',()=>{const x=downloads();vi.spyOn(document,'createElement').mockImplementationOnce(()=>{throw Error('synthetic DOM failure')});expect(()=>downloadSlaServiceReview(build(),()=>true)).toThrow();expect(x.click).not.toHaveBeenCalled();vi.advanceTimersByTime(1000);expect(x.revoke).toHaveBeenCalledOnce()})
 it.each(['filename','header','oversize'])('refuses altered download %s before creating a URL',kind=>{const x=downloads(),out=build();if(kind==='filename')out.filename='../outside.csv';else if(kind==='header')out.csv='unverified';else out.csv+='x'.repeat(8*1024*1024);expect(()=>downloadSlaServiceReview(out,()=>true)).toThrow();expect(x.create).not.toHaveBeenCalled()})
+
+it('review CSV retains monitoring clock provenance and unknown counts without inventing legacy proof',()=>{
+ const value=data()
+ for(const row of value.services){
+  Object.assign(row.mtta,{source_version:'mop-event-acknowledgement-v1',unknown_count:1,sample_count:1,mean_sec:null,p50_sec:null,p95_sec:null})
+  Object.assign(row.mttr,{source_version:'mop-monitoring-recovery-t2-v1',unknown_count:1,sample_count:1,mean_sec:null,p50_sec:null,p95_sec:null})
+ }
+ const row=parse(build(value).csv).data[1]!
+ expect(row.mtta_source_version).toBe('mop-event-acknowledgement-v1')
+ expect(row.mttr_unknown_count).toBe('1')
+ expect(row.mttr_mean_sec).toBe('')
+ expect(parse(build().csv).data[1]!.mttr_source_version).toBe('')
+})

@@ -1,0 +1,24 @@
+{
+  "environment": "lan-test-20261008",
+  "schema_migrations": 0,
+  "actual_tenant_written": false,
+  "new_local_components": 0,
+  "external_messages": 0,
+  "test_tenants": [
+    "dbd0e875-45d1-460d-861a-e62bd5f00272",
+    "1dda9649-2def-472b-bb44-ffc4c42f6d6a"
+  ],
+  "test_actor": "19a9aaa5-fa40-4b2d-9c87-d7b556d81649",
+  "formal_contract_acceptance": "NOT_RUN",
+  "status": "FAILED",
+  "suite": "monitoring-observation",
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "schema_latest": "50",
+  "maven_exit_code": 1,
+  "actual_tenant_fingerprints_unchanged": true,
+  "all_preexisting_tenant_fingerprints_unchanged": true,
+  "migration_history_unchanged": true,
+  "test_principal_deactivated": true,
+  "test_reviewer_deactivated": true,
+  "finished_at": "2026-10-24T05:59:44.869544+00:00"
+}

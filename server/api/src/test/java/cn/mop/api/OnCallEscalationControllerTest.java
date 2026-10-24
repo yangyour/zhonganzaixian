@@ -46,6 +46,26 @@ class OnCallEscalationControllerTest {
         });
     }
 
+    @Test
+    void monitoringLatencyReturnsItsSourceAndUnknownCountWithoutInventingValues() {
+        var mtta = new LatencyStats(1, 0, null, null, null, "mop-event-acknowledgement-v1", 1);
+        var mttr = new LatencyStats(2, 3, null, null, null, "mop-monitoring-recovery-t2-v1", 1);
+        var report = new SlaReportView(TENANT, "2026-10", null, null, null, 0,
+                mtta, mttr, 3, 0, List.of(), Optional.empty(),
+                SlaAvailabilityAndCompensation.evaluateMonthly(null, null, List.of()),
+                SlaAvailabilityAndCompensation.FORMULA_VERSION, AT);
+        when(repository.slaReport(any(), eq("2026-10"))).thenReturn(report);
+        var request = request("GET", "/sla/reports", "");
+        request.addParameter("period", "2026-10");
+        var kpis = (Map<?, ?>) data(controller.slaReport(request)).get("kpis");
+        var latency = (Map<?, ?>) kpis.get("mttr");
+        assertEquals("mop-monitoring-recovery-t2-v1", latency.get("source_version"));
+        assertEquals(1, latency.get("unknown_count"));
+        assertEquals(2, latency.get("sample_count"));
+        assertEquals(3, latency.get("unrecovered_count"));
+        assertNull(latency.get("mean_sec"));
+    }
+
     MockHttpServletRequest request(String method, String path, String body) {
         var r = new MockHttpServletRequest(method, "/api/v1" + path);
         r.setUserPrincipal(() -> ACTOR);

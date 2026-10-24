@@ -148,6 +148,13 @@ export function addOnCallEscalationContract(contract) {
     p50_sec: nullable(nonNegLong),
     p95_sec: nullable(nonNegLong),
   })
+  // Optional paired fields distinguish current monitoring clocks from unchanged legacy/frozen projections.
+  latencyStats.properties.source_version = { enum: ['mop-event-acknowledgement-v1', 'mop-monitoring-recovery-t2-v1'] }
+  latencyStats.properties.unknown_count = nonNegInt
+  latencyStats.dependentRequired = { source_version: ['unknown_count'], unknown_count: ['source_version'] }
+  latencyStats.allOf = [{ if: { required: ['unknown_count'], properties: { unknown_count: { minimum: 1 } } },
+    then: { properties: { mean_sec: { type: 'null' }, p50_sec: { type: 'null' }, p95_sec: { type: 'null' } } } }]
+  const latencyClock = version => ({ allOf: [ref('SlaLatencyStats'), { properties: { source_version: { const: version } } }] })
   const explainedInterval = object({
     kind: { enum: ['KNOWN_AVAILABLE', 'APPROVED_EXCLUSION', 'UNAVAILABLE_UNION', 'UNKNOWN_DATA_GAP'] },
     start: time,
@@ -168,8 +175,8 @@ export function addOnCallEscalationContract(contract) {
     verified_availability_pct: nullable(pctNum),
     upper_bound_availability_pct: nullable(pctNum),
     incident_count: nonNegInt,
-    mtta: ref('SlaLatencyStats'),
-    mttr: ref('SlaLatencyStats'),
+    mtta: latencyClock('mop-event-acknowledgement-v1'),
+    mttr: latencyClock('mop-monitoring-recovery-t2-v1'),
     unrecovered_count: nonNegInt,
     status: { enum: ['MET', 'NOT_MET', 'INSUFFICIENT_SAMPLES', 'UNKNOWN_INTERVAL_PENDING'] },
     unknown_policy_status: { enum: ['NO_UNKNOWN_GAPS', 'UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR'] },
@@ -279,8 +286,8 @@ export function addOnCallEscalationContract(contract) {
       kpis: object({
         mean_verified_availability_pct: nullable(pctNum),
         unavailable_union_total_sec: nonNegLong,
-        mtta: ref('SlaLatencyStats'),
-        mttr: ref('SlaLatencyStats'),
+        mtta: latencyClock('mop-event-acknowledgement-v1'),
+        mttr: latencyClock('mop-monitoring-recovery-t2-v1'),
         unrecovered_total_count: nonNegInt,
         unknown_interval_total_sec: nonNegLong,
       }),

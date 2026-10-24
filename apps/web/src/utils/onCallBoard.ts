@@ -56,6 +56,7 @@ export interface OnCallBoardPayload {
 
 export interface SlaLatencyStats {
  sample_count:number;unrecovered_count:number;mean_sec:number|null;p50_sec:number|null;p95_sec:number|null
+ source_version?:'mop-event-acknowledgement-v1'|'mop-monitoring-recovery-t2-v1';unknown_count?:number
 }
 export interface SlaExplainedInterval {
  kind:'KNOWN_AVAILABLE'|'APPROVED_EXCLUSION'|'UNAVAILABLE_UNION'|'UNKNOWN_DATA_GAP';

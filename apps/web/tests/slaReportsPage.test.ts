@@ -34,3 +34,16 @@ it('review export is disabled when selected input month differs from the loaded 
 it('review export stops after account change during its rendering yield',async()=>{vi.spyOn(api,'request').mockResolvedValue(wire.report);const d=mockDownloads();await mount();vm.periodInput=wire.report.period;await vm.queryReport();const pending=vm.exportServices();session.value={...auth,account_version:2};expect(await pending).toBe(false);expect(d.click).not.toHaveBeenCalled();expect(vm.exportStatus).toBe('')})
 it('repeated export clicks are single flight and failed click preserves the report',async()=>{vi.spyOn(api,'request').mockResolvedValue(wire.report);const d=mockDownloads();await mount();vm.periodInput=wire.report.period;await vm.queryReport();const first=vm.exportServices();expect(await vm.exportServices()).toBe(false);expect(await first).toBe(true);expect(d.click).toHaveBeenCalledOnce();d.click.mockImplementation(()=>{throw Error('synthetic download failed')});expect(await vm.exportServices()).toBe(false);await settle();expect(vm.state.report).not.toBeNull();expect(vm.exportStatus).toBe('');expect(host.querySelector('.review-export .api-error')).not.toBeNull()})
 it('unmount before review export is ready does not initiate a stale download',async()=>{vi.spyOn(api,'request').mockResolvedValue(wire.report);const d=mockDownloads();await mount();vm.periodInput=wire.report.period;await vm.queryReport();const pending=vm.exportServices();app!.unmount();app=undefined;expect(await pending).toBe(false);expect(d.create).not.toHaveBeenCalled()})
+
+it('unknown monitoring timing explains its missing evidence instead of claiming no samples',async()=>{
+ const value=structuredClone(wire.report)
+ for(const metric of [value.kpis,...value.services]){
+  Object.assign(metric.mtta,{source_version:'mop-event-acknowledgement-v1',unknown_count:1,sample_count:1,mean_sec:null,p50_sec:null,p95_sec:null})
+  Object.assign(metric.mttr,{source_version:'mop-monitoring-recovery-t2-v1',unknown_count:1,sample_count:2,mean_sec:null,p50_sec:null,p95_sec:null})
+ }
+ vi.spyOn(api,'request').mockResolvedValue(value)
+ await mount();vm.periodInput='2026-10';await vm.workspace.load('2026-10');await settle()
+ expect(host.textContent).toContain('来源待核验')
+ expect(host.textContent).toContain('恢复待核验 1')
+ expect(vm.state.report.kpis.mttr.sample_count).toBe(2)
+})

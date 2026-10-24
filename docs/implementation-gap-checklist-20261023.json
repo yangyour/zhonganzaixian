@@ -377,11 +377,22 @@
         "M5-11",
         "M5-19"
       ],
-      "status": "OPEN",
+      "status": "IN_PROGRESS",
       "completion_criterion": "补统一快照、正式导出和对账审批/舍入，费用和未确认口径可配置且缺失为空；不自动支付。",
-      "evidence": [],
+      "evidence": [
+        "docs/sla-monitoring-source-20261024.md",
+        "docs/evidence/sla-monitoring-source-20261024/validation.json"
+      ],
       "commits": [],
-      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "completed_subitems": [
+        "Live SLA total/service MTTA and MTTR now use original monitoring event clocks and verified exact t2, with explicit unknown/source metadata; nanosecond recovery comparisons and new monthly freeze/readback verified on designated PG; historic frozen rows retained"
+      ],
+      "remaining_subitems": [
+        "Unified availability denominators and actual health coverage",
+        "Formal same-version cross-business snapshots, export/reconciliation and compensation approval",
+        "Actual lifecycle/provider/browser integration and formal contract acceptance"
+      ]
     },
     {
       "id": "N01",
@@ -633,7 +644,9 @@
       "evidence": [
         "docs/parallel/reports-progress.md",
         "docs/event-operational-metrics-20261023.md",
-        "docs/evidence/dot-continuation-20261023/ui02-event-metrics.json"
+        "docs/evidence/dot-continuation-20261023/ui02-event-metrics.json",
+        "docs/sla-monitoring-source-20261024.md",
+        "docs/evidence/sla-monitoring-source-20261024/validation.json"
       ],
       "commits": [
         "d58ea011",
@@ -645,7 +658,10 @@
         "Remaining source aggregates, effective denominators, frozen reports and customer-confirmed inputs",
         "Existing SLA workflow timestamps are not yet replaced by event problem/first-ack timestamps; shared math alone is not full source unification"
       ],
-      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
+      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e",
+      "completed_subitems": [
+        "Live SLA total/service MTTA and MTTR now use original monitoring event clocks and verified exact t2, with explicit unknown/source metadata; nanosecond recovery comparisons and new monthly freeze/readback verified on designated PG; historic frozen rows retained"
+      ]
     },
     {
       "id": "P01",
@@ -1495,7 +1511,7 @@
       "gap_ids": [
         "M05"
       ],
-      "implementation_review": "REVIEW_REQUIRED",
+      "implementation_review": "IN_PROGRESS",
       "formal_acceptance": "NOT_RUN"
     },
     {
@@ -2004,7 +2020,7 @@
       "gap_ids": [
         "R02"
       ],
-      "implementation_review": "REVIEW_REQUIRED",
+      "implementation_review": "IN_PROGRESS",
       "formal_acceptance": "NOT_RUN"
     },
     {

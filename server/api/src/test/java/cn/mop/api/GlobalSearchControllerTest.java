@@ -24,4 +24,23 @@ class GlobalSearchControllerTest {
     @Test void allKnownRolesAllowedButUnknownAndInactiveDenied(){when(search.search(any(),any())).thenReturn(result());for(String role:List.of("msp","padmin","viewer","tadmin")){role(role);assertEquals(TENANT,data(request()).get("tenant_id"));}role("unknown");assertEquals(403,assertThrows(DomainException.class,()->data(request())).status);when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"msp",7,false)));assertEquals(401,assertThrows(DomainException.class,()->data(request())).status);}
     @Test void repositoryRoleSnapshotAndScopeMustMatchCurrentRequest(){var r=request();r.addHeader("X-Tenant-ID","forged");when(search.search(access(),new GlobalSearchQuery("literal"))).thenReturn(result());data(r);verify(search).search(access(),new GlobalSearchQuery("literal"));when(search.search(any(),any())).thenReturn(new Snapshot("different",TENANT,Instant.EPOCH,"CURRENT_TENANT_INTERNAL",List.of(),false,List.of(),false,true,List.of(),false));assertThrows(IllegalStateException.class,()->data(request()));}
     @Test void missingSessionAndRepositoryRevocationNeverBecomeEmptySuccess(){var r=request();r.setUserPrincipal(null);assertEquals(401,assertThrows(DomainException.class,()->data(r)).status);when(search.search(any(),any())).thenThrow(new DomainException(401,"SESSION_EXPIRED","revoked"));assertEquals(401,assertThrows(DomainException.class,()->data(request())).status);}
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={"inactive","removed","version","role","capabilities","tenant","session","actor"})
+    void rechecksFullCurrentMembershipAfterSearchBeforeReturning(String change){
+        var request=request();when(search.search(any(),any())).thenAnswer(call->{switch(change){
+            case "inactive"->when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"msp",7,false)));
+            case "removed"->when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.empty());
+            case "version"->when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"msp",8,true)));
+            case "role"->role("padmin");case "capabilities"->when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"msp",7,true,List.of("search:read"))));
+            case "tenant"->request.getSession().setAttribute("mop.tenant_id",ACTOR);case "session"->request.getSession().invalidate();case "actor"->request.setUserPrincipal(()->TENANT);
+        }return result();});assertEquals(401,assertThrows(DomainException.class,()->data(request)).status);
+    }
+    @Test void mismatchedInitialMembershipAndIncompleteReadGrantsRejectBeforeSearch(){
+        when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(TENANT,ACTOR,"msp",7,true)));
+        assertEquals(401,assertThrows(DomainException.class,()->data(request())).status);
+        for(var grants:List.of(List.of("search:read"),List.of("search:read","assets:read"),List.of("search:read","tickets:read"))){
+            when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"msp",7,true,grants)));
+            assertEquals(403,assertThrows(DomainException.class,()->data(request())).status);
+        }verifyNoInteractions(search);
+    }
 }

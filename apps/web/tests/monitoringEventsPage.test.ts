@@ -203,3 +203,9 @@ it('shows stored retry deadlines as plans rather than promising execution or del
 })
 it('puts events first in a full-width workspace and removes funnel statistics',async()=>{ready();mount();await settle();expect(host.querySelector('.workspace-grid,.kpi-list')).toBeNull();expect(host.querySelector('.event-workspace>section')?.getAttribute('aria-label')).toBe('监控事件主列表');const scroll=host.querySelector<HTMLElement>('.event-table-scroll')!;expect(scroll.tabIndex).toBe(0);scroll.focus();expect(document.activeElement).toBe(scroll);expect(scroll.querySelectorAll('th[scope="col"]')).toHaveLength(7);expect(button('刷新事件').disabled).toBe(false)})
 it('refresh remains read-only after removing funnel controls',async()=>{const {request}=ready();mount();await settle();button('刷新事件').click();await settle();expect(request).toHaveBeenCalledTimes(2);expect(request.mock.calls.every(([,o])=>o?.method!=='POST')).toBe(true)})
+
+it('account-version-only changes cancel the old event read and discard its late private rows',async()=>{
+ const resolvers:Array<(value:unknown)=>void>=[];const req=vi.spyOn(api,'request').mockImplementation(()=>new Promise(r=>resolvers.push(r)));
+ mount();await settle();expect(req).toHaveBeenCalledTimes(1);session.value={...auth,account_version:2};await settle();expect(req.mock.calls[0]![1]?.signal?.aborted).toBe(true);expect(req).toHaveBeenCalledTimes(2);
+ const old=sampleWorkspace();old.events[0]!.rule_name='STALE_ACCOUNT_EVENT';resolvers[0]!(old);await settle();expect(host.textContent).not.toContain('STALE_ACCOUNT_EVENT');resolvers[1]!(sampleWorkspace());await settle();expect(host.textContent).toContain(sampleWorkspace().events[0]!.rule_name);
+})

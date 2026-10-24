@@ -119,4 +119,16 @@ class GlobalSearchHttpContractTest {
     static void exchange(ArrayNode output,String name,JsonNode response){var node=output.addObject();node.put("name",name);node.put("method","GET");node.put("path","/api/v1/search");node.put("response_schema","GroupedSearchResult");node.set("response",response);}
     static Set<String> keys(JsonNode node){var keys=new HashSet<String>();node.fieldNames().forEachRemaining(keys::add);return keys;}
     static Path fixturePath(){for(Path p=Path.of(System.getProperty("user.dir")).toAbsolutePath();p!=null;p=p.getParent())if(Files.isDirectory(p.resolve("server/api"))&&Files.isDirectory(p.resolve("fixtures")))return p.resolve("fixtures/global-search-controller.json");throw new IllegalStateException("Repository root not found");}
+    @ParameterizedTest @ValueSource(strings={"inactive","removed","version","role","capabilities"})
+    void finalAuthorizationFailureReturnsNoStoreErrorWithoutAnyPartialGroups(String change)throws Exception{
+        when(search.search(any(),any())).thenAnswer(call->{switch(change){
+            case "inactive"->when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"msp",7,false)));
+            case "removed"->when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.empty());
+            case "version"->when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"msp",8,true)));
+            case "role"->role("padmin");
+            case "capabilities"->when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"msp",7,true,List.of("search:read"))));
+        }return snapshot("msp",1,false,0);});
+        request(QUERY).andExpect(status().isUnauthorized()).andExpect(header().string("Cache-Control","no-store"))
+            .andExpect(jsonPath("$.data").doesNotExist()).andExpect(jsonPath("$.error.code").value("SESSION_EXPIRED"));
+    }
 }

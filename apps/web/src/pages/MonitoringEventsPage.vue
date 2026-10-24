@@ -67,7 +67,7 @@ function validExtension(id: string, endsAt: string) { const next = utcInstantNan
 
 // Compare context fields, not array identity: navigation re-reads an equivalent session before route-update guards.
 watch(
-  [() => contextGeneration.value, () => session.value?.tenant.id, () => session.value?.user.id, () => session.value?.permission_version, () => session.value?.user.role, () => capabilityScope.value, () => canRead.value, () => canWrite.value, () => canAdminConfirm.value],
+  [() => contextGeneration.value, () => session.value?.tenant.id, () => session.value?.user.id, () => session.value?.permission_version, () => session.value?.account_version, () => session.value?.user.role, () => capabilityScope.value, () => canRead.value, () => canWrite.value, () => canAdminConfirm.value],
   () => {
     clearDrafts()
     const s = session.value

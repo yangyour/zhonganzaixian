@@ -92,7 +92,9 @@
         "docs/event-read-authorization-20261023.md",
         "docs/evidence/dot-continuation-20261023/ui03-event-read-authorization.json",
         "docs/event-noise-trend-20261023.md",
-        "docs/evidence/dot-continuation-20261023/ui02-noise-trend.json"
+        "docs/evidence/dot-continuation-20261023/ui02-noise-trend.json",
+        "docs/search-monitoring-return-scope-20261024.md",
+        "docs/evidence/search-monitoring-return-scope-20261024/validation.json"
       ],
       "commits": [
         "1e4431b5",
@@ -102,7 +104,8 @@
       "completed_subitems": [
         "M1-8 current-tenant PROBLEM/NEW exact bell reader and header, permissions/recovery and designated PG/HTTP/browser verification",
         "M1-8 slash shortcut, local opt-out and account-version invalidation; 65 targeted tests and real browser interaction",
-        "Search dialog page-wide landmark duplication fixed and original DOM semantics reproduced with real Element Plus/axe in jsdom; 66 targeted tests"
+        "Search dialog page-wide landmark duplication fixed and original DOM semantics reproduced with real Element Plus/axe in jsdom; 66 targeted tests",
+        "Global search now rechecks full membership/session/account before return; exact read capabilities align with repository. Event-center and network-monitoring account-only changes cancel old requests and clear private state; red-to-green tests retained, API contract unchanged."
       ],
       "remaining_subitems": [
         "Review M1-5 recent events, M1-7 tenant switching, remaining M1-8 search groups and M7 gate",

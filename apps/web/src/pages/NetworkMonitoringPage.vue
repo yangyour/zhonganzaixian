@@ -65,7 +65,7 @@ async function loadHistory(){
   }catch(cause){if(alive&&seq===detailSequence&&!isCancelled(cause))historyError.value=cause}
   finally{if(alive&&seq===detailSequence)historyLoading.value=false}
 }
-watch([()=>session.value?.tenant.id,()=>session.value?.user.id,()=>session.value?.user.role,()=>session.value?.mode,()=>session.value?.permission_version,contextGeneration,permitted],()=>{reset();if(permitted.value)void refresh()},{immediate:true,flush:'sync'})
+watch([()=>session.value?.tenant.id,()=>session.value?.user.id,()=>session.value?.user.role,()=>session.value?.mode,()=>session.value?.permission_version,()=>session.value?.account_version,contextGeneration,permitted],()=>{reset();if(permitted.value)void refresh()},{immediate:true,flush:'sync'})
 watch([selected,metric,window],()=>void loadHistory())
 watch(refreshPolicyError,cause=>{if(refreshPermissionRejected(cause))reset()},{flush:'sync'})
 function visible(){now.value=performance.now();if(!document.hidden&&!autoPaused.value&&refreshInterval.value!==null)void refresh()}

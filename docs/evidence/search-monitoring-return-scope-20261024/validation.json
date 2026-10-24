@@ -1,0 +1,54 @@
+{
+  "status": "CODE_CHECKS_PASSED_REAL_BROWSER_NOT_RUN",
+  "base_commit": "de43dd5aac1b624055491fbfa229f84099e5ad72",
+  "red_reproduction": {
+    "java_failed": 8,
+    "java_total": 16,
+    "web_failed": 2,
+    "web_other_passed": 49
+  },
+  "initial_green": {
+    "targeted_java_passed": 42,
+    "targeted_web_passed": 120
+  },
+  "java": {
+    "discovered": 5482,
+    "executed_passed": 4308,
+    "skipped": 1174,
+    "failures": 0,
+    "errors": 0
+  },
+  "web": {
+    "files": 349,
+    "passed": 5636
+  },
+  "node_contracts": {
+    "passed": 285
+  },
+  "offline_demo_plan": {
+    "passed": 18
+  },
+  "typecheck": "PASSED",
+  "build": "PASSED",
+  "static_policy": "PASSED",
+  "contract_generation": "PASSED_UNCHANGED_PUBLIC_SHAPE",
+  "initial_full_failure": "Existing capability-gate reflection depended on access method name; restored original name while retaining Membership capture. Safety assertions unchanged.",
+  "designated_pg": "NOT_RUN_MISSING_CONTROLLED_CONFIG",
+  "browser": "NOT_RUN_EXISTING_LAUNCH_PERMISSION_BLOCK",
+  "migration_changes": 0,
+  "deployment": false,
+  "provider_io": false,
+  "formal_acceptance": "NOT_COMPLETED",
+  "source_sha256": {
+    "apps/web/src/pages/MonitoringEventsPage.vue": "6cf96c7594000e7cfbc00510f0b67e1f0e54e6cc72ed12c3b9a37c591c5f0f38",
+    "apps/web/src/pages/NetworkMonitoringPage.vue": "532a58f03320db908fc1b4d6c7ec0a4f3a93d584d8583fc30d6c1c5ef4f3a24f",
+    "apps/web/tests/monitoringEventsPage.test.ts": "d0def5b1cdb93097de1d30ecd30330f5565b2cc9caed8c6958e70a3b02644224",
+    "apps/web/tests/networkMonitoringPage.test.ts": "2695d992c6c31f039d790da2c3f45e047292325d18c21d8c9568f82028bd9f9d",
+    "docs/implementation-gap-checklist-20261023.json": "ea6ca3ce5775ce2a82a57a8107ab0fd7525656c1208e191c47f4c9fcc68f11df",
+    "docs/implementation-gap-checklist-20261023.md": "ac9c13749389396bc1d45e11f57035ef9ed50a7b36e45a9db6dc6abaacaedfb5",
+    "server/api/src/main/java/cn/mop/api/GlobalSearchController.java": "b9fcc70475cf11a6d57a66c127627d2af94053cbfc37fbb88387012cff79f817",
+    "server/api/src/test/java/cn/mop/api/GlobalSearchControllerTest.java": "3afd42c7868dc25b135321452470e87a44d186aa5ce2dbbe913faafaa3bf6e86",
+    "server/api/src/test/java/cn/mop/api/GlobalSearchHttpContractTest.java": "338511d3e7da1e0991dfad93859cf61ccbf3f791f15e8b8cc3109b8bd3d06c06",
+    "docs/search-monitoring-return-scope-20261024.md": "a512642897295c4977a6c73382551b4a41c9f747b72824dd1f02dea00cdfc82d"
+  }
+}

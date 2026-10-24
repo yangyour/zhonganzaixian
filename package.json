@@ -7,7 +7,7 @@
     "node": ">=22.12.0 <23"
   },
   "scripts": {
-    "test": "node --test tests/contracts.test.mjs tests/email-contract.test.mjs tests/acceptance-data-scope.test.mjs tests/report-capture-contract.test.mjs tests/dashboard-actionable-contract.test.mjs tests/asset-ledger-facts-contract.test.mjs tests/production-readiness-contract.test.mjs",
+    "test": "node --test tests/contracts.test.mjs tests/email-contract.test.mjs tests/acceptance-data-scope.test.mjs tests/report-capture-contract.test.mjs tests/dashboard-actionable-contract.test.mjs tests/asset-ledger-facts-contract.test.mjs tests/production-readiness-contract.test.mjs tests/report-readership-contract.test.mjs",
     "test:api": "node tools/capture-test-session.mjs && node tests/api-smoke.mjs",
     "contract:check": "node tools/build-api-contract.mjs --check"
   },

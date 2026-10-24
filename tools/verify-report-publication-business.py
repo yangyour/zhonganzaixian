@@ -46,6 +46,29 @@ def module(name: str, filename: str):
     return value
 
 
+def active_baseline(pg, chain, fingerprints, expected_version: int) -> dict:
+    """Explicitly pin the active schema; V55 is the recorded release, never an automatic fallback."""
+    snapshot = chain.active_snapshot(pg, fingerprints)
+    history = snapshot['history']
+    exact = len(history) == expected_version \
+        and [row[1] for row in history] == [str(value) for value in range(1, expected_version + 1)] \
+        and all(row[-1] for row in history)
+    if expected_version == 50:
+        objects_match = snapshot['candidate_objects_absent']
+    elif expected_version == 55:
+        with pg.connection('mop_test', readonly=True) as connection, connection.cursor() as cursor:
+            cursor.execute('SELECT to_regclass(name) IS NOT NULL FROM unnest(%s::text[]) AS name',
+                           (['public.mop_notification_control', 'public.mop_attachment_security_revision',
+                             'public.mop_report_publication_document', 'public.mop_monitoring_enrollment',
+                             'public.mop_monitoring_object_binding'],))
+            objects_match = all(row[0] for row in cursor.fetchall())
+    else:
+        raise chain.Refused('R02_UNSUPPORTED_EXPLICIT_ACTIVE_VERSION')
+    if not exact or not objects_match:
+        raise chain.Refused('R02_ACTIVE_BASELINE_NOT_EXPLICIT_V' + str(expected_version))
+    return snapshot
+
+
 def source_scope(path: Path) -> tuple[dict, str]:
     resolved = path.resolve(strict=True)
     if path.absolute() != resolved or resolved not in INPUTS:
@@ -394,11 +417,10 @@ def run(args) -> int:
         locks.acquire()
         pg = chain.DesignatedPostgres(locks)
         pg.open()
-        active_before = chain.active_snapshot(pg, fingerprints)
+        active_before = active_baseline(pg, chain, fingerprints, args.expected_active_version)
         summary['postgresql_version'] = active_before['postgresql_version']
         summary['postgresql_version_observed_before'] = active_before['postgresql_version']
-        if not active_before['exact_v50'] or not active_before['candidate_objects_absent']:
-            raise chain.Refused('R02_ACTIVE_BASELINE_NOT_V50')
+        summary['expected_active_version'] = args.expected_active_version
         before = metadata(chain, pg, stage)
         original = existing_scope(pg, stage)
         protected_before = protected_scope(pg, stage, original)
@@ -464,14 +486,13 @@ def run(args) -> int:
                     if not summary['retained_metadata_unchanged'] or not summary['prior_retained_scope_unchanged']:
                         raise chain.Refused('R02_PRIOR_SCOPE_OR_HISTORY_CHANGED')
                 if active_before is not None:
-                    after = chain.active_snapshot(pg, fingerprints)
+                    after = active_baseline(pg, chain, fingerprints, args.expected_active_version)
                     summary['postgresql_version_observed_after'] = after['postgresql_version']
                     summary['active_history_unchanged'] = active_before['history'] == after['history']
                     summary['active_capabilities_unchanged'] = active_before['capabilities'] == after['capabilities']
                     summary['active_protected_unchanged'] = active_before['protected_fingerprints'] == after['protected_fingerprints']
                     summary['active_protected_after'] = after['protected_fingerprints']
-                    if not after['exact_v50'] or not after['candidate_objects_absent'] \
-                            or active_before['postgresql_version'] != after['postgresql_version'] \
+                    if active_before['postgresql_version'] != after['postgresql_version'] \
                             or not all(summary[key] for key in ('active_history_unchanged', 'active_capabilities_unchanged', 'active_protected_unchanged')):
                         raise chain.Refused('R02_ACTIVE_READONLY_PROTECTION_CHECK_FAILED')
                 summary['retained_database_open_connections'] = connections(pg, stage)
@@ -520,6 +541,7 @@ if __name__ == '__main__':
     parser.add_argument('--session', default='local-astra-ut')
     parser.add_argument('--timeout', type=int, default=600)
     parser.add_argument('--pdf-mode', choices=('REQUIRED', 'HTML_ONLY'), default='REQUIRED')
+    parser.add_argument('--expected-active-version', type=int, choices=(50, 55), default=50)
     parser.add_argument('--font-path', type=Path, default=FONT_PATH)
     parser.add_argument('--font-sha256', default=FONT_SHA256)
     arguments = parser.parse_args()

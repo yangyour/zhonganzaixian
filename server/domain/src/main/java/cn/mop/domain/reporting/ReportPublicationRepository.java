@@ -63,5 +63,7 @@ public interface ReportPublicationRepository {
     List<Stored> list(Access access, int limit, Instant before, String beforeId);
     State command(Access access, String id, long expectedVersion, String action, String reason);
     ReadReceipt read(Access access, String id, long expectedVersion);
+    /** Read-only management view of frozen recipients and explicit first-read receipts. */
+    ReportReadership.Page readership(Access access, String id, ReportReadership.Filter filter, java.util.UUID after);
     Content content(Access access, String id, Format format);
 }

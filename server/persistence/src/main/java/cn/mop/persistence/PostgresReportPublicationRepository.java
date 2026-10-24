@@ -716,6 +716,69 @@ public final class PostgresReportPublicationRepository implements ReportPublicat
     }
 
     @Override
+    public ReportReadership.Page readership(
+        Access access,
+        String id,
+        ReportReadership.Filter filter,
+        UUID after
+    ) {
+        uuid(id);
+        if (filter == null) {
+            throw invalid();
+        }
+        // The write capability controls management visibility; this transaction performs SELECTs only.
+        return transaction(access, true, (connection, member) -> {
+            var stored = get(connection, access, member, id, false);
+            var receipts = new ArrayList<ReadReceipt>();
+            var names = new HashMap<UUID, String>();
+            try (
+                var statement = query(
+                    connection,
+                    "SELECT customer_id,document_sha256,first_read_at FROM public.mop_report_publication_read " +
+                        "WHERE tenant_id=?::uuid AND document_id=?::uuid"
+                )
+            ) {
+                statement.setString(1, access.tenantId());
+                statement.setString(2, id);
+                try (var rows = statement.executeQuery()) {
+                    while (rows.next()) {
+                        receipts.add(
+                            new ReadReceipt(
+                                UUID.fromString(access.tenantId()),
+                                UUID.fromString(id),
+                                rows.getObject(1, UUID.class),
+                                rows.getString(2),
+                                rows.getObject(3, OffsetDateTime.class).toInstant()
+                            )
+                        );
+                    }
+                }
+            }
+            try (
+                var statement = query(
+                    connection,
+                    "SELECT m.user_id,u.display_name FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id " +
+                        "WHERE m.tenant_id=?::uuid AND m.user_id=ANY(?::uuid[])"
+                )
+            ) {
+                statement.setString(1, access.tenantId());
+                var recipients = connection.createArrayOf("uuid", stored.state().recipients().toArray());
+                try {
+                    statement.setArray(2, recipients);
+                    try (var rows = statement.executeQuery()) {
+                        while (rows.next()) {
+                            names.put(rows.getObject(1, UUID.class), rows.getString(2));
+                        }
+                    }
+                } finally {
+                    recipients.free();
+                }
+            }
+            return ReportReadership.page(stored.state(), receipts, names, now(connection), filter, after);
+        });
+    }
+
+    @Override
     public Content content(Access a, String id, Format format) {
         return transaction(a, false, (c, m) -> {
             var stored = get(c, a, m, uuid(id), false);

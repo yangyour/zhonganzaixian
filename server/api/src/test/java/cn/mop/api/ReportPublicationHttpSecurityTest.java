@@ -175,4 +175,18 @@ class ReportPublicationHttpSecurityTest {
         ).andExpect(status().isBadRequest());
         verifyNoInteractions(reports);
     }
+
+    @Test
+    void readershipRequiresAuthenticationAndRejectsDuplicateQueryAndCustomerEnumeration() throws Exception {
+        String path = BASE + "/" + ID + "/readership";
+        mvc.perform(get(path)).andExpect(status().isUnauthorized());
+        mvc.perform(
+            get(path).session(session()).with(user(ACTOR)).param("filter", "ALL", "UNREAD")
+        ).andExpect(status().isBadRequest());
+        when(platform.membership(ACTOR, TENANT)).thenReturn(
+            Optional.of(new Membership(ACTOR, TENANT, "viewer", 7, true))
+        );
+        mvc.perform(get(path).session(session()).with(user(ACTOR))).andExpect(status().isForbidden());
+        verifyNoInteractions(reports);
+    }
 }

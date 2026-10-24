@@ -3,6 +3,7 @@ package cn.mop.api;
 import cn.mop.domain.*;
 import cn.mop.domain.reporting.ReportPublication.*;
 import cn.mop.domain.reporting.ReportPublicationRepository;
+import cn.mop.domain.reporting.ReportReadership;
 import cn.mop.domain.reporting.ReportPublicationRepository.*;
 import com.fasterxml.jackson.databind.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -154,6 +155,50 @@ public final class ReportPublicationController {
             },
             true
         );
+    }
+
+    /** Management-only readership of one published revision; reading never creates reminders or sends messages. */
+    @GetMapping("/{id}/readership")
+    Object readership(@PathVariable String id, HttpServletRequest request) {
+        var subject = subject(request);
+        uuid(id);
+        if (!subject.membership().capabilities().contains("inspection_quarterly_reports:write")) {
+            throw new DomainException(403, "ACTION_FORBIDDEN", "当前成员无报告阅读管理权限");
+        }
+        if (
+            !Set.of("filter", "after").containsAll(request.getParameterMap().keySet()) ||
+            request
+                .getParameterMap()
+                .values()
+                .stream()
+                .anyMatch(values -> values.length != 1)
+        ) {
+            throw invalid();
+        }
+        ReportReadership.Filter filter;
+        try {
+            filter =
+                request.getParameter("filter") == null
+                    ? ReportReadership.Filter.ALL
+                    : ReportReadership.Filter.valueOf(request.getParameter("filter"));
+        } catch (IllegalArgumentException bad) {
+            throw invalid();
+        }
+        UUID after =
+            request.getParameter("after") == null
+                ? null
+                : UUID.fromString(uuid(request.getParameter("after")));
+        var page = reports.readership(subject.access(), id, filter, after);
+        if (
+            page == null ||
+            !id.equals(page.documentId().toString()) ||
+            !subject.access().tenantId().equals(page.tenantId().toString()) ||
+            page.filter() != filter
+        ) {
+            throw unavailable();
+        }
+        DashboardReadAuthorization.recheck(request, platform, subject.membership());
+        return ApiResponse.success(json.convertValue(page, Map.class), request);
     }
 
     @PostMapping("/{id}/actions")

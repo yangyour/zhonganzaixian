@@ -15,6 +15,7 @@ import cn.mop.domain.inspection.InspectionWorksheet;
 import cn.mop.domain.inspection.InspectionWorksheetRepository;
 import cn.mop.domain.reporting.ReportPublication;
 import cn.mop.domain.reporting.ReportPublicationRepository;
+import cn.mop.domain.reporting.ReportReadership;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -460,6 +461,25 @@ class PostgresReportPublicationBusinessIntegrationTest {
         );
         assertDomain(404, "OBJECT_NOT_FOUND", () -> repository.get(access(excluded, tenant), id));
         assertDomain(404, "OBJECT_NOT_FOUND", () -> repository.get(access(foreignActor, foreignTenant), id));
+        var unread = repository.readership(access(creator, tenant), id, ReportReadership.Filter.UNREAD, null);
+        assertEquals(1, unread.totalRecipients());
+        assertEquals(1, unread.unreadCount());
+        assertEquals(0, unread.readCount());
+        assertEquals(recipient, unread.items().get(0).customerId());
+        assertNotNull(unread.items().get(0).displayName());
+        assertFalse(unread.items().get(0).followupDue());
+        assertTrue(
+            repository
+                .readership(access(creator, tenant), id, ReportReadership.Filter.FOLLOWUP_DUE, null)
+                .items()
+                .isEmpty()
+        );
+        assertDomain(403, "ACTION_FORBIDDEN", () ->
+            repository.readership(access(recipient, tenant), id, ReportReadership.Filter.ALL, null)
+        );
+        assertDomain(404, "OBJECT_NOT_FOUND", () ->
+            repository.readership(access(foreignActor, foreignTenant), id, ReportReadership.Filter.ALL, null)
+        );
         String readKey = UUID.randomUUID().toString();
         var first = read(repository, id, published.version(), readKey);
         assertEquals(normalized(first), normalized(read(repository, id, published.version(), readKey)));
@@ -473,6 +493,29 @@ class PostgresReportPublicationBusinessIntegrationTest {
             )
         );
         assertEquals(first.documentSha256(), published.document().documentSha256());
+        var readStats = repository.readership(access(creator, tenant), id, ReportReadership.Filter.ALL, null);
+        assertEquals(1, readStats.readCount());
+        assertEquals(0, readStats.unreadCount());
+        assertEquals(first.firstReadAt(), readStats.items().get(0).firstReadAt());
+        assertTrue(
+            repository
+                .readership(access(creator, tenant), id, ReportReadership.Filter.UNREAD, null)
+                .items()
+                .isEmpty()
+        );
+        setMemberActive(recipient, false);
+        assertEquals(
+            1,
+            repository
+                .readership(access(creator, tenant), id, ReportReadership.Filter.ALL, null)
+                .totalRecipients()
+        );
+        setMemberActive(recipient, true);
+        check(
+            "B_READERSHIP_SAME_REVISION",
+            "PASSED",
+            "Same revision unread/read counts and first receipt; inactive recipient retained; customer forbidden and foreign tenant 404; no reminder sent"
+        );
         saveOutputs(repository, published, "synthetic-isolated-publication");
         var content = repository.content(access(recipient, tenant), id, ReportPublication.Format.PDF);
         assertEquals(published.pdf().contentSha256(), content.sha256());

@@ -1,0 +1,146 @@
+{
+  "project": "众安在线MOP",
+  "base_commit": "73377117",
+  "status": "VERIFIED_READERSHIP_SLICE_WITH_EXPLICIT_SCOPE_LIMITS",
+  "created_at": "2026-10-24T09:52:06.890076+00:00",
+  "source_hashes": {
+    "apps/web/src/pages/ReportPublicationsPage.vue": "b2c5d062a01b1e2158cf5434c4d58e9f477326d928d43c79377262fc3efeb686",
+    "apps/web/src/components/ReportReadershipPanel.vue": "b095a0c5ad81fa392c8bdb0239380c4e2b67e249b0776e50c9c53143abb39448",
+    "apps/web/src/utils/reportReadership.ts": "e55e5aa5e3cd8ff829d18d005aecdb55aabbf12acc71b47c7722c6e7498badff",
+    "apps/web/tests/reportReadership.fixture.ts": "a5d2600ed97448008e7a5ff2903a0c85bcac3a45b346827132d623f70d4e8bdc",
+    "apps/web/tests/reportReadership.test.ts": "c89376ed33b9119a2e6821c05c131800a70f4121e970593c785c556cb6747293",
+    "apps/web/tests/reportReadershipPanel.test.ts": "4c2b92e8f1740e2f1d6cd803643168cf9117d8c019fdc237e2aa4f23393c341a",
+    "apps/web/qa/browser/report-readership.pw.ts": "71b065d08a03170663bf5749ce65f2044661516f90e68fc28d85f2a005c8d154",
+    "server/domain/src/main/java/cn/mop/domain/reporting/ReportReadership.java": "ebfebe61e4f4679a1ac4445f27712b7d685ec383866acb00469bfc4b7800f89b",
+    "server/domain/src/main/java/cn/mop/domain/reporting/ReportPublicationRepository.java": "7d8f3b908bc7ae3c87296296ae54e13a0bd35a45b1c0e37292128f1d235dbe92",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresReportPublicationRepository.java": "91967ba113d7cf4cdf9f03235ea2b80dcac044faa25f89d879030d5fda0860cc",
+    "server/api/src/main/java/cn/mop/api/ReportPublicationController.java": "157246131f9f1636b80cfd0b5d4a959db0ade8fdbcb42bffb5c457267fe479a4",
+    "server/api/src/test/java/cn/mop/api/ReportReadershipTest.java": "c2db6546cb1ce48e6c5e083a7d5d1d10219396cef9b6f91df93788041159360d",
+    "server/api/src/test/java/cn/mop/api/ReportReadershipControllerTest.java": "61171615de6d938ec4c0521db2f50e932af65ac0dab3dfd0a9622513c21fa034",
+    "server/api/src/test/java/cn/mop/api/ReportPublicationHttpSecurityTest.java": "306a6dbdd7dc8441bf91830878708f3828753acf7d23d3c64f14e25f4a18bdf6",
+    "server/api/src/test/java/cn/mop/persistence/PostgresReportPublicationBusinessIntegrationTest.java": "313b50e144fdb57f9b2b3f6c1034ab9d21457a47e01ea0eece6d40d2fe1f2791",
+    "tools/report-publication-contract.mjs": "c61dc877e1158fd3d2a1aa448ea4220202be84f1110e259c2e1fc8ba29c2e026",
+    "tools/verify-report-publication-business.py": "51f233a4b74ad199dcce799c7c1fe4efe90e3f8a816054d302ba6b38dd68ee82",
+    "tools/test_report_publication_active_baseline.py": "4c38abfa72765446132ccb0919ab3a873a234e1750b305f2267a030b89e64148",
+    "tests/report-readership-contract.test.mjs": "05c024309c52c8ffaca38e6fd5d288c3892053d7c3d7f823e7b8226d8ed92500",
+    "contracts/local-api.openapi.json": "a7d464e791b3bcdf892e1905fa6c73ea57358d2b643287384fe82a444c13fa89",
+    "package.json": "23f05bdb75139aae769cb87b98bacd177966b2839ad8da86ec6e835f24eb7856"
+  },
+  "java_full_reactor": {
+    "tests": 5351,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1140,
+    "executed": 4211
+  },
+  "web_full": {
+    "files": 342,
+    "tests": 5560,
+    "failures": 0
+  },
+  "web_targeted": {
+    "files": 4,
+    "tests": 41,
+    "failures": 0
+  },
+  "node_contracts": {
+    "tests": 217,
+    "failures": 0,
+    "reproducible": true
+  },
+  "python_explicit_active_schema_guard": {
+    "tests": 2,
+    "failures": 0
+  },
+  "postgresql": {
+    "version": "17.9 (Debian 17.9-1.pgdg12+1)",
+    "environment": "lan-test-20261008",
+    "active_schema": 55,
+    "retained_schema": 53,
+    "junit": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "checks": [
+      {
+        "status": "PASSED",
+        "id": "A_REAL_CAPTURE_AND_PREPARE",
+        "scope": "Source reasons retained; not approved or published"
+      },
+      {
+        "status": "PASSED",
+        "id": "A_HTML_FAILURE_AND_IDEMPOTENT_REPLAY",
+        "scope": "Real HTML stored; no replacement PDF"
+      },
+      {
+        "status": "PASSED",
+        "id": "A_REAL_PDF_RETURN_AND_APPROVAL_GATE",
+        "scope": "Returned output remains frozen and source approval remains blocked"
+      },
+      {
+        "status": "PASSED",
+        "id": "A_REVISION_CAPTURE_CONCURRENCY_AND_RECOVERY",
+        "scope": "One child per locked parent; original-command recovery, same-period, scope, source gates and immutable parent retained"
+      },
+      {
+        "status": "PASSED",
+        "id": "B_READERSHIP_SAME_REVISION",
+        "scope": "Same revision unread/read counts and first receipt; inactive recipient retained; customer forbidden and foreign tenant 404; no reminder sent"
+      },
+      {
+        "status": "PASSED",
+        "id": "B_ISOLATED_PUBLICATION_WORKFLOW",
+        "scope": "Synthetic ISOLATED_TEST initial state; not capture completeness or customer approval"
+      }
+    ],
+    "scope": "FRESH_SYNTHETIC_TENANTS_RETAINED_V53_NO_MIGRATIONS",
+    "positive_publication": "ISOLATED_TEST_INITIAL_STATE_NOT_CUSTOMER_SOURCE_APPROVAL",
+    "active_history_unchanged": true,
+    "active_capabilities_unchanged": true,
+    "active_protected_unchanged": true,
+    "retained_metadata_unchanged": true,
+    "prior_retained_scope_unchanged": true,
+    "test_actors_deactivated": true,
+    "pools_closed": true,
+    "environment_lock_released": true
+  },
+  "browser": {
+    "engine": "Microsoft Edge",
+    "tests": 2,
+    "viewports": [
+      1440,
+      1024
+    ],
+    "scope": "SYNTHETIC_IDENTITY_INTERCEPTED_API",
+    "axe_violations": 0,
+    "keyboard_scrolling": "PASSED",
+    "failure_cursor_retry": "PASSED",
+    "revocation": "PASSED",
+    "visual_review": "TWO_FINAL_SCREENSHOTS_REVIEWED"
+  },
+  "build": {
+    "typecheck": "PASSED",
+    "production_build": "PASSED",
+    "static_policy": "PASSED"
+  },
+  "schema_migrations": 0,
+  "external_messages": 0,
+  "deployment": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "failures_preserved": [
+    "PowerShell initially split a dotted Maven argument; quoted and reran",
+    "Rule boundary fixture initially used forbidden nanoseconds; corrected to UTC milliseconds",
+    "New contract test initially omitted URN namespace; fixed test identifier",
+    "Original retained-business tool required historical active V50; explicitly pinned V55 and validated all five objects",
+    "Added scrolling region initially lacked keyboard focus; added focusable labelled region and real keyboard assertion"
+  ],
+  "remaining": [
+    "Cross-report worklist and recorded followup actions/intents",
+    "Supplier reminders and authenticated delivery receipts",
+    "Monthly/health/annual sources and approved templates",
+    "Actual HTTP/browser positive integration and formal customer acceptance",
+    "Actual PostgreSQL 1000-recipient scale test"
+  ]
+}

@@ -8,6 +8,7 @@ import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import { createReportCommands, readPublication, type Publication } from '../utils/reportPublications'
 import { fetchPublicationContent } from '../utils/reportPublicationContent'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+import ReportReadershipPanel from '../components/ReportReadershipPanel.vue'
 const route=useRoute(),items=ref<Publication[]>([]),selected=ref<Publication|null>(null),loading=ref(false),error=ref<unknown>(null),next=ref<{before:string;before_id:string}|null>(null),reason=ref('')
 const router=useRouter()
 const detailHeading=ref<HTMLElement|null>(null)
@@ -128,6 +129,7 @@ onUnmounted(()=>{epoch++;abort?.abort();command.dispose();unregister();window.re
    <div v-if="manager&&['REVIEW_REQUIRED','APPROVED'].includes(selected.state.phase)"><label>退回原因<input v-model="reason" maxlength="3000" :disabled="locked" /></label><button :disabled="locked||!reason.trim()" @click="action('RETURN')">退回</button></div>
    <div class="actions"><button v-if="selected.state.html" :disabled="locked" @click="download('html')">{{writable?'下载 HTML':'登记阅读并下载 HTML'}}</button><button v-if="selected.state.pdf" :disabled="locked" @click="download('pdf')">{{writable?'下载 PDF':'登记阅读并下载 PDF'}}</button></div>
    <p>发布和阅读记录不代表客户验收；交付意图不代表已发送。下载含租户数据，离线副本无法随撤权收回。</p>
+   <ReportReadershipPanel v-if="writable&&selected.state.phase==='PUBLISHED'" :key="selected.state.document.id" :id="selected.state.document.id" :hash="selected.state.document.document_sha256" :version="selected.state.version" />
   </section>
  </section>
 </template>

@@ -637,7 +637,9 @@
         "docs/evidence/local-astra-ut-20261023/r02-retained-business/pdf-qa.json",
         "docs/report-revisions-20261024.md",
         "docs/evidence/report-revisions-20261024/validation.json",
-        "docs/remote-release-20261024.md"
+        "docs/remote-release-20261024.md",
+        "docs/report-readership-20261024.md",
+        "docs/evidence/report-readership-20261024/validation.json"
       ],
       "commits": [
         "25a17013",
@@ -651,15 +653,16 @@
         "Separate ISOLATED_TEST initial-state fixture verified actual repository/FOP approval/publication/recipient ACL/first read/replay/resend-intent/revocation; no external dispatch or customer approval",
         "Two actual PDFs (four pages) and three HTML artifacts produced; normalized text equality, bounds and all-page Poppler visual inspection passed; generic technical layout is not a customer-approved template",
         "Immutable report revisions now connect same-quarter frozen sources, parent/version locking, no-fork concurrency, durable replay, API and source-selection UI; designated retained V53 business tests and synthetic real-browser flow verified separately",
-        "Runtime source b964701b deployed to designated active V55; 462 HTTP checks and seven actual-API desktop reads verified. Empty publication lists and read checks do not complete nonempty write/customer workflows."
+        "Runtime source b964701b deployed to designated active V55; 462 HTTP checks and seven actual-API desktop reads verified. Empty publication lists and read checks do not complete nonempty write/customer workflows.",
+        "Published-revision readership API/panel with same-receipt-set counts, ALL/UNREAD/strict-over-7-days filtering, 50-reader UUID cursor and scoped retries/revocation; designated retained PG first-read/isolation and 1440/1024 synthetic Edge keyboard/axe verified"
       ],
       "remaining_subitems": [
         "Monthly boss/full, health-check and annual source/template adapters",
-        "Reader dashboard and unread followup integration",
+        "Cross-report readership worklist, recorded followup actions and notification intent/dispatch; per-revision read-only dashboard is implemented and independently verified",
         "Source verification, customer approval policy/template gates",
         "Real HTTP/browser integration and formal customer template/layout acceptance; retained-V53 transaction/FOP scope is separately verified"
       ],
-      "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
+      "review_baseline_commit": "73377117"
     },
     {
       "id": "R03",

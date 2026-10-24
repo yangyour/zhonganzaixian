@@ -855,7 +855,7 @@
       "rule_code" : "SYNTHETIC_RULE_0",
       "rule_name" : "合成监控规则 0",
       "severity" : "DISASTER",
-      "simulate_autoticket_failure" : true,
+      "simulate_autoticket_failure" : false,
       "source_event_id" : "synthetic-source-2",
       "source_phase" : "PROBLEM"
     },

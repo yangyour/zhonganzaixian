@@ -131,6 +131,7 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
     }
 
     private EventSummary ingestInternal(Connection c, Access a, IngestEventCommand cmd, String rawEventId) throws SQLException {
+        if (cmd.simulateAutoTicketFailure()) MonitoringSimulationGuard.requireIsolated(c, a.tenantId());
         String assetName = requireAssetName(c, a.tenantId(), cmd.assetId());
         String fp = MonitoringEventPipeline.fingerprint(a.tenantId(), cmd.assetId(), cmd.ruleCode());
         lock(c, "mop.monitoring_event|" + fp);

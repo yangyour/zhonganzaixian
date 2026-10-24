@@ -228,10 +228,16 @@
         "M4-18",
         "M4-19"
       ],
-      "status": "OPEN",
+      "status": "IN_PROGRESS",
       "completion_criterion": "完成注册任务、参数/OID/模板消费、显式应用与首值回读、失败恢复，234项目录仅按已获参数配置，不假设全部已采集。",
-      "evidence": [],
-      "commits": []
+      "evidence": [
+        "docs/monitoring-simulation-boundary-20261024.md",
+        "docs/evidence/dot-continuation-20261023/m02-simulation-boundary.json"
+      ],
+      "commits": [],
+      "completed_subitems": [
+        "Public event intake rejects deliberate auto-ticket failure; internal simulation is limited to explicit isolated PostgreSQL and non-protected tenants, with historical customer-tenant fixture fallback removed. No real component run."
+      ]
     },
     {
       "id": "M03",

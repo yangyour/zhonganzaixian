@@ -1,0 +1,40 @@
+{
+  "status": "CODE_VALIDATED_SIMULATION_BOUNDARY",
+  "recorded_at": "2026-10-24T00:05:49Z",
+  "local_full_java": {
+    "tests": 5088,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1120,
+    "executed": 3968
+  },
+  "targeted_java": {
+    "tests": 115,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "independent_origin_main": {
+    "base": "f9d8c59c26217410a350ed0104de4f0413c14a5e",
+    "tests": 115,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "node_contracts": {
+    "tests": 256,
+    "failures": 0
+  },
+  "public_schema_shape_changed": false,
+  "public_true_simulation_status": 422,
+  "normal_false_input_preserved": true,
+  "protected_tenant_write_guard": true,
+  "historical_fixture_tenant_fallback_removed": true,
+  "real_postgresql": "NOT_RUN",
+  "browser": "NOT_RUN",
+  "real_tenant_writes": 0,
+  "migrations_applied": 0,
+  "deployed": false,
+  "formal_acceptance": "NOT_RUN",
+  "remote_integration": "PENDING_AFTER_INDEPENDENT_VALIDATION"
+}

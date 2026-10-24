@@ -25,11 +25,13 @@ class PostgresMonitoringEventCenterIntegrationTest {
     static PostgresPlatformRepository platform;
     static PostgresMonitoringEventCenterRepository events;
     static final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
-    static final String TENANT = "55000000-0000-4000-8000-000000000001";
+    static final String TENANT = System.getenv("MOP_MONITORING_TEST_TENANT_ID");
     static String padmin, msp, assetA, assetB;
     static long padminVersion, mspVersion;
 
     @BeforeAll static void connect() throws SQLException {
+        // No historical fixture identity or actual customer namespace may be reused for synthetic writes.
+        MonitoringSimulationGuard.requireTestConfiguration(System.getenv("SPRING_DATASOURCE_URL"), TENANT);
         var cfg = new HikariConfig();
         cfg.setJdbcUrl(System.getenv("SPRING_DATASOURCE_URL"));
         cfg.setUsername("mop_test_runtime");

@@ -108,6 +108,8 @@ public final class MonitoringEventCenterController {
         Instant occurredAt = b.get("occurred_at").isNull() ? null : parseInstant(b.get("occurred_at"));
         if (!b.get("simulate_autoticket_failure").isBoolean()) throw invalid();
         boolean simulateFail = b.get("simulate_autoticket_failure").booleanValue();
+        if (simulateFail) throw new DomainException(422, "MONITORING_SIMULATION_FORBIDDEN",
+            "事件接入不接受人为建单失败；故障模拟仅限明确隔离的内部测试");
         IngestEventCommand cmd = new IngestEventCommand(assetId, ruleCode, ruleName, severity, phase, sourceEventId, occurredAt, simulateFail);
         String key = idempotencyKey(r);
         String digest = digest("EVENT_INGEST_V1\n" + assetId + "\n" + ruleCode + "\n" + ruleName + "\n" + severity.name() + "\n" + phase.name() + "\n" + sourceEventId + "\n" + occurredAt + "\n" + simulateFail);

@@ -70,22 +70,40 @@ public class FileController {
         return success(result,request);
     }
 
-    @GetMapping("/files/{id}/content") ResponseEntity<byte[]> content(@PathVariable String id,HttpServletRequest request){
-        Access access=access(request,false);Map<String,String[]> query=request.getParameterMap();
-        if(!query.keySet().equals(Set.of("grant"))||query.get("grant").length!=1||!query.get("grant")[0].matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))throw invalid("仅接受一个合法的 grant 查询参数");
-        String grant=query.get("grant")[0];Map<String,Object> location=repository.photoContent(access.tenant,access.actor,id,grant);
+    /** Releases original bytes only while the grant, scan publication and current session remain authorized. */
+    @GetMapping("/files/{id}/content")
+    ResponseEntity<byte[]> content(@PathVariable String id, HttpServletRequest request) {
+        Access access = access(request, false);
+        Map<String, String[]> query = request.getParameterMap();
+        if (!query.keySet().equals(Set.of("grant")) || query.get("grant").length != 1
+                || !query.get("grant")[0].matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")) {
+            throw invalid("仅接受一个合法的 grant 查询参数");
+        }
+        String grant = query.get("grant")[0];
+        Map<String, Object> location = repository.photoContent(access.tenant(), access.actor(), id, grant);
         long releaseVersion = requireReleased(access, id);
-        byte[] original=store.read((String)location.get("object_key"),((Number)location.get("byte_size")).longValue(),(String)location.get("sha256"));
+        byte[] original = store.read((String) location.get("object_key"),
+                ((Number) location.get("byte_size")).longValue(), (String) location.get("sha256"));
         // Storage I/O can outlive a role change. Recheck the persisted grant before returning bytes.
-        Map<String,Object> confirmed=repository.photoContent(access.tenant,access.actor,id,grant);
+        Map<String, Object> confirmed = repository.photoContent(access.tenant(), access.actor(), id, grant);
         if (requireReleased(access, id) != releaseVersion) {
             throw new DomainException(409, "VERSION_CONFLICT", "附件安全状态在读取期间发生变化，请重新确认");
         }
-        if(!location.equals(confirmed))throw missing();
-        repository.audit(access.actor,access.tenant,"file.content.read","file",id,"SUCCEEDED","ACTIVE_SCAN_RELEASE_AND_ORIGINAL_BYTES_VERIFIED",trace(request));
-        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).header("X-Content-Type-Options","nosniff")
-            .header(HttpHeaders.CONTENT_DISPOSITION,ContentDisposition.inline().filename((String)location.get("original_name"),StandardCharsets.UTF_8).build().toString())
-            .contentType(MediaType.parseMediaType((String)location.get("media_type"))).contentLength(original.length).body(original);
+        if (!location.equals(confirmed)) {
+            throw missing();
+        }
+        // Binary responses bypass the standard JSON advice; recheck identity before recording success or releasing bytes.
+        DashboardReadAuthorization.recheck(request, repository, access.membership());
+        repository.audit(access.actor(), access.tenant(), "file.content.read", "file", id, "SUCCEEDED",
+                "ACTIVE_SCAN_RELEASE_AND_ORIGINAL_BYTES_VERIFIED", trace(request));
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore())
+                .header("X-Content-Type-Options", "nosniff")
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline()
+                        .filename((String) location.get("original_name"), StandardCharsets.UTF_8).build().toString())
+                .contentType(MediaType.parseMediaType((String) location.get("media_type")))
+                .contentLength(original.length)
+                .body(original);
     }
 
     private Access access(HttpServletRequest request,boolean write){

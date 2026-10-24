@@ -582,7 +582,10 @@
         "docs/report-publication-continuation-20261023.md",
         "docs/evidence/dot-continuation-20261023/r02.json",
         "docs/designated-candidate-schema-chain-20261023.md",
-        "docs/evidence/local-astra-ut-20261023/schema-chain/summary.json"
+        "docs/evidence/local-astra-ut-20261023/schema-chain/summary.json",
+        "docs/report-publication-retained-business-20261024.md",
+        "docs/evidence/local-astra-ut-20261023/r02-retained-business/summary.json",
+        "docs/evidence/local-astra-ut-20261023/r02-retained-business/pdf-qa.json"
       ],
       "commits": [
         "25a17013",
@@ -590,13 +593,16 @@
       ],
       "completed_subitems": [
         "Quarterly frozen-source publication repository, V53 applied/frozen in designated isolated schema validation, exact XHTML/PDF renderer, authenticated API/report center, durable command recovery and read receipts; no outbound dispatch",
-        "V53 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50"
+        "V53 applied once and repeat zero on retained owned designated-PG schema-only validation databases; schema/ACL/nonempty row locks/first revisions verified, business validation separate; active mop_test remains V50",
+        "Designated retained-V53 PG integration scenario passed: real source capture/frozen read and actual HTML/PDF failed-render retry, idempotency and return while source/template approval remains gated",
+        "Separate ISOLATED_TEST initial-state fixture verified actual repository/FOP approval/publication/recipient ACL/first read/replay/resend-intent/revocation; no external dispatch or customer approval",
+        "Two actual PDFs (four pages) and three HTML artifacts produced; normalized text equality, bounds and all-page Poppler visual inspection passed; generic technical layout is not a customer-approved template"
       ],
       "remaining_subitems": [
         "Monthly boss/full, health-check and annual source/template adapters",
         "Revision generation, reader dashboard and unread followup integration",
         "Source verification, customer approval policy/template gates",
-        "Retained V53 real business transactions, actual font/rendering and browser integration; formal acceptance"
+        "Real HTTP/browser integration and formal customer template/layout acceptance; retained-V53 transaction/FOP scope is separately verified"
       ],
       "review_baseline_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
     },
@@ -2301,7 +2307,7 @@
       "P01 diagnostic matrix": "71bc7a95",
       "A05 same-ID tenant and wire regression": "df92a03d"
     },
-    "remaining": "See each task; N01 retained PG business checks now separately evidenced, R02 business/rendering checks are still in preparation"
+    "remaining": "See each task; N01 retained business and R02 retained transaction/FOP evidence now recorded separately, full customer/provider/browser gates remain"
   },
   "reviewed_main_commit": "df92a03d8618237896f2ec7f4ac6d71f537ac65e"
 }

@@ -1,0 +1,352 @@
+{
+  "schema_version": 1,
+  "status": "PASSED_WITH_EXPLICIT_SCOPE_LIMITS",
+  "run_id": "b45de5e4f98c42b895f5135e00ea0a0c",
+  "environment": "lan-test-20261008",
+  "database": "mop_report_test_449b59f37319",
+  "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:R02:a979bbeaf7494742a773273953c55216",
+  "schema_mode": "PREAPPLIED_V53",
+  "source_summary": ".local\\candidate-schema-chain-attempt-1\\summary.json",
+  "source_summary_sha256": "0295ff4b9ec23441ebb28b9a839458efa24d90fa5ed5baad1c16a949f894b1a7",
+  "schema_migrations": 0,
+  "database_created": false,
+  "database_removed": false,
+  "records_deleted": 0,
+  "actual_tenant_written": false,
+  "external_messages": 0,
+  "production_approved": false,
+  "pdf_mode": "REQUIRED",
+  "font": {
+    "status": "READ_ONLY_VERIFIED",
+    "path": "C:\\Windows\\Fonts\\simhei.ttf",
+    "sha256": "9b1959db3b3abeb7efdaec26edf7dfe871a6039de8d614af7248575207be629e",
+    "renderer_font_identity_sha256": "e172ae05d942cc3ecf3cccc724cbb7c9521759c7cefe4a3e5973bdfff4f90464",
+    "copied": false
+  },
+  "started_at": "2026-10-24T04:20:12.566620+00:00",
+  "formal_contract_acceptance": "NOT_RUN",
+  "business_validation": {
+    "status": "PASSED_WITH_EXPLICIT_SCOPE_LIMITS",
+    "junit_scenarios": 1,
+    "visual_review": "NOT_RUN",
+    "layer_a": "REAL_CAPTURE_REMAINS_APPROVAL_GATED",
+    "layer_b": "PASSED_ISOLATED_TEST_INITIAL_STATE",
+    "pdf": "PASSED_ACTUAL_FOP_OUTPUT",
+    "limitations": [
+      "NO_CUSTOMER_SOURCE_OR_TEMPLATE_APPROVAL",
+      "NO_REAL_EXTERNAL_DELIVERY",
+      "NO_HTTP_BROWSER_OR_VISUAL_ACCEPTANCE",
+      "NO_FORMAL_FEE_CONFIGURATION"
+    ]
+  },
+  "postgresql_version": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "postgresql_version_observed_before": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "retained_metadata_before": {
+    "history_rows": 53,
+    "history_sha256": "0f4141b0c23bf250f8f29b6e6707154e1e453db200804a47384ade232e35e384",
+    "canonical_history_sha256": "232f9817a11714d5559d13eb96dcc1673a9057a101cbc622373805a50e78954b",
+    "capabilities_sha256": "2b0cc4459a86b81c0bf26937ae4acfb0d30cba5f26070c00efbf3c16a96307d4",
+    "v53_checksum": 1372829874,
+    "v53_installed_on": "2026-10-23T23:25:26.927154"
+  },
+  "active_history_before_sha256": "6fa366487907d87627afb9775740ee68b5d671acb91f829c533f2b1ce2509a69",
+  "active_protected_before": {
+    "mop_inspection_source_collection": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_source_collection_item": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_quarterly_report": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_worksheet": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_worksheet_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_membership": {
+      "count": 1,
+      "md5": "440ffbc5f7524eea75de6adf6212b2e3"
+    },
+    "mop_asset": {
+      "count": 4,
+      "md5": "6fd9eac57b972735155dbe38fde8511c"
+    },
+    "mop_ticket": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_ticket_workflow_event": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_ticket_lifecycle_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_asset_manual_details": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_asset_manual_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    }
+  },
+  "java_started": true,
+  "java_process_completed": true,
+  "test_class": "PostgresReportPublicationBusinessIntegrationTest",
+  "maven_exit_code": 0,
+  "junit": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "file": "synthetic-captured-quarter.html",
+      "bytes": 4538,
+      "sha256": "34ebd142dbb7d646762a3b197f2db61c25b7e496d4bc20e85eb5ce8f689b97cc",
+      "visual_review": "NOT_RUN"
+    },
+    {
+      "file": "synthetic-captured-quarter.pdf",
+      "bytes": 38611,
+      "sha256": "91c695f28fcc4feb0ae27dd27afbd7f3560cc5465a311077d8f60bdbcd5b4ae9",
+      "visual_review": "NOT_RUN"
+    },
+    {
+      "file": "synthetic-isolated-publication.html",
+      "bytes": 4466,
+      "sha256": "a43245936115f42ad702409fca13837056a125c9145a4af494dffd79b4f23b38",
+      "visual_review": "NOT_RUN"
+    },
+    {
+      "file": "synthetic-isolated-publication.pdf",
+      "bytes": 37662,
+      "sha256": "a720ca67b777d8040966bf1a0b23ab0878f99f033514ea6ed346b353e8841634",
+      "visual_review": "NOT_RUN"
+    },
+    {
+      "file": "synthetic-render-failure.html",
+      "bytes": 4538,
+      "sha256": "34ebd142dbb7d646762a3b197f2db61c25b7e496d4bc20e85eb5ce8f689b97cc",
+      "visual_review": "NOT_RUN"
+    }
+  ],
+  "java_business_evidence": {
+    "status": "PASSED_WITH_EXPLICIT_SCOPE_LIMITS",
+    "database": "mop_report_test_449b59f37319",
+    "owner_marker": "MOP_CANDIDATE_CHAIN:d64df838d0dc49ef93066fbf0b886ab8:R02:a979bbeaf7494742a773273953c55216",
+    "schema_mode": "PREAPPLIED_V53",
+    "schema_migrations": 0,
+    "external_dispatch_enabled": false,
+    "customer_template_confirmation": null,
+    "formal_fee_configuration": null,
+    "formal_contract_acceptance": "NOT_RUN",
+    "test_tenants": [
+      "4c35aff3-757c-4bbd-a433-05e7f1f0d2a2",
+      "a4918580-1ebd-4ec4-a2d4-d371aae17cb9"
+    ],
+    "test_actors": [
+      "be39ae2d-e50c-4586-934f-5d73b25c5a5e",
+      "5810d584-0dc1-44bb-96bf-368a4c627066",
+      "bd2a8f93-57b1-4c9a-ad86-7fa4909ca578",
+      "8f299e1d-d068-41c1-a531-9ed88835ec6a",
+      "29468bea-6683-4e1c-95d4-0cf68de95f79",
+      "6159dd2b-8021-4de3-a24d-36e239d68f4d"
+    ],
+    "identity_source": "r02_business_validation",
+    "test_actor_memberships": [
+      {
+        "subject": "SYNTHETIC_R02_be39ae2d-e50c-4586-934f-5d73b25c5a5e",
+        "actor_id": "be39ae2d-e50c-4586-934f-5d73b25c5a5e",
+        "role": "padmin",
+        "tenant_id": "4c35aff3-757c-4bbd-a433-05e7f1f0d2a2"
+      },
+      {
+        "subject": "SYNTHETIC_R02_5810d584-0dc1-44bb-96bf-368a4c627066",
+        "actor_id": "5810d584-0dc1-44bb-96bf-368a4c627066",
+        "role": "padmin",
+        "tenant_id": "4c35aff3-757c-4bbd-a433-05e7f1f0d2a2"
+      },
+      {
+        "subject": "SYNTHETIC_R02_bd2a8f93-57b1-4c9a-ad86-7fa4909ca578",
+        "actor_id": "bd2a8f93-57b1-4c9a-ad86-7fa4909ca578",
+        "role": "padmin",
+        "tenant_id": "4c35aff3-757c-4bbd-a433-05e7f1f0d2a2"
+      },
+      {
+        "subject": "SYNTHETIC_R02_8f299e1d-d068-41c1-a531-9ed88835ec6a",
+        "actor_id": "8f299e1d-d068-41c1-a531-9ed88835ec6a",
+        "role": "viewer",
+        "tenant_id": "4c35aff3-757c-4bbd-a433-05e7f1f0d2a2"
+      },
+      {
+        "subject": "SYNTHETIC_R02_29468bea-6683-4e1c-95d4-0cf68de95f79",
+        "actor_id": "29468bea-6683-4e1c-95d4-0cf68de95f79",
+        "role": "viewer",
+        "tenant_id": "4c35aff3-757c-4bbd-a433-05e7f1f0d2a2"
+      },
+      {
+        "subject": "SYNTHETIC_R02_6159dd2b-8021-4de3-a24d-36e239d68f4d",
+        "actor_id": "6159dd2b-8021-4de3-a24d-36e239d68f4d",
+        "role": "padmin",
+        "tenant_id": "a4918580-1ebd-4ec4-a2d4-d371aae17cb9"
+      }
+    ],
+    "seed_committed": true,
+    "pools_closed": true,
+    "identity_cleanup_owner": "ROOT_RUNNER_AFTER_JVM_EXIT_AND_ZERO_CONNECTIONS",
+    "pdf_mode": "REQUIRED",
+    "checks": [
+      {
+        "id": "A_REAL_CAPTURE_AND_PREPARE",
+        "scope": "Source reasons retained; not approved or published",
+        "status": "PASSED"
+      },
+      {
+        "id": "A_HTML_FAILURE_AND_IDEMPOTENT_REPLAY",
+        "scope": "Real HTML stored; no replacement PDF",
+        "status": "PASSED"
+      },
+      {
+        "id": "A_REAL_PDF_RETURN_AND_APPROVAL_GATE",
+        "scope": "RETURNED has no revise API; capture publication remains blocked",
+        "status": "PASSED"
+      },
+      {
+        "id": "B_ISOLATED_PUBLICATION_WORKFLOW",
+        "scope": "Synthetic ISOLATED_TEST initial state; not capture completeness or customer approval",
+        "status": "PASSED"
+      }
+    ],
+    "history_before": "232f9817a11714d5559d13eb96dcc1673a9057a101cbc622373805a50e78954b",
+    "captured_source_id": "db5305be-b1c7-4c5b-93cd-f5e3475ccbf1",
+    "captured_source_sha256": "527d67b4e5a37d260888d664a260c739a2def8221103aec6a8d86ef3e8b25835",
+    "synthetic-captured-quarter": {
+      "pages": 2,
+      "pdf_sha256": "91c695f28fcc4feb0ae27dd27afbd7f3560cc5465a311077d8f60bdbcd5b4ae9",
+      "html_sha256": "34ebd142dbb7d646762a3b197f2db61c25b7e496d4bc20e85eb5ce8f689b97cc",
+      "font_identity_sha256": "e172ae05d942cc3ecf3cccc724cbb7c9521759c7cefe4a3e5973bdfff4f90464",
+      "renderer": "APACHE_FOP_2.12_XHTML_1",
+      "visual_review": "NOT_RUN",
+      "document_sha256": "378055316a7eef27828fe8784b826628840b61db9ff5da49f63c8c8695052936"
+    },
+    "isolated_fixture_scope": "ISOLATED_TEST; initial state injected only for repository workflow validation; source output unchanged",
+    "synthetic-isolated-publication": {
+      "pages": 2,
+      "pdf_sha256": "a720ca67b777d8040966bf1a0b23ab0878f99f033514ea6ed346b353e8841634",
+      "html_sha256": "a43245936115f42ad702409fca13837056a125c9145a4af494dffd79b4f23b38",
+      "font_identity_sha256": "e172ae05d942cc3ecf3cccc724cbb7c9521759c7cefe4a3e5973bdfff4f90464",
+      "renderer": "APACHE_FOP_2.12_XHTML_1",
+      "visual_review": "NOT_RUN",
+      "document_sha256": "7eb8f2d5ab65aa49e1bdaf296479eaf157efbfb81e43997e6a6b760e178ebfd9"
+    },
+    "isolated_publication_id": "53db6127-2815-48e2-ae57-dcb115ee3745",
+    "captured_source_publication": "BLOCKED_BY_UNVERIFIED_SOURCE_AND_TEMPLATE",
+    "history_after": "232f9817a11714d5559d13eb96dcc1673a9057a101cbc622373805a50e78954b",
+    "database_retained": true
+  },
+  "java_lifecycle_confirmed_closed": true,
+  "connections_before_actor_cleanup": 0,
+  "actor_cleanup": {
+    "status": "DEACTIVATED",
+    "users_changed": 6,
+    "memberships_changed": 5,
+    "declared_actors": 6,
+    "declared_memberships": 6,
+    "records_deleted": 0
+  },
+  "retained_metadata_after": {
+    "history_rows": 53,
+    "history_sha256": "0f4141b0c23bf250f8f29b6e6707154e1e453db200804a47384ade232e35e384",
+    "canonical_history_sha256": "232f9817a11714d5559d13eb96dcc1673a9057a101cbc622373805a50e78954b",
+    "capabilities_sha256": "2b0cc4459a86b81c0bf26937ae4acfb0d30cba5f26070c00efbf3c16a96307d4",
+    "v53_checksum": 1372829874,
+    "v53_installed_on": "2026-10-23T23:25:26.927154"
+  },
+  "retained_metadata_unchanged": true,
+  "prior_retained_scope_unchanged": true,
+  "postgresql_version_observed_after": "17.9 (Debian 17.9-1.pgdg12+1)",
+  "active_history_unchanged": true,
+  "active_capabilities_unchanged": true,
+  "active_protected_unchanged": true,
+  "active_protected_after": {
+    "mop_inspection_source_collection": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_source_collection_item": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_quarterly_report": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_worksheet": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_inspection_worksheet_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_membership": {
+      "count": 1,
+      "md5": "440ffbc5f7524eea75de6adf6212b2e3"
+    },
+    "mop_asset": {
+      "count": 4,
+      "md5": "6fd9eac57b972735155dbe38fde8511c"
+    },
+    "mop_ticket": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_ticket_workflow_event": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_ticket_lifecycle_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_asset_manual_details": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "mop_asset_manual_revision": {
+      "count": 0,
+      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+    }
+  },
+  "retained_database_open_connections": 0,
+  "source_summary_unchanged": true,
+  "v53_resource_unchanged": true,
+  "font_unchanged": true,
+  "finished_at": "2026-10-24T04:22:47.975152+00:00",
+  "environment_lock_released": true,
+  "execution_source": {
+    "base_commit": "292c5da6491109d4673247b57baf80f8f3fa8687",
+    "validation_overlay_sha256": {
+      "tools/verify-report-publication-business.py": "7e3cd7d75b018966a4f585ce46ce45c1ee8fc0749d64ba80647f1a891bffa3b5",
+      "server/api/src/test/java/cn/mop/persistence/PostgresReportPublicationBusinessIntegrationTest.java": "fa6ed6bba4f0b0ddc0104780890396a8493849515caffdcb6182327d91892a42"
+    }
+  },
+  "post_run_visual_qa": {
+    "status": "PASSED_ALL_FOUR_RENDERED_PAGES",
+    "evidence": "docs/evidence/local-astra-ut-20261023/r02-retained-business/pdf-qa.json",
+    "rendered_pages": 4,
+    "formal_template_approval": false
+  }
+}

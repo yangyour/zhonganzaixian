@@ -1,0 +1,73 @@
+{
+  "status": "PASSED",
+  "visual_inspection": "PASSED_ALL_FOUR_RENDERED_PAGES",
+  "scope": "SYNTHETIC_ACTUAL_FOP_OUTPUT_ONLY",
+  "documents": [
+    {
+      "file": "synthetic-captured-quarter.pdf",
+      "pdf_sha256": "91c695f28fcc4feb0ae27dd27afbd7f3560cc5465a311077d8f60bdbcd5b4ae9",
+      "pages": 2,
+      "normalized_html_pdf_text_equal": true,
+      "html_characters": 2899,
+      "pdf_characters": 2899,
+      "page_bounds": [
+        {
+          "page": 1,
+          "width": 595.275,
+          "height": 841.889,
+          "characters": 1660,
+          "outside_page_safety_margin": 0
+        },
+        {
+          "page": 2,
+          "width": 595.275,
+          "height": 841.889,
+          "characters": 1525,
+          "outside_page_safety_margin": 0
+        }
+      ],
+      "previews": [
+        "pdf-previews\\synthetic-captured-quarter-1.png",
+        "pdf-previews\\synthetic-captured-quarter-2.png"
+      ]
+    },
+    {
+      "file": "synthetic-isolated-publication.pdf",
+      "pdf_sha256": "a720ca67b777d8040966bf1a0b23ab0878f99f033514ea6ed346b353e8841634",
+      "pages": 2,
+      "normalized_html_pdf_text_equal": true,
+      "html_characters": 2848,
+      "pdf_characters": 2848,
+      "page_bounds": [
+        {
+          "page": 1,
+          "width": 595.275,
+          "height": 841.889,
+          "characters": 1676,
+          "outside_page_safety_margin": 0
+        },
+        {
+          "page": 2,
+          "width": 595.275,
+          "height": 841.889,
+          "characters": 1458,
+          "outside_page_safety_margin": 0
+        }
+      ],
+      "previews": [
+        "pdf-previews\\synthetic-isolated-publication-1.png",
+        "pdf-previews\\synthetic-isolated-publication-2.png"
+      ]
+    }
+  ],
+  "inspected_at": "2026-10-24T04:25:21.313863+00:00",
+  "visual_findings": [
+    "Chinese and Latin glyphs legible; no replacement boxes observed",
+    "Long digests and headings wrap without clipping or overlap",
+    "All four pages checked from 96 DPI Poppler PNGs",
+    "Generic frozen-output technical layout only; formal customer template approval and HTTP/browser acceptance remain outside scope"
+  ],
+  "rendering_tool": "Bundled Poppler pdftoppm, 96 DPI PNG",
+  "text_comparison": "HTML body and extracted PDF text compared after removing whitespace and renderer line-break U+200B/U+FEFF only",
+  "qa_script_sha256": "bb205e5328a6e95a0b6bb5b8f846799bc32de55d3adba48d23d41ad5ac3743c4"
+}
